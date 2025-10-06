@@ -31,6 +31,7 @@
     "scripts",
     "scripts/**",
     "prisma/seed.cjs",
-    "prisma/seed.js"
+    "prisma/seed.js",
+    "seed-communication-templates.ts"
   ]
 }
