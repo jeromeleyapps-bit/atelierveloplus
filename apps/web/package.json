@@ -117,8 +117,5 @@
   "author": "Jerome Leyssard",
   "license": "ISC",
   "homepage": "./",
-  "type": "commonjs",
-  "prisma": {
-    "seed": "node prisma/seed.cjs"
-  }
+  "type": "commonjs"
 }
