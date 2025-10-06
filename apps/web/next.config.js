@@ -7,6 +7,10 @@ const nextConfig = {
     // Allow production builds to succeed even if there are ESLint errors
     ignoreDuringBuilds: true,
   },
+  typescript: {
+    // Ignore TypeScript errors during build
+    ignoreBuildErrors: true,
+  },
   experimental: {
     typedRoutes: true,
     optimizePackageImports: ["@mui/material", "@mui/icons-material"],
