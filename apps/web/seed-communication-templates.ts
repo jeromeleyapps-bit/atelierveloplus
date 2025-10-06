@@ -182,14 +182,14 @@ async function main() {
 
   // Seed SMS templates
   for (const template of smsTemplates) {
-    const existing = await prisma.smsTemplate.findUnique({
+    const existing = await prisma.sMSTemplate.findUnique({
       where: { name: template.name }
     });
 
     if (existing) {
       console.log(`✓ SMS template "${template.name}" already exists`);
     } else {
-      await prisma.smsTemplate.create({ data: template });
+      await prisma.sMSTemplate.create({ data: template });
       console.log(`✓ Created SMS template "${template.name}"`);
     }
   }

@@ -22,7 +22,43 @@
     "db:reset": "prisma generate && prisma migrate reset --force && prisma migrate dev",
     "db:studio": "prisma studio",
     "db:seed": "ts-node scripts/seed.ts",
-    "audit:deps": "depcheck"
+    "audit:deps": "depcheck",
+    "electron": "electron .",
+    "electron:dev": "cross-env NODE_ENV=development electron .",
+    "electron:build": "next build && electron-builder",
+    "pack": "next build && electron-builder --dir",
+    "dist": "next build && electron-builder"
+  },
+  "build": {
+    "appId": "com.ateliervelo.app",
+    "productName": "Atelier Velo+",
+    "directories": {
+      "output": "dist",
+      "buildResources": "electron"
+    },
+    "files": [
+      "electron/**/*",
+      ".next/**/*",
+      "public/**/*",
+      "prisma/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "public/logo.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Atelier Velo+",
+      "installerIcon": "public/logo.png",
+      "uninstallerIcon": "public/logo.png"
+    }
   },
   "dependencies": {
     "@emotion/cache": "^11.14.0",
@@ -56,7 +92,11 @@
     "@types/react": "^18.3.5",
     "@vitest/coverage-v8": "^1.6.1",
     "@vitest/ui": "^1.6.0",
+    "cross-env": "^10.1.0",
     "depcheck": "^1.4.7",
+    "electron": "^38.2.1",
+    "electron-builder": "^26.0.12",
+    "electron-is-dev": "^3.0.1",
     "eslint": "8.57.0",
     "eslint-config-next": "^14.2.10",
     "png-to-ico": "^3.0.1",
@@ -64,13 +104,19 @@
     "sharp": "^0.33.3",
     "ts-node": "^10.9.2",
     "typescript": "5.6.2",
-    "vitest": "^1.6.0"
+    "vitest": "^1.6.0",
+    "wait-on": "^9.0.1"
   },
-  "description": "",
-  "main": "next.config.js",
-  "keywords": [],
-  "author": "",
+  "description": "Atelier Velo+ - Gestion d'atelier velo",
+  "main": "electron/main.js",
+  "keywords": [
+    "atelier",
+    "velo",
+    "gestion"
+  ],
+  "author": "Jerome Leyssard",
   "license": "ISC",
+  "homepage": "./",
   "type": "commonjs",
   "prisma": {
     "seed": "node prisma/seed.cjs"
