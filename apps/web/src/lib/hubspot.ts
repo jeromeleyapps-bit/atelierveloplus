@@ -53,7 +53,7 @@ export async function sendEmail(options: SendEmailOptions) {
 
     return {
       success: true,
-      messageId: response.id,
+      messageId: (response as any).id,
       data: response
     };
   } catch (error: any) {
@@ -83,7 +83,7 @@ export async function sendSMS(options: SendSMSOptions) {
 
     return {
       success: true,
-      messageId: response.id,
+      messageId: (response as any).id,
       data: response
     };
   } catch (error: any) {
