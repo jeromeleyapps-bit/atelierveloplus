@@ -1,0 +1,9 @@
+# Fichier à créer : .env.local
+# Copier ce contenu dans un nouveau fichier .env.local
+
+# PostgreSQL Local
+DATABASE_URL="postgresql://postgres@localhost:5432/atelier_velo?schema=public"
+
+# Autres variables (si nécessaire)
+# NEXTAUTH_URL=http://localhost:3000
+# NEXTAUTH_SECRET=votre_secret

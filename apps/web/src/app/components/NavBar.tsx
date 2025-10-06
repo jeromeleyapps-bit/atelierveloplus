@@ -1,0 +1,78 @@
+"use client";
+
+import { AppBar, Toolbar, Button, Typography, Box, IconButton, Tooltip } from "@mui/material";
+import Link from "next/link";
+import type { Route } from "next";
+import { usePathname } from "next/navigation";
+import LightModeIcon from "@mui/icons-material/LightMode";
+import DarkModeIcon from "@mui/icons-material/DarkMode";
+import { useThemeMode } from "../providers";
+
+interface NavItem {
+  text: string;
+  path: Route;
+}
+
+const NavBar = () => {
+  const pathname = usePathname();
+  const { mode, toggleTheme } = useThemeMode();
+
+  const navItems: NavItem[] = [
+    { text: "Tableau de bord", path: "/dashboard" as Route },
+    { text: "Clients", path: "/customers" as Route },
+    { text: "Tickets", path: "/tickets" as Route },
+    { text: "Factures", path: "/finance" as Route },
+    { text: "Catalogue", path: "/catalog" as Route },
+    { text: "Calendrier", path: "/calendar" as Route },
+    { text: "Statistiques", path: "/stats" as Route },
+  ];
+
+  return (
+    <AppBar position="static" sx={{ mb: 4 }}>
+      <Toolbar>
+        <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontWeight: 700 }}>
+          <Link
+            href={"/" as Route}
+            passHref
+            style={{ color: "inherit", textDecoration: "none" }}
+          >
+            🚴 Atelier Vélo+
+          </Link>
+        </Typography>
+        <Box sx={{ display: { xs: "none", sm: "flex" }, gap: 1, alignItems: "center" }}>
+          {navItems.map((item) => {
+            const isActive = pathname === item.path;
+            return (
+              <Link key={item.path} href={item.path} passHref legacyBehavior>
+                <Button
+                  component="a"
+                  color={isActive ? "secondary" : "inherit"}
+                  variant={isActive ? "outlined" : "text"}
+                  sx={{
+                    color: "inherit",
+                    "&:hover": {
+                      bgcolor: "rgba(255, 255, 255, 0.1)",
+                    },
+                  }}
+                >
+                  {item.text}
+                </Button>
+              </Link>
+            );
+          })}
+          <Tooltip title={mode === 'light' ? 'Mode sombre' : 'Mode clair'}>
+            <IconButton 
+              onClick={toggleTheme} 
+              color="inherit"
+              sx={{ ml: 1 }}
+            >
+              {mode === 'light' ? <DarkModeIcon /> : <LightModeIcon />}
+            </IconButton>
+          </Tooltip>
+        </Box>
+      </Toolbar>
+    </AppBar>
+  );
+};
+
+export default NavBar;

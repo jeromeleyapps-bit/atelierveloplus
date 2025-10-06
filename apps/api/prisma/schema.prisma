@@ -1,0 +1,172 @@
+// Prisma schema for Atelier Vélo (minimal MVP)
+// DB: PostgreSQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  email       String   @unique
+  firstName   String?
+  lastName    String?
+  passwordHash String
+  shopName    String?
+  isAutoEntrepreneur Boolean @default(false)
+}
+
+model Customer {
+  id            String   @id @default(cuid())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  ownerId       String?
+  firstName     String?
+  lastName      String?
+  email         String?  @unique
+  phone         String?
+  marketingOptIn Boolean  @default(false)
+  bikes         Bike[]       @relation("CustomerToBikes")
+  workOrders    WorkOrder[]  @relation("CustomerToWorkOrders")
+  sales         Sale[]
+  @@index([ownerId])
+}
+
+model Bike {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  ownerId     String?
+  customer    Customer @relation("CustomerToBikes", fields: [customerId], references: [id])
+  customerId  String
+  brand       String?
+  model       String?
+  serialNumber String?
+  notes       String?
+  workOrders  WorkOrder[] @relation("BikeToWorkOrders")
+  @@index([ownerId])
+}
+
+model Product {
+  id         String   @id @default(cuid())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  sku        String   @unique
+  name       String
+  brand      String?
+  taxRate    Float    @default(20)
+  priceHT    Decimal  @db.Decimal(12, 2)
+  barcode    String?  @unique
+  stockItems StockItem[]
+  workOrderItems WorkOrderItem[] @relation("ProductToWorkOrderItems")
+  saleLines  SaleLine[]
+}
+
+model StockLocation {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  items     StockItem[]
+}
+
+model StockItem {
+  id          String        @id @default(cuid())
+  product     Product       @relation(fields: [productId], references: [id])
+  productId   String
+  location    StockLocation @relation(fields: [locationId], references: [id])
+  locationId  String
+  qty         Int           @default(0)
+  minThreshold Int          @default(0)
+}
+
+model WorkOrder {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  ownerId     String?
+  customer    Customer @relation("CustomerToWorkOrders", fields: [customerId], references: [id])
+  customerId  String
+  bike        Bike?    @relation("BikeToWorkOrders", fields: [bikeId], references: [id])
+  bikeId      String?
+  status      String   @default("created") // created, in_progress, ready, delivered
+  scheduledAt DateTime?
+  dueAt       DateTime?
+  items       WorkOrderItem[]
+  hubspotFallbackAt DateTime?
+  inProgressAt DateTime?
+  readyAt      DateTime?
+  // Estimation & time tracking
+  estimatedMinutes Int?     // estimate for labor time
+  hourlyRate       Decimal? @db.Decimal(12, 2) // labor hourly rate HT
+  actualMinutes    Int?     // actual time spent
+  @@index([ownerId])
+}
+
+model WorkOrderItem {
+  id          String    @id @default(cuid())
+  workOrder   WorkOrder @relation(fields: [workOrderId], references: [id])
+  workOrderId String
+  product     Product?  @relation("ProductToWorkOrderItems", fields: [productId], references: [id])
+  productId   String?
+  description String?
+  qty         Int       @default(1)
+  priceHT     Decimal   @db.Decimal(12, 2)
+  type        String    // part | labor
+}
+
+model Sale {
+  id          String    @id @default(cuid())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  ownerId     String?
+  customer    Customer? @relation(fields: [customerId], references: [id])
+  customerId  String?
+  totalHT     Decimal   @db.Decimal(12, 2)
+  totalTVA    Decimal   @db.Decimal(12, 2)
+  totalTTC    Decimal   @db.Decimal(12, 2)
+  payments    Payment[]
+  lines       SaleLine[]
+  @@index([ownerId])
+}
+
+model Payment {
+  id         String   @id @default(cuid())
+  sale       Sale     @relation(fields: [saleId], references: [id])
+  saleId     String
+  method     String
+  amount     Decimal  @db.Decimal(12, 2)
+  provider   String
+  providerRef String?
+  status     String   @default("pending")
+  createdAt  DateTime @default(now())
+}
+
+model SaleLine {
+  id          String   @id @default(cuid())
+  sale        Sale     @relation(fields: [saleId], references: [id])
+  saleId      String
+  productId   String?
+  product     Product? @relation(fields: [productId], references: [id])
+  description String?
+  qty         Int      @default(1)
+  priceHT     Decimal  @db.Decimal(12, 2)
+  discount    Decimal  @db.Decimal(12, 2) @default(0)
+}
+
+// Unavailability slots for staff/workshop (meetings, vacations, etc.)
+model Unavailability {
+  id        String   @id @default(cuid())
+  ownerId   String?
+  title     String
+  start     DateTime
+  end       DateTime
+  type      String   @default("other") // meeting | vacation | training | other
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([ownerId])
+}
