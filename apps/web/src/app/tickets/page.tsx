@@ -884,14 +884,14 @@ export default function TicketsPage() {
                           </Tooltip>
                         )}
                         <Tooltip title="Modifier">
-                          <IconButton
-                            size="small"
-                            component={Link}
-                            href={`/tickets/${wo.id}`}
-                            aria-label="Modifier"
-                          >
-                            <EditIcon fontSize="small" />
-                          </IconButton>
+                          <Link href={`/tickets/${wo.id}`} passHref>
+                            <IconButton
+                              size="small"
+                              aria-label="Modifier"
+                            >
+                              <EditIcon fontSize="small" />
+                            </IconButton>
+                          </Link>
                         </Tooltip>
                         <Tooltip title="Supprimer">
                           <IconButton
