@@ -38,6 +38,7 @@ import DirectionsBikeIcon from "@mui/icons-material/DirectionsBike";
 
 export default function CustomersPage() {
   const [items, setItems] = useState<Customer[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
   // Important: démarre à true pour un rendu initial déterministe SSR/CSR
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -292,6 +293,28 @@ export default function CustomersPage() {
         </SectionCard>
 
         <SectionCard title="Liste des clients" icon={<ListAltIcon color="primary" />}>
+          <Box sx={{ mb: 2 }}>
+            <Stack direction="row" spacing={1}>
+              <TextField
+                label="Rechercher par nom ou prénom"
+                size="small"
+                fullWidth
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Tapez un nom ou prénom..."
+              />
+              {searchQuery && (
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => setSearchQuery("")}
+                  sx={{ whiteSpace: 'nowrap' }}
+                >
+                  Effacer
+                </Button>
+              )}
+            </Stack>
+          </Box>
           <TableContainer sx={{ overflowX: 'auto' }}>
           <Table size="small" sx={{ tableLayout: 'fixed', width: '100%' }}>
             <TableHead>
@@ -331,7 +354,16 @@ export default function CustomersPage() {
                 </>
               )}
               {!loading &&
-                items.map((c) => (
+                items
+                  .filter((c) => {
+                    if (!searchQuery.trim()) return true;
+                    const query = searchQuery.toLowerCase();
+                    const firstName = (c.firstName || "").toLowerCase();
+                    const lastName = (c.lastName || "").toLowerCase();
+                    const email = (c.email || "").toLowerCase();
+                    return firstName.includes(query) || lastName.includes(query) || email.includes(query);
+                  })
+                  .map((c) => (
                   <TableRow key={c.id} hover>
                     <TableCell>
                       <Tooltip title={c.id}>

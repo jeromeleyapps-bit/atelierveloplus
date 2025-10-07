@@ -27,7 +27,14 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import TransformIcon from "@mui/icons-material/Transform";
+import DescriptionIcon from "@mui/icons-material/Description";
+import ReceiptIcon from "@mui/icons-material/Receipt";
+import CreditCardIcon from "@mui/icons-material/CreditCard";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
+import EmailIcon from "@mui/icons-material/Email";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import PageShell from "@/app/components/PageShell";
 import RequireAuth from "@/app/components/RequireAuth";
 import {
@@ -56,6 +63,7 @@ export const dynamic = 'force-dynamic';
 
 export default function InvoiceDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const router = useRouter();
   const [inv, setInv] = useState<(Invoice & { lines: InvoiceLine[] }) | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -103,7 +111,8 @@ export default function InvoiceDetailPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || 'credit_failed');
       setToast({ open: true, message: 'Avoir créé', severity: 'success' });
-      window.location.href = `/finance/invoices/${data.id}`;
+      // Rediriger vers la route avoir
+      window.location.href = `/finance/credits/${data.id}`;
     } catch (e) {
       console.error(e);
       setToast({ open: true, message: 'Erreur: création avoir', severity: 'error' });
@@ -173,7 +182,8 @@ export default function InvoiceDetailPage() {
       const res = await fetch(`/api/finance/invoices/${id}/cancel`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ reason }) });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || 'cancel_failed');
-      setToast({ open: true, message: 'Facture annulée', severity: 'success' });
+      const docType = inv?.type === 'quote' ? 'Devis' : inv?.type === 'credit' ? 'Avoir' : 'Facture';
+      setToast({ open: true, message: `${docType} annulé${inv.type === 'quote' ? '' : 'e'}`, severity: 'success' });
       await refresh();
     } catch (e) {
       console.error(e);
@@ -186,7 +196,8 @@ export default function InvoiceDetailPage() {
       const res = await fetch(`/api/finance/invoices/${id}/email`, { method: 'POST' });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data?.error || 'email_failed');
-      setToast({ open: true, message: 'Facture envoyée par email', severity: 'success' });
+      const docType = inv?.type === 'quote' ? 'Devis' : inv?.type === 'credit' ? 'Avoir' : 'Facture';
+      setToast({ open: true, message: `${docType} envoyé${inv.type === 'quote' ? '' : 'e'} par email`, severity: 'success' });
     } catch (e) {
       console.error(e);
       setToast({ open: true, message: 'Erreur: envoi email', severity: 'error' });
@@ -253,7 +264,8 @@ export default function InvoiceDetailPage() {
       if (inv.discountAmount && inv.discountAmount > 0) {
         await updateInvoice(copy.id, { discountAmount: inv.discountAmount });
       }
-      setToast({ open: true, message: "Facture dupliquée", severity: "success" });
+      const docType = inv?.type === 'quote' ? 'Devis' : inv?.type === 'credit' ? 'Avoir' : 'Facture';
+      setToast({ open: true, message: `${docType} dupliqué${inv.type === 'quote' ? '' : 'e'}`, severity: "success" });
       // navigate to new invoice
       window.location.href = `/finance/invoices/${copy.id}`;
     } catch (e) {
@@ -316,6 +328,16 @@ export default function InvoiceDetailPage() {
     try {
       const upd = await updateInvoice(inv.id, { [field]: value } as any);
       setInv({ ...inv, ...upd });
+      
+      // Si on change le mode de pricing vers AE_TTC, mettre toutes les TVA à 0%
+      if (field === 'pricingMode' && value === 'AE_TTC') {
+        for (const line of inv.lines) {
+          if (line.vatRate !== 0) {
+            await updateInvoiceLine(inv.id, line.id, { vatRate: 0 });
+          }
+        }
+        await refresh();
+      }
     } catch (e) {
       console.error(e);
       setToast({ open: true, message: "Erreur de mise à jour", severity: "error" });
@@ -333,7 +355,7 @@ export default function InvoiceDetailPage() {
         qty: 1,
         unitPriceHT: inv.pricingMode === "HT_TVA" ? 0 : undefined,
         unitPriceTTC: inv.pricingMode === "AE_TTC" ? 0 : undefined,
-        vatRate: inv.vatRate,
+        vatRate: inv.pricingMode === "AE_TTC" ? 0 : inv.vatRate,
       } as any);
       await refresh();
     } catch (e) {
@@ -390,7 +412,8 @@ export default function InvoiceDetailPage() {
         console.warn('Stock decrement failed', e);
       }
       await refresh();
-      setToast({ open: true, message: "Facture émise", severity: "success" });
+      const docType = inv?.type === 'quote' ? 'Devis' : inv?.type === 'credit' ? 'Avoir' : 'Facture';
+      setToast({ open: true, message: `${docType} émis${inv.type === 'quote' ? '' : 'e'}`, severity: "success" });
     } catch (e) {
       console.error(e);
       setToast({ open: true, message: "Erreur: émission facture", severity: "error" });
@@ -407,7 +430,8 @@ export default function InvoiceDetailPage() {
       await payInvoice(inv.id, { method: payMethod, paidAt: payDate });
       setPayOpen(false);
       await refresh();
-      setToast({ open: true, message: "Facture payée", severity: "success" });
+      const docType = inv?.type === 'quote' ? 'Devis' : inv?.type === 'credit' ? 'Avoir' : 'Facture';
+      setToast({ open: true, message: `${docType} payé${inv.type === 'quote' ? '' : 'e'}`, severity: "success" });
     } catch (e) {
       console.error(e);
       setToast({ open: true, message: "Erreur: marquage payé", severity: "error" });
@@ -480,13 +504,39 @@ export default function InvoiceDetailPage() {
     }, 0);
   }, [inv?.lines]);
 
+  // Déterminer le type de document pour l'affichage
+  const documentType = inv?.type === "quote" ? "Devis" : inv?.type === "credit" ? "Avoir" : "Facture";
+  const documentIcon = inv?.type === "quote" ? <DescriptionIcon /> : inv?.type === "credit" ? <CreditCardIcon /> : <ReceiptIcon />;
+  const documentColor = inv?.type === "quote" ? "info" : inv?.type === "credit" ? "error" : "primary";
+  const backUrl = inv?.type === "quote" ? "/finance?tab=quotes" : inv?.type === "credit" ? "/finance?tab=credits" : "/finance?tab=invoices";
+  const backLabel = inv?.type === "quote" ? "Retour aux devis" : inv?.type === "credit" ? "Retour aux avoirs" : "Retour aux factures";
+
   return (
     <RequireAuth>
       <div data-test="invoice-root" style={{ background: '#fff' }}>
-        <PageShell title={`${inv?.type === "quote" ? "Devis" : inv?.type === "credit" ? "Avoir" : "Facture"} ${inv?.number || "(brouillon)"}`} maxWidth="lg">
+        <PageShell title={inv ? `${documentType} ${inv.number || "(brouillon)"}` : "Chargement..."} maxWidth="lg">
         {!inv && <Typography sx={{ p: 3 }}>Chargement...</Typography>}
         {inv && (
           <Stack spacing={2}>
+            {/* Bouton retour */}
+            <Button
+              startIcon={<ArrowBackIcon />}
+              onClick={() => router.push(backUrl)}
+              variant="text"
+              sx={{ alignSelf: 'flex-start', textTransform: 'none' }}
+            >
+              {backLabel}
+            </Button>
+            {/* Nom du client */}
+            {inv.workOrder?.customer && (
+              <Alert severity="info" icon={false} sx={{ mb: 2, bgcolor: 'primary.light' }}>
+                <Typography variant="h6" fontWeight={600}>
+                  Client : {inv.workOrder.customer.firstName} {inv.workOrder.customer.lastName}
+                  {inv.workOrder.customer.email && ` • ${inv.workOrder.customer.email}`}
+                  {inv.workOrder.customer.phone && ` • ${inv.workOrder.customer.phone}`}
+                </Typography>
+              </Alert>
+            )}
             {(inv as any).workOrderType && (
               <Alert severity="info" sx={{ mb: 2 }}>
                 <Typography variant="subtitle1" fontWeight={600}>
@@ -518,46 +568,131 @@ export default function InvoiceDetailPage() {
                   <MenuItem value="AE_TTC">AE (TTC)</MenuItem>
                   <MenuItem value="HT_TVA">HT + TVA</MenuItem>
                 </TextField>
-                <TextField size="small" label="TVA (%)" type="number" value={inv.vatRate} onChange={(e) => onHeaderChange("vatRate", Number(e.target.value))} disabled={!isDraft || saving} sx={{ width: 120 }} />
-                <TextField size="small" label="Taux MO (€/h)" type="number" value={inv.laborRate} onChange={(e) => onHeaderChange("laborRate", Number(e.target.value))} disabled={!isDraft || saving} sx={{ width: 140 }} />
-                <TextField size="small" label="Remise (%)" type="number" value={discountPct} onChange={(e) => onChangeDiscountPct(Number(e.target.value))} sx={{ width: 120 }} />
+                <TextField size="small" label="TVA (%)" type="number" value={inv.vatRate} onChange={(e) => onHeaderChange("vatRate", Number(e.target.value))} onFocus={(e) => e.target.select()} disabled={!isDraft || saving} sx={{ width: 120 }} />
+                <TextField size="small" label="Taux MO (€/h)" type="number" value={inv.laborRate} onChange={(e) => onHeaderChange("laborRate", Number(e.target.value))} onFocus={(e) => e.target.select()} disabled={!isDraft || saving} sx={{ width: 140 }} />
+                <TextField size="small" label="Remise (%)" type="number" value={discountPct} onChange={(e) => onChangeDiscountPct(Number(e.target.value))} onFocus={(e) => e.target.select()} sx={{ width: 120 }} />
                 <TextField size="small" label="Échéance" type="date" value={(inv.dueDate ? inv.dueDate.slice(0,10) : '')} onChange={(e) => onHeaderChange('dueDate' as any, e.target.value ? new Date(e.target.value).toISOString() : null)} InputLabelProps={{ shrink: true }} sx={{ width: 160 }} />
                 <Box flex={1} />
-                <Button size="small" variant="text" onClick={() => setShowMargin(v => !v)} sx={{ textTransform: 'none' }}>{showMargin ? 'Masquer marge' : 'Afficher marge'}</Button>
-                <Chip size="small" label={inv.status === 'draft' ? 'brouillon' : inv.status === 'issued' ? 'émise' : inv.status} color={inv.status === 'paid' ? 'success' : inv.status === 'issued' ? 'info' : inv.status === 'cancelled' ? 'default' : 'warning'} sx={{ textTransform: 'none' }} />
-                {inv.type === "quote" && !inv.convertedAt && inv.status === "draft" && (
-                  <Button
-                    size="small"
-                    variant="contained"
-                    color="success"
-                    startIcon={<TransformIcon />}
-                    onClick={handleConvertToInvoice}
-                    disabled={converting}
-                    sx={{ textTransform: 'none' }}
-                  >
-                    {converting ? "Conversion..." : "Convertir en facture"}
-                  </Button>
+                {inv.type !== "credit" && (
+                  <Button size="small" variant="text" onClick={() => setShowMargin(v => !v)} sx={{ textTransform: 'none' }}>{showMargin ? 'Masquer marge' : 'Afficher marge'}</Button>
                 )}
-                <Button size="small" variant="contained" onClick={onIssue} disabled={!isDraft} sx={{ textTransform: 'none' }}>Émettre</Button>
-                <Button size="small" variant="contained" color="success" onClick={onPay} disabled={inv.status !== 'issued'} sx={{ textTransform: 'none' }}>Marquer payé</Button>
-                <Button size="small" variant="outlined" component="a" href={`/api/finance/invoices/${inv.id}/pdf`} target="_blank" rel="noopener noreferrer" sx={{ textTransform: 'none' }}>Exporter PDF</Button>
-                <Button size="small" variant="outlined" onClick={sendInvoiceEmail} sx={{ textTransform: 'none' }}>Envoyer email</Button>
-                <Button size="small" variant="outlined" color="success" onClick={() => { setPpAmount(Number(remainingAmount.toFixed(2))); setPpOpen(true); }} disabled={inv.status === 'paid' || inv.status === 'cancelled'} sx={{ textTransform: 'none' }}>Ajouter paiement</Button>
-                <Button size="small" variant="outlined" color="primary" onClick={saveAllChanges} disabled={saving || (!hasLinePatches && !discountChanged)} sx={{ textTransform: 'none' }}>Enregistrer tout</Button>
-                {inv.status==='issued' && inv.dueDate && (new Date(inv.dueDate).getTime() < Date.now()) && (
-                  <Button size="small" variant="outlined" color="warning" onClick={async () => {
-                    try {
-                      const res = await fetch(`/api/finance/invoices/${inv.id}/remind`, { method: 'POST' });
-                      const data = await res.json();
-                      if (!res.ok) throw new Error(data?.error || 'remind_failed');
-                      setToast({ open: true, message: 'Relance envoyée', severity: 'success' });
-                      await refresh();
-                  } catch (e) { console.error(e); setToast({ open: true, message: 'Erreur: relance', severity: 'error' }); }
-                  }}>Relancer</Button>
+                <Chip size="small" icon={documentIcon} label={documentType} color={documentColor} variant="outlined" sx={{ textTransform: 'none', fontWeight: 600 }} />
+                <Chip size="small" label={inv.status === 'draft' ? 'brouillon' : inv.status === 'issued' ? 'émis' : inv.status} color={inv.status === 'paid' ? 'success' : inv.status === 'issued' ? 'info' : inv.status === 'cancelled' ? 'default' : 'warning'} sx={{ textTransform: 'none' }} />
+                
+                {/* Actions spécifiques DEVIS */}
+                {inv.type === "quote" && (
+                  <>
+                    <Button 
+                      size="small" 
+                      variant="outlined" 
+                      startIcon={<PictureAsPdfIcon />}
+                      component="a"
+                      href={`/api/finance/invoices/${id}/pdf`}
+                      target="_blank"
+                      sx={{ textTransform: 'none' }}
+                    >
+                      PDF
+                    </Button>
+                    <Button 
+                      size="small" 
+                      variant="outlined" 
+                      startIcon={<EmailIcon />}
+                      onClick={sendInvoiceEmail}
+                      sx={{ textTransform: 'none' }}
+                    >
+                      Email
+                    </Button>
+                    {isDraft && (
+                      <>
+                        <Button size="small" variant="contained" onClick={onIssue} sx={{ textTransform: 'none' }}>Émettre</Button>
+                        <Button size="small" variant="contained" color="primary" onClick={saveAllChanges} disabled={saving || (!hasLinePatches && !discountChanged)} sx={{ textTransform: 'none' }}>
+                          {saving ? "Enregistrement..." : "Enregistrer"}
+                        </Button>
+                      </>
+                    )}
+                    {!inv.convertedAt && (
+                      <Button
+                        size="small"
+                        variant="contained"
+                        color="success"
+                        startIcon={<TransformIcon />}
+                        onClick={handleConvertToInvoice}
+                        disabled={converting}
+                        sx={{ textTransform: 'none' }}
+                      >
+                        {converting ? "Conversion..." : "Convertir"}
+                      </Button>
+                    )}
+                  </>
                 )}
-                <Button size="small" variant="outlined" color="warning" onClick={onCancelInvoice} disabled={inv.status === 'paid' || inv.status === 'cancelled' || (inv as any).type === 'credit'} sx={{ textTransform: 'none' }}>Annuler</Button>
-                <Button size="small" variant="outlined" color="secondary" onClick={onCreateCredit} disabled={(inv as any).type === 'credit' || inv.status === 'cancelled'} sx={{ textTransform: 'none' }}>Créer un avoir</Button>
-                <Button size="small" variant="text" onClick={onDuplicate} sx={{ textTransform: 'none' }}>Dupliquer</Button>
+
+                {/* Actions spécifiques AVOIR */}
+                {inv.type === "credit" && (
+                  <>
+                    <Button 
+                      size="small" 
+                      variant="outlined" 
+                      startIcon={<PictureAsPdfIcon />}
+                      component="a"
+                      href={`/api/finance/invoices/${id}/pdf`}
+                      target="_blank"
+                      sx={{ textTransform: 'none' }}
+                    >
+                      PDF
+                    </Button>
+                    <Button 
+                      size="small" 
+                      variant="outlined" 
+                      startIcon={<EmailIcon />}
+                      onClick={sendInvoiceEmail}
+                      sx={{ textTransform: 'none' }}
+                    >
+                      Email
+                    </Button>
+                    {isDraft && (
+                      <>
+                        <Button size="small" variant="contained" onClick={onIssue} sx={{ textTransform: 'none' }}>Émettre</Button>
+                        <Button size="small" variant="contained" color="primary" onClick={saveAllChanges} disabled={saving || (!hasLinePatches && !discountChanged)} sx={{ textTransform: 'none' }}>
+                          {saving ? "Enregistrement..." : "Enregistrer"}
+                        </Button>
+                      </>
+                    )}
+                  </>
+                )}
+
+                {/* Actions spécifiques FACTURE */}
+                {inv.type === "invoice" && (
+                  <>
+                    <Button 
+                      size="small" 
+                      variant="outlined" 
+                      startIcon={<PictureAsPdfIcon />}
+                      component="a"
+                      href={`/api/finance/invoices/${id}/pdf`}
+                      target="_blank"
+                      sx={{ textTransform: 'none' }}
+                    >
+                      PDF
+                    </Button>
+                    <Button 
+                      size="small" 
+                      variant="outlined" 
+                      startIcon={<EmailIcon />}
+                      onClick={sendInvoiceEmail}
+                      sx={{ textTransform: 'none' }}
+                    >
+                      Email
+                    </Button>
+                    {isDraft && (
+                      <>
+                        <Button size="small" variant="contained" onClick={onIssue} sx={{ textTransform: 'none' }}>Émettre</Button>
+                        <Button size="small" variant="contained" color="primary" onClick={saveAllChanges} disabled={saving || (!hasLinePatches && !discountChanged)} sx={{ textTransform: 'none' }}>
+                          {saving ? "Enregistrement..." : "Enregistrer"}
+                        </Button>
+                      </>
+                    )}
+                  </>
+                )}
               </Stack>
             </Paper>
 
@@ -615,6 +750,7 @@ export default function InvoiceDetailPage() {
                         <TableCell align="right">
                           <TextField size="small" type="number" value={(linePatches[l.id]?.qty as any) ?? l.qty} disabled={!isDraft}
                             onChange={(e) => setLinePatches((p) => ({ ...p, [l.id]: { ...(p[l.id]||{}), qty: Number(e.target.value) } }))}
+                            onFocus={(e) => e.target.select()}
                             onBlur={async (e) => { if (!isDraft) return; const v=Number(e.currentTarget.value||0); await onUpdateLine(l, { qty: v }); setLinePatches((p)=>{ const { [l.id]:_, ...rest } = p; return rest; }); }}
                             sx={{ width: 100 }} />
                         </TableCell>
@@ -622,6 +758,7 @@ export default function InvoiceDetailPage() {
                           <TableCell align="right">
                             <TextField size="small" type="number" value={(linePatches[l.id]?.unitPriceHT as any) ?? (l.unitPriceHT ?? 0)} disabled={!isDraft}
                               onChange={(e) => setLinePatches((p) => ({ ...p, [l.id]: { ...(p[l.id]||{}), unitPriceHT: Number(e.target.value) } }))}
+                              onFocus={(e) => e.target.select()}
                               onBlur={async (e) => { if (!isDraft) return; const v=Number(e.currentTarget.value||0); await onUpdateLine(l, { unitPriceHT: v }); setLinePatches((p)=>{ const { [l.id]:_, ...rest } = p; return rest; }); }}
                               sx={{ width: 120 }} />
                           </TableCell>
@@ -629,12 +766,14 @@ export default function InvoiceDetailPage() {
                           <TableCell align="right">
                             <TextField size="small" type="number" value={(linePatches[l.id]?.unitPriceTTC as any) ?? (l.unitPriceTTC ?? 0)} disabled={!isDraft}
                               onChange={(e) => setLinePatches((p) => ({ ...p, [l.id]: { ...(p[l.id]||{}), unitPriceTTC: Number(e.target.value) } }))}
+                              onFocus={(e) => e.target.select()}
                               onBlur={async (e) => { if (!isDraft) return; const v=Number(e.currentTarget.value||0); await onUpdateLine(l, { unitPriceTTC: v }); setLinePatches((p)=>{ const { [l.id]:_, ...rest } = p; return rest; }); }}
                               sx={{ width: 120 }} />
                           </TableCell>
                         )}
                         <TableCell align="right">
                           <TextField size="small" type="number" value={(linePatches[l.id]?.vatRate as any) ?? (l.vatRate ?? inv.vatRate)} disabled={!isDraft}
+                            onFocus={(e) => e.target.select()}
                             onChange={(e) => setLinePatches((p) => ({ ...p, [l.id]: { ...(p[l.id]||{}), vatRate: Number(e.target.value) } }))}
                             onBlur={async (e) => { if (!isDraft) return; const v=Number(e.currentTarget.value||0); await onUpdateLine(l, { vatRate: v }); setLinePatches((p)=>{ const { [l.id]:_, ...rest } = p; return rest; }); }}
                             sx={{ width: 100 }} />
@@ -708,12 +847,12 @@ export default function InvoiceDetailPage() {
                   <MenuItem value="service">Service</MenuItem>
                 </Select>
                 <TextField size="small" label="Description" value={qDesc} onChange={(e) => setQDesc(e.target.value)} sx={{ flex: 1, minWidth: 240 }} />
-                <TextField size="small" label="Qté" type="number" value={qQty} onChange={(e) => setQQty(Number(e.target.value))} sx={{ width: 90 }} />
-                <TextField size="small" label={inv?.pricingMode === 'HT_TVA' ? 'PU HT' : 'PU TTC'} type="number" value={qPrice} onChange={(e) => setQPrice(Number(e.target.value))} sx={{ width: 130 }} />
+                <TextField size="small" label="Qté" type="number" value={qQty} onChange={(e) => setQQty(Number(e.target.value))} onFocus={(e) => e.target.select()} sx={{ width: 90 }} />
+                <TextField size="small" label={inv?.pricingMode === 'HT_TVA' ? 'PU HT' : 'PU TTC'} type="number" value={qPrice} onChange={(e) => setQPrice(Number(e.target.value))} onFocus={(e) => e.target.select()} sx={{ width: 130 }} />
                 {inv?.pricingMode === 'HT_TVA' && (
-                  <TextField size="small" label="TVA (%)" type="number" value={qVat} onChange={(e) => setQVat(Number(e.target.value))} sx={{ width: 110 }} />
+                  <TextField size="small" label="TVA (%)" type="number" value={qVat} onChange={(e) => setQVat(Number(e.target.value))} onFocus={(e) => e.target.select()} sx={{ width: 110 }} />
                 )}
-                <TextField size="small" label="Marge (%)" type="number" value={markupPct} onChange={(e) => setMarkupPct(Number(e.target.value))} sx={{ width: 110 }} />
+                <TextField size="small" label="Marge (%)" type="number" value={markupPct} onChange={(e) => setMarkupPct(Number(e.target.value))} onFocus={(e) => e.target.select()} sx={{ width: 110 }} />
                 <Button size="small" variant="contained" onClick={onAddQuickItem} sx={{ whiteSpace: 'nowrap', textTransform: 'none' }}>Ajouter</Button>
               </Stack>
 
@@ -726,8 +865,12 @@ export default function InvoiceDetailPage() {
                   <Typography variant="body2">HT: {totals.subtotalHT.toFixed(2)} {inv.currency}</Typography>
                   <Typography variant="body2">TVA: {totals.vatAmount.toFixed(2)} {inv.currency}</Typography>
                   <Typography variant="subtitle1"><b>Total TTC: {totals.totalTTC.toFixed(2)} {inv.currency}</b></Typography>
-                  <Typography variant="body2">Payé: {paidAmount.toFixed(2)} {inv.currency}</Typography>
-                  <Typography variant="body2" color={remainingAmount > 0 ? 'warning.main' : 'success.main'}>Restant: {remainingAmount.toFixed(2)} {inv.currency}</Typography>
+                  {inv.type !== "quote" && (
+                    <>
+                      <Typography variant="body2">Payé: {paidAmount.toFixed(2)} {inv.currency}</Typography>
+                      <Typography variant="body2" color={remainingAmount > 0 ? 'warning.main' : 'success.main'}>Restant: {remainingAmount.toFixed(2)} {inv.currency}</Typography>
+                    </>
+                  )}
                 </Stack>
               </Stack>
               {inv.vatRate === 0 && inv.pricingMode === "AE_TTC" && (
@@ -744,30 +887,32 @@ export default function InvoiceDetailPage() {
               )}
             </Paper>
 
-            {/* Liste des paiements partiels */}
-            <Paper sx={{ p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
-              <Typography variant="h6" sx={{ mb: 1 }}>Paiements</Typography>
-              {payments.length === 0 ? (
-                <Typography variant="body2" color="text.secondary">Aucun paiement enregistré</Typography>
-              ) : (
-                <Stack spacing={1}>
-                  {payments.map((p) => (
-                    <Stack key={p.id} direction="row" spacing={2} alignItems="center">
-                      <Typography variant="body2" sx={{ minWidth: 120 }}>{p.paidAt ? new Date(p.paidAt).toLocaleDateString('fr-FR') : '-'}</Typography>
-                      <Typography variant="body2" sx={{ minWidth: 120 }}>{Number(p.amount ?? 0).toFixed(2)} {inv.currency}</Typography>
-                      <Typography variant="body2" sx={{ minWidth: 100 }}>{p.method || '-'}</Typography>
-                      <Typography variant="body2" color="text.secondary" sx={{ flex: 1 }}>{p.note || ''}</Typography>
-                      <IconButton size="small" aria-label="Éditer paiement" onClick={() => { setPpEditing(p); setPpAmount(p.amount); setPpMethod(p.method || "CB"); setPpDate((p.paidAt || new Date().toISOString()).slice(0,10)); setPpNote(p.note || ""); setPpOpen(true); }}>
-                        <EditIcon fontSize="small" />
-                      </IconButton>
-                      <IconButton size="small" aria-label="Supprimer paiement" onClick={() => onDeletePayment(p)}>
-                        <DeleteIcon fontSize="small" />
-                      </IconButton>
-                    </Stack>
-                  ))}
-                </Stack>
-              )}
-            </Paper>
+            {/* Liste des paiements partiels - Masqué pour les devis */}
+            {inv.type !== "quote" && (
+              <Paper sx={{ p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
+                <Typography variant="h6" sx={{ mb: 1 }}>Paiements</Typography>
+                {payments.length === 0 ? (
+                  <Typography variant="body2" color="text.secondary">Aucun paiement enregistré</Typography>
+                ) : (
+                  <Stack spacing={1}>
+                    {payments.map((p) => (
+                      <Stack key={p.id} direction="row" spacing={2} alignItems="center">
+                        <Typography variant="body2" sx={{ minWidth: 120 }}>{p.paidAt ? new Date(p.paidAt).toLocaleDateString('fr-FR') : '-'}</Typography>
+                        <Typography variant="body2" sx={{ minWidth: 120 }}>{Number(p.amount ?? 0).toFixed(2)} {inv.currency}</Typography>
+                        <Typography variant="body2" sx={{ minWidth: 100 }}>{p.method || '-'}</Typography>
+                        <Typography variant="body2" color="text.secondary" sx={{ flex: 1 }}>{p.note || ''}</Typography>
+                        <IconButton size="small" aria-label="Éditer paiement" onClick={() => { setPpEditing(p); setPpAmount(p.amount); setPpMethod(p.method || "CB"); setPpDate((p.paidAt || new Date().toISOString()).slice(0,10)); setPpNote(p.note || ""); setPpOpen(true); }}>
+                          <EditIcon fontSize="small" />
+                        </IconButton>
+                        <IconButton size="small" aria-label="Supprimer paiement" onClick={() => onDeletePayment(p)}>
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      </Stack>
+                    ))}
+                  </Stack>
+                )}
+              </Paper>
+            )}
           </Stack>
         )}
 
@@ -808,7 +953,7 @@ function PartialPaymentDialog(props: { open: boolean; onClose: () => void; onCon
       <div style={{ background: 'white', padding: 16, borderRadius: 8, minWidth: 360 }} onClick={(e) => e.stopPropagation()}>
         <Typography variant="h6" gutterBottom>Ajouter un paiement</Typography>
         <Stack spacing={2}>
-          <TextField size="small" type="number" label={`Montant (${currency})`} value={amount} onChange={(e) => setAmount(Number(e.target.value || 0))} />
+          <TextField size="small" type="number" label={`Montant (${currency})`} value={amount} onChange={(e) => setAmount(Number(e.target.value || 0))} onFocus={(e) => e.target.select()} />
           <TextField size="small" select label="Mode" value={method} onChange={(e) => setMethod(e.target.value)}>
             <MenuItem value="CB">CB</MenuItem>
             <MenuItem value="Espèces">Espèces</MenuItem>

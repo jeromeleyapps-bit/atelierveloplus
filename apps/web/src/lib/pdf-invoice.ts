@@ -6,6 +6,8 @@ interface InvoiceData {
   dueDate?: string | null;
   status: string;
   type?: string; // Type de document: 'invoice' | 'quote' | 'credit'
+  validUntil?: string | null; // Pour les devis
+  parentId?: string | null; // Pour les avoirs (référence facture d'origine)
   
   // Shop info
   shopName: string;
@@ -16,6 +18,9 @@ interface InvoiceData {
   shopEmail?: string;
   shopSiret?: string;
   shopTVA?: string;
+  shopRCS?: string; // Registre du Commerce et des Sociétés
+  shopCapital?: string; // Capital social
+  shopInsurance?: string; // Assurance RC Pro
   
   // Customer info
   customerName: string;
@@ -72,93 +77,147 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Uint8Array>
   
   let y = height - 50;
   
-  // === HEADER ===
+  // === HEADER - INFORMATIONS ATELIER ===
+  // Logo ou nom
   if (data.logoBytes && data.logoBytes.byteLength > 0) {
     try {
       const img = await pdfDoc.embedPng(data.logoBytes).catch(async () => await pdfDoc.embedJpg(data.logoBytes!));
-      const imgWidth = 120;
+      const imgWidth = 100;
       const scale = imgWidth / img.width;
       const imgHeight = img.height * scale;
       page.drawImage(img, { x: 50, y: y - imgHeight + 10, width: imgWidth, height: imgHeight });
       y -= Math.max(25, imgHeight);
     } catch {
-      // Fallback to text if logo embedding fails
-      page.drawText(data.shopName.toUpperCase(), { x: 50, y, size: 20, font: fontBold, color: primaryColor });
+      page.drawText(data.shopName.toUpperCase(), { x: 50, y, size: 18, font: fontBold, color: primaryColor });
       y -= 25;
     }
   } else {
-    page.drawText(data.shopName.toUpperCase(), { x: 50, y, size: 20, font: fontBold, color: primaryColor });
+    page.drawText(data.shopName.toUpperCase(), { x: 50, y, size: 18, font: fontBold, color: primaryColor });
     y -= 25;
   }
-  page.drawText(`${data.shopAddress}`, { x: 50, y, size: 10, font, color: textColor });
-  y -= 15;
-  page.drawText(`${data.shopZip} ${data.shopCity}`, { x: 50, y, size: 10, font, color: textColor });
   
+  // Adresse
+  page.drawText(`${data.shopAddress}`, { x: 50, y, size: 9, font, color: textColor });
+  y -= 13;
+  page.drawText(`${data.shopZip} ${data.shopCity}`, { x: 50, y, size: 9, font, color: textColor });
+  y -= 13;
+  
+  // Contact
   if (data.shopPhone) {
-    y -= 15;
-    page.drawText(`Tél: ${data.shopPhone}`, { x: 50, y, size: 10, font, color: textColor });
+    page.drawText(`Tél : ${data.shopPhone}`, { x: 50, y, size: 9, font, color: textColor });
+    y -= 13;
   }
-  
   if (data.shopEmail) {
-    y -= 15;
-    page.drawText(`Email: ${data.shopEmail}`, { x: 50, y, size: 10, font, color: textColor });
+    page.drawText(`Email : ${data.shopEmail}`, { x: 50, y, size: 9, font, color: textColor });
+    y -= 13;
   }
   
+  // Ligne séparatrice
+  y -= 5;
+  page.drawLine({ start: { x: 50, y }, end: { x: 280, y }, thickness: 0.5, color: grayColor });
+  y -= 10;
+  
+  // Informations légales
   if (data.shopSiret) {
-    y -= 15;
-    page.drawText(`SIRET: ${data.shopSiret}`, { x: 50, y, size: 9, font, color: grayColor });
+    page.drawText(`SIRET : ${data.shopSiret}`, { x: 50, y, size: 8, font, color: grayColor });
+    y -= 11;
   }
-  
   if (data.shopTVA) {
-    y -= 12;
-    page.drawText(`N° TVA: ${data.shopTVA}`, { x: 50, y, size: 9, font, color: grayColor });
+    page.drawText(`N° TVA Intracommunautaire : ${data.shopTVA}`, { x: 50, y, size: 8, font, color: grayColor });
+    y -= 11;
+  }
+  if (data.shopRCS) {
+    page.drawText(`RCS : ${data.shopRCS}`, { x: 50, y, size: 8, font, color: grayColor });
+    y -= 11;
+  }
+  if (data.shopCapital) {
+    page.drawText(`Capital social : ${data.shopCapital}`, { x: 50, y, size: 8, font, color: grayColor });
+    y -= 11;
+  }
+  if (data.shopInsurance) {
+    page.drawText(`Assurance RC Pro : ${data.shopInsurance}`, { x: 50, y, size: 7, font, color: grayColor });
   }
   
-  // === INVOICE TITLE ===
+  // === DOCUMENT TITLE & INFO (Right side) ===
   y = height - 50;
   const documentTitle = data.type === 'quote' ? 'DEVIS' : data.type === 'credit' ? 'AVOIR' : 'FACTURE';
+  
+  // Encadré pour le titre
+  const titleBoxX = width - 180;
+  const titleBoxY = y - 35;
+  page.drawRectangle({ 
+    x: titleBoxX, 
+    y: titleBoxY, 
+    width: 160, 
+    height: 35, 
+    borderColor: primaryColor, 
+    borderWidth: 2 
+  });
+  
   page.drawText(documentTitle, {
-    x: width - 150,
-    y,
-    size: 24,
+    x: titleBoxX + 10,
+    y: titleBoxY + 15,
+    size: 20,
     font: fontBold,
     color: primaryColor,
   });
   
-  y -= 30;
+  y -= 50;
   page.drawText(`N° ${data.number}`, {
-    x: width - 150,
+    x: width - 170,
     y,
-    size: 12,
+    size: 11,
     font: fontBold,
     color: textColor,
   });
   
-  y -= 20;
+  y -= 18;
   const issueDate = new Date(data.issueDate).toLocaleDateString('fr-FR');
-  page.drawText(`Date: ${issueDate}`, { x: width - 150, y, size: 10, font, color: textColor });
+  page.drawText(`Date d'émission : ${issueDate}`, { x: width - 170, y, size: 9, font, color: textColor });
   
-  if (data.dueDate) {
+  // Spécifique selon le type de document
+  if (data.type === 'quote' && data.validUntil) {
+    y -= 15;
+    const validDate = new Date(data.validUntil).toLocaleDateString('fr-FR');
+    page.drawText(`Valide jusqu'au : ${validDate}`, { x: width - 170, y, size: 9, font: fontBold, color: rgb(0.8, 0.4, 0) });
+  } else if (data.type === 'credit' && data.parentId) {
+    y -= 15;
+    page.drawText(`Avoir sur facture : ${data.parentId}`, { x: width - 170, y, size: 9, font: fontBold, color: rgb(0.8, 0.2, 0.2) });
+  } else if (data.dueDate) {
     y -= 15;
     const dueDate = new Date(data.dueDate).toLocaleDateString('fr-FR');
-    page.drawText(`Échéance: ${dueDate}`, { x: width - 150, y, size: 10, font, color: textColor });
+    page.drawText(`Date d'échéance : ${dueDate}`, { x: width - 170, y, size: 9, font, color: textColor });
   }
   
   // === CUSTOMER INFO (styled block) ===
   y = height - 210;
   const addrX = 50;
   const addrW = 260;
-  const addrH = 80;
-  page.drawRectangle({ x: addrX - 6, y: y - addrH + 6, width: addrW + 12, height: addrH, color: rgb(0.97, 0.97, 0.98) });
+  
+  // Calculer la hauteur nécessaire
+  let addrLines = 2; // FACTURÉ À + nom
+  if (data.customerAddress) addrLines++;
+  if (data.customerZip && data.customerCity) addrLines++;
+  const addrH = addrLines * 18 + 10;
+  
+  // Fond grisé
+  page.drawRectangle({ 
+    x: addrX - 5, 
+    y: y - addrH + 8, 
+    width: addrW, 
+    height: addrH, 
+    color: rgb(0.95, 0.95, 0.95) 
+  });
+  
   page.drawText('FACTURÉ À:', { x: addrX, y, size: 11, font: fontBold, color: textColor });
-  y -= 20;
+  y -= 18;
   page.drawText(data.customerName, { x: addrX, y, size: 11, font: fontBold, color: textColor });
   if (data.customerAddress) {
-    y -= 15;
+    y -= 16;
     page.drawText(data.customerAddress, { x: addrX, y, size: 10, font, color: textColor });
   }
   if (data.customerZip && data.customerCity) {
-    y -= 15;
+    y -= 16;
     page.drawText(`${data.customerZip} ${data.customerCity}`, { x: addrX, y, size: 10, font, color: textColor });
   }
   
@@ -169,31 +228,41 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Uint8Array>
   const colWidths = [250, 50, 80, 80, 80];
   
   function drawTableHeader() {
-    page.drawRectangle({ x: tableLeft, y: y - 20, width: width - 100, height: 20, color: rgb(0.9, 0.9, 0.9) });
+    // Calculer la largeur totale nécessaire pour le tableau
+    const totalTableWidth = colWidths.reduce((sum, w) => sum + w, 0) + 10; // +10 pour les marges
+    
+    // Fond grisé pour l'en-tête du tableau (aligné avec les autres blocs grisés)
+    page.drawRectangle({ 
+      x: 45, // Aligné avec les autres blocs grisés (addrX - 5)
+      y: y - 22, 
+      width: totalTableWidth * 0.99, // Réduit de 1%
+      height: 22, 
+      color: rgb(0.9, 0.9, 0.9) 
+    });
     let x = tableLeft + 5;
-    page.drawText('Description', { x, y: y - 15, size: 10, font: fontBold, color: textColor });
+    page.drawText('Description', { x, y: y - 13, size: 10, font: fontBold, color: textColor });
     x += colWidths[0];
-    page.drawText('Qté', { x, y: y - 15, size: 10, font: fontBold, color: textColor });
+    page.drawText('Qté', { x, y: y - 13, size: 10, font: fontBold, color: textColor });
     x += colWidths[1];
     if (data.pricingMode === 'HT_TVA') {
-      page.drawText('PU HT', { x, y: y - 15, size: 10, font: fontBold, color: textColor });
+      page.drawText('PU HT', { x, y: y - 13, size: 10, font: fontBold, color: textColor });
       x += colWidths[2];
-      page.drawText('TVA', { x, y: y - 15, size: 10, font: fontBold, color: textColor });
+      page.drawText('TVA', { x, y: y - 13, size: 10, font: fontBold, color: textColor });
       x += colWidths[3];
-      page.drawText('Total HT', { x, y: y - 15, size: 10, font: fontBold, color: textColor });
+      page.drawText('Total HT', { x, y: y - 13, size: 10, font: fontBold, color: textColor });
     } else {
-      page.drawText('PU TTC', { x, y: y - 15, size: 10, font: fontBold, color: textColor });
+      page.drawText('PU TTC', { x, y: y - 13, size: 10, font: fontBold, color: textColor });
       x += colWidths[2];
-      page.drawText('', { x, y: y - 15, size: 10, font: fontBold, color: textColor });
+      page.drawText('', { x, y: y - 13, size: 10, font: fontBold, color: textColor });
       x += colWidths[3];
-      page.drawText('Total TTC', { x, y: y - 15, size: 10, font: fontBold, color: textColor });
+      page.drawText('Total TTC', { x, y: y - 13, size: 10, font: fontBold, color: textColor });
     }
   }
 
   // First header
   drawTableHeader();
   
-  y -= 25;
+  y -= 30; // Espace supplémentaire entre l'en-tête et la première ligne
   
   // Table rows
   for (const line of data.lines) {
@@ -251,35 +320,44 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Uint8Array>
     y -= 18;
   }
   
+  // Calculer la hauteur du bloc total (TOTAL TTC + Payé + Restant dû)
+  let totalBlockLines = 1; // TOTAL TTC
+  if (data.paidAmount != null) totalBlockLines++; // Payé
+  if (data.remainingAmount != null && data.remainingAmount > 0) totalBlockLines++; // Restant dû
+  const totalBlockHeight = totalBlockLines * 20 + 4;
+  
+  // Fond grisé pour tout le bloc total
   page.drawRectangle({
     x: totalsX - 5,
-    y: y - 18,
+    y: y - totalBlockHeight + 4,
     width: 190,
-    height: 20,
+    height: totalBlockHeight,
     color: rgb(0.95, 0.95, 0.95),
   });
   
-  page.drawText(`TOTAL TTC:`, { x: totalsX, y: y - 5, size: 12, font: fontBold, color: primaryColor });
-  page.drawText(`${data.totalTTC.toFixed(2)} €`, { x: totalsX + 100, y: y - 5, size: 12, font: fontBold, color: primaryColor });
+  page.drawText(`TOTAL TTC:`, { x: totalsX, y: y - 7, size: 12, font: fontBold, color: primaryColor });
+  page.drawText(`${data.totalTTC.toFixed(2)} €`, { x: totalsX + 100, y: y - 7, size: 12, font: fontBold, color: primaryColor });
+  y -= 20;
+  
+  // Afficher Payé et Restant dû dans le même bloc grisé
+  if (data.paidAmount != null) {
+    page.drawText(`Payé:`, { x: totalsX, y: y - 7, size: 10, font, color: textColor });
+    page.drawText(`${(data.paidAmount || 0).toFixed(2)} €`, { x: totalsX + 100, y: y - 7, size: 10, font, color: textColor });
+    y -= 20;
+    if (data.remainingAmount != null && data.remainingAmount > 0) {
+      page.drawText(`Restant dû:`, { x: totalsX, y: y - 7, size: 11, font: fontBold, color: rgb(0.7, 0.2, 0.2) });
+      page.drawText(`${data.remainingAmount.toFixed(2)} €`, { x: totalsX + 100, y: y - 7, size: 11, font: fontBold, color: rgb(0.7, 0.2, 0.2) });
+    }
+  }
   
   // === PAYMENT INFO ===
   if (data.paidAt) {
-    y -= 30;
+    y -= 25;
     const paidDate = new Date(data.paidAt).toLocaleDateString('fr-FR');
     page.drawText(`✓ Payée le ${paidDate}`, { x: totalsX, y, size: 10, font: fontBold, color: rgb(0, 0.6, 0) });
     if (data.paymentMethod) {
       y -= 15;
       page.drawText(`Moyen: ${data.paymentMethod}`, { x: totalsX, y, size: 9, font, color: grayColor });
-    }
-  }
-  if (data.paidAmount != null) {
-    y -= 20;
-    page.drawText(`Payé:`, { x: totalsX, y, size: 10, font, color: textColor });
-    page.drawText(`${(data.paidAmount || 0).toFixed(2)} €`, { x: totalsX + 100, y, size: 10, font, color: textColor });
-    y -= 18;
-    if (data.remainingAmount != null && data.remainingAmount > 0) {
-      page.drawText(`Restant dû:`, { x: totalsX, y, size: 11, font: fontBold, color: rgb(0.7, 0.2, 0.2) });
-      page.drawText(`${data.remainingAmount.toFixed(2)} €`, { x: totalsX + 100, y, size: 11, font: fontBold, color: rgb(0.7, 0.2, 0.2) });
     }
   }
   
@@ -309,22 +387,115 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Uint8Array>
   }
 
   // === LEGAL FOOTER ===
-  y = Math.min(y, 100);
-  
-  const legalText = data.legalFooter || 
-    "En cas de retard de paiement, une pénalité égale à 3 fois le taux d'intérêt légal sera appliquée, " +
-    "à laquelle s'ajoutera une indemnité forfaitaire pour frais de recouvrement de 40 euros.";
-  
-  const legalLines = wrapText(legalText, 80);
-  for (const line of legalLines) {
-    page.drawText(line, { x: 50, y, size: 7, font, color: grayColor });
-    y -= 10;
+  // S'assurer qu'on a assez d'espace en bas de page
+  y -= 20;
+  if (y < 200) {
+    // Nouvelle page si pas assez d'espace
+    page = pdfDoc.addPage([595, 842]);
+    y = height - 80;
   }
   
+  // Ligne de séparation
+  page.drawLine({ start: { x: 50, y }, end: { x: width - 50, y }, thickness: 0.5, color: grayColor });
+  y -= 15;
+  
+  // Titre de la section
+  page.drawText('CONDITIONS GÉNÉRALES', { x: 50, y, size: 8, font: fontBold, color: textColor });
+  y -= 12;
+  
+  // Mentions légales selon le type de document
+  let legalText = '';
+  
+  if (data.type === 'quote') {
+    // MENTIONS POUR DEVIS
+    legalText = data.legalFooter || 
+      "Ce devis est valable pour la durée indiquée. Les travaux ne débuteront qu'après acceptation écrite du devis et versement de l'acompte éventuel. " +
+      "Conformément aux articles L217-4 et suivants du Code de la consommation, les produits vendus bénéficient de la garantie légale de conformité et de la garantie contre les vices cachés. " +
+      "Conditions de règlement : paiement à réception de facture. Tout retard de paiement entraînera l'application de pénalités de retard au taux de 3 fois le taux d'intérêt légal, " +
+      "ainsi qu'une indemnité forfaitaire pour frais de recouvrement de 40 euros (article L441-6 du Code de commerce).";
+  } else if (data.type === 'credit') {
+    // MENTIONS POUR AVOIR
+    legalText = data.legalFooter || 
+      "Cet avoir annule et remplace la facture mentionnée ci-dessus pour le montant indiqué. " +
+      "Il peut être utilisé pour le règlement de futures prestations ou faire l'objet d'un remboursement selon les conditions convenues.";
+  } else {
+    // MENTIONS POUR FACTURE
+    legalText = data.legalFooter || 
+      "Conditions de règlement : paiement à réception de facture. En cas de retard de paiement, des pénalités égales à 3 fois le taux d'intérêt légal seront appliquées, " +
+      "auxquelles s'ajoutera une indemnité forfaitaire pour frais de recouvrement de 40 euros (article L441-6 du Code de commerce). " +
+      "Conformément aux articles L217-4 et suivants du Code de la consommation, les produits vendus bénéficient de la garantie légale de conformité (2 ans) et de la garantie contre les vices cachés. " +
+      "Les réparations sont garanties 3 mois pièces et main d'œuvre. Aucun escompte pour paiement anticipé.";
+  }
+  
+  // Fond grisé pour les mentions légales
+  // Calculer la largeur disponible en pixels (largeur page - marges)
+  const availableWidth = width - 100; // 50px de marge de chaque côté
+  const fontSize = 7;
+  const lineHeight = 10;
+  
+  // Wrapper le texte en fonction de la largeur réelle disponible
+  const avgCharWidth = font.widthOfTextAtSize('x', fontSize);
+  const maxCharsPerLine = Math.floor(availableWidth / avgCharWidth);
+  const legalLines = wrapText(legalText, maxCharsPerLine);
+  
+  // Calculer la hauteur totale nécessaire
+  const legalHeight = legalLines.length * lineHeight + 10;
+  
+  // Vérifier si on a assez d'espace pour tout le bloc
+  if (y - legalHeight < 40) {
+    page = pdfDoc.addPage([595, 842]);
+    y = height - 80;
+    page.drawText('CONDITIONS GÉNÉRALES', { x: 50, y, size: 8, font: fontBold, color: textColor });
+    y -= 12;
+  }
+  
+  // Dessiner le fond grisé (toute la largeur disponible)
+  page.drawRectangle({
+    x: 45,
+    y: y - legalHeight + 5,
+    width: width - 90,
+    height: legalHeight,
+    color: rgb(0.97, 0.97, 0.97),
+  });
+  
+  // Afficher le texte sur le fond grisé
+  y -= 5;
+  for (const line of legalLines) {
+    page.drawText(line, { x: 50, y, size: fontSize, font, color: rgb(0.3, 0.3, 0.3) });
+    y -= lineHeight;
+  }
+  
+  y -= 10;
+  
+  // TVA non applicable pour auto-entrepreneur
   if (data.pricingMode === 'AE_TTC') {
-    y -= 5;
-    page.drawText("TVA non applicable, art. 293 B du CGI (Auto-entrepreneur)", { 
-      x: 50, y, size: 7, font: fontBold, color: grayColor 
+    if (y < 50) {
+      page = pdfDoc.addPage([595, 842]);
+      y = height - 80;
+    }
+    const tvaTxt = "TVA non applicable, article 293 B du Code Général des Impôts (Auto-entrepreneur)";
+    const txtWidth = font.widthOfTextAtSize(tvaTxt, 7);
+    page.drawRectangle({
+      x: 45,
+      y: y - 15,
+      width: txtWidth + 10,
+      height: 18,
+      color: rgb(0.95, 0.95, 0.95),
+    });
+    page.drawText(tvaTxt, { 
+      x: 50, y: y - 10, size: 7, font: fontBold, color: rgb(0.2, 0.2, 0.2)
+    });
+    y -= 25;
+  }
+  
+  // Note spéciale pour devis
+  if (data.type === 'quote') {
+    if (y < 60) {
+      page = pdfDoc.addPage([595, 842]);
+      y = height - 80;
+    }
+    page.drawText("Bon pour accord (signature précédée de la mention 'Lu et approuvé') :", { 
+      x: 50, y, size: 9, font: fontBold, color: textColor 
     });
   }
   

@@ -17,17 +17,21 @@ export async function POST(req: Request, { params }: { params: { id: string } })
   const vatRate = body.vatRate != null ? Number(body.vatRate) : inv.vatRate;
   const isAE = inv.pricingMode === 'AE_TTC';
   
+  let unitPriceHT = 0;
+  let unitPriceTTC = 0;
   let totalHT = 0;
   let totalTTC = 0;
   
   if (isAE) {
-    const unitTTC = Number(body.unitPriceTTC || 0);
-    totalTTC = unitTTC * qty;
-    totalHT = vatRate > 0 ? totalTTC / (1 + vatRate / 100) : totalTTC;
+    unitPriceTTC = Number(body.unitPriceTTC || 0);
+    unitPriceHT = vatRate > 0 ? unitPriceTTC / (1 + vatRate / 100) : unitPriceTTC;
+    totalTTC = unitPriceTTC * qty;
+    totalHT = unitPriceHT * qty;
   } else {
-    const unitHT = Number(body.unitPriceHT || 0);
-    totalHT = unitHT * qty;
-    totalTTC = totalHT * (1 + (vatRate > 0 ? vatRate / 100 : 0));
+    unitPriceHT = Number(body.unitPriceHT || 0);
+    unitPriceTTC = unitPriceHT * (1 + (vatRate > 0 ? vatRate / 100 : 0));
+    totalHT = unitPriceHT * qty;
+    totalTTC = unitPriceTTC * qty;
   }
 
   const line = await prisma.invoiceLine.create({
@@ -36,9 +40,9 @@ export async function POST(req: Request, { params }: { params: { id: string } })
       type: String(body.type || 'part'),
       description: String(body.description || ''),
       qty,
-      unitPriceHT: body.unitPriceHT != null ? Number(body.unitPriceHT) : null,
-      unitPriceTTC: body.unitPriceTTC != null ? Number(body.unitPriceTTC) : null,
-      vatRate: body.vatRate != null ? Number(body.vatRate) : null,
+      unitPriceHT: Math.round(unitPriceHT * 100) / 100,
+      unitPriceTTC: Math.round(unitPriceTTC * 100) / 100,
+      vatRate: vatRate,
       totalHT: Math.round(totalHT * 100) / 100,
       totalTTC: Math.round(totalTTC * 100) / 100,
     },

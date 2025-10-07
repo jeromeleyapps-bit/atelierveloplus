@@ -127,6 +127,9 @@ export default function TicketsPage() {
   const [sortBy, setSortBy] = useState<"id" | "customer" | "name" | "email" | "bike" | "status" | "hubspot">("id");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const [page, setPage] = useState(0);
+  
+  // Sélection multiple pour actions groupées
+  const [selected, setSelected] = useState<string[]>([]);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const refresh = useCallback(async () => {
@@ -488,11 +491,25 @@ export default function TicketsPage() {
   return (
     <RequireAuth>
       <PageShell title="Tickets atelier">
-        <SectionCard title="Filtres & création" icon={<AssignmentIcon color="primary" />}>
+        {/* Widget 1 : Filtres & Recherche */}
+        <SectionCard title="Recherche & Filtres" icon={<SearchIcon color="primary" />}>
           <Stack spacing={2}>
-            {/* Ligne 1: uniquement les filtres d'état (tabs) */}
-            <Stack direction={{ xs: 'column', md: 'row' }} alignItems={{ xs: 'start', md: 'center' }} justifyContent="space-between" spacing={2} sx={{ flexWrap: 'wrap', rowGap: 1 }}>
-              <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>Créer un ticket</Typography>
+            {/* Ligne 1: Recherche + Tabs statut */}
+            <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} alignItems={{ xs: 'stretch', md: 'center' }}>
+              <TextField
+                size="small"
+                placeholder="Rechercher (id, client, email, vélo)"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                sx={{ flex: 1, minWidth: 260 }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon fontSize="small" />
+                    </InputAdornment>
+                  ),
+                }}
+              />
               <Tabs
                 value={statusFilter || ""}
                 onChange={(_, v) => setStatusFilter(v as typeof statusFilter)}
@@ -507,26 +524,23 @@ export default function TicketsPage() {
               </Tabs>
             </Stack>
 
-            {/* Ligne 2: recherche, actions, colonnes, chips, densité */}
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} alignItems="center" sx={{ width: { xs: '100%', md: 'auto' }, flexWrap: { xs: 'wrap', md: 'nowrap' }, rowGap: 1 }}>
-              <TextField
-                size="small"
-                placeholder="Rechercher (id, client, email, vélo)"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                sx={{ minWidth: 260 }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon fontSize="small" />
-                    </InputAdornment>
-                  ),
-                }}
+            {/* Ligne 2: Filtres rapides + Options */}
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} alignItems="center" sx={{ flexWrap: 'wrap', rowGap: 1 }}>
+              <Chip
+                label="Prêts aujourd'hui"
+                color={onlyReadyToday ? 'primary' : 'default'}
+                onClick={() => setOnlyReadyToday((v) => !v)}
+                variant={onlyReadyToday ? 'filled' : 'outlined'}
               />
-              <Button onClick={refresh} size="small" variant="outlined" startIcon={<SearchIcon />}>Rechercher</Button>
-              <Button onClick={exportCsv} size="small" variant="outlined" startIcon={<FileDownloadIcon />}>Export CSV</Button>
+              <Chip
+                label="Cette semaine"
+                color={onlyReadyWeek ? 'primary' : 'default'}
+                onClick={() => setOnlyReadyWeek((v) => !v)}
+                variant={onlyReadyWeek ? 'filled' : 'outlined'}
+              />
+              <Box flex={1} />
               <Tooltip title="Colonnes visibles">
-                <IconButton onClick={(e) => setColAnchor(e.currentTarget)}>
+                <IconButton size="small" onClick={(e) => setColAnchor(e.currentTarget)}>
                   <ViewColumnIcon />
                 </IconButton>
               </Tooltip>
@@ -548,77 +562,76 @@ export default function TicketsPage() {
                   </MenuItem>
                 ))}
               </Menu>
-              <Chip
-                label="Prêts aujourd'hui"
-                color={onlyReadyToday ? 'primary' : 'default'}
-                onClick={() => setOnlyReadyToday((v) => !v)}
-                variant={onlyReadyToday ? 'filled' : 'outlined'}
-                sx={{ ml: { sm: 1 } }}
-              />
-              <Chip
-                label="Cette semaine"
-                color={onlyReadyWeek ? 'primary' : 'default'}
-                onClick={() => setOnlyReadyWeek((v) => !v)}
-                variant={onlyReadyWeek ? 'filled' : 'outlined'}
-              />
-              <FormControlLabel control={<Switch size="small" checked={dense} onChange={(e) => setDense(e.target.checked)} />} label="Lignes compactes" />
+              <Button onClick={exportCsv} size="small" variant="outlined" startIcon={<FileDownloadIcon />}>Export CSV</Button>
+              <FormControlLabel control={<Switch size="small" checked={dense} onChange={(e) => setDense(e.target.checked)} />} label="Compact" />
             </Stack>
-            <Divider />
-            <form onSubmit={onCreate}>
-              <Stack spacing={2}>
-                <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems={{ xs: "stretch", sm: "center" }} sx={{ flexWrap: 'wrap', rowGap: 1 }}>
-                  <Autocomplete
+          </Stack>
+        </SectionCard>
+
+        {/* Widget 2 : Création rapide */}
+        <SectionCard title="Nouveau ticket" icon={<AddIcon color="primary" />}>
+          <form onSubmit={onCreate}>
+            <Stack spacing={2}>
+              {/* Ligne 1: Client + Vélo */}
+              <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems={{ xs: "stretch", sm: "center" }}>
+                <Autocomplete
                   options={customers}
                   loading={loadingCustomers}
                   getOptionLabel={(c) => [c.firstName, c.lastName].filter(Boolean).join(" ") || c.email || "Client"}
                   onChange={(_, val) => setCustomerId(val?.id || "")}
                   renderInput={(params) => (
-                    <TextField {...params} label="Client (autocomplete)" size="small" placeholder="Tapez un nom, email..." />
+                    <TextField {...params} label="Client *" size="small" placeholder="Rechercher un client..." />
                   )}
-                  sx={{ minWidth: 280, flex: 1 }}
+                  sx={{ flex: 1, minWidth: 280 }}
                 />
-                  <TextField
-                  label="Customer ID (manuel)"
-                  helperText="Optionnel si l'autocomplete ne convient pas"
-                  value={customerId}
-                  onChange={(e) => setCustomerId(e.target.value)}
-                  size="small"
-                  sx={{ minWidth: 220 }}
-                />
-                  <Autocomplete
+                <Autocomplete
                   options={customerBikes}
                   getOptionLabel={(b) => [b.brand, b.model, b.serialNumber ? `SN:${b.serialNumber}` : ""].filter(Boolean).join(" • ") || "Vélo"}
                   value={customerBikes.find(b => b.id === bikeId) || null}
                   onChange={(_, v) => setBikeId(v?.id || "")}
                   disabled={!customerId}
                   renderInput={(params) => (
-                    <TextField {...params} label="Vélo du client (optionnel)" size="small" placeholder={customerId ? "Choisir un vélo" : "Sélectionner d'abord un client"} />
+                    <TextField {...params} label="Vélo (optionnel)" size="small" placeholder={customerId ? "Choisir un vélo" : "Sélectionner d'abord un client"} />
                   )}
-                  sx={{ minWidth: 240 }}
+                  sx={{ flex: 1, minWidth: 240 }}
                 />
-                  <Button size="small" variant="outlined" disabled={!customerId} onClick={() => setAddBikeOpen(true)}>Ajouter un vélo</Button>
-                  <Select size="small" value={ticketType} onChange={(e: SelectChangeEvent) => setTicketType(e.target.value as WorkOrderType | "")} displayEmpty sx={{ minWidth: 200 }}>
-                    <MenuItem value=""><em>Type de ticket (optionnel)</em></MenuItem>
-                    <MenuItem value="revision">Révision</MenuItem>
-                    <MenuItem value="repair">Réparation</MenuItem>
-                    <MenuItem value="maintenance">Entretien</MenuItem>
-                    <MenuItem value="upgrade">Upgrade</MenuItem>
-                  </Select>
-                </Stack>
-                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} alignItems={{ xs: 'stretch', sm: 'center' }} sx={{ flexWrap: 'wrap', rowGap: 1 }}>
-                  <ButtonGroup size="small" variant="outlined">
-                    <Button onClick={() => setTicketType('revision' as WorkOrderType)}>Révision</Button>
-                    <Button onClick={() => setTicketType('repair' as WorkOrderType)}>Réparation</Button>
-                    <Button onClick={() => setTicketType('maintenance' as WorkOrderType)}>Entretien</Button>
-                    <Button onClick={() => setTicketType('upgrade' as WorkOrderType)}>Upgrade</Button>
-                  </ButtonGroup>
-                  <Button type="submit" variant="contained" size="small" startIcon={<AddIcon />} disabled={creating} sx={{ whiteSpace: "nowrap" }}>
-                    {creating ? "Création..." : "Créer"}
-                  </Button>
-                </Stack>
+                <Button size="small" variant="outlined" disabled={!customerId} onClick={() => setAddBikeOpen(true)}>+ Vélo</Button>
               </Stack>
-            </form>
-          </Stack>
+
+              {/* Ligne 2: Type + Créer */}
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} alignItems={{ xs: 'stretch', sm: 'center' }} justifyContent="space-between">
+                <ButtonGroup size="small" variant="outlined">
+                  <Button 
+                    onClick={() => setTicketType('revision' as WorkOrderType)}
+                    variant={ticketType === 'revision' ? 'contained' : 'outlined'}
+                  >
+                    Révision
+                  </Button>
+                  <Button 
+                    onClick={() => setTicketType('repair' as WorkOrderType)}
+                    variant={ticketType === 'repair' ? 'contained' : 'outlined'}
+                  >
+                    Réparation
+                  </Button>
+                  <Button 
+                    onClick={() => setTicketType('maintenance' as WorkOrderType)}
+                    variant={ticketType === 'maintenance' ? 'contained' : 'outlined'}
+                  >
+                    Entretien
+                  </Button>
+                  <Button 
+                    onClick={() => setTicketType('upgrade' as WorkOrderType)}
+                    variant={ticketType === 'upgrade' ? 'contained' : 'outlined'}
+                  >
+                    Upgrade
+                  </Button>
+                </ButtonGroup>
+                <Button type="submit" variant="contained" size="medium" startIcon={<AddIcon />} disabled={creating || !customerId}>
+                  {creating ? "Création..." : "Créer le ticket"}
+                </Button>
+              </Stack>
+            </Stack>
+          </form>
         </SectionCard>
 
         <SectionCard title="Liste des tickets" icon={<ListAltIcon color="primary" />} sx={{ overflow: 'hidden' }}>
@@ -640,10 +653,116 @@ export default function TicketsPage() {
               <Button size="small" variant="outlined" onClick={goToPage}>Aller</Button>
             </Stack>
           </Box>
+
+          {/* Widget d'actions groupées */}
+          {selected.length > 0 && (
+            <Paper elevation={2} sx={{ p: 2, mb: 2, borderRadius: 2, bgcolor: 'action.hover', border: '2px solid', borderColor: 'divider' }}>
+              <Stack direction={{ xs: 'column', md: 'row' }} spacing={1} alignItems="center" sx={{ flexWrap: 'wrap', rowGap: 1 }}>
+                <Typography variant="subtitle1" fontWeight={600} sx={{ mr: 2 }}>
+                  {selected.length} ticket{selected.length > 1 ? 's' : ''} sélectionné{selected.length > 1 ? 's' : ''}
+                </Typography>
+                <Button 
+                  size="small" 
+                  variant="outlined" 
+                  startIcon={<EditIcon />}
+                  onClick={() => {
+                    if (selected.length !== 1) {
+                      setToast({ open: true, message: 'Sélectionnez un seul ticket', severity: 'error' });
+                      return;
+                    }
+                    window.location.href = `/tickets/${selected[0]}`;
+                  }}
+                >
+                  Modifier
+                </Button>
+                <Button 
+                  size="small" 
+                  variant="outlined" 
+                  onClick={async () => {
+                    if (selected.length < 2) {
+                      setToast({ open: true, message: 'Sélectionnez au moins 2 tickets', severity: 'error' });
+                      return;
+                    }
+                    // Vérifier que tous les tickets ont le même client
+                    const tickets = items.filter(t => selected.includes(t.id));
+                    const customerIds = [...new Set(tickets.map(t => t.customerId))];
+                    if (customerIds.length > 1) {
+                      setToast({ open: true, message: 'Les tickets doivent appartenir au même client', severity: 'error' });
+                      return;
+                    }
+                    if (!confirm(`Fusionner ${selected.length} tickets en un seul ?`)) return;
+                    
+                    try {
+                      const res = await fetch('/api/workshop/workorders/merge', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ workOrderIds: selected }),
+                      });
+                      if (res.ok) {
+                        const merged = await res.json();
+                        setToast({ open: true, message: 'Tickets fusionnés', severity: 'success' });
+                        setSelected([]);
+                        await refresh();
+                        window.location.href = `/tickets/${merged.id}`;
+                      } else {
+                        const errorData = await res.json().catch(() => ({}));
+                        console.error('Merge error:', errorData);
+                        throw new Error(errorData.error || 'Erreur fusion');
+                      }
+                    } catch (e) {
+                      setToast({ open: true, message: 'Erreur lors de la fusion', severity: 'error' });
+                    }
+                  }}
+                >
+                  Fusionner
+                </Button>
+                <Button 
+                  size="small" 
+                  variant="outlined" 
+                  color="error"
+                  onClick={async () => {
+                    if (!confirm(`Supprimer définitivement ${selected.length} ticket(s) ? Cette action est irréversible.`)) return;
+                    let successCount = 0;
+                    for (const id of selected) {
+                      try {
+                        await deleteWorkOrder(id);
+                        successCount++;
+                      } catch (e) {
+                        console.error('Delete error:', e);
+                      }
+                    }
+                    setSelected([]);
+                    await refresh();
+                    setToast({ open: true, message: `${successCount} ticket(s) supprimé(s)`, severity: 'success' });
+                  }}
+                >
+                  Supprimer
+                </Button>
+                <Box flex={1} />
+                <Button 
+                  size="small" 
+                  onClick={() => setSelected([])}
+                >
+                  Annuler sélection
+                </Button>
+              </Stack>
+            </Paper>
+          )}
+
           <TableContainer ref={tableRef} sx={{ maxHeight: 560, borderTop: '1px solid', borderColor: 'divider' }}>
           <Table size={dense ? "small" : "medium"} stickyHeader>
             <TableHead>
               <TableRow>
+                <TableCell padding="checkbox">
+                  <Checkbox
+                    indeterminate={selected.length > 0 && selected.length < processedItems.length}
+                    checked={processedItems.length > 0 && selected.length === processedItems.length}
+                    onChange={(e) => {
+                      if (e.target.checked) setSelected(processedItems.map(t => t.id));
+                      else setSelected([]);
+                    }}
+                  />
+                </TableCell>
                 {columns.id && (
                   <TableCell
                     sortDirection={sortBy === 'id' ? sortDir : false as any}
@@ -732,6 +851,18 @@ export default function TicketsPage() {
               )}
               {!loading && processedItems.map((wo) => (
                 <TableRow key={wo.id} hover sx={{ '&:nth-of-type(odd)': { bgcolor: 'action.hover' } }}>
+                  <TableCell padding="checkbox">
+                    <Checkbox
+                      checked={selected.includes(wo.id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelected([...selected, wo.id]);
+                        } else {
+                          setSelected(selected.filter(id => id !== wo.id));
+                        }
+                      }}
+                    />
+                  </TableCell>
                   {columns.id && (
                     <TableCell sx={{ position: 'sticky', left: 0, bgcolor: 'background.paper', zIndex: 2, width: 140, maxWidth: 140, minWidth: 120 }}>
                       <Tooltip title={wo.id}>

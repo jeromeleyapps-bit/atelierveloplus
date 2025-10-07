@@ -14,10 +14,16 @@ import {
   TableHead,
   TableRow,
   Typography,
+  Checkbox,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import TransformIcon from "@mui/icons-material/Transform";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EmailIcon from "@mui/icons-material/Email";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import Link from "next/link";
 import { convertQuoteToInvoice, type Invoice } from "@/lib/api";
 import CreateQuoteDialog from "./CreateQuoteDialog";
@@ -30,6 +36,8 @@ interface QuotesTabProps {
 export default function QuotesTab({ quotes, onRefresh }: QuotesTabProps) {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [converting, setConverting] = useState<string | null>(null);
+  const [selected, setSelected] = useState<string[]>([]);
+  const [toast, setToast] = useState<{ open: boolean; message: string; severity: "success" | "error" | "warning" }>({ open: false, message: "", severity: "success" });
 
   const handleConvert = async (quoteId: string) => {
     if (!confirm("Convertir ce devis en facture ?")) return;
@@ -73,6 +81,83 @@ export default function QuotesTab({ quotes, onRefresh }: QuotesTabProps) {
         </Button>
       </Stack>
 
+      {/* Bandeau d'actions groupées */}
+      {selected.length > 0 && (
+        <Paper elevation={2} sx={{ p: 2, mb: 3, borderRadius: 2, bgcolor: 'action.hover', border: '2px solid', borderColor: 'divider' }}>
+          <Stack direction={{ xs: 'column', md: 'row' }} spacing={1} alignItems="center" sx={{ flexWrap: 'wrap', rowGap: 1 }}>
+            <Typography variant="subtitle1" fontWeight={600} sx={{ mr: 2 }}>
+              {selected.length} devis sélectionné{selected.length > 1 ? 's' : ''}
+            </Typography>
+            <Button 
+              size="small" 
+              variant="outlined"
+              startIcon={<PictureAsPdfIcon />}
+              onClick={() => {
+                selected.forEach(id => {
+                  window.open(`/api/finance/invoices/${id}/pdf`, '_blank');
+                });
+              }}
+            >
+              Télécharger PDF
+            </Button>
+            <Button 
+              size="small" 
+              variant="outlined"
+              startIcon={<EmailIcon />}
+              onClick={async () => {
+                for (const id of selected) {
+                  try {
+                    await fetch(`/api/finance/invoices/${id}/email`, { method: 'POST' });
+                  } catch (e) {
+                    console.error('Email error:', e);
+                  }
+                }
+                setToast({ open: true, message: `${selected.length} devis envoyé${selected.length > 1 ? 's' : ''}`, severity: 'success' });
+              }}
+            >
+              Envoyer par email
+            </Button>
+            <Button 
+              size="small" 
+              variant="outlined" 
+              color="error"
+              startIcon={<DeleteIcon />}
+              onClick={async () => {
+                if (!confirm(`Supprimer définitivement ${selected.length} devis ? Cette action est irréversible.`)) return;
+                let successCount = 0;
+                const userId = window.localStorage.getItem("auth:userId");
+                for (const id of selected) {
+                  try {
+                    const res = await fetch(`/api/finance/invoices/${id}`, { 
+                      method: 'DELETE',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        'x-user-id': userId || '',
+                      }
+                    });
+                    if (res.ok) successCount++;
+                  } catch (e) {
+                    console.error('Delete error:', e);
+                  }
+                }
+                setToast({ open: true, message: `${successCount} devis supprimé${successCount > 1 ? 's' : ''}`, severity: 'success' });
+                setSelected([]);
+                onRefresh();
+              }}
+            >
+              Supprimer
+            </Button>
+            <Button 
+              size="small" 
+              variant="text"
+              onClick={() => setSelected([])}
+            >
+              Annuler sélection
+            </Button>
+          </Stack>
+        </Paper>
+      )}
+
       {quotes.length === 0 ? (
         <Paper sx={{ p: 4, textAlign: "center" }}>
           <Typography variant="body1" color="text.secondary" gutterBottom>
@@ -94,6 +179,15 @@ export default function QuotesTab({ quotes, onRefresh }: QuotesTabProps) {
           <Table>
             <TableHead>
               <TableRow>
+                <TableCell padding="checkbox">
+                  <Checkbox
+                    indeterminate={selected.length > 0 && selected.length < quotes.length}
+                    checked={quotes.length > 0 && selected.length === quotes.length}
+                    onChange={(e) => {
+                      if (e.target.checked) setSelected(quotes.map(q => q.id)); else setSelected([]);
+                    }}
+                  />
+                </TableCell>
                 <TableCell>Numéro</TableCell>
                 <TableCell>Date création</TableCell>
                 <TableCell>Valide jusqu'au</TableCell>
@@ -104,7 +198,15 @@ export default function QuotesTab({ quotes, onRefresh }: QuotesTabProps) {
             </TableHead>
             <TableBody>
               {quotes.map((quote) => (
-                <TableRow key={quote.id} hover>
+                <TableRow key={quote.id} hover selected={selected.includes(quote.id)}>
+                  <TableCell padding="checkbox">
+                    <Checkbox
+                      checked={selected.includes(quote.id)}
+                      onChange={(e) => {
+                        setSelected((prev) => e.target.checked ? Array.from(new Set([...prev, quote.id])) : prev.filter(id => id !== quote.id));
+                      }}
+                    />
+                  </TableCell>
                   <TableCell>
                     <Typography variant="body2" fontWeight={600}>
                       {quote.number || "Brouillon"}
@@ -147,7 +249,7 @@ export default function QuotesTab({ quotes, onRefresh }: QuotesTabProps) {
                         size="small"
                         variant="outlined"
                         component={Link}
-                        href={`/finance/invoices/${quote.id}`}
+                        href={`/finance/quotes/${quote.id}`}
                         startIcon={<OpenInNewIcon />}
                       >
                         Voir
@@ -191,6 +293,12 @@ export default function QuotesTab({ quotes, onRefresh }: QuotesTabProps) {
           onRefresh();
         }}
       />
+
+      <Snackbar open={toast.open} autoHideDuration={3500} onClose={() => setToast((t) => ({ ...t, open: false }))} anchorOrigin={{ vertical: "bottom", horizontal: "center" }}>
+        <Alert onClose={() => setToast((t) => ({ ...t, open: false }))} severity={toast.severity} sx={{ width: '100%' }}>
+          {toast.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }

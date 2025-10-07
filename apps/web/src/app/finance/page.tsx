@@ -52,6 +52,7 @@ import RequireAuth from "../components/RequireAuth";
 import PageShell from "../components/PageShell";
 import { listInvoices, createInvoice, payInvoice, listCustomers, createCustomer, createWorkOrder, type Invoice, type PricingMode, type Customer } from "@/lib/api";
 import CreateQuoteDialog from "./components/CreateQuoteDialog";
+import CreateInvoiceDialog from "./components/CreateInvoiceDialog";
 import QuotesTab from "./components/QuotesTab";
 import CreditsTab from "./components/CreditsTab";
 
@@ -65,7 +66,7 @@ function FinanceContent() {
   const [query, setQuery] = useState("");
   // Filter status accepted by listInvoices (exclude 'part_paid')
   const [status, setStatus] = useState<"" | "draft" | "issued" | "paid" | "cancelled">("");
-  const [toast, setToast] = useState<{ open: boolean; message: string; severity: "success" | "error" }>({ open: false, message: "", severity: "success" });
+  const [toast, setToast] = useState<{ open: boolean; message: string; severity: "success" | "error" | "warning" }>({ open: false, message: "", severity: "success" });
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [sortBy, setSortBy] = useState<"issueDate" | "number" | "status" | "totalTTC">("issueDate");
@@ -77,17 +78,8 @@ function FinanceContent() {
   const [payAt, setPayAt] = useState<string>(() => new Date().toISOString().slice(0,16));
   // Bulk selection
   const [selected, setSelected] = useState<string[]>([]);
-  // Direct sale form
-  const [directRef, setDirectRef] = useState("direct");
-  const [directMode, setDirectMode] = useState<PricingMode>("HT_TVA");
-  const [directVat, setDirectVat] = useState<number>(20);
-  const [directLabor, setDirectLabor] = useState<number>(60);
-  // Customer selection for direct sale
-  const [customerOptions, setCustomerOptions] = useState<Customer[]>([]);
-  const [customerQuery, setCustomerQuery] = useState("");
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
-  const [newCustOpen, setNewCustOpen] = useState(false);
-  const [newCust, setNewCust] = useState<Partial<Customer>>({ firstName: "", lastName: "", email: "", phone: "" });
+  // Removed: Direct sale form (now in CreateInvoiceDialog)
+  // Removed: Customer selection for direct sale (now in CreateInvoiceDialog)
   // Revenue filters
   const [fromDate, setFromDate] = useState<string>(() => {
     const d = new Date();
@@ -100,9 +92,15 @@ function FinanceContent() {
   const [paidInvoices, setPaidInvoices] = useState<Invoice[] | null>(null);
   // Auto-entrepreneur flag (from local storage or future settings)
   const [aeFlag, setAeFlag] = useState<boolean>(false);
-  // Document type tabs
-  const [documentType, setDocumentType] = useState<"quotes" | "invoices" | "credits">("invoices");
+  // Document type tabs - Initialiser depuis l'URL si présent
+  const tabParam = searchParams.get('tab') as "quotes" | "invoices" | "credits" | null;
+  const [documentType, setDocumentType] = useState<"quotes" | "invoices" | "credits">(tabParam || "invoices");
   const [createQuoteDialogOpen, setCreateQuoteDialogOpen] = useState(false);
+  const [createInvoiceDialogOpen, setCreateInvoiceDialogOpen] = useState(false);
+  const [addPaymentOpen, setAddPaymentOpen] = useState(false);
+  const [paymentAmount, setPaymentAmount] = useState<number>(0);
+  const [paymentMethod, setPaymentMethod] = useState<string>("CB");
+  const [paymentDate, setPaymentDate] = useState<string>(() => new Date().toISOString().slice(0, 10));
 
   async function refresh() {
     setLoading(true);
@@ -189,7 +187,6 @@ function FinanceContent() {
       const v = localStorage.getItem('shop_ae');
       const isAe = v === '1' || v === 'true';
       setAeFlag(isAe);
-      if (isAe) setDirectMode('AE_TTC');
     } catch {}
   }, []);
 
@@ -269,46 +266,10 @@ function FinanceContent() {
     URL.revokeObjectURL(url);
   }
 
-  async function createDirectInvoice() {
-    try {
-      const pricingMode: PricingMode = aeFlag ? 'AE_TTC' : directMode;
-      const vat = pricingMode === 'AE_TTC' ? 0 : directVat;
-      // Always create a local Work Order to link the invoice properly
-      const wo = await createWorkOrder({
-        customerId: selectedCustomer?.id || undefined,
-        bikeId: undefined,
-        dueAt: undefined,
-      });
-      const inv = await createInvoice({ workOrderId: wo.id, pricingMode, currency: "EUR", vatRate: vat, laborRate: directLabor });
-      router.push((`/finance/invoices/${inv.id}` as Route));
-    } catch (e) {
-      console.error(e);
-      setToast({ open: true, message: "Erreur: création facture directe", severity: "error" });
-    }
-  }
-
-  // Load customers (simple: fetch all then filter client-side by query)
-  useEffect(() => {
-    (async () => {
-      try {
-        const list = await listCustomers();
-        let opts = list;
-        const n = customerQuery.trim().toLowerCase();
-        if (n) {
-          opts = list.filter(c =>
-            (c.firstName || '').toLowerCase().includes(n) ||
-            (c.lastName || '').toLowerCase().includes(n) ||
-            (c.email || '').toLowerCase().includes(n) ||
-            (c.phone || '').toLowerCase().includes(n)
-          );
-        }
-        setCustomerOptions(opts.slice(0, 50));
-      } catch (e) { console.error(e); }
-    })();
-  }, [customerQuery]);
+  // Removed: createDirectInvoice and customer loading (now in CreateInvoiceDialog)
 
   return (
-        <PageShell title="Factures" maxWidth="lg">
+        <PageShell title="Facturation" maxWidth="lg">
         <Tabs 
           value={documentType} 
           onChange={(_, val) => setDocumentType(val)}
@@ -339,43 +300,32 @@ function FinanceContent() {
         {/* Onglet Factures - Interface complète */}
         {documentType === "invoices" && (
         <>
-        <Paper elevation={1} sx={{ p: 2, mb: 3, borderRadius: 2, position: { md: 'sticky' }, top: { md: 64 }, zIndex: 1 }}>
-          <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} alignItems={{ xs: "stretch", sm: "center" }} justifyContent="space-between">
-            <Stack direction="row" spacing={1} alignItems="center">
-              <ReceiptLongIcon color="primary" />
-              <Typography variant="h6" sx={{ mr: 1 }}>Factures</Typography>
-            </Stack>
-            <Stack direction={{ xs: "column", md: "row" }} spacing={1} alignItems="center" sx={{ width: { xs: "100%", md: "auto" } }}>
-              <TextField
-                size="small"
-                placeholder="Rechercher (n°, client, ticket)"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                sx={{ minWidth: 320, width: { xs: '100%', md: 480 } }}
-                InputProps={{ startAdornment: <InputAdornment position="start"><SearchIcon fontSize="small" /></InputAdornment> }}
-              />
-              <Button variant="outlined" size="small" onClick={refresh} startIcon={<RefreshIcon />} sx={{ minWidth: 0, px: 1.5, whiteSpace: 'nowrap' }}>Actualiser</Button>
-              <TextField
-                size="small"
-                select
-                label="Statut"
-                value={status}
-                onChange={(e) => setStatus(e.target.value as any)}
-                sx={{ minWidth: 160 }}
-              >
-                <MenuItem value="">Tous</MenuItem>
-                <MenuItem value="draft">Brouillon</MenuItem>
-                <MenuItem value="issued">Émise</MenuItem>
-                <MenuItem value="paid">Payée</MenuItem>
-                <MenuItem value="cancelled">Annulée</MenuItem>
-              </TextField>
-              <Button variant="contained" size="small" onClick={createDirectInvoice} sx={{ minWidth: 0, px: 1.5, whiteSpace: 'nowrap' }}>Nouvelle facture</Button>
-            </Stack>
-          </Stack>
-          <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} alignItems={{ xs: 'stretch', md: 'center' }} sx={{ mt: 2 }}>
-            <Typography variant="body2" color="text.secondary">Total financier TTC (liste): <b>{totalTTC.toFixed(2)} EUR</b></Typography>
-            <Box flex={1} />
-            <Button size="small" variant="outlined" disabled={selected.length===0} onClick={openBulkPay} sx={{ minWidth: 0, px: 1.5, whiteSpace: 'nowrap' }}>Marquer payées ({selected.length})</Button>
+        <Paper elevation={1} sx={{ p: 2, mb: 3, borderRadius: 2 }}>
+          <Stack direction={{ xs: "column", md: "row" }} spacing={1} alignItems="center" sx={{ flexWrap: 'wrap', rowGap: 1 }}>
+            <TextField
+              size="small"
+              placeholder="Rechercher (n°, client, ticket)"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              sx={{ minWidth: 320, flex: 1 }}
+              InputProps={{ startAdornment: <InputAdornment position="start"><SearchIcon fontSize="small" /></InputAdornment> }}
+            />
+            <TextField
+              size="small"
+              select
+              label="Statut"
+              value={status}
+              onChange={(e) => setStatus(e.target.value as any)}
+              sx={{ minWidth: 160 }}
+            >
+              <MenuItem value="">Tous</MenuItem>
+              <MenuItem value="draft">Brouillon</MenuItem>
+              <MenuItem value="issued">Émise</MenuItem>
+              <MenuItem value="paid">Payée</MenuItem>
+              <MenuItem value="cancelled">Annulée</MenuItem>
+            </TextField>
+            <Button variant="outlined" size="small" onClick={refresh} startIcon={<RefreshIcon />}>Actualiser</Button>
+            <Button variant="contained" size="small" onClick={() => setCreateInvoiceDialogOpen(true)}>Nouvelle facture</Button>
           </Stack>
         </Paper>
 
@@ -427,71 +377,106 @@ function FinanceContent() {
           </Paper>
         </Stack>
 
-        {/* CA payé (période) */}
-        <Paper elevation={1} sx={{ p: 2, mb: 3, borderRadius: 2 }}>
-          <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
-            <TrendingUpIcon color="primary" />
-            <Typography variant="h6">Chiffre d&apos;affaires (payé)</Typography>
-          </Stack>
-          {/* Ligne 1: période */}
-          <Stack direction={{ xs: 'column', md: 'row' }} spacing={1} alignItems={{ xs: 'stretch', md: 'center' }} sx={{ mb: 1 }}>
-            <TextField size="small" label="Du" type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} InputLabelProps={{ shrink: true }} />
-            <TextField size="small" label="Au" type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} InputLabelProps={{ shrink: true }} />
-          </Stack>
-          {/* Ligne 2: actions */}
-          <Stack direction={{ xs: 'column', md: 'row' }} spacing={1} alignItems={{ xs: 'stretch', md: 'center' }}>
-            <Button size="small" variant="outlined" onClick={calcRevenue}>Calculer</Button>
-            <Box flex={1} />
-            <Button size="small" onClick={exportPaidCsv} disabled={!paidInvoices || paidInvoices.length===0}>Exporter CSV</Button>
-          </Stack>
-          {paidInvoices && (
-            <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} sx={{ mt: 1 }}>
-              <Chip label={`Total: ${paidTotals.total.toFixed(2)} EUR`} color="primary" />
-              <Chip label={`Atelier: ${paidTotals.atelier.toFixed(2)} EUR`} />
-              <Chip label={`Vente directe: ${paidTotals.direct.toFixed(2)} EUR`} />
-              <Typography variant="caption" color="text.secondary" sx={{ alignSelf: 'center' }}>Basé sur factures payées</Typography>
+        {/* Widget d'actions groupées */}
+        {selected.length > 0 && (
+          <Paper elevation={2} sx={{ p: 2, mb: 3, borderRadius: 2, bgcolor: 'action.hover', border: '2px solid', borderColor: 'divider' }}>
+            <Stack direction={{ xs: 'column', md: 'row' }} spacing={1} alignItems="center" sx={{ flexWrap: 'wrap', rowGap: 1 }}>
+              <Typography variant="subtitle1" fontWeight={600} sx={{ mr: 2 }}>
+                {selected.length} facture{selected.length > 1 ? 's' : ''} sélectionnée{selected.length > 1 ? 's' : ''}
+              </Typography>
+              <Button 
+                size="small" 
+                variant="outlined" 
+                startIcon={<PaidIcon />}
+                onClick={openBulkPay}
+              >
+                Marquer payée{selected.length > 1 ? 's' : ''}
+              </Button>
+              <Button 
+                size="small" 
+                variant="outlined" 
+                onClick={() => {
+                  if (selected.length !== 1) {
+                    setToast({ open: true, message: 'Sélectionnez une seule facture', severity: 'warning' });
+                    return;
+                  }
+                  setAddPaymentOpen(true);
+                }}
+              >
+                Ajouter paiement
+              </Button>
+              <Button 
+                size="small" 
+                variant="outlined" 
+                onClick={async () => {
+                  if (selected.length !== 1) {
+                    setToast({ open: true, message: 'Sélectionnez une seule facture', severity: 'warning' });
+                    return;
+                  }
+                  router.push(`/finance/credits/new?invoiceId=${selected[0]}` as Route);
+                }}
+              >
+                Créer avoir
+              </Button>
+              <Button 
+                size="small" 
+                variant="outlined" 
+                onClick={async () => {
+                  for (const id of selected) {
+                    try {
+                      await fetch(`/api/finance/invoices/${id}/email`, { method: 'POST' });
+                    } catch (e) {
+                      console.error('Email error:', e);
+                    }
+                  }
+                  setToast({ open: true, message: `${selected.length} email(s) envoyé(s)`, severity: 'success' });
+                }}
+              >
+                Envoyer par email
+              </Button>
+              <Button 
+                size="small" 
+                variant="outlined" 
+                onClick={() => {
+                  selected.forEach(id => {
+                    window.open(`/api/finance/invoices/${id}/pdf`, '_blank');
+                  });
+                }}
+              >
+                Exporter PDF
+              </Button>
+              <Button 
+                size="small" 
+                variant="outlined" 
+                color="error"
+                onClick={async () => {
+                  if (!confirm(`Supprimer définitivement ${selected.length} facture(s) ? Cette action est irréversible.`)) return;
+                  let successCount = 0;
+                  for (const id of selected) {
+                    try {
+                      const res = await fetch(`/api/finance/invoices/${id}`, { method: 'DELETE' });
+                      if (res.ok) successCount++;
+                    } catch (e) {
+                      console.error('Delete error:', e);
+                    }
+                  }
+                  setSelected([]);
+                  await refresh();
+                  setToast({ open: true, message: `${successCount} facture(s) supprimée(s)`, severity: 'success' });
+                }}
+              >
+                Supprimer
+              </Button>
+              <Box flex={1} />
+              <Button 
+                size="small" 
+                onClick={() => setSelected([])}
+              >
+                Annuler sélection
+              </Button>
             </Stack>
-          )}
-        </Paper>
-
-        {/* Ventes directes (création facture sans ticket) */}
-        <Paper elevation={1} sx={{ p: 2, mb: 3, borderRadius: 2 }}>
-          <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
-            <PointOfSaleIcon color="primary" />
-            <Typography variant="h6">Vente directe</Typography>
-          </Stack>
-          {/* Ligne 1: client + nouveau + référence */}
-          <Stack direction={{ xs: 'column', md: 'row' }} spacing={1} alignItems={{ xs: 'stretch', md: 'center' }} sx={{ mb: 1, flexWrap: { xs: 'wrap', md: 'nowrap' }, rowGap: 1 }}>
-            <Autocomplete
-              size="small"
-              options={customerOptions}
-              value={selectedCustomer}
-              getOptionLabel={(c) => `${c.firstName || ''} ${c.lastName || ''} ${c.email ? `· ${c.email}` : ''}`.trim() || c.id}
-              onChange={(_, v) => setSelectedCustomer(v)}
-              onInputChange={(_, v) => setCustomerQuery(v)}
-              filterOptions={(x) => x}
-              sx={{ minWidth: 360, width: { xs: '100%', md: 420 } }}
-              renderInput={(params) => <TextField {...params} label="Client (optionnel)" />}
-            />
-            <Button size="small" variant="outlined" onClick={() => setNewCustOpen(true)} sx={{ minWidth: 0, px: 1.5, whiteSpace: 'nowrap' }}>Nouveau client</Button>
-            <TextField size="small" label="Référence" value={directRef} onChange={(e) => setDirectRef(e.target.value)} sx={{ minWidth: 200, width: { xs: '100%', md: 240 } }} />
-          </Stack>
-          {/* Ligne 2: mode + TVA + taux MO + créer */}
-          <Stack direction={{ xs: 'column', md: 'row' }} spacing={1} alignItems={{ xs: 'stretch', md: 'center' }} sx={{ flexWrap: { xs: 'wrap', md: 'nowrap' }, rowGap: 1 }}>
-            <TextField size="small" select label="Mode" value={directMode} onChange={(e) => setDirectMode(e.target.value as PricingMode)} sx={{ minWidth: 160 }}>
-              <MenuItem value="HT_TVA">HT + TVA</MenuItem>
-              <MenuItem value="AE_TTC">AE (TTC)</MenuItem>
-            </TextField>
-            {directMode === 'HT_TVA' && (
-              <TextField size="small" label="TVA (%)" type="number" value={directVat} onChange={(e) => setDirectVat(Number(e.target.value))} sx={{ width: 120 }} />
-            )}
-            <TextField size="small" label="Taux MO (€/h)" type="number" value={directLabor} onChange={(e) => setDirectLabor(Number(e.target.value))} sx={{ width: 150 }} />
-            <Button variant="contained" size="small" onClick={createDirectInvoice} sx={{ minWidth: 0, px: 1.5, whiteSpace: 'nowrap' }}>Créer facture directe</Button>
-          </Stack>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-            Astuce: une fois créée, ajoute les pièces/équipements/vélos depuis l&apos;écran de facture.
-          </Typography>
-        </Paper>
+          </Paper>
+        )}
 
         <Paper elevation={1} sx={{ borderRadius: 2 }}>
           <TableContainer sx={{ maxHeight: 560 }}>
@@ -627,33 +612,78 @@ function FinanceContent() {
           </DialogActions>
         </Dialog>
 
-        {/* Nouveau client */}
-        <Dialog open={newCustOpen} onClose={() => setNewCustOpen(false)} maxWidth="sm" fullWidth>
-          <DialogTitle>Nouveau client</DialogTitle>
+        {/* Dialog Ajouter paiement */}
+        <Dialog open={addPaymentOpen} onClose={() => setAddPaymentOpen(false)} maxWidth="xs" fullWidth>
+          <DialogTitle>Ajouter un paiement</DialogTitle>
           <DialogContent>
             <Stack spacing={2} sx={{ mt: 1 }}>
-              <TextField id="cust-first" size="small" label="Prénom" value={newCust.firstName || ''} onChange={(e) => setNewCust((c) => ({ ...(c as any), firstName: e.target.value }))} />
-              <TextField id="cust-last" size="small" label="Nom" value={newCust.lastName || ''} onChange={(e) => setNewCust((c) => ({ ...(c as any), lastName: e.target.value }))} />
-              <TextField id="cust-email" size="small" label="Email" type="email" value={newCust.email || ''} onChange={(e) => setNewCust((c) => ({ ...(c as any), email: e.target.value }))} />
-              <TextField id="cust-phone" size="small" label="Téléphone" value={newCust.phone || ''} onChange={(e) => setNewCust((c) => ({ ...(c as any), phone: e.target.value }))} />
+              <TextField
+                label="Montant"
+                type="number"
+                value={paymentAmount}
+                onChange={(e) => setPaymentAmount(Number(e.target.value))}
+                onFocus={(e) => e.target.select()}
+                fullWidth
+              />
+              <TextField
+                select
+                label="Méthode"
+                value={paymentMethod}
+                onChange={(e) => setPaymentMethod(e.target.value)}
+                fullWidth
+              >
+                <MenuItem value="CB">Carte bancaire</MenuItem>
+                <MenuItem value="especes">Espèces</MenuItem>
+                <MenuItem value="cheque">Chèque</MenuItem>
+                <MenuItem value="virement">Virement</MenuItem>
+              </TextField>
+              <TextField
+                label="Date"
+                type="date"
+                value={paymentDate}
+                onChange={(e) => setPaymentDate(e.target.value)}
+                InputLabelProps={{ shrink: true }}
+                fullWidth
+              />
             </Stack>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setNewCustOpen(false)}>Annuler</Button>
-            <Button variant="contained" onClick={async () => {
-              try {
-                const created = await createCustomer({
-                  email: (newCust.email || undefined) as any,
-                  firstName: (newCust.firstName || undefined) as any,
-                  lastName: (newCust.lastName || undefined) as any,
-                  phone: (newCust.phone || undefined) as any,
-                });
-                setSelectedCustomer(created as any);
-                setNewCustOpen(false);
-              } catch (e) { console.error(e); setToast({ open: true, message: 'Erreur: création client', severity: 'error' }); }
-            }}>Créer</Button>
+            <Button onClick={() => setAddPaymentOpen(false)}>Annuler</Button>
+            <Button
+              variant="contained"
+              onClick={async () => {
+                if (selected.length !== 1) return;
+                try {
+                  await fetch(`/api/finance/invoices/${selected[0]}/payments`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      amount: paymentAmount,
+                      method: paymentMethod,
+                      paidAt: paymentDate,
+                    }),
+                  });
+                  setAddPaymentOpen(false);
+                  setToast({ open: true, message: 'Paiement ajouté', severity: 'success' });
+                  await refresh();
+                } catch (e) {
+                  setToast({ open: true, message: 'Erreur ajout paiement', severity: 'error' });
+                }
+              }}
+            >
+              Ajouter
+            </Button>
           </DialogActions>
         </Dialog>
+
+        <CreateInvoiceDialog
+          open={createInvoiceDialogOpen}
+          onClose={() => setCreateInvoiceDialogOpen(false)}
+          onSuccess={(invoiceId) => {
+            setCreateInvoiceDialogOpen(false);
+            router.push(`/finance/invoices/${invoiceId}` as Route);
+          }}
+        />
 
         <CreateQuoteDialog
           open={createQuoteDialogOpen}

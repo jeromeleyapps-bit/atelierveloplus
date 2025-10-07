@@ -22,6 +22,7 @@ import {
   Typography,
   Select,
   MenuItem,
+  IconButton,
 } from "@mui/material";
 import {
   createSaleFromWorkOrder,
@@ -58,7 +59,9 @@ import ReceiptIcon from "@mui/icons-material/Receipt";
 import TransformIcon from "@mui/icons-material/Transform";
 import EmailIcon from "@mui/icons-material/Email";
 import SmsIcon from "@mui/icons-material/Sms";
+import RefreshIcon from "@mui/icons-material/Refresh";
 import Link from "next/link";
+import { AppointmentPicker } from "@/components/AppointmentPicker";
 
 export default function TicketDetailPage() {
   const params = useParams();
@@ -163,6 +166,13 @@ export default function TicketDetailPage() {
   useEffect(() => {
     if (!id) return;
     loadQuotes();
+    
+    // Rafraîchir les devis toutes les 10 secondes
+    const interval = setInterval(() => {
+      loadQuotes();
+    }, 10000);
+    
+    return () => clearInterval(interval);
   }, [id]);
 
   async function loadQuotes() {
@@ -183,14 +193,38 @@ export default function TicketDetailPage() {
     if (!id) return;
     
     try {
+      console.log('Création devis pour ticket:', id);
       const quote = await createQuote({ workOrderId: id, validDays: 30 });
+      console.log('Devis créé:', quote.id);
+      
+      // Importer la main d'œuvre du ticket
+      try {
+        console.log('Import des données du ticket vers le devis...');
+        const result = await importLaborToInvoice(quote.id, id);
+        console.log('Import réussi:', result);
+      } catch (e: any) {
+        console.error('Erreur import main d\'œuvre:', e);
+        console.error('Détails:', e.message);
+        // Afficher l'erreur à l'utilisateur
+        setToast({
+          open: true,
+          message: `Attention: ${e.message || 'Erreur import données'}`,
+          severity: "error",
+        });
+      }
+      
       setToast({
         open: true,
-        message: "Devis créé avec succès !",
+        message: "Devis créé ! Vérifiez les lignes importées.",
         severity: "success",
       });
-      window.location.href = `/finance/invoices/${quote.id}`;
+      
+      // Attendre un peu avant de rediriger pour voir le toast
+      setTimeout(() => {
+        window.location.href = `/finance/invoices/${quote.id}`;
+      }, 1000);
     } catch (err: any) {
+      console.error('Erreur création devis:', err);
       setToast({
         open: true,
         message: `Erreur: ${err.message}`,
@@ -235,9 +269,25 @@ export default function TicketDetailPage() {
 
   async function onCreateInvoice(pricingMode: "HT_TVA" | "AE_TTC") {
     try {
-      const inv = await createInvoice({ workOrderId: id, pricingMode, currency: "EUR", vatRate: pricingMode === "AE_TTC" ? 0 : 20, laborRate: Number(hourlyRate) || 60 });
-      try { await importLaborToInvoice(inv.id, id); } catch {}
+      // Créer une FACTURE directe (pas un devis)
+      const inv = await createInvoice({ 
+        workOrderId: id, 
+        type: "invoice", // ← FACTURE
+        pricingMode, 
+        currency: "EUR", 
+        vatRate: pricingMode === "AE_TTC" ? 0 : 20, 
+        laborRate: Number(hourlyRate) || 60 
+      } as any);
+      
+      // Importer la main d'œuvre du ticket
+      try { 
+        await importLaborToInvoice(inv.id, id); 
+      } catch (e) {
+        console.error('Erreur import main d\'œuvre:', e);
+      }
+      
       router.push(`/finance/invoices/${inv.id}`);
+      setToast({ open: true, message: "Facture créée avec les pièces et la main d'œuvre !", severity: "success" });
     } catch (e) {
       console.error(e);
       setToast({ open: true, message: "Erreur: création facture", severity: "error" });
@@ -496,6 +546,7 @@ export default function TicketDetailPage() {
                 type="number"
                 value={estimatedMinutes}
                 onChange={(e) => setEstimatedMinutes(e.target.value)}
+                onFocus={(e) => e.target.select()}
               />
               <TextField
                 label="Taux horaire (€ / h)"
@@ -503,6 +554,7 @@ export default function TicketDetailPage() {
                 type="number"
                 value={hourlyRate}
                 onChange={(e) => setHourlyRate(e.target.value)}
+                onFocus={(e) => e.target.select()}
               />
               <Button
                 size="small"
@@ -548,10 +600,10 @@ export default function TicketDetailPage() {
                         <TextField size="small" value={p.description} onChange={(e) => setParts(prev => { const n=[...prev]; n[idx] = { ...n[idx], description: e.target.value }; return n; })} sx={{ minWidth: 220 }} />
                       </td>
                       <td style={{ textAlign: 'right' }}>
-                        <TextField size="small" type="number" value={p.qty} onChange={(e) => setParts(prev => { const n=[...prev]; n[idx] = { ...n[idx], qty: Number(e.target.value || 0) }; return n; })} sx={{ width: 100 }} />
+                        <TextField size="small" type="number" value={p.qty} onChange={(e) => setParts(prev => { const n=[...prev]; n[idx] = { ...n[idx], qty: Number(e.target.value || 0) }; return n; })} onFocus={(e) => e.target.select()} sx={{ width: 100 }} />
                       </td>
                       <td style={{ textAlign: 'right' }}>
-                        <TextField size="small" type="number" value={p.priceHT} onChange={(e) => setParts(prev => { const n=[...prev]; n[idx] = { ...n[idx], priceHT: Number(e.target.value || 0) }; return n; })} sx={{ width: 140 }} />
+                        <TextField size="small" type="number" value={p.priceHT} onChange={(e) => setParts(prev => { const n=[...prev]; n[idx] = { ...n[idx], priceHT: Number(e.target.value || 0) }; return n; })} onFocus={(e) => e.target.select()} sx={{ width: 140 }} />
                       </td>
                       <td>
                         <TextField size="small" value={p.note || ''} onChange={(e) => setParts(prev => { const n=[...prev]; n[idx] = { ...n[idx], note: e.target.value }; return n; })} sx={{ minWidth: 180 }} />
@@ -603,8 +655,8 @@ export default function TicketDetailPage() {
               />
             </Box>
             <TextField size="small" label="Description" value={pDesc} onChange={(e) => setPDesc(e.target.value)} sx={{ flex: 1 }} />
-            <TextField size="small" type="number" label="Qté" value={pQty} onChange={(e) => setPQty(e.target.value)} sx={{ width: 120 }} />
-            <TextField size="small" type="number" label="Prix HT" value={pPrice} onChange={(e) => setPPrice(e.target.value)} sx={{ width: 140 }} />
+            <TextField size="small" type="number" label="Qté" value={pQty} onChange={(e) => setPQty(e.target.value)} onFocus={(e) => e.target.select()} sx={{ width: 120 }} />
+            <TextField size="small" type="number" label="Prix HT" value={pPrice} onChange={(e) => setPPrice(e.target.value)} onFocus={(e) => e.target.select()} sx={{ width: 140 }} />
             <TextField size="small" label="Note" value={pNote} onChange={(e) => setPNote(e.target.value)} sx={{ flex: 1 }} />
             <Button size="small" variant="outlined" disabled={addingPart || !pDesc.trim()}
               onClick={async () => {
@@ -723,9 +775,18 @@ export default function TicketDetailPage() {
         </DialogActions>
       </Dialog>
 
+      {/* Rendez-vous Retour */}
+      {wo && (
+        <AppointmentPicker
+          workOrderId={id}
+          currentAppointment={wo.appointmentDate}
+          onAppointmentChanged={refresh}
+        />
+      )}
+
       {/* Facturation */}
-      <Paper sx={{ p: 2, mt: 3 }}>
-        <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2 }}>
+      <Paper sx={{ p: 3, mb: 3 }}>
+        <Stack direction="row" spacing={1} alignItems="center" mb={2}>
           <ReceiptIcon color="primary" />
           <Typography variant="h6">Facturation</Typography>
         </Stack>
@@ -740,9 +801,19 @@ export default function TicketDetailPage() {
             </Stack>
           ) : quotes.length > 0 ? (
             <Box>
-              <Typography variant="subtitle2" gutterBottom fontWeight={600}>
-                Devis existants
-              </Typography>
+              <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
+                <Typography variant="subtitle2" fontWeight={600}>
+                  Devis existants
+                </Typography>
+                <IconButton 
+                  size="small" 
+                  onClick={loadQuotes}
+                  disabled={loadingQuotes}
+                  title="Rafraîchir"
+                >
+                  <RefreshIcon fontSize="small" />
+                </IconButton>
+              </Stack>
               {quotes.map((quote) => (
                 <Paper key={quote.id} sx={{ p: 2, mb: 1, bgcolor: 'background.default' }}>
                   <Stack direction="row" justifyContent="space-between" alignItems="center">
@@ -812,7 +883,7 @@ export default function TicketDetailPage() {
               onClick={() => onCreateInvoice('HT_TVA')}
               disabled={!id}
             >
-              Facture directe
+              Créer une facture
             </Button>
           </Stack>
         </Stack>

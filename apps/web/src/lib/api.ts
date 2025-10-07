@@ -60,6 +60,8 @@ export type WorkOrder = {
   bikeId?: string | null;
   createdAt: string;
   dueAt?: string | null;
+  appointmentDate?: string | null;
+  calendarEventId?: string | null;
   customer?: {
     id: string;
     email?: string | null;
@@ -590,11 +592,11 @@ export async function deleteInvoiceLine(invoiceId: string, lineId: string): Prom
 
 // Labor Entries
 export async function listLaborEntries(workOrderId: string): Promise<LaborEntry[]> {
-  return request(`/finance/workorders/${workOrderId}/labor`);
+  return request(`/workshop/workorders/${workOrderId}/labor`);
 }
 
 export async function addLaborEntry(workOrderId: string, input: { minutes: number; note?: string }): Promise<LaborEntry> {
-  return request(`/finance/workorders/${workOrderId}/labor`, {
+  return request(`/workshop/workorders/${workOrderId}/labor`, {
     method: "POST",
     body: JSON.stringify(input),
   });
@@ -794,6 +796,12 @@ export type AppSettings = {
   country?: string | null;
   pdfPrimary?: string | null;
   legalFooter?: string | null;
+  // Informations légales
+  siret?: string | null;
+  tva?: string | null;
+  rcs?: string | null;
+  capital?: string | null;
+  insurance?: string | null;
 };
 
 export async function getAppSettings(): Promise<AppSettings> {

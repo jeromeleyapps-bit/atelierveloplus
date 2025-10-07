@@ -7,6 +7,8 @@ const nextConfig = {
     // Allow production builds to succeed even if there are ESLint errors
     ignoreDuringBuilds: true,
   },
+  // Autoriser les requêtes depuis le domaine Cloudflare Tunnel
+  allowedDevOrigins: ["https://rdv.upgradedbikes.com"],
   experimental: {
     typedRoutes: true,
     optimizePackageImports: ["@mui/material", "@mui/icons-material"],

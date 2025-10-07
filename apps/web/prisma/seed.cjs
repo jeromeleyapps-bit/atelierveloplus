@@ -31,7 +31,7 @@ async function main() {
   const items = [
     {
       sku: 'p-chaine',
-      category: 'piece',
+      category: 'PIECES',
       name: 'Chaine 11v',
       priceHT: 18,
       priceTTC: 21.6,
@@ -41,7 +41,7 @@ async function main() {
     },
     {
       sku: 's-revision',
-      category: 'service',
+      category: 'AUTRES',
       name: 'Révision générale',
       priceHT: 60,
       priceTTC: 72,

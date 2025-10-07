@@ -106,8 +106,8 @@ export default function CreateQuoteDialog({
       const quote = await createQuote({ workOrderId: finalWorkOrderId, validDays });
       onSuccess(quote.id);
       onClose();
-      // Rediriger vers la page du devis
-      window.location.href = `/finance/invoices/${quote.id}`;
+      // Rediriger vers la page du devis (route dédiée)
+      window.location.href = `/finance/quotes/${quote.id}`;
     } catch (err: any) {
       setError(err.message || "Erreur lors de la création du devis");
     } finally {
@@ -209,6 +209,7 @@ export default function CreateQuoteDialog({
                 type="number"
                 value={validDays}
                 onChange={(e) => setValidDays(parseInt(e.target.value) || 30)}
+                onFocus={(e) => e.target.select()}
                 helperText="Nombre de jours avant expiration du devis"
                 inputProps={{ min: 1, max: 365 }}
               />

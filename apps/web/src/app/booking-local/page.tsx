@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import {
+  Autocomplete,
   Box,
   Button,
   CircularProgress,
@@ -31,16 +32,18 @@ function addDays(d: Date, days: number) { return new Date(d.getTime() + days*24*
 
 export default function PublicBookingPage() {
   const [rangeStart, setRangeStart] = useState<string>(() => isoLocal(new Date()));
-  const [rangeEnd, setRangeEnd] = useState<string>(() => isoLocal(addDays(new Date(), 14)));
+  const [rangeEnd, setRangeEnd] = useState<string>(() => isoLocal(addDays(new Date(), 7)));
   const [loading, setLoading] = useState(false);
-  const [slots, setSlots] = useState<{ start: string; end: string }[]>([]);
+  const [slots, setSlots] = useState<{ start: string; end: string; available: boolean }[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   const [open, setOpen] = useState(false);
-  const [selected, setSelected] = useState<{ start: string; end: string } | null>(null);
+  const [selected, setSelected] = useState<{ start: string; end: string; available: boolean } | null>(null);
   const [form, setForm] = useState({ name: "", email: "", phone: "", bike: "", description: "" });
   const [submitting, setSubmitting] = useState(false);
   const [submitMsg, setSubmitMsg] = useState<{ ok: boolean; msg: string } | null>(null);
+  const [customers, setCustomers] = useState<any[]>([]);
+  const [loadingCustomers, setLoadingCustomers] = useState(false);
 
   async function load() {
     setLoading(true); setError(null);
@@ -58,7 +61,33 @@ export default function PublicBookingPage() {
     }
   }
 
-  useEffect(() => { load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
+  useEffect(() => { load(); loadCustomers(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
+
+  async function loadCustomers() {
+    setLoadingCustomers(true);
+    try {
+      const res = await fetch('/api/customers');
+      if (res.ok) {
+        const data = await res.json();
+        setCustomers(data);
+      }
+    } catch (e) {
+      console.error('Failed to load customers', e);
+    } finally {
+      setLoadingCustomers(false);
+    }
+  }
+
+  function selectCustomer(customer: any) {
+    if (!customer) return;
+    setForm({
+      name: `${customer.firstName || ''} ${customer.lastName || ''}`.trim() || customer.email || '',
+      email: customer.email || '',
+      phone: customer.phone || '',
+      bike: '',
+      description: ''
+    });
+  }
 
   async function submitBooking() {
     if (!selected) return;
@@ -84,6 +113,87 @@ export default function PublicBookingPage() {
     } finally {
       setSubmitting(false);
     }
+  }
+
+  function renderSlotsByDay() {
+    // Grouper les créneaux par jour (exclure les dimanches)
+    const slotsByDay: { [key: string]: typeof slots } = {};
+    
+    slots.forEach(slot => {
+      const date = new Date(slot.start);
+      const dayOfWeek = date.getDay();
+      // Exclure les dimanches (0)
+      if (dayOfWeek === 0) return;
+      
+      const dayKey = date.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+      if (!slotsByDay[dayKey]) slotsByDay[dayKey] = [];
+      slotsByDay[dayKey].push(slot);
+    });
+
+    const days = Object.keys(slotsByDay);
+    
+    if (days.length === 0) {
+      return <Typography color="text.secondary">Aucun créneau disponible dans la période sélectionnée.</Typography>;
+    }
+
+    return (
+      <Box sx={{ display: 'flex', gap: 2, overflowX: 'auto', pb: 2 }}>
+        {days.map(day => {
+          const daySlots = slotsByDay[day];
+          const firstSlot = new Date(daySlots[0].start);
+          const dayOfWeek = firstSlot.getDay();
+          const isSaturday = dayOfWeek === 6;
+          
+          return (
+            <Paper 
+              key={day} 
+              sx={{ 
+                minWidth: 200, 
+                p: 2, 
+                bgcolor: isSaturday ? 'action.hover' : 'background.paper',
+                border: isSaturday ? '2px dashed' : '1px solid',
+                borderColor: isSaturday ? 'warning.main' : 'divider'
+              }}
+            >
+              <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'bold', textAlign: 'center' }}>
+                {day}
+              </Typography>
+              {isSaturday && (
+                <Alert severity="info" sx={{ mb: 1, py: 0 }}>
+                  Horaires spéciaux : 10h-17h
+                </Alert>
+              )}
+              <Stack spacing={1}>
+                {daySlots.map(slot => (
+                  <Button
+                    key={slot.start}
+                    variant={slot.available ? (isSaturday ? "outlined" : "contained") : "outlined"}
+                    size="small"
+                    fullWidth
+                    onClick={() => { if (slot.available) { setSelected(slot); setOpen(true); } }}
+                    disabled={!slot.available}
+                    sx={{ 
+                      justifyContent: 'center',
+                      textTransform: 'none',
+                      bgcolor: !slot.available ? 'action.disabledBackground' : undefined,
+                      color: !slot.available ? 'text.disabled' : undefined,
+                      borderColor: !slot.available ? 'divider' : undefined,
+                      '&:hover': {
+                        bgcolor: !slot.available ? 'action.disabledBackground' : undefined,
+                        cursor: !slot.available ? 'not-allowed' : 'pointer'
+                      }
+                    }}
+                  >
+                    {new Date(slot.start).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                    {!slot.available && ' (Complet)'}
+                  </Button>
+                ))}
+              </Stack>
+            </Paper>
+          );
+        })}
+      </Box>
+    );
   }
 
   return (
@@ -124,25 +234,15 @@ export default function PublicBookingPage() {
         </Grid>
       </Paper>
 
-      <Paper variant="outlined" sx={{ p:2 }}>
-        <Typography variant="subtitle1" sx={{ mb:1 }}>Créneaux disponibles</Typography>
+      <Paper variant="outlined" sx={{ p:2, overflowX: 'auto' }}>
         {loading && (
           <Stack direction="row" spacing={1} alignItems="center"><CircularProgress size={20} /> <Typography>Chargement…</Typography></Stack>
         )}
         {error && <Alert severity="error">{error}</Alert>}
         {!loading && !error && (
-          <Grid container spacing={1}>
-            {slots.map((s) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={s.start}>
-                <Button variant="outlined" fullWidth onClick={() => { setSelected(s); setOpen(true); }}>
-                  <span suppressHydrationWarning>{new Date(s.start).toLocaleString()}</span>
-                </Button>
-              </Grid>
-            ))}
-            {!slots.length && (
-              <Grid item xs={12}><Typography color="text.secondary">Aucun créneau dans l’intervalle choisi.</Typography></Grid>
-            )}
-          </Grid>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {renderSlotsByDay()}
+          </Box>
         )}
       </Paper>
 
@@ -150,7 +250,45 @@ export default function PublicBookingPage() {
         <DialogTitle>Réserver le créneau</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
-            <TextField label="Nom" fullWidth required value={form.name} onChange={e=>setForm({ ...form, name: e.target.value })} />
+            <Autocomplete
+              options={customers}
+              getOptionLabel={(option) => {
+                if (typeof option === 'string') return option;
+                const name = `${option.firstName || ''} ${option.lastName || ''}`.trim();
+                return name || option.email || 'Client sans nom';
+              }}
+              renderOption={(props, option) => (
+                <li {...props}>
+                  <Box>
+                    <Typography variant="body2">
+                      {`${option.firstName || ''} ${option.lastName || ''}`.trim() || option.email}
+                    </Typography>
+                    {option.phone && (
+                      <Typography variant="caption" color="text.secondary">
+                        {option.phone}
+                      </Typography>
+                    )}
+                  </Box>
+                </li>
+              )}
+              freeSolo
+              loading={loadingCustomers}
+              onChange={(e, value) => {
+                if (value && typeof value !== 'string') {
+                  selectCustomer(value);
+                }
+              }}
+              inputValue={form.name}
+              onInputChange={(e, value) => setForm({ ...form, name: value })}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Nom (ou sélectionnez un client existant)"
+                  required
+                  fullWidth
+                />
+              )}
+            />
             <TextField label="Email" type="email" fullWidth value={form.email} onChange={e=>setForm({ ...form, email: e.target.value })} />
             <TextField label="Téléphone" fullWidth value={form.phone} onChange={e=>setForm({ ...form, phone: e.target.value })} />
             <TextField label="Vélo" fullWidth value={form.bike} onChange={e=>setForm({ ...form, bike: e.target.value })} />

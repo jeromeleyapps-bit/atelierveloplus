@@ -19,6 +19,26 @@ export async function PATCH(req: Request, { params }: { params: { id: string; li
   if (body.partId !== undefined) data.partId = body.partId == null ? null : String(body.partId);
   if (body.purchasePriceHT !== undefined) data.purchasePriceHT = body.purchasePriceHT == null ? null : Number(body.purchasePriceHT);
 
+  // Récupérer la ligne actuelle pour avoir toutes les valeurs
+  const currentLine = await prisma.invoiceLine.findUnique({ where: { id: params.lineId } });
+  if (!currentLine) {
+    return NextResponse.json({ error: "Line not found" }, { status: 404 });
+  }
+
+  // Fusionner les données actuelles avec les nouvelles
+  const mergedData = { ...currentLine, ...data };
+  
+  // Recalculer les totaux de la ligne si nécessaire
+  if (mergedData.unitPriceHT != null && mergedData.qty != null && mergedData.vatRate != null) {
+    const unitPriceHT = Number(mergedData.unitPriceHT);
+    const qty = Number(mergedData.qty);
+    const vatRate = Number(mergedData.vatRate);
+    
+    data.unitPriceTTC = unitPriceHT * (1 + vatRate / 100);
+    data.totalHT = unitPriceHT * qty;
+    data.totalTTC = data.unitPriceTTC * qty;
+  }
+
   const updated = await prisma.invoiceLine.update({ where: { id: params.lineId }, data });
 
   // recompute totals

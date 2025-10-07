@@ -48,9 +48,9 @@ export default function AdminCalendarPage() {
         fetch(`/api/calendar/blocks${qs}`).then(r=>r.json()),
         fetch(`/api/calendar/bookings${qs}`).then(r=>r.json()),
       ]);
-      setEvents(ev);
-      setBlocks(bl);
-      setBookings(bk);
+      setEvents(Array.isArray(ev) ? ev : []);
+      setBlocks(Array.isArray(bl) ? bl : []);
+      setBookings(Array.isArray(bk) ? bk : []);
     } catch(e:any) { setErr(e?.message || "Erreur de chargement"); }
     finally { setLoading(false); }
   }
@@ -64,9 +64,9 @@ export default function AdminCalendarPage() {
         fetch(`/api/calendar/blocks${qs}`).then(r=>r.json()),
         fetch(`/api/calendar/bookings${qs}`).then(r=>r.json()),
       ]);
-      setEvents(ev);
-      setBlocks(bl);
-      setBookings(bk);
+      setEvents(Array.isArray(ev) ? ev : []);
+      setBlocks(Array.isArray(bl) ? bl : []);
+      setBookings(Array.isArray(bk) ? bk : []);
     } catch(e:any) { setErr(e?.message || "Erreur de chargement"); }
     finally { setLoading(false); }
   }

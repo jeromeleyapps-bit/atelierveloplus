@@ -4,6 +4,7 @@
   "version": "0.1.0",
   "scripts": {
     "dev": "next dev -p 3000",
+    "dev:tunnel": "powershell -ExecutionPolicy Bypass -File ./start-tunnel.ps1",
     "build": "next build",
     "start": "next start -p 3000",
     "lint": "next lint",
@@ -22,43 +23,7 @@
     "db:reset": "prisma generate && prisma migrate reset --force && prisma migrate dev",
     "db:studio": "prisma studio",
     "db:seed": "ts-node scripts/seed.ts",
-    "audit:deps": "depcheck",
-    "electron": "electron .",
-    "electron:dev": "cross-env NODE_ENV=development electron .",
-    "electron:build": "next build && electron-builder",
-    "pack": "next build && electron-builder --dir",
-    "dist": "next build && electron-builder"
-  },
-  "build": {
-    "appId": "com.ateliervelo.app",
-    "productName": "Atelier Velo+",
-    "directories": {
-      "output": "dist",
-      "buildResources": "electron"
-    },
-    "files": [
-      "electron/**/*",
-      ".next/**/*",
-      "public/**/*",
-      "prisma/**/*",
-      "node_modules/**/*",
-      "package.json"
-    ],
-    "win": {
-      "target": [
-        "nsis"
-      ],
-      "icon": "public/logo.png"
-    },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
-      "createDesktopShortcut": true,
-      "createStartMenuShortcut": true,
-      "shortcutName": "Atelier Velo+",
-      "installerIcon": "public/logo.png",
-      "uninstallerIcon": "public/logo.png"
-    }
+    "audit:deps": "depcheck"
   },
   "dependencies": {
     "@emotion/cache": "^11.14.0",
@@ -72,10 +37,10 @@
     "@mui/icons-material": "^5.15.0",
     "@mui/material": "^5.15.0",
     "@mui/x-data-grid": "^6.18.7",
-    "@prisma/client": "^6.16.2",
+    "@prisma/client": "6.16.3",
     "@supabase/supabase-js": "^2.58.0",
     "@upstash/ratelimit": "^1.2.0",
-    "@upstash/redis": "^1.33.0",
+    "@upstash/redis": "^1.35.5",
     "bcryptjs": "^2.4.3",
     "framer-motion": "^12.23.22",
     "next": "^14.2.10",
@@ -92,11 +57,7 @@
     "@types/react": "^18.3.5",
     "@vitest/coverage-v8": "^1.6.1",
     "@vitest/ui": "^1.6.0",
-    "cross-env": "^10.1.0",
     "depcheck": "^1.4.7",
-    "electron": "^38.2.1",
-    "electron-builder": "^26.0.12",
-    "electron-is-dev": "^3.0.1",
     "eslint": "8.57.0",
     "eslint-config-next": "^14.2.10",
     "png-to-ico": "^3.0.1",
@@ -104,18 +65,15 @@
     "sharp": "^0.33.3",
     "ts-node": "^10.9.2",
     "typescript": "5.6.2",
-    "vitest": "^1.6.0",
-    "wait-on": "^9.0.1"
+    "vitest": "^1.6.0"
   },
-  "description": "Atelier Velo+ - Gestion d'atelier velo",
-  "main": "electron/main.js",
-  "keywords": [
-    "atelier",
-    "velo",
-    "gestion"
-  ],
-  "author": "Jerome Leyssard",
+  "description": "",
+  "main": "next.config.js",
+  "keywords": [],
+  "author": "",
   "license": "ISC",
-  "homepage": "./",
-  "type": "commonjs"
+  "type": "commonjs",
+  "prisma": {
+    "seed": "node prisma/seed.cjs"
+  }
 }

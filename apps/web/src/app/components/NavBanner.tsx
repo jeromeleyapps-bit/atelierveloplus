@@ -11,6 +11,7 @@ import LightModeIcon from "@mui/icons-material/LightMode";
 import Image from "next/image";
 import { useAuth } from "../auth/AuthContext";
 import { useThemeMode } from "../providers";
+import { getAppSettings } from "@/lib/api";
 
 export default function NavBanner() {
   const { user, logout } = useAuth();
@@ -18,9 +19,29 @@ export default function NavBanner() {
   const pathname = usePathname();
   const router = useRouter();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [shopName, setShopName] = React.useState("Atelier velo +");
   const menuOpen = Boolean(anchorEl);
   const openMenu = (event: React.MouseEvent<HTMLElement>) => setAnchorEl(event.currentTarget);
   const closeMenu = () => setAnchorEl(null);
+
+  React.useEffect(() => {
+    // Charger le nom initial
+    getAppSettings().then((settings) => {
+      if (settings.shopName) {
+        setShopName(settings.shopName);
+      }
+    }).catch(() => {});
+    
+    // Écouter les mises à jour du nom
+    const handleShopNameUpdate = (event: any) => {
+      if (event.detail?.shopName) {
+        setShopName(event.detail.shopName);
+      }
+    };
+    
+    window.addEventListener('shopNameUpdated', handleShopNameUpdate);
+    return () => window.removeEventListener('shopNameUpdated', handleShopNameUpdate);
+  }, []);
 
   // Visible links in the top banner (tabs)
   const linksMain: { href: Route; label: string }[] = [
@@ -31,7 +52,8 @@ export default function NavBanner() {
     { href: "/suppliers" as Route, label: "Fournisseurs" },
     { href: "/admin/booking" as Route, label: "Calendrier" },
     { href: "/booking" as Route, label: "RDV client" },
-    { href: "/finance" as Route, label: "Factures" },
+    { href: "/finance" as Route, label: "Facturation" },
+    { href: "/cash-register" as Route, label: "Caisse" },
     { href: "/stats" as Route, label: "Statistiques" },
   ];
   // Extra links only shown in the dropdown menu
@@ -63,7 +85,7 @@ export default function NavBanner() {
           <Button component={Link} href="/" sx={{ p: 0, minWidth: 0 }} title="Accueil">
             <Image src="/logo.png" alt="Atelier velo +" width={28} height={28} priority style={{ borderRadius: 4 }} />
           </Button>
-          <Typography variant="subtitle1" sx={{ fontWeight: 700, whiteSpace: 'nowrap' }}>Atelier velo +</Typography>
+          <Typography variant="subtitle1" sx={{ fontWeight: 700, whiteSpace: 'nowrap' }}>{shopName}</Typography>
         </Box>
         <Box display="flex" gap={1} alignItems="center">
           {user ? (
@@ -73,7 +95,7 @@ export default function NavBanner() {
               size="small"
               variant={isActive("/account") ? "contained" : "outlined"}
             >
-              {user.shopName || 'Mon compte'}
+              {shopName || 'Mon compte'}
             </Button>
           ) : null}
           <IconButton 

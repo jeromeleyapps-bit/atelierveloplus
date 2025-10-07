@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
   const hours = parseBusinessHours(cfg.businessHours);
 
   const now = new Date();
-  const results: { start: string; end: string }[] = [];
+  const results: { start: string; end: string; available: boolean }[] = [];
 
   // Iterate day by day
   for (let day = new Date(rangeStart); day < rangeEnd; day = addMinutes(day, 24 * 60)) {
@@ -42,16 +42,21 @@ export async function GET(req: NextRequest) {
       // business hours (same-day rule inside helper)
       if (!isWithinBusinessHours(slotStart, slotEnd, hours)) continue;
 
-      // conflicts
+      // Check conflicts but don't skip - mark as unavailable
       // eslint-disable-next-line no-await-in-loop
-      if (await hasBlockConflict(slotStart, slotEnd)) continue;
+      const hasBlock = await hasBlockConflict(slotStart, slotEnd);
       // eslint-disable-next-line no-await-in-loop
-      if (await hasEventBlockConflict(slotStart, slotEnd)) continue;
+      const hasEvent = await hasEventBlockConflict(slotStart, slotEnd);
       // eslint-disable-next-line no-await-in-loop
       const overlapCount = await countOverlappingBookings(slotStart, slotEnd);
-      if (overlapCount >= maxC) continue;
+      
+      const available = !hasBlock && !hasEvent && overlapCount < maxC;
 
-      results.push({ start: slotStart.toISOString(), end: slotEnd.toISOString() });
+      results.push({ 
+        start: slotStart.toISOString(), 
+        end: slotEnd.toISOString(),
+        available 
+      });
     }
   }
 

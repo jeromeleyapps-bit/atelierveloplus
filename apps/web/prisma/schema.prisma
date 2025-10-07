@@ -1,29 +1,12 @@
-// Prisma schema - Multi-Database Support
-// Supports both PostgreSQL (Supabase) and SQLite (Local)
-//
-// Development: PostgreSQL (Supabase)
-//   DATABASE_URL="postgresql://user:password@localhost:5432/atelier_velo?schema=public"
-//
-// Production Desktop/Mobile: SQLite
-//   DATABASE_PROVIDER="sqlite"
-//   SQLITE_DB_PATH="./data/atelier-velo.db"
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql" // Default: PostgreSQL (Supabase)
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-enum CatalogCategory {
-  PIECES
-  EQUIPEMENTS
-  AUTRES
-}
-
-// Partial payments recorded against invoices
 model InvoicePayment {
   id        String   @id @default(cuid())
   invoiceId String
@@ -33,14 +16,13 @@ model InvoicePayment {
   note      String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  invoice   Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
 
   @@index([invoiceId])
 }
 
 model CustomerBike {
-  id             String   @id @default(cuid())
+  id             String      @id @default(cuid())
   customerId     String
   index          Int
   brand          String?
@@ -49,11 +31,10 @@ model CustomerBike {
   serialNumber   String?
   color          String?
   notes          String?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
-  customer   Customer    @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  workOrders WorkOrder[]
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  customer       Customer    @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  workOrders     WorkOrder[]
 
   @@unique([customerId, index])
 }
@@ -63,7 +44,17 @@ model GlobalSetting {
   value String?
 }
 
-// Invoice number sequence per year
+model PricingMargin {
+  id          String   @id @default(cuid())
+  minPrice    Float    // Prix minimum de la tranche (inclus)
+  maxPrice    Float?   // Prix maximum de la tranche (exclus), null = infini
+  coefficient Float    // Coefficient multiplicateur
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([minPrice])
+}
+
 model InvoiceSequence {
   id         String   @id @default(cuid())
   year       Int      @unique
@@ -73,22 +64,21 @@ model InvoiceSequence {
 }
 
 model CatalogItem {
-  id              String   @id @default(cuid())
-  sku             String?  @unique
+  id              String          @id @default(cuid())
+  sku             String?         @unique
   category        CatalogCategory
   name            String
   priceHT         Float
   priceTTC        Float
   vatRate         Float
-  active          Boolean  @default(true)
-  stockQty        Int      @default(0)
-  minStock        Int      @default(0)
-  reorderQty      Int      @default(0)
+  active          Boolean         @default(true)
+  stockQty        Int             @default(0)
+  minStock        Int             @default(0)
+  reorderQty      Int             @default(0)
   location        String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
   purchasePriceHT Float?
-
   stockMovements  StockMovement[]
   supplierItems   SupplierItem[]
   supplierOffers  SupplierOffer[]
@@ -96,16 +86,16 @@ model CatalogItem {
 }
 
 model Customer {
-  id             String   @id @default(cuid())
-  email          String?  @unique
+  id             String          @id @default(cuid())
+  email          String?         @unique
   firstName      String?
   lastName       String?
   phone          String?
+  address1       String?
   address2       String?
   zip            String?
   city           String?
   country        String?
-  // Bike info
   bikeBrand      String?
   bikeModel      String?
   nationalFileId String?
@@ -115,46 +105,45 @@ model Customer {
   shipCity       String?
   shipCountry    String?
   notes          String?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
-  bikes          CustomerBike[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
   bookings       Booking[]
-  workOrders     WorkOrder[]
   communications Communication[]
+  bikes          CustomerBike[]
+  workOrders     WorkOrder[]
 }
 
 model Invoice {
-  id              String    @id @default(cuid())
+  id              String           @id @default(cuid())
   workOrderId     String
-  number          String?   @unique
+  number          String?          @unique
   issueDate       DateTime?
-  status          String    @default("draft")
-  type            String    @default("invoice") // invoice | quote | credit
-  parentId        String?   // For quote→invoice conversion or credit notes
-  pricingMode     String    @default("HT_TVA")
-  currency        String    @default("EUR")
-  vatRate         Float     @default(20)
-  laborRate       Float     @default(60)
-  subtotalHT      Float     @default(0)
-  vatAmount       Float     @default(0)
-  totalTTC        Float     @default(0)
-  discountAmount  Float?    @default(0)
+  status          String           @default("draft")
+  type            String           @default("invoice")
+  parentId        String?
+  pricingMode     String           @default("HT_TVA")
+  currency        String           @default("EUR")
+  vatRate         Float            @default(20)
+  laborRate       Float            @default(60)
+  subtotalHT      Float            @default(0)
+  vatAmount       Float            @default(0)
+  totalTTC        Float            @default(0)
+  discountAmount  Float?           @default(0)
   paidAt          DateTime?
   paymentMethod   String?
   cancelledAt     DateTime?
   cancelledReason String?
   dueDate         DateTime?
-  reminderCount   Int       @default(0)
+  reminderCount   Int              @default(0)
   lastReminderAt  DateTime?
-  validUntil      DateTime? // For quotes: expiration date
-  convertedAt     DateTime? // For quotes: when converted to invoice
-  convertedToId   String?   // For quotes: ID of the invoice created
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-
-  lines InvoiceLine[]
-  payments InvoicePayment[]
+  validUntil      DateTime?
+  convertedAt     DateTime?
+  convertedToId   String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  cashPayments    CashRegister[]
+  lines           InvoiceLine[]
+  payments        InvoicePayment[]
 }
 
 model InvoiceLine {
@@ -170,37 +159,32 @@ model InvoiceLine {
   totalTTC        Float   @default(0)
   partId          String?
   purchasePriceHT Float?
-
-  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  invoice         Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
 }
 
-// Stock movement log
 model StockMovement {
-  id        String   @id @default(cuid())
+  id        String      @id @default(cuid())
   itemId    String
-  type      String // IN | OUT | ADJUST
+  type      String
   qty       Int
-  refType   String? // invoice | workOrder | directSale | manual | purchase
+  refType   String?
   refId     String?
   note      String?
-  createdAt DateTime @default(now())
-
-  item CatalogItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  createdAt DateTime    @default(now())
+  item      CatalogItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
 }
 
-// Supplier directory
 model Supplier {
-  id            String   @id @default(cuid())
+  id            String               @id @default(cuid())
   name          String
   website       String?
-  connectorType String   @default("MOCK")
-  active        Boolean  @default(true)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  items       SupplierItem[]
-  credentials SupplierCredential[]
-  offers      SupplierOffer[]
+  connectorType String               @default("MOCK")
+  active        Boolean              @default(true)
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  credentials   SupplierCredential[]
+  items         SupplierItem[]
+  offers        SupplierOffer[]
 }
 
 model SupplierCredential {
@@ -212,12 +196,11 @@ model SupplierCredential {
   extraJson  String?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-
-  supplier Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  supplier   Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
 }
 
 model SupplierItem {
-  id               String    @id @default(cuid())
+  id               String       @id @default(cuid())
   supplierId       String
   catalogItemId    String?
   supplierSku      String
@@ -225,37 +208,34 @@ model SupplierItem {
   lastPriceHT      Float?
   lastAvailability String?
   lastCheckedAt    DateTime?
-  favorite         Boolean   @default(false)
-
-  supplier    Supplier     @relation(fields: [supplierId], references: [id], onDelete: Cascade)
-  catalogItem CatalogItem? @relation(fields: [catalogItemId], references: [id])
+  favorite         Boolean      @default(false)
+  catalogItem      CatalogItem? @relation(fields: [catalogItemId], references: [id])
+  supplier         Supplier     @relation(fields: [supplierId], references: [id], onDelete: Cascade)
 }
 
-// Cache des offres fournisseurs (recherche B2B live)
 model SupplierOffer {
-  id            String   @id @default(cuid())
+  id            String       @id @default(cuid())
   supplierId    String
   catalogItemId String?
-  externalId    String?  // ID chez le fournisseur
+  externalId    String?
   name          String
   description   String?
   reference     String?
   brand         String?
   price         Float
   priceHT       Float?
-  currency      String   @default("EUR")
-  availability  String?  // "in_stock", "out_of_stock", "on_order"
+  currency      String       @default("EUR")
+  availability  String?
   stock         Int?
   deliveryDays  Int?
   url           String?
   imageUrl      String?
-  metadata      String?  // JSON pour données spécifiques
-  fetchedAt     DateTime @default(now())
-  expiresAt     DateTime // Cache expiration
-  
-  supplier    Supplier     @relation(fields: [supplierId], references: [id], onDelete: Cascade)
-  catalogItem CatalogItem? @relation(fields: [catalogItemId], references: [id], onDelete: SetNull)
-  
+  metadata      String?
+  fetchedAt     DateTime     @default(now())
+  expiresAt     DateTime
+  catalogItem   CatalogItem? @relation(fields: [catalogItemId], references: [id])
+  supplier      Supplier     @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+
   @@index([supplierId])
   @@index([catalogItemId])
   @@index([externalId])
@@ -263,57 +243,61 @@ model SupplierOffer {
   @@index([expiresAt])
 }
 
-// Minimal local WorkOrder for linking invoices
 model WorkOrder {
-  id         String    @id @default(cuid())
-  status     String    @default("created")
-  customerId String?
-  bikeId     String?
-  type       String?   @default("repair") // revision | repair | maintenance | upgrade
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  dueAt      DateTime?
+  id                 String          @id @default(cuid())
+  status             String          @default("created")
+  customerId         String?
+  bikeId             String?
+  type               String?         @default("repair")
+  estimatedMinutes   Int?
+  hourlyRate         Float?
+  appointmentDate    DateTime?       // Date et heure du RDV retour vélo
+  calendarEventId    String?         // Lien vers l'événement calendrier
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  dueAt              DateTime?
+  communications     Communication[]
+  bike               CustomerBike?   @relation(fields: [bikeId], references: [id])
+  customer           Customer?       @relation(fields: [customerId], references: [id])
+  parts              WorkOrderPart[]
+  calendarEvent      CalendarEvent?  @relation(fields: [calendarEventId], references: [id])
 
-  customer       Customer?       @relation(fields: [customerId], references: [id], onDelete: SetNull)
-  bike           CustomerBike?   @relation(fields: [bikeId], references: [id], onDelete: SetNull)
-  parts          WorkOrderPart[]
-  communications Communication[]
-  
   @@index([customerId])
   @@index([bikeId])
+  @@index([appointmentDate])
+  @@index([calendarEventId])
 }
 
 model WorkOrderPart {
-  id            String   @id @default(cuid())
+  id            String       @id @default(cuid())
   workOrderId   String
   catalogItemId String?
   description   String
-  qty           Int      @default(1)
-  priceHT       Float    @default(0)
+  qty           Int          @default(1)
+  priceHT       Float        @default(0)
   note          String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  workOrder   WorkOrder    @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
-  catalogItem CatalogItem? @relation(fields: [catalogItemId], references: [id])
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  catalogItem   CatalogItem? @relation(fields: [catalogItemId], references: [id])
+  workOrder     WorkOrder    @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
 }
 
-// NextAuth.js Models
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String    @unique
-  emailVerified DateTime?
-  image         String?
-  password      String? // hashed password for credentials provider
-  role          String    @default("user") // user | admin | technician | accountant
-  active        Boolean   @default(true)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  accounts Account[]
-  sessions Session[]
-  settings AppSetting?
+  id             String           @id @default(cuid())
+  name           String?
+  email          String           @unique
+  emailVerified  DateTime?
+  image          String?
+  password       String?
+  role           String           @default("user")
+  active         Boolean          @default(true)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  accounts       Account[]
+  settings       AppSetting?
+  systemSettings SystemSettings?
+  cashRegisters  CashRegister[]
+  sessions       Session[]
 }
 
 model Account {
@@ -329,8 +313,7 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -351,7 +334,6 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-// Per-user application settings
 model AppSetting {
   id          String   @id @default(cuid())
   userId      String   @unique
@@ -363,26 +345,31 @@ model AppSetting {
   zip         String?
   city        String?
   country     String?
-  pdfPrimary  String? // hex color like #1976d2
+  pdfPrimary  String?
   legalFooter String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  capital     String?
+  insurance   String?
+  rcs         String?
+  siret       String?
+  tva         String?
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 /// Calendar: admin events visible internally; blocks that make time unavailable; client bookings
 model CalendarEvent {
-  id          String   @id @default(cuid())
+  id          String      @id @default(cuid())
   title       String
   description String?
   start       DateTime
   end         DateTime
-  status      String   @default("planned") // planned | in_progress | done | cancelled
-  blocksAvail Boolean  @default(true) // if true, event time is not bookable
-  color       String? // optional UI color
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  status      String      @default("planned")
+  blocksAvail Boolean     @default(true)
+  color       String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  workOrders  WorkOrder[] // Tickets liés à ce RDV
 }
 
 model CalendarBlock {
@@ -398,8 +385,7 @@ model Booking {
   id          String    @id @default(cuid())
   start       DateTime
   end         DateTime
-  status      String    @default("pending") // pending | confirmed | cancelled | done
-  // Client info
+  status      String    @default("pending")
   name        String
   email       String?
   phone       String?
@@ -407,15 +393,13 @@ model Booking {
   description String?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  // Link to customer (optional when created)
   customerId  String?
-  customer    Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  customer    Customer? @relation(fields: [customerId], references: [id])
 
   @@index([start, end])
   @@index([customerId])
 }
 
-// Singleton config for calendar rules
 model CalendarConfig {
   id             Int      @id @default(1)
   timezone       String   @default("Europe/Paris")
@@ -423,40 +407,32 @@ model CalendarConfig {
   leadTimeHours  Int      @default(6)
   maxConcurrent  Int      @default(1)
   saturdayByAppt Boolean  @default(true)
-  businessHours  String? // JSON string of weekly schedule
+  businessHours  String?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 }
 
-// Communications
 model Communication {
-  id          String   @id @default(cuid())
+  id          String     @id @default(cuid())
   customerId  String
   workOrderId String?
   invoiceId   String?
-  
-  type        String   // "email" | "sms"
-  event       String   // "quote_created", "bike_ready", etc.
-  
-  recipient   String   // Email ou téléphone
-  subject     String?  // Pour emails
-  content     String   // Contenu du message
-  
-  status      String   // "pending", "sent", "failed", "delivered"
-  provider    String   @default("hubspot")
-  externalId  String?  // ID HubSpot
-  
+  type        String
+  event       String
+  recipient   String
+  subject     String?
+  content     String
+  status      String
+  provider    String     @default("hubspot")
+  externalId  String?
   sentAt      DateTime?
   deliveredAt DateTime?
   error       String?
-  
-  metadata    String?  // JSON avec infos supplémentaires
-  
-  createdAt   DateTime @default(now())
-  
-  customer   Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  workOrder  WorkOrder? @relation(fields: [workOrderId], references: [id], onDelete: SetNull)
-  
+  metadata    String?
+  createdAt   DateTime   @default(now())
+  customer    Customer   @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  workOrder   WorkOrder? @relation(fields: [workOrderId], references: [id])
+
   @@index([customerId])
   @@index([workOrderId])
   @@index([status])
@@ -466,29 +442,61 @@ model Communication {
 model EmailTemplate {
   id          String   @id @default(cuid())
   name        String   @unique
-  event       String   // "quote_created", "bike_ready", etc.
-  
+  event       String
   subject     String
-  htmlContent String   // HTML avec variables {{customer.name}}
-  textContent String   // Version texte
-  
+  htmlContent String
+  textContent String
   active      Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  
+
   @@index([event])
 }
 
 model SMSTemplate {
   id        String   @id @default(cuid())
   name      String   @unique
-  event     String   // "bike_ready", "order_arrived"
-  
-  content   String   // Max 160 caractères avec variables
-  
+  event     String
+  content   String
   active    Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
+
   @@index([event])
+}
+
+model CashRegister {
+  id          String   @id @default(cuid())
+  type        String
+  amount      Float
+  description String?
+  invoiceId   String?
+  userId      String
+  createdAt   DateTime @default(now())
+  invoice     Invoice? @relation(fields: [invoiceId], references: [id])
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@index([type])
+  @@index([createdAt])
+  @@index([invoiceId])
+  @@index([userId])
+}
+
+model SystemSettings {
+  id                         String   @id @default(cuid())
+  userId                     String   @unique
+  notificationsEnabled       Boolean  @default(true)
+  emailNotificationsEnabled  Boolean  @default(true)
+  activityLogsEnabled        Boolean  @default(true)
+  autoBackupEnabled          Boolean  @default(false)
+  backupFrequency            String   @default("weekly")
+  createdAt                  DateTime @default(now())
+  updatedAt                  DateTime @updatedAt
+  user                       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum CatalogCategory {
+  PIECES
+  EQUIPEMENTS
+  AUTRES
 }

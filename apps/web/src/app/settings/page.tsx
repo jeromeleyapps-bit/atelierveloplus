@@ -25,6 +25,13 @@ export default function SettingsPage() {
   const [zip, setZip] = useState<string>("");
   const [city, setCity] = useState<string>("");
   const [legalFooter, setLegalFooter] = useState<string>("");
+  
+  // Informations légales (obligatoires pour les PDF)
+  const [siret, setSiret] = useState<string>("");
+  const [tva, setTva] = useState<string>("");
+  const [rcs, setRcs] = useState<string>("");
+  const [capital, setCapital] = useState<string>("");
+  const [insurance, setInsurance] = useState<string>("");
 
   useEffect(() => {
     (async () => {
@@ -42,6 +49,7 @@ export default function SettingsPage() {
         if (rq?.value != null && !Number.isNaN(Number(rq.value))) setDefaultReorderQty(Number(rq.value));
         
         // Charger les informations atelier
+        console.log('[SETTINGS PAGE] Loaded appSettings:', appSettings);
         setShopName(appSettings.shopName || "");
         setShopEmail(appSettings.shopEmail || "");
         setShopPhone(appSettings.shopPhone || "");
@@ -49,6 +57,13 @@ export default function SettingsPage() {
         setZip(appSettings.zip || "");
         setCity(appSettings.city || "");
         setLegalFooter(appSettings.legalFooter || "");
+        
+        // Charger les informations légales
+        setSiret(appSettings.siret || "");
+        setTva(appSettings.tva || "");
+        setRcs(appSettings.rcs || "");
+        setCapital(appSettings.capital || "");
+        setInsurance(appSettings.insurance || "");
       } catch (e) {
         console.error(e);
       } finally {
@@ -86,8 +101,16 @@ export default function SettingsPage() {
         zip,
         city,
         legalFooter,
+        siret,
+        tva,
+        rcs,
+        capital,
+        insurance,
       });
       setToast({ open: true, message: 'Informations atelier enregistrées', severity: 'success' });
+      
+      // Déclencher un événement personnalisé pour rafraîchir la navbar
+      window.dispatchEvent(new CustomEvent('shopNameUpdated', { detail: { shopName } }));
     } catch (e) {
       console.error(e);
       setToast({ open: true, message: 'Erreur: enregistrement', severity: 'error' });
@@ -155,15 +178,67 @@ export default function SettingsPage() {
               size="small"
               helperText="Ex: contact@atelier-velo.fr"
             />
+            
+            <Divider sx={{ my: 2 }} />
+            <Typography variant="subtitle2" fontWeight={600} color="primary" sx={{ mb: 1 }}>
+              Informations légales (obligatoires pour les PDF)
+            </Typography>
+            
             <TextField
-              label="Mention légale (pied de page)"
+              label="SIRET"
+              value={siret}
+              onChange={(e) => setSiret(e.target.value)}
+              disabled={loading}
+              size="small"
+              helperText="14 chiffres - Ex: 123 456 789 00012"
+              required
+            />
+            <TextField
+              label="N° TVA Intracommunautaire"
+              value={tva}
+              onChange={(e) => setTva(e.target.value)}
+              disabled={loading}
+              size="small"
+              helperText="Ex: FR12345678901"
+              required
+            />
+            <TextField
+              label="RCS (Registre du Commerce)"
+              value={rcs}
+              onChange={(e) => setRcs(e.target.value)}
+              disabled={loading}
+              size="small"
+              helperText="Ex: Paris B 123 456 789"
+            />
+            <TextField
+              label="Capital social"
+              value={capital}
+              onChange={(e) => setCapital(e.target.value)}
+              disabled={loading}
+              size="small"
+              helperText="Ex: 10 000 €"
+            />
+            <TextField
+              label="Assurance RC Professionnelle"
+              value={insurance}
+              onChange={(e) => setInsurance(e.target.value)}
+              disabled={loading}
+              size="small"
+              helperText="Ex: Allianz Police n° 123456789"
+              required
+            />
+            
+            <Divider sx={{ my: 1 }} />
+            
+            <TextField
+              label="Mention légale personnalisée (optionnel)"
               value={legalFooter}
               onChange={(e) => setLegalFooter(e.target.value)}
               disabled={loading}
               size="small"
               multiline
               rows={2}
-              helperText="Texte affiché en bas des documents PDF (SIRET, TVA, etc.)"
+              helperText="Texte personnalisé pour remplacer les mentions légales par défaut"
             />
             <Stack direction="row" spacing={1}>
               <Button variant="contained" onClick={saveShopInfo} disabled={savingShop || loading}>

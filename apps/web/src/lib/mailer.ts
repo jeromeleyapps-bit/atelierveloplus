@@ -15,12 +15,17 @@ function getTransporter() {
   const port = process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : undefined;
   const user = process.env.SMTP_USER;
   const pass = process.env.SMTP_PASS;
+  const secure = process.env.SMTP_SECURE === 'true' || port === 465;
+  
   if (host && port && user && pass) {
     transporter = nodemailer.createTransport({
       host,
       port,
-      secure: port === 465, // true for 465, false for other ports
+      secure,
       auth: { user, pass },
+      tls: {
+        rejectUnauthorized: false // Pour éviter les erreurs de certificat
+      }
     });
   } else {
     transporter = null; // No SMTP configured

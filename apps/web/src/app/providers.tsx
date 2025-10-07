@@ -3,6 +3,7 @@
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { ReactNode, useState, createContext, useContext, useMemo, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import NavBanner from "./components/NavBanner";
 import { AuthProvider } from "./auth/AuthContext";
 import { lightTheme, darkTheme } from "@/theme/theme";
@@ -51,12 +52,15 @@ export function AppProviders({ children }: { children: ReactNode }) {
     [mode]
   );
 
+  const pathname = usePathname();
+  const isPublicPage = pathname === '/rdv' || pathname === '/booking-local';
+
   return (
     <ThemeContext.Provider value={{ mode, toggleTheme }}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <AuthProvider>
-          <NavBanner />
+          {!isPublicPage && <NavBanner />}
           {children}
         </AuthProvider>
       </ThemeProvider>

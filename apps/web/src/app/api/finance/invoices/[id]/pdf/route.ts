@@ -21,16 +21,23 @@ function buildInvoiceData(inv: any, customer: any, settings: any) {
     dueDate: inv.dueDate,
     status: inv.status,
     type: inv.type || 'invoice', // Type de document
+    validUntil: inv.validUntil, // Pour les devis
+    parentId: inv.parentId, // Pour les avoirs
     
-    // Shop info
+    // Shop info (priorité : profil utilisateur > variables d'environnement > valeurs par défaut)
     shopName: s.shopName || process.env.SHOP_NAME || 'Atelier Vélo+',
-    shopAddress: s.address1 || process.env.SHOP_ADDRESS1 || '',
-    shopZip: s.zip || process.env.SHOP_ZIP || '',
-    shopCity: s.city || process.env.SHOP_CITY || '',
-    shopPhone: s.shopPhone || process.env.SHOP_PHONE,
-    shopEmail: s.shopEmail || process.env.SHOP_EMAIL,
-    shopSiret: process.env.SHOP_SIRET,
-    shopTVA: process.env.SHOP_TVA,
+    shopAddress: s.address1 || process.env.SHOP_ADDRESS1 || '123 Rue du Vélo',
+    shopZip: s.zip || process.env.SHOP_ZIP || '75000',
+    shopCity: s.city || process.env.SHOP_CITY || 'Paris',
+    shopPhone: s.shopPhone || process.env.SHOP_PHONE || '01 23 45 67 89',
+    shopEmail: s.shopEmail || process.env.SHOP_EMAIL || 'contact@atelier-velo.fr',
+    
+    // Informations légales (priorité : profil utilisateur > variables d'environnement)
+    shopSiret: (s as any).siret || process.env.SHOP_SIRET || '',
+    shopTVA: (s as any).tva || process.env.SHOP_TVA || '',
+    shopRCS: (s as any).rcs || process.env.SHOP_RCS || '',
+    shopCapital: (s as any).capital || process.env.SHOP_CAPITAL || '',
+    shopInsurance: (s as any).insurance || process.env.SHOP_INSURANCE || '',
     
     // Customer info
     customerName: customer 
@@ -87,7 +94,14 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
   }
   
   // Get user settings
-  const userId = getUserId(req);
+  let userId = getUserId(req);
+  
+  // Si pas d'userId, utiliser le premier utilisateur
+  if (!userId) {
+    const firstUser = await prisma.user.findFirst();
+    if (firstUser) userId = firstUser.id;
+  }
+  
   const settings = userId ? await prisma.appSetting.findUnique({ where: { userId } }) : null;
 
   // Build invoice data

@@ -8,6 +8,7 @@ import InsightsIcon from "@mui/icons-material/Insights";
 import QueryStatsIcon from "@mui/icons-material/QueryStats";
 import PaidIcon from "@mui/icons-material/Paid";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
+import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import { useEffect, useMemo, useState } from "react";
 
 type Summary = {
@@ -32,6 +33,8 @@ export default function StatsPage() {
   });
   const [loading, setLoading] = useState(false);
   const [sum, setSum] = useState<Summary | null>(null);
+  const [cashTotal, setCashTotal] = useState<number>(0);
+  const [yearlyRevenue, setYearlyRevenue] = useState<number>(0);
 
   async function load() {
     setLoading(true);
@@ -50,7 +53,42 @@ export default function StatsPage() {
     }
   }
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { 
+    load(); 
+    loadCashTotal();
+    loadYearlyRevenue();
+  }, []);
+
+  async function loadCashTotal() {
+    try {
+      const res = await fetch('/api/cash-register');
+      if (res.ok) {
+        const data = await res.json();
+        const total = data.reduce((sum: number, entry: any) => sum + entry.amount, 0);
+        setCashTotal(total);
+      }
+    } catch (e) {
+      console.error('Failed to load cash total', e);
+    }
+  }
+
+  async function loadYearlyRevenue() {
+    try {
+      const year = new Date().getFullYear();
+      const fromIso = new Date(year, 0, 1).toISOString();
+      const toIso = new Date(year, 11, 31, 23, 59, 59).toISOString();
+      const p = new URLSearchParams();
+      p.set('from', fromIso);
+      p.set('to', toIso);
+      const res = await fetch(`/api/stats/summary?${p.toString()}`);
+      if (res.ok) {
+        const data = await res.json();
+        setYearlyRevenue(data.invoices?.range?.totalAmount ?? 0);
+      }
+    } catch (e) {
+      console.error('Failed to load yearly revenue', e);
+    }
+  }
 
   const kpis = useMemo(() => ({
     monthlyRevenue: sum?.invoices.range.totalAmount ?? null,
@@ -71,49 +109,75 @@ export default function StatsPage() {
           </Stack>
         </SectionCard>
 
-        {/* KPI cards */}
-        <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} sx={{ mb: 3 }}>
-          <Paper sx={{ flex: 1, p: 2, borderRadius: 2 }}>
-            <Stack direction="row" spacing={2} alignItems="center">
-              <Box sx={{ width: 40, height: 40, borderRadius: '50%', bgcolor: 'primary.light', color: 'primary.contrastText', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <InsightsIcon fontSize="small" />
-              </Box>
-              <Box>
-                <Typography variant="caption" color="text.secondary">Chiffre d&apos;affaires (période)</Typography>
-                <Typography variant="h6">{kpis.monthlyRevenue != null ? `${kpis.monthlyRevenue.toFixed(2)} EUR` : '—'}</Typography>
-              </Box>
-            </Stack>
-          </Paper>
-          <Paper sx={{ flex: 1, p: 2, borderRadius: 2 }}>
+        {/* KPI cards - Ligne 1 : Opérationnels */}
+        <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} sx={{ mb: 2 }}>
+          <Paper sx={{ flex: 1, p: 3, borderRadius: 2 }}>
             <Stack direction="row" spacing={2} alignItems="center">
               <Box sx={{ width: 40, height: 40, borderRadius: '50%', bgcolor: 'info.light', color: 'info.contrastText', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <QueryStatsIcon fontSize="small" />
               </Box>
               <Box>
-                <Typography variant="caption" color="text.secondary">Tickets clôturés</Typography>
+                <Typography variant="caption" color="text.secondary">Tickets clôturés (période)</Typography>
                 <Typography variant="h6">{kpis.ticketsDelivered != null ? kpis.ticketsDelivered : '—'}</Typography>
               </Box>
             </Stack>
           </Paper>
-          <Paper sx={{ flex: 1, p: 2, borderRadius: 2 }}>
-            <Stack direction="row" spacing={2} alignItems="center">
-              <Box sx={{ width: 40, height: 40, borderRadius: '50%', bgcolor: 'success.light', color: 'success.contrastText', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <PaidIcon fontSize="small" />
-              </Box>
-              <Box>
-                <Typography variant="caption" color="text.secondary">Montant payé (période)</Typography>
-                <Typography variant="h6">{kpis.paidAmount != null ? `${kpis.paidAmount.toFixed(2)} EUR` : '—'}</Typography>
-              </Box>
-            </Stack>
-          </Paper>
-          <Paper sx={{ flex: 1, p: 2, borderRadius: 2 }}>
+          <Paper sx={{ flex: 1, p: 3, borderRadius: 2 }}>
             <Stack direction="row" spacing={2} alignItems="center">
               <Box sx={{ width: 40, height: 40, borderRadius: '50%', bgcolor: 'warning.light', color: 'warning.contrastText', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <ReceiptLongIcon fontSize="small" />
               </Box>
               <Box>
-                <Typography variant="caption" color="text.secondary">Factures (période)</Typography>
+                <Typography variant="caption" color="text.secondary">Factures émises (période)</Typography>
                 <Typography variant="h6">{sum?.invoices.range.count ?? '—'}</Typography>
+              </Box>
+            </Stack>
+          </Paper>
+          <Paper sx={{ flex: 1, p: 3, borderRadius: 2 }}>
+            <Stack direction="row" spacing={2} alignItems="center">
+              <Box sx={{ width: 40, height: 40, borderRadius: '50%', bgcolor: 'success.light', color: 'success.contrastText', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <PaidIcon fontSize="small" />
+              </Box>
+              <Box>
+                <Typography variant="caption" color="text.secondary">Factures payées (période)</Typography>
+                <Typography variant="h6">{kpis.paidAmount != null ? `${kpis.paidAmount.toFixed(2)} EUR` : '—'}</Typography>
+              </Box>
+            </Stack>
+          </Paper>
+          <Paper sx={{ flex: 1, p: 3, borderRadius: 2 }}>
+            <Stack direction="row" spacing={2} alignItems="center">
+              <Box sx={{ width: 40, height: 40, borderRadius: '50%', bgcolor: 'secondary.light', color: 'secondary.contrastText', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <PointOfSaleIcon fontSize="small" />
+              </Box>
+              <Box>
+                <Typography variant="caption" color="text.secondary">Total Caisse Espèces</Typography>
+                <Typography variant="h6">{cashTotal.toFixed(2)} EUR</Typography>
+              </Box>
+            </Stack>
+          </Paper>
+        </Stack>
+
+        {/* KPI cards - Ligne 2 : Chiffres d'affaires */}
+        <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} sx={{ mb: 3 }}>
+          <Paper sx={{ flex: 1, p: 3, borderRadius: 2 }}>
+            <Stack direction="row" spacing={2} alignItems="center">
+              <Box sx={{ width: 40, height: 40, borderRadius: '50%', bgcolor: 'primary.light', color: 'primary.contrastText', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <InsightsIcon fontSize="small" />
+              </Box>
+              <Box>
+                <Typography variant="caption" color="text.secondary">CA Période sélectionnée</Typography>
+                <Typography variant="h6">{kpis.monthlyRevenue != null ? `${kpis.monthlyRevenue.toFixed(2)} EUR` : '—'}</Typography>
+              </Box>
+            </Stack>
+          </Paper>
+          <Paper sx={{ flex: 1, p: 3, borderRadius: 2 }}>
+            <Stack direction="row" spacing={2} alignItems="center">
+              <Box sx={{ width: 40, height: 40, borderRadius: '50%', bgcolor: 'error.light', color: 'error.contrastText', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <InsightsIcon fontSize="small" />
+              </Box>
+              <Box>
+                <Typography variant="caption" color="text.secondary">CA Année {new Date().getFullYear()}</Typography>
+                <Typography variant="h6">{yearlyRevenue.toFixed(2)} EUR</Typography>
               </Box>
             </Stack>
           </Paper>

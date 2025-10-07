@@ -7,6 +7,8 @@ import { usePathname } from "next/navigation";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import { useThemeMode } from "../providers";
+import { useEffect, useState } from "react";
+import { getAppSettings } from "@/lib/api";
 
 interface NavItem {
   text: string;
@@ -16,14 +18,35 @@ interface NavItem {
 const NavBar = () => {
   const pathname = usePathname();
   const { mode, toggleTheme } = useThemeMode();
+  const [shopName, setShopName] = useState("Atelier Vélo+");
+
+  useEffect(() => {
+    // Charger le nom initial
+    getAppSettings().then((settings) => {
+      if (settings.shopName) {
+        setShopName(settings.shopName);
+      }
+    }).catch(() => {});
+    
+    // Écouter les mises à jour du nom
+    const handleShopNameUpdate = (event: any) => {
+      if (event.detail?.shopName) {
+        setShopName(event.detail.shopName);
+      }
+    };
+    
+    window.addEventListener('shopNameUpdated', handleShopNameUpdate);
+    return () => window.removeEventListener('shopNameUpdated', handleShopNameUpdate);
+  }, []);
 
   const navItems: NavItem[] = [
     { text: "Tableau de bord", path: "/dashboard" as Route },
     { text: "Clients", path: "/customers" as Route },
     { text: "Tickets", path: "/tickets" as Route },
-    { text: "Factures", path: "/finance" as Route },
+    { text: "Facturation", path: "/finance" as Route },
     { text: "Catalogue", path: "/catalog" as Route },
     { text: "Calendrier", path: "/calendar" as Route },
+    { text: "Caisse", path: "/cash-register" as Route },
     { text: "Statistiques", path: "/stats" as Route },
   ];
 
@@ -36,7 +59,7 @@ const NavBar = () => {
             passHref
             style={{ color: "inherit", textDecoration: "none" }}
           >
-            🚴 Atelier Vélo+
+            🚴 {shopName}
           </Link>
         </Typography>
         <Box sx={{ display: { xs: "none", sm: "flex" }, gap: 1, alignItems: "center" }}>
