@@ -1,0 +1,75 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                                                                              ║
+║              📱 SCANNER DE CODE-BARRES - DÉMARRAGE RAPIDE                   ║
+║                                                                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+
+✅ TOUT EST DÉJÀ CONFIGURÉ !
+═══════════════════════════════════════════════════════════════════════════════
+
+✓ Tunnel Cloudflare déjà en place
+✓ Domaine : https://rdv.upgradedbikes.com
+✓ URL scanner : https://rdv.upgradedbikes.com/admin/catalog
+✓ Pas besoin d'installer cloudflared
+✓ Pas de script séparé à lancer
+
+
+🚀 INSTALLATION (2 MINUTES)
+═══════════════════════════════════════════════════════════════════════════════
+
+cd apps/web
+.\install-barcode-scanner.ps1
+
+
+📱 UTILISATION SUR SMARTPHONE
+═══════════════════════════════════════════════════════════════════════════════
+
+1. Sur PC :
+   ────────────────────────────────────────────────────────────────────────
+   npm run dev:tunnel
+
+
+2. Sur smartphone :
+   ────────────────────────────────────────────────────────────────────────
+   Ouvrir : https://rdv.upgradedbikes.com/admin/catalog
+   
+   Se connecter
+   Cliquer "Scanner"
+   Scanner les produits
+
+
+💡 POINTS CLÉS
+═══════════════════════════════════════════════════════════════════════════════
+
+✓ Toujours lancer avec : npm run dev:tunnel (pas npm run dev)
+✓ URL complète : https://rdv.upgradedbikes.com/admin/catalog
+✓ Ne PAS utiliser juste https://rdv.upgradedbikes.com (redirige vers RDV)
+✓ Sauvegarder l'URL complète dans vos favoris smartphone
+✓ Prix jamais récupérés automatiquement → Toujours saisir manuellement
+
+
+🧪 TEST RAPIDE
+═══════════════════════════════════════════════════════════════════════════════
+
+1. npm run dev:tunnel
+2. Ouvrir https://rdv.upgradedbikes.com/admin/catalog sur smartphone
+3. Se connecter
+4. Cliquer "Scanner"
+5. Saisir manuellement : 3017620422003
+6. Vérifier : Nutella, Ferrero
+
+
+📖 DOCUMENTATION
+═══════════════════════════════════════════════════════════════════════════════
+
+README_SCANNER.md         → Démarrage rapide
+SCANNER_CODE_BARRES.md    → Guide complet
+SCANNER_ACCES_MOBILE.md   → Configuration tunnel
+
+
+═══════════════════════════════════════════════════════════════════════════════
+
+                            📱 Bon scan ! 🚴‍♂️
+
+═══════════════════════════════════════════════════════════════════════════════

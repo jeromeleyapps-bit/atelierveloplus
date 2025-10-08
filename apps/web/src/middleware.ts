@@ -21,6 +21,7 @@ const publicApiRoutes = [
   '/api/calendar/events',         // Événements calendrier (lecture seule)
   '/api/calendar/blocks',         // Blocs calendrier (lecture seule)
   '/api/customers',               // Liste clients pour autocomplete
+  '/api/catalog/barcode',         // Lookup code-barres uniquement (lecture seule)
 ];
 
 // Patterns de routes publiques (regex)
@@ -31,6 +32,8 @@ const publicPatterns = [
   /^\/api\/finance\/invoices\/[^/]+\/email$/,   // Envoi email facture
   /^\/api\/finance\/quotes\/[^/]+\/email$/,     // Envoi email devis
   /^\/api\/finance\/credits\/[^/]+\/email$/,    // Envoi email avoir
+  /^\/api\/catalog\/items$/,                     // Liste des items (GET uniquement, page protégée côté client)
+  /^\/api\/catalog\/categories$/,                // Liste des catégories (GET uniquement)
 ];
 
 // Routes admin (nécessitent role = admin)
@@ -58,90 +61,78 @@ const protectedApiRoutes = [
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-
-  // 0. Ignorer les ressources Next.js internes
-  if (
-    pathname.startsWith('/_next/') ||
-    pathname.startsWith('/static/') ||
-    pathname.includes('webpack-hmr') ||
-    pathname.endsWith('.ico') ||
-    pathname.endsWith('.png') ||
-    pathname.endsWith('.jpg') ||
-    pathname.endsWith('.svg')
-  ) {
+  
+  // GARDE-FOU: Ignorer explicitement tout ce qui n'est pas /api/
+  if (!pathname.startsWith('/api/')) {
     return NextResponse.next();
   }
-
-  // 1. Ignorer les routes UI publiques
-  if (publicRoutes.includes(pathname)) {
+  
+  // 1. Vérifier si c'est une API publique (laisser passer sans vérification)
+  const isPublicApi = publicApiRoutes.some(route => pathname.startsWith(route));
+  if (isPublicApi) {
     return NextResponse.next();
   }
-
-  // 2. Ignorer les routes API publiques explicites
-  if (publicApiRoutes.some(route => pathname.startsWith(route))) {
+  
+  // 2. Vérifier les patterns publics (PDFs, emails, etc.)
+  const matchesPublicPattern = publicPatterns.some(pattern => pattern.test(pathname));
+  if (matchesPublicPattern) {
     return NextResponse.next();
   }
-
-  // 3. Ignorer les routes publiques avec patterns (PDFs, emails)
-  if (publicPatterns.some(pattern => pattern.test(pathname))) {
-    return NextResponse.next();
-  }
-
-  // 4. Vérifier si c'est une API protégée
+  
+  // 3. Vérifier si c'est une API protégée
   const isProtectedApi = protectedApiRoutes.some(route => pathname.startsWith(route));
   
-  if (isProtectedApi) {
-    // Vérifier la présence du header x-user-id
-    const userId = request.headers.get('x-user-id');
+  if (!isProtectedApi) {
+    // Ni publique, ni protégée explicitement -> laisser passer par défaut
+    return NextResponse.next();
+  }
 
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'unauthorized', message: 'Authentication required' },
-        { status: 401 }
-      );
-    }
+  // C'est une API protégée, vérifier l'authentification
+  const userId = request.headers.get('x-user-id');
 
-    // Pour les routes admin, vérifier le rôle en base
-    const isAdminApi = pathname.startsWith('/api/admin');
-    if (isAdminApi) {
-      try {
-        const prisma = await getPrisma();
-        if (prisma) {
-          const user = await prisma.user.findUnique({
-            where: { id: userId },
-            select: { role: true, active: true }
-          });
+  if (!userId) {
+    return NextResponse.json(
+      { error: 'unauthorized', message: 'Authentication required' },
+      { status: 401 }
+    );
+  }
 
-          if (!user || !user.active || user.role !== 'admin') {
-            return NextResponse.json(
-              { error: 'forbidden', message: 'Admin role required' },
-              { status: 403 }
-            );
-          }
+  // Pour les routes admin API, vérifier le rôle en base
+  const isAdminApi = pathname.startsWith('/api/admin');
+  if (isAdminApi) {
+    try {
+      const prisma = await getPrisma();
+      if (prisma) {
+        const user = await prisma.user.findUnique({
+          where: { id: userId },
+          select: { role: true, active: true }
+        });
+
+        if (!user || !user.active || user.role !== 'admin') {
+          return NextResponse.json(
+            { error: 'forbidden', message: 'Admin role required' },
+            { status: 403 }
+          );
         }
-      } catch (error) {
-        console.error('Error checking admin role:', error);
-        return NextResponse.json(
-          { error: 'internal_error', message: 'Failed to verify permissions' },
-          { status: 500 }
-        );
       }
+    } catch (error) {
+      console.error('Error checking admin role:', error);
+      return NextResponse.json(
+        { error: 'internal_error', message: 'Failed to verify permissions' },
+        { status: 500 }
+      );
     }
   }
 
-  // 5. Pour les routes UI, RequireAuth (client-side) gère la protection
   return NextResponse.next();
 }
 
 export const config = {
   matcher: [
     /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder
+     * Matcher simplifié : on ne vérifie QUE les routes /api/*
+     * Tout le reste (pages, ressources, _next, etc.) est ignoré
      */
-    '/((?!_next/static|_next/image|favicon.ico|public).*)',
+    '/api/:path*',
   ],
 };

@@ -26,19 +26,26 @@ if (-not (Test-Path "C:\cloudflared\config.yml")) {
     exit 1
 }
 
-Write-Host "Demarrage Next.js..." -ForegroundColor Cyan
+Write-Host "Demarrage Next.js (sans WebSocket HMR)..." -ForegroundColor Cyan
 $nextJob = Start-Job -ScriptBlock {
     Set-Location "C:\Users\j_ley\Atelier-velo+\apps\web"
+    # Désactiver le WebSocket HMR pour éviter les erreurs avec Cloudflare Tunnel
+    $env:NEXT_TELEMETRY_DISABLED = "1"
+    $env:WATCHPACK_POLLING = "true"
+    $env:FAST_REFRESH = "false"
+    $env:__NEXT_DISABLE_WEBSOCKET = "1"
     pnpm dev
 }
 
 Write-Host "Next.js demarre (Job ID: $($nextJob.Id))" -ForegroundColor Green
 Start-Sleep -Seconds 5
 
-Write-Host "Demarrage Cloudflare Tunnel..." -ForegroundColor Cyan
+Write-Host "Demarrage Cloudflare Tunnel (logs filtres)..." -ForegroundColor Cyan
 $tunnelJob = Start-Job -ScriptBlock {
     Set-Location "C:\cloudflared"
-    .\cloudflared.exe tunnel --config C:\cloudflared\config.yml run atelier-velo
+    # Filtrer les erreurs webpack-hmr qui sont normales en dev
+    .\cloudflared.exe tunnel --config C:\cloudflared\config.yml run atelier-velo 2>&1 | 
+        Where-Object { $_ -notmatch 'webpack-hmr' -and $_ -notmatch 'Unauthorized.*_next' }
 }
 
 Write-Host "Tunnel demarre (Job ID: $($tunnelJob.Id))" -ForegroundColor Green

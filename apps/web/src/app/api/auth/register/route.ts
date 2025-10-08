@@ -67,7 +67,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "register_failed" }, { status: 400 });
     }
     // Optionally reset database before creating the first user
-    const shouldReset = process.env.RESET_DB_ON_REGISTER === "true" || process.env.NODE_ENV === "development";
+    // ⚠️ DÉSACTIVÉ PAR DÉFAUT POUR SÉCURITÉ - Activer uniquement si nécessaire
+    const shouldReset = process.env.RESET_DB_ON_REGISTER === "true";
     if (shouldReset) {
       try {
         await wipeAllApplicationData();

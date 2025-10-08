@@ -50,7 +50,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr" className={inter.className}>
-      <head />
+      <head>
+        <meta httpEquiv="Permissions-Policy" content="camera=*, microphone=*, geolocation=*" />
+      </head>
       <body>
         <AppProviders>{children}</AppProviders>
       </body>

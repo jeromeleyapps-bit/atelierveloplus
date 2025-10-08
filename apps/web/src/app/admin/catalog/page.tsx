@@ -33,7 +33,9 @@ import PageShell from "@/app/components/PageShell";
 import SectionCard from "@/app/components/SectionCard";
 import Inventory2Icon from "@mui/icons-material/Inventory2";
 import ListAltIcon from "@mui/icons-material/ListAlt";
+import QrCodeScannerIcon from "@mui/icons-material/QrCodeScanner";
 import type { CatalogCategory } from "@/lib/catalog";
+import { useRouter, useSearchParams } from 'next/navigation';
 
 interface CatalogItem {
   id: string;
@@ -41,13 +43,14 @@ interface CatalogItem {
   category: string;
   name: string;
   priceHT: number;
-  priceTTC: number;
   vatRate: number;
   active: boolean;
   updatedAt?: string;
 }
 
-export default function AdminCatalogPage() {
+export default function CatalogPageContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [items, setItems] = React.useState<CatalogItem[]>([]);
   const [total, setTotal] = React.useState(0);
   const [loading, setLoading] = React.useState(false);
@@ -58,6 +61,53 @@ export default function AdminCatalogPage() {
 
   const [editOpen, setEditOpen] = React.useState(false);
   const [current, setCurrent] = React.useState<Partial<CatalogItem> | null>(null);
+  
+  // Check if we have a barcode from scan page
+  React.useEffect(() => {
+    const barcode = searchParams.get('barcode');
+    if (barcode) {
+      // Search for product data first
+      searchBarcode(barcode);
+    }
+  }, [searchParams]);
+
+  async function searchBarcode(barcode: string, searchRetailers: boolean = false) {
+    setLoading(true);
+    try {
+      const url = `/api/catalog/barcode?barcode=${encodeURIComponent(barcode)}${searchRetailers ? '&searchRetailers=true' : ''}`;
+      const res = await fetch(url);
+      const data = await res.json();
+      
+      if (res.ok && data.found) {
+        // Product found
+        handleBarcodeScan(barcode, data);
+      } else if (res.ok && data.canSearchRetailers && !searchRetailers) {
+        // Ask if user wants to search retailers
+        const searchOnRetailers = window.confirm(
+          'Produit non trouvé dans les bases publiques.\n\n' +
+          'Voulez-vous chercher sur les sites spécialisés vélo ?\n' +
+          '(Alltricks, Probikeshop, Bike24, Decathlon)\n\n' +
+          'Cela prendra quelques secondes supplémentaires.'
+        );
+        
+        if (searchOnRetailers) {
+          await searchBarcode(barcode, true);
+        } else {
+          // User declined, open form with barcode only
+          handleBarcodeScan(barcode, null);
+        }
+      } else {
+        // Not found, open form with barcode only
+        handleBarcodeScan(barcode, null);
+      }
+    } catch (err) {
+      console.error('Barcode search error:', err);
+      // On error, still open form with barcode
+      handleBarcodeScan(barcode, null);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   async function load() {
     setLoading(true);
@@ -140,6 +190,27 @@ export default function AdminCatalogPage() {
     await load();
   }
 
+  function handleBarcodeScan(barcode: string, productData?: any) {
+    // Pre-fill form with scanned data
+    const newItem: Partial<CatalogItem> = {
+      sku: barcode,
+      category: productData?.category || "piece",
+      name: productData?.name || "",
+      priceHT: 0,
+      priceTTC: 0,
+      vatRate: 20,
+      active: true,
+    };
+
+    // If we have brand info, prepend it to the name
+    if (productData?.brand && productData?.name) {
+      newItem.name = `${productData.brand} - ${productData.name}`;
+    }
+
+    setCurrent(newItem);
+    setEditOpen(true);
+  }
+
   return (
     <RequireAuth>
       <PageShell title="Admin · Catalogue" maxWidth="lg">
@@ -212,6 +283,7 @@ export default function AdminCatalogPage() {
                 URL.revokeObjectURL(url);
               } catch (e) { console.error(e); }
             }}>Exporter CSV</Button>
+            <Button variant="outlined" color="secondary" startIcon={<QrCodeScannerIcon />} onClick={() => router.push('/scan')}>Scanner</Button>
             <Button variant="contained" startIcon={<AddIcon />} onClick={openCreate}>Nouvel article</Button>
           </Stack>
         </SectionCard>
@@ -271,6 +343,7 @@ export default function AdminCatalogPage() {
             rowsPerPageOptions={[10,25,50,100]}
           />
         </SectionCard>
+
 
         <Dialog open={editOpen} onClose={() => setEditOpen(false)} maxWidth="sm" fullWidth>
           <DialogTitle>{current?.id ? 'Modifier l\'article' : 'Nouvel article'}</DialogTitle>

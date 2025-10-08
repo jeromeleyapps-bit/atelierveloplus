@@ -44,8 +44,6 @@ export default function PublicBookingPage() {
   const [form, setForm] = useState({ name: "", email: "", phone: "", bike: "", description: "" });
   const [submitting, setSubmitting] = useState(false);
   const [submitMsg, setSubmitMsg] = useState<{ ok: boolean; msg: string } | null>(null);
-  const [customers, setCustomers] = useState<any[]>([]);
-  const [loadingCustomers, setLoadingCustomers] = useState(false);
 
   async function load() {
     setLoading(true); setError(null);
@@ -63,33 +61,10 @@ export default function PublicBookingPage() {
     }
   }
 
-  useEffect(() => { load(); loadCustomers(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
+  useEffect(() => { load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
 
-  async function loadCustomers() {
-    setLoadingCustomers(true);
-    try {
-      const res = await fetch('/api/customers');
-      if (res.ok) {
-        const data = await res.json();
-        setCustomers(data);
-      }
-    } catch (e) {
-      console.error('Failed to load customers', e);
-    } finally {
-      setLoadingCustomers(false);
-    }
-  }
-
-  function selectCustomer(customer: any) {
-    if (!customer) return;
-    setForm({
-      name: `${customer.firstName || ''} ${customer.lastName || ''}`.trim() || customer.email || '',
-      email: customer.email || '',
-      phone: customer.phone || '',
-      bike: '',
-      description: ''
-    });
-  }
+  // SUPPRIMÉ : Ne pas charger les clients sur la page publique (fuite de données)
+  // Les clients ne doivent être accessibles que dans l'interface admin
 
   async function submitBooking() {
     if (!selected) return;
@@ -293,49 +268,45 @@ export default function PublicBookingPage() {
         <DialogTitle>Réserver le créneau</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
-            <Autocomplete
-              options={customers}
-              getOptionLabel={(option) => {
-                if (typeof option === 'string') return option;
-                const name = `${option.firstName || ''} ${option.lastName || ''}`.trim();
-                return name || option.email || 'Client sans nom';
-              }}
-              renderOption={(props, option) => (
-                <li {...props}>
-                  <Box>
-                    <Typography variant="body2">
-                      {`${option.firstName || ''} ${option.lastName || ''}`.trim() || option.email}
-                    </Typography>
-                    {option.phone && (
-                      <Typography variant="caption" color="text.secondary">
-                        {option.phone}
-                      </Typography>
-                    )}
-                  </Box>
-                </li>
-              )}
-              freeSolo
-              loading={loadingCustomers}
-              onChange={(e, value) => {
-                if (value && typeof value !== 'string') {
-                  selectCustomer(value);
-                }
-              }}
-              inputValue={form.name}
-              onInputChange={(e, value) => setForm({ ...form, name: value })}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Nom (ou sélectionnez un client existant)"
-                  required
-                  fullWidth
-                />
-              )}
+            <TextField 
+              label="Nom" 
+              required 
+              fullWidth 
+              value={form.name} 
+              onChange={e=>setForm({ ...form, name: e.target.value })}
+              InputLabelProps={{ shrink: true }}
             />
-            <TextField label="Email" type="email" fullWidth value={form.email} onChange={e=>setForm({ ...form, email: e.target.value })} />
-            <TextField label="Téléphone" fullWidth value={form.phone} onChange={e=>setForm({ ...form, phone: e.target.value })} />
-            <TextField label="Vélo" fullWidth value={form.bike} onChange={e=>setForm({ ...form, bike: e.target.value })} />
-            <TextField label="Description du besoin" multiline minRows={3} fullWidth value={form.description} onChange={e=>setForm({ ...form, description: e.target.value })} />
+            <TextField 
+              label="Email" 
+              type="email" 
+              fullWidth 
+              value={form.email} 
+              onChange={e=>setForm({ ...form, email: e.target.value })}
+              InputLabelProps={{ shrink: true }}
+            />
+            <TextField 
+              label="Téléphone" 
+              fullWidth 
+              value={form.phone} 
+              onChange={e=>setForm({ ...form, phone: e.target.value })}
+              InputLabelProps={{ shrink: true }}
+            />
+            <TextField 
+              label="Vélo" 
+              fullWidth 
+              value={form.bike} 
+              onChange={e=>setForm({ ...form, bike: e.target.value })}
+              InputLabelProps={{ shrink: true }}
+            />
+            <TextField 
+              label="Description du besoin" 
+              multiline 
+              minRows={3} 
+              fullWidth 
+              value={form.description} 
+              onChange={e=>setForm({ ...form, description: e.target.value })}
+              InputLabelProps={{ shrink: true }}
+            />
             {selected && (
               <Alert severity="info">Créneau sélectionné: <b><span suppressHydrationWarning>{new Date(selected.start).toLocaleString()}</span></b></Alert>
             )}

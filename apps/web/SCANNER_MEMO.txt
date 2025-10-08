@@ -1,0 +1,48 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                                                                              ║
+║                    📱 SCANNER - AIDE-MÉMOIRE RAPIDE                         ║
+║                                                                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+
+🚀 DÉMARRER
+═══════════════════════════════════════════════════════════════════════════════
+
+npm run dev:tunnel
+
+
+📱 URL SMARTPHONE
+═══════════════════════════════════════════════════════════════════════════════
+
+https://rdv.upgradedbikes.com/admin/catalog
+
+⚠️  URL COMPLÈTE ! Ne PAS utiliser juste https://rdv.upgradedbikes.com
+
+
+✅ WORKFLOW
+═══════════════════════════════════════════════════════════════════════════════
+
+1. Se connecter
+2. Admin > Catalogue > Scanner
+3. Scanner le code-barres
+4. Vérifier le nom
+5. Ajouter les prix
+6. Enregistrer
+
+
+💡 RAPPELS
+═══════════════════════════════════════════════════════════════════════════════
+
+✓ Toujours utiliser npm run dev:tunnel (pas npm run dev)
+✓ URL complète avec /admin/catalog
+✓ Prix jamais récupérés → Saisir manuellement
+✓ Produits vélo rarement trouvés → Normal
+
+
+🧪 TEST
+═══════════════════════════════════════════════════════════════════════════════
+
+Code-barres : 3017620422003 (Nutella)
+
+
+═══════════════════════════════════════════════════════════════════════════════
