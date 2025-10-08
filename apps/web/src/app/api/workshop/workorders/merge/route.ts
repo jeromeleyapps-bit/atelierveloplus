@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getPrisma } from "@/lib/db";
+import { handleApiError } from "@/lib/error-handler";
 
 export const dynamic = "force-dynamic";
 
@@ -88,8 +89,6 @@ export async function POST(req: Request) {
 
     return NextResponse.json(merged, { status: 200 });
   } catch (e: any) {
-    console.error("[MERGE] Error merging work orders:", e);
-    console.error("[MERGE] Error stack:", e.stack);
-    return NextResponse.json({ error: e.message || "merge_error", detail: e.stack }, { status: 500 });
+    return handleApiError(e, 'MERGE');
   }
 }

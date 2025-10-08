@@ -39,15 +39,49 @@ const nextConfig = {
     
     return config;
   },
-  // Add security headers to allow camera access
+  // Security headers
   async headers() {
     return [
       {
         source: '/:path*',
         headers: [
+          // CSP - Content Security Policy
+          {
+            key: 'Content-Security-Policy',
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+              "style-src 'self' 'unsafe-inline'",
+              "img-src 'self' data: https:",
+              "font-src 'self' data:",
+              "connect-src 'self' https://api.pwnedpasswords.com",
+              "frame-ancestors 'none'",
+            ].join('; '),
+          },
+          // HSTS - Force HTTPS
+          {
+            key: 'Strict-Transport-Security',
+            value: 'max-age=31536000; includeSubDomains',
+          },
+          // X-Frame-Options - Prevention clickjacking
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          // X-Content-Type-Options - Prevention MIME sniffing
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          // Referrer-Policy
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
+          },
+          // Permissions-Policy - Restreindre camera aux pages scanner
           {
             key: 'Permissions-Policy',
-            value: 'camera=*, microphone=*, geolocation=*',
+            value: 'camera=(self "https://rdv.upgradedbikes.com"), microphone=(), geolocation=()',
           },
         ],
       },

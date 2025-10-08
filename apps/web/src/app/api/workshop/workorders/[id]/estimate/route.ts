@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server";
-import { getPrisma } from "@/lib/db";
+import { NextResponse } from 'next/server';
+import { getPrisma } from '@/lib/db';
+import { handleApiError } from '@/lib/error-handler';
 
 export const dynamic = "force-dynamic";
 
@@ -21,7 +22,6 @@ export async function POST(req: Request, { params }: { params: { id: string } })
 
     return NextResponse.json(updated, { status: 200 });
   } catch (e: any) {
-    console.error("Error updating estimate:", e);
-    return NextResponse.json({ error: e.message || "update_error" }, { status: 500 });
+    return handleApiError(e, 'ESTIMATE_UPDATE');
   }
 }

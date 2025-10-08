@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getPrisma } from "@/lib/db";
 import { compare } from "bcryptjs";
 import { rateLimit } from "@/lib/security";
+import { generateToken } from "@/lib/jwt";
 
 function getClientIp(req: Request): string {
   const xf = req.headers.get('x-forwarded-for');
@@ -47,7 +48,21 @@ export async function POST(req: Request) {
       await jitter(250);
       return NextResponse.json({ error: "invalid_credentials" }, { status: 401 });
     }
-    return NextResponse.json({ id: user.id, email: user.email ?? email, firstName: null, lastName: null, shopName: null });
+    // Générer JWT token
+    const token = generateToken({
+      userId: user.id,
+      email: user.email ?? email,
+      role: user.role || 'user',
+    });
+
+    return NextResponse.json({
+      token,
+      user: {
+        id: user.id,
+        email: user.email ?? email,
+        role: user.role || 'user',
+      },
+    });
   } catch (e: any) {
     await jitter(250);
     return NextResponse.json({ error: "login_failed" }, { status: 500 });

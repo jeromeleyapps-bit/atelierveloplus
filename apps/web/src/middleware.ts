@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { getPrisma } from '@/lib/db';
+import { getUserFromToken } from '@/lib/jwt';
 
 // Routes publiques (accessibles sans authentification)
 const publicRoutes = [
@@ -87,44 +87,31 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // C'est une API protégée, vérifier l'authentification
-  const userId = request.headers.get('x-user-id');
+  // C'est une API protégée, vérifier l'authentification JWT
+  const user = getUserFromToken(request);
 
-  if (!userId) {
+  if (!user) {
     return NextResponse.json(
-      { error: 'unauthorized', message: 'Authentication required' },
+      { error: 'unauthorized', message: 'Valid JWT token required' },
       { status: 401 }
     );
   }
 
-  // Pour les routes admin API, vérifier le rôle en base
+  // Pour les routes admin API, vérifier le rôle
   const isAdminApi = pathname.startsWith('/api/admin');
-  if (isAdminApi) {
-    try {
-      const prisma = await getPrisma();
-      if (prisma) {
-        const user = await prisma.user.findUnique({
-          where: { id: userId },
-          select: { role: true, active: true }
-        });
-
-        if (!user || !user.active || user.role !== 'admin') {
-          return NextResponse.json(
-            { error: 'forbidden', message: 'Admin role required' },
-            { status: 403 }
-          );
-        }
-      }
-    } catch (error) {
-      console.error('Error checking admin role:', error);
-      return NextResponse.json(
-        { error: 'internal_error', message: 'Failed to verify permissions' },
-        { status: 500 }
-      );
-    }
+  if (isAdminApi && user.role !== 'admin') {
+    return NextResponse.json(
+      { error: 'forbidden', message: 'Admin role required' },
+      { status: 403 }
+    );
   }
 
-  return NextResponse.next();
+  // Passer userId et role dans headers pour les routes API
+  const response = NextResponse.next();
+  response.headers.set('x-user-id', user.userId);
+  response.headers.set('x-user-role', user.role);
+  
+  return response;
 }
 
 export const config = {
