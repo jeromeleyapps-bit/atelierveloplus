@@ -2,12 +2,12 @@
 // Using "/api" ensures we target Next.js route handlers by default.
 export const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "/api";
 
-function getUserIdHeader() {
+function getAuthHeader() {
   if (typeof window !== "undefined") {
-    const uid = window.localStorage.getItem("auth:userId");
-    const email = window.localStorage.getItem("auth:email") || undefined;
-    if (uid)
-      return { "x-user-id": uid, ...(email ? { "x-user-email": email } : {}) };
+    const token = window.localStorage.getItem("jwt_token");
+    if (token) {
+      return { "Authorization": `Bearer ${token}` };
+    }
   }
   return {} as Record<string, string>;
 }
@@ -15,8 +15,14 @@ function getUserIdHeader() {
 // Always hit local Next.js API routes, ignoring external BASE_URL
 async function requestLocal<T>(path: string, options?: RequestInit): Promise<T> {
   const url = `/api${path}`;
-  const res = await fetch(url, { headers: { "Content-Type": "application/json", ...getUserIdHeader() }, ...options });
+  const res = await fetch(url, { headers: { "Content-Type": "application/json", ...getAuthHeader() }, ...options });
   if (!res.ok) {
+    // Token expired or invalid - redirect to login
+    if (res.status === 401 && typeof window !== "undefined") {
+      window.localStorage.removeItem("jwt_token");
+      window.localStorage.removeItem("user");
+      window.location.href = "/auth/login";
+    }
     const text = await res.text();
     throw new Error(`API ${res.status}: ${text}`);
   }
@@ -27,10 +33,16 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const url = `${BASE_URL}${path}`;
   try {
     const res = await fetch(url, {
-      headers: { "Content-Type": "application/json", ...getUserIdHeader() },
+      headers: { "Content-Type": "application/json", ...getAuthHeader() },
       ...options,
     });
     if (!res.ok) {
+      // Token expired or invalid - redirect to login
+      if (res.status === 401 && typeof window !== "undefined") {
+        window.localStorage.removeItem("jwt_token");
+        window.localStorage.removeItem("user");
+        window.location.href = "/auth/login";
+      }
       const text = await res.text();
       throw new Error(`API ${res.status}: ${text}`);
     }
@@ -40,10 +52,16 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
     if (process.env.NEXT_PUBLIC_API_BASE_URL) {
       const localUrl = `/api${path}`;
       const res2 = await fetch(localUrl, {
-        headers: { "Content-Type": "application/json", ...getUserIdHeader() },
+        headers: { "Content-Type": "application/json", ...getAuthHeader() },
         ...options,
       });
       if (!res2.ok) {
+        // Token expired or invalid - redirect to login
+        if (res2.status === 401 && typeof window !== "undefined") {
+          window.localStorage.removeItem("jwt_token");
+          window.localStorage.removeItem("user");
+          window.location.href = "/auth/login";
+        }
         const text2 = await res2.text();
         throw new Error(`API ${res2.status}: ${text2}`);
       }
@@ -433,11 +451,12 @@ export async function authRegister(input: {
 
 export async function authLogin(input: { email: string; password: string }) {
   return request<{
-    id: string;
-    email: string;
-    firstName?: string | null;
-    lastName?: string | null;
-    shopName?: string | null;
+    token: string;
+    user: {
+      id: string;
+      email: string;
+      role: string;
+    };
   }>(`/auth/login`, {
     method: "POST",
     body: JSON.stringify(input),

@@ -38,19 +38,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Load from localStorage after mount to avoid SSR/CSR mismatch
-    const uid = window.localStorage.getItem("auth:userId");
-    const email = window.localStorage.getItem("auth:email") || undefined;
-    const shopName = window.localStorage.getItem("auth:shopName") || undefined;
-    if (uid) setUser({ id: uid, email, shopName });
+    const token = window.localStorage.getItem("jwt_token");
+    const userStr = window.localStorage.getItem("user");
+    if (token && userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        setUser({ id: user.id, email: user.email, shopName: user.shopName });
+      } catch (e) {
+        // Invalid user data, clear
+        window.localStorage.removeItem("jwt_token");
+        window.localStorage.removeItem("user");
+      }
+    }
     setReady(true);
   }, []);
 
   const login = async (email: string, password: string) => {
-    const u = await authLogin({ email, password });
-    window.localStorage.setItem("auth:userId", u.id);
-    window.localStorage.setItem("auth:email", u.email);
-    const shopName = window.localStorage.getItem("auth:shopName") || undefined;
-    setUser({ id: u.id, email: u.email, shopName });
+    const response = await authLogin({ email, password });
+    // Store JWT token
+    window.localStorage.setItem("jwt_token", response.token);
+    window.localStorage.setItem("user", JSON.stringify(response.user));
+    setUser({ id: response.user.id, email: response.user.email });
   };
 
   const register = async (input: {
@@ -62,17 +70,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     isAutoEntrepreneur?: boolean;
   }) => {
     const u = await authRegister(input);
-    // After registration, auto-login client-side by storing headers
-    window.localStorage.setItem("auth:userId", u.id);
-    window.localStorage.setItem("auth:email", u.email);
-    if (u.shopName) window.localStorage.setItem("auth:shopName", u.shopName);
+    // After registration, auto-login by fetching token
+    // Note: register endpoint should also return token in future
+    // For now, store user data and require login
+    window.localStorage.setItem("user", JSON.stringify({ id: u.id, email: u.email, shopName: u.shopName }));
     setUser({ id: u.id, email: u.email, shopName: u.shopName });
   };
 
   const logout = async () => {
-    window.localStorage.removeItem("auth:userId");
-    window.localStorage.removeItem("auth:email");
-    window.localStorage.removeItem("auth:shopName");
+    window.localStorage.removeItem("jwt_token");
+    window.localStorage.removeItem("user");
     setUser(null);
   };
 
