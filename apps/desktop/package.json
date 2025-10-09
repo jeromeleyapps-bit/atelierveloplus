@@ -1,0 +1,47 @@
+{
+  "name": "atelier-velo-desktop",
+  "version": "1.0.0",
+  "description": "Atelier Vélo+ - Application Desktop de gestion d'atelier vélo",
+  "main": "main.js",
+  "author": "Jérôme Leyssard",
+  "license": "ISC",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win portable",
+    "build:installer": "electron-builder --win nsis"
+  },
+  "devDependencies": {
+    "electron": "^28.3.3",
+    "electron-builder": "^24.9.1"
+  },
+  "build": {
+    "appId": "com.ateliervelo.app",
+    "productName": "Atelier Vélo+",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "icon.ico",
+      "../web/.next/standalone/**/*",
+      "../web/public/**/*",
+      "../web/prisma/**/*",
+      "../web/data/**/*"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "icon.ico"
+    },
+    "portable": {
+      "artifactName": "AtelierVelo-${version}.exe"
+    }
+  }
+}
