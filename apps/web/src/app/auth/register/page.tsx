@@ -55,6 +55,8 @@ function RegisterContent() {
         shopName: shopName || undefined,
         isAutoEntrepreneur: isAuto,
       });
+      // Délai pour laisser le localStorage et React state se synchroniser
+      await new Promise(resolve => setTimeout(resolve, 500));
       router.push(next as Route);
     } catch (e: unknown) {
       // Try to parse backend reason from error message like: "API 400: {\"error\":...,\"reason\":...}"

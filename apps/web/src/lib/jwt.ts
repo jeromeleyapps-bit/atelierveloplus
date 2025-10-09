@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import { SignJWT, jwtVerify } from 'jose';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-CHANGE-IN-PRODUCTION-IMMEDIATELY';
 const JWT_EXPIRES_IN = '7d'; // 7 jours
@@ -9,25 +9,39 @@ export interface JWTPayload {
   role: string;
 }
 
+// Convertir le secret en Uint8Array pour jose
+const getSecretKey = () => new TextEncoder().encode(JWT_SECRET);
+
 /**
- * Générer un token JWT
+ * Générer un token JWT (compatible Edge Runtime)
  */
-export function generateToken(payload: JWTPayload): string {
-  return jwt.sign(payload, JWT_SECRET, {
-    expiresIn: JWT_EXPIRES_IN,
-    issuer: 'atelier-velo',
-  });
+export async function generateToken(payload: JWTPayload): Promise<string> {
+  const secret = getSecretKey();
+  
+  return await new SignJWT(payload as any)
+    .setProtectedHeader({ alg: 'HS256', typ: 'JWT' })
+    .setIssuedAt()
+    .setIssuer('atelier-velo')
+    .setExpirationTime(JWT_EXPIRES_IN)
+    .sign(secret);
 }
 
 /**
- * Vérifier et décoder un token JWT
+ * Vérifier et décoder un token JWT (compatible Edge Runtime)
  */
-export function verifyToken(token: string): JWTPayload | null {
+export async function verifyToken(token: string): Promise<JWTPayload | null> {
   try {
-    const decoded = jwt.verify(token, JWT_SECRET, {
+    const secret = getSecretKey();
+    const { payload } = await jwtVerify(token, secret, {
       issuer: 'atelier-velo',
-    }) as JWTPayload;
-    return decoded;
+    });
+    
+    // Vérifier que le payload contient les champs requis
+    if (!payload.userId || !payload.email || !payload.role) {
+      return null;
+    }
+    
+    return payload as unknown as JWTPayload;
   } catch (error) {
     console.error('[JWT] Token verification failed:', error instanceof Error ? error.message : 'Unknown error');
     return null;
@@ -48,8 +62,8 @@ export function extractToken(req: Request): string | null {
 /**
  * Récupérer l'utilisateur depuis le token
  */
-export function getUserFromToken(req: Request): JWTPayload | null {
+export async function getUserFromToken(req: Request): Promise<JWTPayload | null> {
   const token = extractToken(req);
   if (!token) return null;
-  return verifyToken(token);
+  return await verifyToken(token);
 }

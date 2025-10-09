@@ -28,6 +28,7 @@ import {
   IconButton,
 } from "@mui/material";
 import RequireAuth from "../components/RequireAuth";
+import { listCashRegisterEntries, createCashRegisterEntry, updateCashRegisterEntry, deleteCashRegisterEntry } from "@/lib/api";
 import PageShell from "../components/PageShell";
 import SectionCard from "../components/SectionCard";
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
@@ -64,15 +65,8 @@ export default function CashRegisterPage() {
   async function loadEntries() {
     setLoading(true);
     try {
-      const res = await fetch("/api/cash-register", {
-        headers: getUserIdHeader()
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setEntries(data);
-      } else {
-        setToast({ open: true, message: "Erreur de chargement", severity: "error" });
-      }
+      const data = await listCashRegisterEntries();
+      setEntries(data);
     } catch (e) {
       console.error(e);
       setToast({ open: true, message: "Erreur de chargement", severity: "error" });
@@ -92,29 +86,26 @@ export default function CashRegisterPage() {
 
     setSubmitting(true);
     try {
-      const url = editingId ? `/api/cash-register/${editingId}` : "/api/cash-register";
-      const method = editingId ? "PUT" : "POST";
+      const data = {
+        type: form.type,
+        amount: parseFloat(form.amount),
+        note: form.description,
+        reference: form.invoiceId
+      };
       
-      const res = await fetch(url, {
-        method,
-        headers: { 
-          "Content-Type": "application/json",
-          ...getUserIdHeader()
-        },
-        body: JSON.stringify(form)
-      });
-
-      if (res.ok) {
-        setToast({ open: true, message: editingId ? "Entrée modifiée" : "Entrée enregistrée", severity: "success" });
-        setOpen(false);
-        setEditingId(null);
-        setForm({ type: "direct_sale", amount: "", description: "", invoiceId: "" });
-        await loadEntries();
+      if (editingId) {
+        await updateCashRegisterEntry(editingId, data);
       } else {
-        setToast({ open: true, message: "Erreur d'enregistrement", severity: "error" });
+        await createCashRegisterEntry(data);
       }
+
+      setToast({ open: true, message: editingId ? "Entrée modifiée" : "Entrée enregistrée", severity: "success" });
+      setOpen(false);
+      setEditingId(null);
+      setForm({ type: "direct_sale", amount: "", description: "", invoiceId: "" });
+      await loadEntries();
     } catch (e) {
-      setToast({ open: true, message: "Erreur réseau", severity: "error" });
+      setToast({ open: true, message: "Erreur d'enregistrement", severity: "error" });
     } finally {
       setSubmitting(false);
     }
@@ -135,16 +126,9 @@ export default function CashRegisterPage() {
     if (!confirm("Supprimer cette entrée ?")) return;
     
     try {
-      const res = await fetch(`/api/cash-register/${id}`, { 
-        method: "DELETE",
-        headers: getUserIdHeader()
-      });
-      if (res.ok) {
-        setToast({ open: true, message: "Entrée supprimée", severity: "success" });
-        await loadEntries();
-      } else {
-        setToast({ open: true, message: "Erreur de suppression", severity: "error" });
-      }
+      await deleteCashRegisterEntry(id);
+      setToast({ open: true, message: "Entrée supprimée", severity: "success" });
+      await loadEntries();
     } catch (e) {
       console.error(e);
       setToast({ open: true, message: "Erreur de suppression", severity: "error" });

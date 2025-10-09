@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@prisma/client": "^6.16.2",
+    "jose": "^6.1.0",
     "prisma": "^6.16.2"
   }
 }

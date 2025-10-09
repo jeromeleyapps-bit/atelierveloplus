@@ -50,7 +50,7 @@ import Tab from "@mui/material/Tab";
 import Link from "next/link";
 import RequireAuth from "../components/RequireAuth";
 import PageShell from "../components/PageShell";
-import { listInvoices, createInvoice, payInvoice, listCustomers, createCustomer, createWorkOrder, type Invoice, type PricingMode, type Customer } from "@/lib/api";
+import { listInvoices, createInvoice, payInvoice, listCustomers, createCustomer, createWorkOrder, sendInvoiceEmail, deleteInvoice, addInvoicePayment, type Invoice, type PricingMode, type Customer } from "@/lib/api";
 import CreateQuoteDialog from "./components/CreateQuoteDialog";
 import CreateInvoiceDialog from "./components/CreateInvoiceDialog";
 import QuotesTab from "./components/QuotesTab";
@@ -454,8 +454,8 @@ function FinanceContent() {
                   let successCount = 0;
                   for (const id of selected) {
                     try {
-                      const res = await fetch(`/api/finance/invoices/${id}`, { method: 'DELETE' });
-                      if (res.ok) successCount++;
+                      await deleteInvoice(id);
+                      successCount++;
                     } catch (e) {
                       console.error('Delete error:', e);
                     }

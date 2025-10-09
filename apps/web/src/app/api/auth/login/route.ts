@@ -3,6 +3,7 @@ import { getPrisma } from "@/lib/db";
 import { compare } from "bcryptjs";
 import { rateLimit } from "@/lib/security";
 import { generateToken } from "@/lib/jwt";
+import { handleApiError, validateRequired } from "@/lib/api-error";
 
 function getClientIp(req: Request): string {
   const xf = req.headers.get('x-forwarded-for');
@@ -49,7 +50,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "invalid_credentials" }, { status: 401 });
     }
     // Générer JWT token
-    const token = generateToken({
+    const token = await generateToken({
       userId: user.id,
       email: user.email ?? email,
       role: user.role || 'user',
@@ -63,8 +64,8 @@ export async function POST(req: Request) {
         role: user.role || 'user',
       },
     });
-  } catch (e: any) {
+  } catch (error) {
     await jitter(250);
-    return NextResponse.json({ error: "login_failed" }, { status: 500 });
+    return handleApiError(error, 'auth/login');
   }
 }

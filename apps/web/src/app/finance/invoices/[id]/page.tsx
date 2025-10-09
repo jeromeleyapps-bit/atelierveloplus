@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import {
   Alert,
   Autocomplete,
   Box,
   Button,
+  CircularProgress,
   Chip,
   Container,
   IconButton,
@@ -84,6 +85,7 @@ export default function InvoiceDetailPage() {
   // Catalog mock + markup
   const [catalog, setCatalog] = useState<CatalogItemExt[]>([]);
   const [selectedItem, setSelectedItem] = useState<CatalogItemExt | null>(null);
+  const [catLoading, setCatLoading] = useState(false);
   const [markupPct, setMarkupPct] = useState<number>(0);
   const [showMargin, setShowMargin] = useState<boolean>(false);
   // Partial payments state
@@ -105,6 +107,15 @@ export default function InvoiceDetailPage() {
       default: return 'service';
     }
   };
+  const mapQTypeToCatalogCategory = (t: typeof qType): CatalogItemExt['category'] | undefined => {
+    switch (t) {
+      case 'piece': return 'PIECES';
+      case 'equipement': return 'EQUIPEMENTS';
+      default: return undefined; // autres types = service/custom
+    }
+  };
+  // Timer pour le debounce de recherche catalogue
+  const catSearchTimer = useRef<any>(null);
   async function onCreateCredit() {
     try {
       const res = await fetch(`/api/finance/invoices/${id}/credit`, { method: 'POST' });
@@ -816,7 +827,8 @@ export default function InvoiceDetailPage() {
                   size="small"
                   options={catalog}
                   value={selectedItem}
-                  getOptionLabel={(o) => o.name}
+                  getOptionLabel={(o) => o?.name || ''}
+                  isOptionEqualToValue={(a, b) => a?.id === b?.id}
                   onChange={(_, val) => {
                     setSelectedItem(val);
                     if (!val) return;
@@ -827,16 +839,53 @@ export default function InvoiceDetailPage() {
                     setQPrice(base);
                   }}
                   sx={{ minWidth: 260 }}
-                  renderInput={(params) => <TextField {...params} label="Catalogue (optionnel)" />}
+                  loading={catLoading}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Catalogue (optionnel)"
+                      placeholder="Rechercher (min. 2 caractères)"
+                      InputProps={{
+                        ...params.InputProps,
+                        endAdornment: (
+                          <>
+                            {catLoading ? <CircularProgress color="inherit" size={18} /> : null}
+                            {params.InputProps.endAdornment}
+                          </>
+                        ),
+                      }}
+                    />
+                  )}
                   filterOptions={(x) => x}
-                  onInputChange={async (_e, value) => {
-                    try {
-                      const list = await searchCatalog({ q: value, category: qType as any, limit: 20 });
-                      setCatalog(list);
-                    } catch (e) {
-                      console.error(e);
-                      // keep previous catalog on error
-                    }
+                  renderOption={(props, option) => (
+                    <li {...props} key={option.id} style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
+                      <span>
+                        <b>{option.name}</b>
+                        {option.sku ? <span style={{ color: '#607d8b' }}> • SKU {option.sku}</span> : null}
+                      </span>
+                      <span style={{ color: '#455a64' }}>
+                        {typeof option.stockQty === 'number' ? `${option.stockQty} en stock` : ''}
+                        <span style={{ marginLeft: 8, fontWeight: 600 }}>
+                          {(inv?.pricingMode === 'HT_TVA' ? option.priceHT : option.priceTTC).toFixed(2)} {inv?.currency}
+                        </span>
+                      </span>
+                    </li>
+                  )}
+                  onInputChange={(_e, value) => {
+                    const v = (value || '').trim();
+                    if (!v || v.length < 2) { setCatalog([]); setCatLoading(false); return; }
+                    if (catSearchTimer.current) clearTimeout(catSearchTimer.current);
+                    catSearchTimer.current = setTimeout(async () => {
+                      setCatLoading(true);
+                      try {
+                        const list = await searchCatalog({ q: v, category: mapQTypeToCatalogCategory(qType), limit: 20 });
+                        setCatalog(list);
+                      } catch (e) {
+                        console.error(e);
+                      } finally {
+                        setCatLoading(false);
+                      }
+                    }, 250);
                   }}
                 />
                 <Select size="small" value={qType} onChange={(e) => setQType(e.target.value as any)} sx={{ minWidth: 160 }}>

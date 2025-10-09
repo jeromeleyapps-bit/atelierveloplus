@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getPrisma } from "@/lib/db";
+import { handleApiError, validateRequired, validateTypes } from "@/lib/api-error";
 
 export const dynamic = "force-dynamic";
 
@@ -49,17 +50,18 @@ export async function POST(req: Request) {
   const prisma = await getPrisma();
   if (!prisma) return NextResponse.json({ error: "prisma_unavailable" }, { status: 501 });
 
-  const body = await req.json();
-  const { sku, category, name, priceHT, priceTTC, vatRate, active = true } = body || {};
-  if (!category || !name || typeof priceHT !== "number" || typeof priceTTC !== "number" || typeof vatRate !== "number") {
-    return NextResponse.json({ error: "invalid_payload" }, { status: 400 });
-  }
   try {
+    const body = await req.json();
+    const { sku, category, name, priceHT, priceTTC, vatRate, active = true } = body || {};
+    
+    validateRequired(body, ['category', 'name']);
+    validateTypes(body, { priceHT: 'number', priceTTC: 'number', vatRate: 'number' });
+    
     const created = await prisma.catalogItem.create({
       data: { sku: sku || null, category, name, priceHT, priceTTC, vatRate, active: !!active },
     });
     return NextResponse.json(created, { status: 201 });
-  } catch (e: any) {
-    return NextResponse.json({ error: "catalog_create_failed", detail: String(e?.message || e) }, { status: 500 });
+  } catch (error) {
+    return handleApiError(error, 'catalog/items/POST');
   }
 }

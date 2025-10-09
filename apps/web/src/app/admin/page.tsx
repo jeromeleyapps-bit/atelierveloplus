@@ -31,6 +31,7 @@ import {
 import RequireAuth from "../components/RequireAuth";
 import PageShell from "../components/PageShell";
 import Link from "next/link";
+import { adminGetStats, adminExportBackup, adminImportBackup, adminCreateUser, adminGetSystemSettings, adminUpdateSystemSettings } from "@/lib/api";
 
 // Icons
 import DashboardIcon from "@mui/icons-material/Dashboard";
@@ -91,10 +92,7 @@ export default function AdminPage() {
     try {
       setToast({ open: true, message: "Export en cours...", severity: "info" });
       
-      const response = await fetch('/api/admin/backup');
-      if (!response.ok) throw new Error('Export failed');
-      
-      const blob = await response.blob();
+      const blob = await adminExportBackup();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -149,24 +147,14 @@ export default function AdminPage() {
       const backupData = JSON.parse(fileContent);
 
       // Envoyer à l'API
-      const response = await fetch('/api/admin/backup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          data: backupData.data,
-          confirmRestore: true,
-        }),
+      const result = await adminImportBackup({
+        backup: backupData.data,
+        wipeFirst: true
       });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Restauration échouée');
-      }
-
-      const result = await response.json();
       setToast({ 
         open: true, 
-        message: `Restauration réussie ! ${result.restored.customers} clients, ${result.restored.workOrders} tickets restaurés`, 
+        message: result.message || 'Restauration réussie !', 
         severity: "success" 
       });
       
@@ -175,11 +163,8 @@ export default function AdminPage() {
       setRestoreFile(null);
       
       // Rafraîchir les stats
-      const statsResponse = await fetch('/api/admin/stats');
-      if (statsResponse.ok) {
-        const data = await statsResponse.json();
-        setStats(data);
-      }
+      const data = await adminGetStats();
+      setStats(data);
     } catch (error: any) {
       console.error('Restore error:', error);
       setToast({ open: true, message: `Erreur: ${error.message}`, severity: "error" });
@@ -204,22 +189,12 @@ export default function AdminPage() {
       setCreatingUser(true);
       setToast({ open: true, message: "Création en cours...", severity: "info" });
 
-      const response = await fetch('/api/admin/users', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: newUserEmail,
-          name: newUserName || newUserEmail.split('@')[0],
-          password: newUserPassword,
-        }),
+      const user = await adminCreateUser({
+        email: newUserEmail,
+        password: newUserPassword,
+        role: 'admin'
       });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Création échouée');
-      }
-
-      const user = await response.json();
       setToast({ 
         open: true, 
         message: `Utilisateur ${user.email} créé avec succès !`, 
@@ -233,11 +208,8 @@ export default function AdminPage() {
       setNewUserPassword("");
 
       // Rafraîchir les stats
-      const statsResponse = await fetch('/api/admin/stats');
-      if (statsResponse.ok) {
-        const data = await statsResponse.json();
-        setStats(data);
-      }
+      const data = await adminGetStats();
+      setStats(data);
     } catch (error: any) {
       console.error('Create user error:', error);
       setToast({ open: true, message: `Erreur: ${error.message}`, severity: "error" });
@@ -248,21 +220,13 @@ export default function AdminPage() {
 
   const handleToggleSetting = async (setting: string, value: boolean) => {
     try {
-      const response = await fetch('/api/admin/system-settings', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...systemSettings,
-          [setting]: value,
-        }),
+      await adminUpdateSystemSettings({
+        setting,
+        value
       });
 
-      if (response.ok) {
-        setSystemSettings(prev => ({ ...prev, [setting]: value }));
-        setToast({ open: true, message: "Paramètre mis à jour", severity: "success" });
-      } else {
-        throw new Error('Mise à jour échouée');
-      }
+      setSystemSettings(prev => ({ ...prev, [setting]: value }));
+      setToast({ open: true, message: "Paramètre mis à jour", severity: "success" });
     } catch (error) {
       console.error('Toggle setting error:', error);
       setToast({ open: true, message: "Erreur lors de la mise à jour", severity: "error" });
@@ -273,20 +237,8 @@ export default function AdminPage() {
     // Charger les vraies stats depuis l'API
     const loadStats = async () => {
       try {
-        const response = await fetch('/api/admin/stats');
-        if (response.ok) {
-          const data = await response.json();
-          setStats(data);
-        } else {
-          // Fallback sur des données simulées
-          setStats({
-            totalUsers: 1,
-            activeTickets: 0,
-            pendingInvoices: 0,
-            dbSize: "45.2 MB",
-            lastBackup: new Date().toLocaleDateString("fr-FR"),
-          });
-        }
+        const data = await adminGetStats();
+        setStats(data);
       } catch (error) {
         console.error("Erreur chargement stats:", error);
         // Fallback sur des données simulées
@@ -305,15 +257,12 @@ export default function AdminPage() {
     // Charger les paramètres système
     const loadSettings = async () => {
       try {
-        const response = await fetch('/api/admin/system-settings');
-        if (response.ok) {
-          const data = await response.json();
-          setSystemSettings({
-            notificationsEnabled: data.notificationsEnabled,
-            emailNotificationsEnabled: data.emailNotificationsEnabled,
-            activityLogsEnabled: data.activityLogsEnabled,
-          });
-        }
+        const data = await adminGetSystemSettings();
+        setSystemSettings({
+          notificationsEnabled: data.notificationsEnabled,
+          emailNotificationsEnabled: data.emailNotificationsEnabled,
+          activityLogsEnabled: data.activityLogsEnabled,
+        });
       } catch (error) {
         console.error("Erreur chargement settings:", error);
       }

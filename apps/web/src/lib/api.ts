@@ -13,12 +13,13 @@ function getAuthHeader() {
 }
 
 // Always hit local Next.js API routes, ignoring external BASE_URL
-async function requestLocal<T>(path: string, options?: RequestInit): Promise<T> {
+export async function requestLocal<T>(path: string, options?: RequestInit): Promise<T> {
   const url = `/api${path}`;
   const res = await fetch(url, { headers: { "Content-Type": "application/json", ...getAuthHeader() }, ...options });
   if (!res.ok) {
-    // Token expired or invalid - redirect to login
-    if (res.status === 401 && typeof window !== "undefined") {
+    // Token expired or invalid - redirect to login (but not if already on auth pages)
+    const isAuthPage = window.location.pathname === "/auth/login" || window.location.pathname === "/auth/register";
+    if (res.status === 401 && typeof window !== "undefined" && !isAuthPage) {
       window.localStorage.removeItem("jwt_token");
       window.localStorage.removeItem("user");
       window.location.href = "/auth/login";
@@ -37,8 +38,9 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
       ...options,
     });
     if (!res.ok) {
-      // Token expired or invalid - redirect to login
-      if (res.status === 401 && typeof window !== "undefined") {
+      // Token expired or invalid - redirect to login (but not if already on auth pages)
+      const isAuthPage = window.location.pathname === "/auth/login" || window.location.pathname === "/auth/register";
+      if (res.status === 401 && typeof window !== "undefined" && !isAuthPage) {
         window.localStorage.removeItem("jwt_token");
         window.localStorage.removeItem("user");
         window.location.href = "/auth/login";
@@ -56,8 +58,9 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
         ...options,
       });
       if (!res2.ok) {
-        // Token expired or invalid - redirect to login
-        if (res2.status === 401 && typeof window !== "undefined") {
+        // Token expired or invalid - redirect to login (but not if already on auth pages)
+        const isAuthPage = window.location.pathname === "/auth/login" || window.location.pathname === "/auth/register";
+        if (res2.status === 401 && typeof window !== "undefined" && !isAuthPage) {
           window.localStorage.removeItem("jwt_token");
           window.localStorage.removeItem("user");
           window.location.href = "/auth/login";
@@ -437,6 +440,16 @@ export async function authRegister(input: {
   isAutoEntrepreneur?: boolean;
 }) {
   return request<{
+    token: string;
+    user: {
+      id: string;
+      email: string;
+      role: string;
+      shopName?: string | null;
+    };
+    isAutoEntrepreneur: boolean;
+  } | {
+    // Fallback for old format
     id: string;
     email: string;
     firstName?: string | null;
@@ -671,6 +684,14 @@ export type AccountSettings = {
   country?: string | null;
   pdfPrimary?: string | null;
   legalFooter?: string | null;
+  // Informations légales
+  siret?: string | null;
+  tva?: string | null;
+  rcs?: string | null;
+  capital?: string | null;
+  insurance?: string | null;
+  // Statut fiscal
+  isAutoEntrepreneur?: boolean;
 };
 
 export async function getAccountSettings(): Promise<AccountSettings> {
@@ -687,15 +708,18 @@ export type CatalogItem = {
   sku?: string | null;
   category: string;
   name: string;
-  priceHT: number;
-  priceTTC: number;
-  vatRate: number;
+  priceHT: number; // Prix de vente HT
+  priceTTC: number; // Prix de vente TTC (utilisé dans tickets/devis/factures)
+  vatRate: number; // TVA de vente (0 si AE, 20 sinon)
   active: boolean;
   stockQty: number;
   minStock: number;
   reorderQty: number;
   location?: string | null;
-  purchasePriceHT?: number | null;
+  purchasePriceHT?: number | null; // Prix d'achat HT
+  purchasePriceTTC?: number | null; // Prix d'achat TTC
+  supplierVatEnabled?: boolean; // Si true, TTC achat = HT achat + 20%
+  marginCoeff?: number | null; // Coefficient multiplicateur pour calculer prix vente
   createdAt: string;
   updatedAt: string;
 };
@@ -782,6 +806,32 @@ export async function refreshItemOffers(itemId: string): Promise<{ itemId: strin
   return request(`/catalog/items/${itemId}/offers/refresh`, { method: 'POST' });
 }
 
+export type LowStockItem = {
+  id: string;
+  name: string;
+  stockQty: number;
+  minStock?: number | null;
+  category: string;
+};
+
+export async function getLowStock(): Promise<LowStockItem[]> {
+  return requestLocal(`/catalog/low-stock`);
+}
+
+export async function mergeWorkOrders(workOrderIds: string[]): Promise<{ id: string; merged: number }> {
+  return requestLocal(`/workshop/workorders/merge`, {
+    method: 'POST',
+    body: JSON.stringify({ workOrderIds })
+  });
+}
+
+export async function saveWorkOrderEstimate(id: string, data: { estimatedMinutes?: number; hourlyRate?: number }): Promise<WorkOrder> {
+  return request(`/workshop/workorders/${id}/estimate`, {
+    method: 'POST',
+    body: JSON.stringify(data)
+  });
+}
+
 export async function searchSupplierOffers(params: { q: string; limit?: number }): Promise<{ offers: SupplierOffer[] }> {
   const query = new URLSearchParams();
   query.set('q', params.q);
@@ -821,6 +871,8 @@ export type AppSettings = {
   rcs?: string | null;
   capital?: string | null;
   insurance?: string | null;
+  // Statut fiscal
+  isAutoEntrepreneur?: boolean;
 };
 
 export async function getAppSettings(): Promise<AppSettings> {
@@ -945,4 +997,166 @@ export async function listCommunications(filters?: {
   if (filters?.limit) params.append('limit', filters.limit.toString());
   
   return request(`/communications?${params}`);
+}
+
+// ============================================
+// ADMIN APIs
+// ============================================
+
+export async function adminGetStats(): Promise<any> {
+  return requestLocal(`/admin/stats`);
+}
+
+export async function adminExportBackup(): Promise<Blob> {
+  const url = `/api/admin/backup`;
+  const res = await fetch(url, { 
+    headers: { ...getAuthHeader() } 
+  });
+  if (!res.ok) {
+    throw new Error(`Backup export failed: ${res.status}`);
+  }
+  return res.blob();
+}
+
+export async function adminImportBackup(data: { backup: any; wipeFirst: boolean }): Promise<{ success: boolean; message?: string }> {
+  return requestLocal(`/admin/backup`, {
+    method: 'POST',
+    body: JSON.stringify(data)
+  });
+}
+
+export async function adminCreateUser(data: { email: string; password: string; role?: string }): Promise<{ id: string; email: string }> {
+  return requestLocal(`/admin/users`, {
+    method: 'POST',
+    body: JSON.stringify(data)
+  });
+}
+
+export async function adminGetSystemSettings(): Promise<any> {
+  return requestLocal(`/admin/system-settings`);
+}
+
+export async function adminUpdateSystemSettings(data: { setting: string; value: boolean }): Promise<any> {
+  return requestLocal(`/admin/system-settings`, {
+    method: 'PUT',
+    body: JSON.stringify(data)
+  });
+}
+
+// ============================================
+// STATS APIs
+// ============================================
+
+export async function getStatsSummary(params?: { from?: string; to?: string }): Promise<any> {
+  const query = new URLSearchParams();
+  if (params?.from) query.set('from', params.from);
+  if (params?.to) query.set('to', params.to);
+  const qs = query.toString();
+  return requestLocal(`/stats/summary${qs ? `?${qs}` : ''}`);
+}
+
+export async function setWorkOrderAppointment(workOrderId: string, data: { appointmentDate: string; duration?: number }): Promise<any> {
+  return requestLocal(`/workorders/${workOrderId}/appointment`, {
+    method: 'POST',
+    body: JSON.stringify(data)
+  });
+}
+
+export async function updateWorkOrderAppointment(workOrderId: string, data: { appointmentDate: string; duration?: number }): Promise<any> {
+  return requestLocal(`/workorders/${workOrderId}/appointment`, {
+    method: 'PUT',
+    body: JSON.stringify(data)
+  });
+}
+
+export async function deleteWorkOrderAppointment(workOrderId: string): Promise<{ ok: true }> {
+  return requestLocal(`/workorders/${workOrderId}/appointment`, {
+    method: 'DELETE'
+  });
+}
+
+// ============================================
+// CALENDAR APIs
+// ============================================
+
+export async function listCalendarEvents(params: { start: string; end: string }): Promise<any[]> {
+  return requestLocal(`/calendar/events?start=${encodeURIComponent(params.start)}&end=${encodeURIComponent(params.end)}`);
+}
+
+export async function listCalendarBlocks(params: { start: string; end: string }): Promise<any[]> {
+  return requestLocal(`/calendar/blocks?start=${encodeURIComponent(params.start)}&end=${encodeURIComponent(params.end)}`);
+}
+
+export async function listCalendarBookings(params: { start: string; end: string }): Promise<any[]> {
+  return requestLocal(`/calendar/bookings?start=${encodeURIComponent(params.start)}&end=${encodeURIComponent(params.end)}`);
+}
+
+export async function createCalendarEvent(data: { title: string; start: string; end: string; blocksAvail?: boolean }): Promise<any> {
+  return requestLocal(`/calendar/events`, {
+    method: 'POST',
+    body: JSON.stringify(data)
+  });
+}
+
+export async function createCalendarBlock(data: { reason: string; start: string; end: string }): Promise<any> {
+  return requestLocal(`/calendar/blocks`, {
+    method: 'POST',
+    body: JSON.stringify(data)
+  });
+}
+
+export async function updateBookingStatus(bookingId: string, status: string): Promise<any> {
+  return requestLocal(`/calendar/bookings/${bookingId}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ status })
+  });
+}
+
+// ============================================
+// FINANCE & WORKSHOP - Additional APIs
+// ============================================
+
+export async function deleteInvoice(invoiceId: string): Promise<{ ok: true }> {
+  return requestLocal(`/finance/invoices/${invoiceId}`, {
+    method: 'DELETE'
+  });
+}
+
+export async function cancelInvoice(invoiceId: string, reason?: string): Promise<any> {
+  return requestLocal(`/finance/invoices/${invoiceId}/cancel`, {
+    method: 'POST',
+    body: JSON.stringify({ reason })
+  });
+}
+
+export async function listWorkOrdersByCustomer(customerId: string): Promise<WorkOrder[]> {
+  return requestLocal(`/workshop/workorders?customerId=${customerId}`);
+}
+
+// ============================================
+// CASH REGISTER APIs
+// ============================================
+
+export async function listCashRegisterEntries(): Promise<any[]> {
+  return requestLocal(`/cash-register`);
+}
+
+export async function createCashRegisterEntry(data: { type: string; amount: number; note?: string; reference?: string }): Promise<any> {
+  return requestLocal(`/cash-register`, {
+    method: 'POST',
+    body: JSON.stringify(data)
+  });
+}
+
+export async function updateCashRegisterEntry(id: string, data: { type: string; amount: number; note?: string; reference?: string }): Promise<any> {
+  return requestLocal(`/cash-register/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data)
+  });
+}
+
+export async function deleteCashRegisterEntry(id: string): Promise<{ ok: true }> {
+  return requestLocal(`/cash-register/${id}`, {
+    method: 'DELETE'
+  });
 }

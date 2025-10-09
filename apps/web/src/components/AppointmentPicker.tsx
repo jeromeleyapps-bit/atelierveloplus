@@ -16,6 +16,7 @@ import {
 import EventIcon from "@mui/icons-material/Event";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import { setWorkOrderAppointment, updateWorkOrderAppointment, deleteWorkOrderAppointment } from "@/lib/api";
 
 interface AppointmentPickerProps {
   workOrderId: string;
@@ -64,17 +65,16 @@ export function AppointmentPicker({
     try {
       const appointmentDate = new Date(`${date}T${time}:00`);
 
-      const response = await fetch(`/api/workorders/${workOrderId}/appointment`, {
-        method: currentAppointment ? "PUT" : "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-user-id": window.localStorage.getItem("auth:userId") || "",
-        },
-        body: JSON.stringify({ appointmentDate: appointmentDate.toISOString(), duration }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Erreur lors de la sauvegarde du RDV");
+      if (currentAppointment) {
+        await updateWorkOrderAppointment(workOrderId, {
+          appointmentDate: appointmentDate.toISOString(),
+          duration
+        });
+      } else {
+        await setWorkOrderAppointment(workOrderId, {
+          appointmentDate: appointmentDate.toISOString(),
+          duration
+        });
       }
 
       setDialogOpen(false);
@@ -93,17 +93,7 @@ export function AppointmentPicker({
     setError(null);
 
     try {
-      const response = await fetch(`/api/workorders/${workOrderId}/appointment`, {
-        method: "DELETE",
-        headers: {
-          "x-user-id": window.localStorage.getItem("auth:userId") || "",
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Erreur lors de l'annulation du RDV");
-      }
-
+      await deleteWorkOrderAppointment(workOrderId);
       onAppointmentChanged();
     } catch (err: any) {
       setError(err.message || "Erreur lors de l'annulation");

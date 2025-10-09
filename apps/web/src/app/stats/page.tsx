@@ -10,6 +10,7 @@ import PaidIcon from "@mui/icons-material/Paid";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import { useEffect, useMemo, useState } from "react";
+import { getStatsSummary, listCashRegisterEntries } from "@/lib/api";
 
 type Summary = {
   invoices: {
@@ -41,13 +42,12 @@ export default function StatsPage() {
     try {
       const fromIso = fromDate ? new Date(fromDate).toISOString() : undefined;
       const toIso = toDate ? new Date(new Date(toDate).setHours(23,59,59,999)).toISOString() : undefined;
-      const p = new URLSearchParams();
-      if (fromIso) p.set('from', fromIso);
-      if (toIso) p.set('to', toIso);
-      const res = await fetch(`/api/stats/summary?${p.toString()}`);
-      const data = await res.json();
-      if (res.ok) setSum(data as Summary);
-      else console.error(data);
+      
+      const data = await getStatsSummary({
+        from: fromIso,
+        to: toIso
+      });
+      setSum(data as Summary);
     } finally {
       setLoading(false);
     }
@@ -61,12 +61,9 @@ export default function StatsPage() {
 
   async function loadCashTotal() {
     try {
-      const res = await fetch('/api/cash-register');
-      if (res.ok) {
-        const data = await res.json();
-        const total = data.reduce((sum: number, entry: any) => sum + entry.amount, 0);
-        setCashTotal(total);
-      }
+      const data = await listCashRegisterEntries();
+      const total = data.reduce((sum: number, entry: any) => sum + entry.amount, 0);
+      setCashTotal(total);
     } catch (e) {
       console.error('Failed to load cash total', e);
     }
@@ -77,14 +74,12 @@ export default function StatsPage() {
       const year = new Date().getFullYear();
       const fromIso = new Date(year, 0, 1).toISOString();
       const toIso = new Date(year, 11, 31, 23, 59, 59).toISOString();
-      const p = new URLSearchParams();
-      p.set('from', fromIso);
-      p.set('to', toIso);
-      const res = await fetch(`/api/stats/summary?${p.toString()}`);
-      if (res.ok) {
-        const data = await res.json();
-        setYearlyRevenue(data.invoices?.range?.totalAmount ?? 0);
-      }
+      
+      const data = await getStatsSummary({
+        from: fromIso,
+        to: toIso
+      });
+      setYearlyRevenue(data.invoices?.range?.totalAmount ?? 0);
     } catch (e) {
       console.error('Failed to load yearly revenue', e);
     }

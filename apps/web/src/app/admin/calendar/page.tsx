@@ -6,6 +6,7 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
+import { listCalendarEvents, listCalendarBlocks, listCalendarBookings, createCalendarEvent, createCalendarBlock, updateBookingStatus } from "@/lib/api";
 
 function isoLocal(d: Date) {
   const z = n => `${n}`.padStart(2, "0");
@@ -42,11 +43,10 @@ export default function AdminCalendarPage() {
     try {
       const now = new Date();
       const soon = new Date(now.getTime() + 14*24*3600*1000);
-      const qs = `?start=${now.toISOString()}&end=${soon.toISOString()}`;
       const [ev, bl, bk] = await Promise.all([
-        fetch(`/api/calendar/events${qs}`).then(r=>r.json()),
-        fetch(`/api/calendar/blocks${qs}`).then(r=>r.json()),
-        fetch(`/api/calendar/bookings${qs}`).then(r=>r.json()),
+        listCalendarEvents({ start: now.toISOString(), end: soon.toISOString() }),
+        listCalendarBlocks({ start: now.toISOString(), end: soon.toISOString() }),
+        listCalendarBookings({ start: now.toISOString(), end: soon.toISOString() }),
       ]);
       setEvents(Array.isArray(ev) ? ev : []);
       setBlocks(Array.isArray(bl) ? bl : []);
@@ -58,11 +58,10 @@ export default function AdminCalendarPage() {
   async function loadRange(start: Date, end: Date) {
     setLoading(true); setErr(null);
     try {
-      const qs = `?start=${start.toISOString()}&end=${end.toISOString()}`;
       const [ev, bl, bk] = await Promise.all([
-        fetch(`/api/calendar/events${qs}`).then(r=>r.json()),
-        fetch(`/api/calendar/blocks${qs}`).then(r=>r.json()),
-        fetch(`/api/calendar/bookings${qs}`).then(r=>r.json()),
+        listCalendarEvents({ start: start.toISOString(), end: end.toISOString() }),
+        listCalendarBlocks({ start: start.toISOString(), end: end.toISOString() }),
+        listCalendarBookings({ start: start.toISOString(), end: end.toISOString() }),
       ]);
       setEvents(Array.isArray(ev) ? ev : []);
       setBlocks(Array.isArray(bl) ? bl : []);
@@ -101,12 +100,7 @@ export default function AdminCalendarPage() {
   async function saveBookingStatus() {
     if (!editingBooking) return;
     try {
-      const res = await fetch(`/api/calendar/bookings/${editingBooking.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: editStatus }) });
-      if (!res.ok) {
-        const j = await res.json().catch(()=>({}));
-        setErr(j?.error || 'Échec mise à jour statut');
-        return;
-      }
+      await updateBookingStatus(editingBooking.id, editStatus);
       setEditOpen(false);
       const api = calRef.current?.getApi();
       if (api) await loadRange(api.view.activeStart, api.view.activeEnd);
@@ -115,26 +109,27 @@ export default function AdminCalendarPage() {
 
   async function createEvent() {
     setErr(null);
-    const res = await fetch(`/api/calendar/events`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title: evTitle || "Travail atelier", start: new Date(evStart).toISOString(), end: new Date(evEnd).toISOString(), blocksAvail: true })
-    });
-    if (!res.ok) {
-      const j = await res.json().catch(()=>({})); setErr(j?.error || "Erreur création événement"); return;
-    }
-    setEvTitle(""); refresh();
+    try {
+      await createCalendarEvent({
+        title: evTitle || "Travail atelier",
+        start: new Date(evStart).toISOString(),
+        end: new Date(evEnd).toISOString(),
+        blocksAvail: true
+      });
+      setEvTitle(""); refresh();
+    } catch(e:any) { setErr(e?.message || "Erreur création événement"); }
   }
 
   async function createBlock() {
     setErr(null);
-    const res = await fetch(`/api/calendar/blocks`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ reason: blReason || "Indispo", start: new Date(blStart).toISOString(), end: new Date(blEnd).toISOString() })
-    });
-    if (!res.ok) {
-      const j = await res.json().catch(()=>({})); setErr(j?.error || "Erreur création indisponibilité"); return;
-    }
-    setBlReason(""); refresh();
+    try {
+      await createCalendarBlock({
+        reason: blReason || "Indispo",
+        start: new Date(blStart).toISOString(),
+        end: new Date(blEnd).toISOString()
+      });
+      setBlReason(""); refresh();
+    } catch(e:any) { setErr(e?.message || "Erreur création indisponibilité"); }
   }
 
   return (

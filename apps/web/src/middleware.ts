@@ -88,7 +88,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // C'est une API protégée, vérifier l'authentification JWT
-  const user = getUserFromToken(request);
+  const user = await getUserFromToken(request);
 
   if (!user) {
     return NextResponse.json(

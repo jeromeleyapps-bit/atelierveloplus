@@ -69,12 +69,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     shopName?: string;
     isAutoEntrepreneur?: boolean;
   }) => {
-    const u = await authRegister(input);
-    // After registration, auto-login by fetching token
-    // Note: register endpoint should also return token in future
-    // For now, store user data and require login
-    window.localStorage.setItem("user", JSON.stringify({ id: u.id, email: u.email, shopName: u.shopName }));
-    setUser({ id: u.id, email: u.email, shopName: u.shopName });
+    const response = await authRegister(input);
+    console.log('[AuthContext] Register response:', response);
+    console.log('[AuthContext] Has token?', 'token' in response);
+    console.log('[AuthContext] Has user?', 'user' in response);
+    
+    // Register now returns token - auto-login
+    if ('token' in response && 'user' in response) {
+      console.log('[AuthContext] Storing token in localStorage');
+      window.localStorage.setItem("jwt_token", response.token);
+      window.localStorage.setItem("user", JSON.stringify(response.user));
+      setUser({ id: response.user.id, email: response.user.email, shopName: response.user.shopName });
+      console.log('[AuthContext] Token stored, user set');
+    } else {
+      console.log('[AuthContext] Using fallback (old format)');
+      // Fallback for old response format
+      window.localStorage.setItem("user", JSON.stringify({ id: response.id, email: response.email, shopName: response.shopName }));
+      setUser({ id: response.id, email: response.email, shopName: response.shopName });
+    }
   };
 
   const logout = async () => {

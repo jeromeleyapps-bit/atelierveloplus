@@ -1,3 +1,5 @@
+import { requestLocal } from './api';
+
 export type CatalogCategory = 'PIECES' | 'EQUIPEMENTS' | 'AUTRES';
 export type CatalogItem = {
   id: string;
@@ -6,6 +8,8 @@ export type CatalogItem = {
   priceHT: number;
   priceTTC: number;
   vatRate: number;
+  sku?: string;
+  stockQty?: number;
 };
 
 export const FALLBACK: CatalogItem[] = [
@@ -18,28 +22,15 @@ export const FALLBACK: CatalogItem[] = [
 export async function searchCatalog(params: { q?: string; category?: CatalogCategory; limit?: number }): Promise<CatalogItem[]> {
   const { q = '', category, limit = 20 } = params || {};
   const qp = `?q=${encodeURIComponent(q)}${category ? `&category=${category}` : ''}&limit=${limit}`;
-  // 1) Try local Next.js API route first
+  // 1) Try local Next.js API route with JWT
   try {
-    const res = await fetch(`/api/catalog/search${qp}`, { headers: { 'Accept': 'application/json' } });
-    if (res.ok) {
-      const data = await res.json();
-      if (Array.isArray(data)) return data as CatalogItem[];
-    }
-  } catch {}
-
-  // 2) Try external API base if configured
-  const base = (process.env.NEXT_PUBLIC_API_BASE_URL || '').replace(/\/$/, '');
-  if (base) {
-    try {
-      const res = await fetch(`${base}/catalog/search${qp}`, { headers: { 'Accept': 'application/json' } });
-      if (res.ok) {
-        const data = await res.json();
-        if (Array.isArray(data)) return data as CatalogItem[];
-      }
-    } catch {}
+    const data = await requestLocal(`/catalog/search${qp}`);
+    if (Array.isArray(data)) return data as CatalogItem[];
+  } catch (e) {
+    console.error('[searchCatalog] Error:', e);
   }
 
-  // 3) Fallback local filtering
+  // 2) Fallback local filtering
   const needle = q.trim().toLowerCase();
   let list = FALLBACK;
   if (category) list = list.filter((i) => i.category === category);

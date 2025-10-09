@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -64,25 +64,28 @@ model InvoiceSequence {
 }
 
 model CatalogItem {
-  id              String          @id @default(cuid())
-  sku             String?         @unique
-  category        CatalogCategory
-  name            String
-  priceHT         Float
-  priceTTC        Float
-  vatRate         Float
-  active          Boolean         @default(true)
-  stockQty        Int             @default(0)
-  minStock        Int             @default(0)
-  reorderQty      Int             @default(0)
-  location        String?
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
-  purchasePriceHT Float?
-  stockMovements  StockMovement[]
-  supplierItems   SupplierItem[]
-  supplierOffers  SupplierOffer[]
-  workOrderParts  WorkOrderPart[]
+  id                 String          @id @default(cuid())
+  sku                String?         @unique
+  category           CatalogCategory
+  name               String
+  priceHT            Float
+  priceTTC           Float
+  vatRate            Float
+  active             Boolean         @default(true)
+  stockQty           Int             @default(0)
+  minStock           Int             @default(0)
+  reorderQty         Int             @default(0)
+  location           String?
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  purchasePriceHT    Float?
+  purchasePriceTTC   Float?
+  supplierVatEnabled Boolean         @default(false)
+  marginCoeff        Float?          @default(1)
+  stockMovements     StockMovement[]
+  supplierItems      SupplierItem[]
+  supplierOffers     SupplierOffer[]
+  workOrderParts     WorkOrderPart[]
 }
 
 model Customer {
@@ -335,26 +338,27 @@ model VerificationToken {
 }
 
 model AppSetting {
-  id          String   @id @default(cuid())
-  userId      String   @unique
-  shopName    String?
-  shopEmail   String?
-  shopPhone   String?
-  address1    String?
-  address2    String?
-  zip         String?
-  city        String?
-  country     String?
-  pdfPrimary  String?
-  legalFooter String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  capital     String?
-  insurance   String?
-  rcs         String?
-  siret       String?
-  tva         String?
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                  String   @id @default(cuid())
+  userId              String   @unique
+  shopName            String?
+  shopEmail           String?
+  shopPhone           String?
+  address1            String?
+  address2            String?
+  zip                 String?
+  city                String?
+  country             String?
+  pdfPrimary          String?
+  legalFooter         String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  capital             String?
+  insurance           String?
+  rcs                 String?
+  siret               String?
+  tva                 String?
+  isAutoEntrepreneur  Boolean  @default(false)
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 /// Calendar: admin events visible internally; blocks that make time unavailable; client bookings

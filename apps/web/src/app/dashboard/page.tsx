@@ -18,7 +18,7 @@ import {
 import RequireAuth from "../components/RequireAuth";
 import PageShell from "../components/PageShell";
 import { useCachedData } from "@/hooks/useCachedData";
-import { listInvoices, listCustomers, searchWorkOrders, type WorkOrder } from "@/lib/api";
+import { listInvoices, listCustomers, searchWorkOrders, type WorkOrder, getLowStock, type LowStockItem } from "@/lib/api";
 import BuildIcon from "@mui/icons-material/Build";
 import DoneAllIcon from "@mui/icons-material/DoneAll";
 import EuroIcon from "@mui/icons-material/Euro";
@@ -28,11 +28,9 @@ import ModernStatCard from "@/components/ModernStatCard";
 
 async function fetchLowStockReal(): Promise<LowStockItem[]> {
   try {
-    const res = await fetch(`/api/catalog/low-stock`);
-    if (!res.ok) return [];
-    const data = await res.json();
+    const data = await getLowStock();
     if (!Array.isArray(data)) return [];
-    return (data as LowStockItem[]) 
+    return data
       .filter(i => typeof i.stockQty === 'number' && typeof i.name === 'string')
       .sort((a,b) => (a.stockQty - (a.minStock ?? 0)) - (b.stockQty - (b.minStock ?? 0)))
       .slice(0, 5);
@@ -61,13 +59,6 @@ type Ticket = {
   customer: string;
   status: string;
   createdAt: string;
-};
-
-type LowStockItem = {
-  id: string;
-  name: string;
-  stockQty: number;
-  minStock?: number;
 };
 
 // Stats réelles basées sur API locales

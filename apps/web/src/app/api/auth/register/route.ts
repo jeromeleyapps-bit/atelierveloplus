@@ -3,6 +3,8 @@ import { getPrisma } from "@/lib/db";
 import { hash } from "bcryptjs";
 import { rateLimit, validatePasswordComplexity, isPasswordBreached } from "@/lib/security";
 import { wipeAllApplicationData } from "@/lib/dbReset";
+import { generateToken } from "@/lib/jwt";
+import { handleApiError } from "@/lib/api-error";
 
 function getClientIp(req: Request): string {
   const xf = req.headers.get('x-forwarded-for');
@@ -94,16 +96,25 @@ export async function POST(req: Request) {
       await prisma.appSetting.create({ data: { userId: user.id, shopName } });
     }
 
-    return NextResponse.json({
-      id: user.id,
+    // Générer JWT token pour auto-login
+    const token = await generateToken({
+      userId: user.id,
       email: user.email ?? email,
-      firstName: firstName ?? null,
-      lastName: lastName ?? null,
-      shopName: shopName ?? null,
+      role: user.role || 'user',
+    });
+
+    return NextResponse.json({
+      token,
+      user: {
+        id: user.id,
+        email: user.email ?? email,
+        role: user.role,
+        shopName: shopName ?? null,
+      },
       isAutoEntrepreneur,
     }, { status: 201 });
-  } catch (e: any) {
+  } catch (error) {
     await jitter(250);
-    return NextResponse.json({ error: "register_failed" }, { status: 500 });
+    return handleApiError(error, 'auth/register');
   }
 }

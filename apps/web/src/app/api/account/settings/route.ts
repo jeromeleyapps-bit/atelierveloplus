@@ -33,7 +33,7 @@ export async function GET(req: Request) {
   
   console.log('[SETTINGS GET] Final userId:', userId);
   const row = await prisma.appSetting.findUnique({ where: { userId } });
-  console.log('[SETTINGS GET] Found settings:', !!row);
+  console.log('[SETTINGS GET] Found settings:', !!row, 'isAE:', row?.isAutoEntrepreneur);
   return NextResponse.json({
     shopName: row?.shopName ?? null,
     shopEmail: row?.shopEmail ?? null,
@@ -50,6 +50,7 @@ export async function GET(req: Request) {
     rcs: row?.rcs ?? null,
     capital: row?.capital ?? null,
     insurance: row?.insurance ?? null,
+    isAutoEntrepreneur: row?.isAutoEntrepreneur ?? false,
   }, { status: 200 });
 }
 
@@ -101,6 +102,9 @@ export async function PATCH(req: Request) {
   if (typeof body.rcs === 'string') data.rcs = body.rcs;
   if (typeof body.capital === 'string') data.capital = body.capital;
   if (typeof body.insurance === 'string') data.insurance = body.insurance;
+  if (typeof body.isAutoEntrepreneur === 'boolean') data.isAutoEntrepreneur = body.isAutoEntrepreneur;
+  
+  console.log('[SETTINGS] Data to save:', JSON.stringify(data, null, 2));
   
   // Chercher un AppSetting existant pour cet utilisateur
   const existing = await prisma.appSetting.findUnique({ where: { userId } });
@@ -136,5 +140,6 @@ export async function PATCH(req: Request) {
     rcs: saved.rcs ?? null,
     capital: saved.capital ?? null,
     insurance: saved.insurance ?? null,
+    isAutoEntrepreneur: saved.isAutoEntrepreneur ?? false,
   }, { status: 200 });
 }

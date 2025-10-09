@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getPrisma } from "@/lib/db";
-import { getUserId } from "@/lib/auth";
+import { getUserFromToken } from "@/lib/jwt";
 
 export const dynamic = 'force-dynamic';
 
@@ -12,7 +12,8 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "prisma_unavailable" }, { status: 501 });
     }
 
-    let userId = getUserId(req);
+    const user = await getUserFromToken(req);
+    let userId = user?.userId;
     
     // Fallback: utiliser le premier utilisateur
     if (!userId) {
@@ -61,7 +62,8 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "prisma_unavailable" }, { status: 501 });
     }
 
-    let userId = getUserId(req);
+    const user = await getUserFromToken(req);
+    let userId = user?.userId;
     
     if (!userId) {
       const firstUser = await prisma.user.findFirst();

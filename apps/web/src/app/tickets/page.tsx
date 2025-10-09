@@ -14,6 +14,7 @@ import {
   listCustomerBikes,
   createCustomerBike,
   deleteWorkOrder,
+  mergeWorkOrders,
   type WorkOrder,
   type Customer,
   type WorkOrderType,
@@ -693,22 +694,11 @@ export default function TicketsPage() {
                     if (!confirm(`Fusionner ${selected.length} tickets en un seul ?`)) return;
                     
                     try {
-                      const res = await fetch('/api/workshop/workorders/merge', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ workOrderIds: selected }),
-                      });
-                      if (res.ok) {
-                        const merged = await res.json();
-                        setToast({ open: true, message: 'Tickets fusionnés', severity: 'success' });
-                        setSelected([]);
-                        await refresh();
-                        window.location.href = `/tickets/${merged.id}`;
-                      } else {
-                        const errorData = await res.json().catch(() => ({}));
-                        console.error('Merge error:', errorData);
-                        throw new Error(errorData.error || 'Erreur fusion');
-                      }
+                      const merged = await mergeWorkOrders(selected);
+                      setToast({ open: true, message: 'Tickets fusionnés', severity: 'success' });
+                      setSelected([]);
+                      await refresh();
+                      window.location.href = `/tickets/${merged.id}`;
                     } catch (e) {
                       setToast({ open: true, message: 'Erreur lors de la fusion', severity: 'error' });
                     }

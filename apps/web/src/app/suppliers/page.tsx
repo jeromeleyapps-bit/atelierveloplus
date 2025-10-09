@@ -9,7 +9,7 @@ import PublicIcon from "@mui/icons-material/Public";
 import RequireAuth from "../components/RequireAuth";
 import PageShell from "../components/PageShell";
 import SectionCard from "../components/SectionCard";
-import { createSupplier, getSupplierCredentials, listSuppliers, saveSupplierCredentials, type Supplier } from "@/lib/api";
+import { createSupplier, getSupplierCredentials, listSuppliers, saveSupplierCredentials, deleteSupplier, type Supplier } from "@/lib/api";
 
 export default function SuppliersPage() {
   const [rows, setRows] = useState<Supplier[]>([]);
@@ -48,6 +48,15 @@ export default function SuppliersPage() {
   }
 
   useEffect(() => { refresh(); }, []);
+
+  // Normaliser une URL en absolu (ajoute https:// si manquant)
+  function toAbsoluteUrl(u?: string | null): string | undefined {
+    if (!u) return undefined;
+    const s = String(u).trim();
+    if (!s) return undefined;
+    if (/^https?:\/\//i.test(s)) return s; // déjà absolu
+    return `https://${s}`;
+  }
 
   function openCreate() {
     setName(""); setWebsite(""); setConnectorType("MOCK");
@@ -141,7 +150,7 @@ export default function SuppliersPage() {
     const ok = window.confirm('Supprimer ce fournisseur ? Les références et identifiants liés seront supprimés.');
     if (!ok) return;
     try {
-      await (await fetch(`/api/suppliers/${id}`, { method: 'DELETE' })).json();
+      await deleteSupplier(id);
       setToast({ open: true, message: 'Fournisseur supprimé', severity: 'success' });
       await refresh();
     } catch (e) {
@@ -173,7 +182,7 @@ export default function SuppliersPage() {
                     <TableCell align="center">
                       <Stack direction="row" spacing={1} justifyContent="center" alignItems="center">
                         <span>
-                          <IconButton size="small" component="a" href={s.website || undefined} target="_blank" rel="noopener noreferrer" disabled={!s.website} aria-label="Site web du fournisseur">
+                          <IconButton size="small" component="a" href={toAbsoluteUrl(s.website)} target="_blank" rel="noopener noreferrer" disabled={!s.website} aria-label="Site web du fournisseur">
                             <PublicIcon fontSize="small" />
                           </IconButton>
                         </span>

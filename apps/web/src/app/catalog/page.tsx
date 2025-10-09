@@ -1,7 +1,8 @@
 "use client";
+// Version 2.0 - Nouveau système de prix avec Auto-Entrepreneur
 
 import { useEffect, useMemo, useState } from "react";
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, InputAdornment, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography, Chip, Snackbar, Alert, LinearProgress } from "@mui/material";
+import { Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, Divider, FormControl, IconButton, InputAdornment, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography, Chip, Snackbar, Alert, LinearProgress } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
 import InventoryIcon from "@mui/icons-material/Inventory";
@@ -13,7 +14,7 @@ import PageShell from "../components/PageShell";
 import SectionCard from "../components/SectionCard";
 import RequireAuth from "../components/RequireAuth";
 import B2BSearchDialog from "../../components/B2BSearchDialog";
-import { CatalogItem, createCatalogItem, createStockMovement, getItemOffers, listCatalogItems, updateCatalogItem, listSuppliers, type Supplier, upsertItemSupplierItem, refreshItemOffers, getSetting, setSetting, searchSupplierOffers, type SupplierOffer, type B2BSearchResult } from "@/lib/api";
+import { CatalogItem, createCatalogItem, createStockMovement, getItemOffers, listCatalogItems, updateCatalogItem, listSuppliers, type Supplier, upsertItemSupplierItem, refreshItemOffers, getSetting, setSetting, searchSupplierOffers, type SupplierOffer, type B2BSearchResult, getAppSettings } from "@/lib/api";
 
 function labelCategory(cat?: string | null) {
   switch (cat) {
@@ -48,6 +49,7 @@ export default function CatalogPage() {
   const [linkSupplierId, setLinkSupplierId] = useState<string>("");
   const [linkSupplierSku, setLinkSupplierSku] = useState<string>("");
   const [linkEan, setLinkEan] = useState<string>("");
+  const [isAutoEntrepreneur, setIsAutoEntrepreneur] = useState(false);
   const [offersLoading, setOffersLoading] = useState<boolean>(false);
   const [multiplier, setMultiplier] = useState<number>(1.5);
   // Supplier catalog search
@@ -85,9 +87,17 @@ export default function CatalogPage() {
   useEffect(() => {
     (async () => {
       try {
-        const r = await getSetting<number>('pricing.defaultMultiplier');
+        const [r, settings] = await Promise.all([
+          getSetting<number>('pricing.defaultMultiplier'),
+          getAppSettings()
+        ]);
         if (r?.value != null && !Number.isNaN(Number(r.value))) setMultiplier(Number(r.value));
-      } catch {}
+        const aeStatus = settings.isAutoEntrepreneur || false;
+        setIsAutoEntrepreneur(aeStatus);
+        console.log('[CATALOG] Auto-Entrepreneur:', aeStatus);
+      } catch (e) {
+        console.error('[CATALOG] Error loading settings:', e);
+      }
     })();
   }, []);
 
@@ -138,7 +148,23 @@ export default function CatalogPage() {
   }, [items, onlyLowStock, sortByInv]);
 
   function openCreate() {
-    setEditing({ category: "PIECES", name: "", priceHT: 0, priceTTC: 0, vatRate: 20, active: true, stockQty: 0, minStock: 0, reorderQty: 0 });
+    const vatRate = isAutoEntrepreneur ? 0 : 20;
+    console.log('[CATALOG] openCreate - isAE:', isAutoEntrepreneur, '=> TVA:', vatRate + '%');
+    setEditing({ 
+      category: "PIECES", 
+      name: "", 
+      priceHT: 0, 
+      priceTTC: 0, 
+      vatRate: vatRate, 
+      active: true, 
+      stockQty: 0, 
+      minStock: 0, 
+      reorderQty: 0,
+      purchasePriceHT: 0,
+      purchasePriceTTC: 0,
+      supplierVatEnabled: false,
+      marginCoeff: 1
+    });
     setEditOpen(true);
   }
   function openEdit(it: CatalogItem) {
@@ -434,25 +460,139 @@ export default function CatalogPage() {
         </SectionCard>
 
         {/* Dialog Create/Edit */}
-        <Dialog open={editOpen} onClose={() => setEditOpen(false)} maxWidth="sm" fullWidth>
+        <Dialog open={editOpen} onClose={() => setEditOpen(false)} maxWidth="md" fullWidth>
           <DialogTitle>{(editing as any)?.id ? 'Modifier le produit' : 'Ajouter un produit'}</DialogTitle>
-          <DialogContent>
-            <Stack spacing={2} sx={{ mt: 1 }}>
+          <DialogContent sx={{ minHeight: 500 }}>
+            <Stack spacing={3} sx={{ mt: 1 }}>
+              {/* Informations générales */}
               <TextField size="small" label="SKU" value={editing?.sku || ''} onChange={(e) => setEditing({ ...(editing as any), sku: e.target.value })} />
-              <TextField size="small" label="Nom" value={editing?.name || ''} onChange={(e) => setEditing({ ...(editing as any), name: e.target.value })} />
               <TextField size="small" label="Type de produit" select SelectProps={{ native: true }} InputLabelProps={{ shrink: true }} value={editing?.category || 'PIECES'} onChange={(e) => setEditing({ ...(editing as any), category: e.target.value })}>
                 <option value="PIECES">Pièces</option>
                 <option value="EQUIPEMENTS">Équipements</option>
                 <option value="AUTRES">Autres</option>
               </TextField>
-              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-                <TextField size="small" label="Prix HT" type="number" value={editing?.priceHT ?? 0} onChange={(e) => setEditing({ ...(editing as any), priceHT: Number(e.target.value) })} />
-                <TextField size="small" label="Prix TTC" type="number" value={editing?.priceTTC ?? 0} onChange={(e) => setEditing({ ...(editing as any), priceTTC: Number(e.target.value) })} />
-                <TextField size="small" label="TVA (%)" type="number" value={editing?.vatRate ?? 20} onChange={(e) => setEditing({ ...(editing as any), vatRate: Number(e.target.value) })} />
+              <TextField size="small" label="Nom" value={editing?.name || ''} onChange={(e) => setEditing({ ...(editing as any), name: e.target.value })} />
+              
+              <Divider><Typography variant="caption" color="text.secondary">PRIX D'ACHAT</Typography></Divider>
+              
+              {/* Prix d'achat */}
+              <Stack direction="row" spacing={1} alignItems="center">
+                <TextField 
+                  size="small" 
+                  label="Prix achat HT" 
+                  type="number" 
+                  value={editing?.purchasePriceHT ?? 0} 
+                  onChange={(e) => {
+                    const purchaseHT = Number(e.target.value);
+                    const supplierVat = editing?.supplierVatEnabled || false;
+                    const purchaseTTC = supplierVat ? purchaseHT * 1.20 : purchaseHT;
+                    const coeff = editing?.marginCoeff || 1;
+                    const sellHT = purchaseHT * coeff;
+                    const sellTTC = sellHT * (isAutoEntrepreneur ? 1.0 : 1.20);
+                    setEditing({ 
+                      ...(editing as any), 
+                      purchasePriceHT: purchaseHT,
+                      purchasePriceTTC: purchaseTTC,
+                      priceHT: sellHT,
+                      priceTTC: sellTTC,
+                      vatRate: isAutoEntrepreneur ? 0 : 20
+                    });
+                  }} 
+                  onFocus={(e) => e.target.select()} 
+                  sx={{ flex: 1 }} 
+                />
+                <FormControl component="fieldset">
+                  <Stack direction="row" alignItems="center" spacing={0.5}>
+                    <Checkbox
+                      size="small"
+                      checked={editing?.supplierVatEnabled || false}
+                      onChange={(e) => {
+                        const supplierVat = e.target.checked;
+                        const purchaseHT = editing?.purchasePriceHT || 0;
+                        const purchaseTTC = supplierVat ? purchaseHT * 1.20 : purchaseHT;
+                        setEditing({ 
+                          ...(editing as any), 
+                          supplierVatEnabled: supplierVat,
+                          purchasePriceTTC: purchaseTTC
+                        });
+                      }}
+                    />
+                    <Typography variant="caption">TVA fournisseur (20%)</Typography>
+                  </Stack>
+                </FormControl>
+                <TextField 
+                  size="small" 
+                  label="Prix achat TTC" 
+                  type="number" 
+                  value={editing?.purchasePriceTTC ?? 0}
+                  disabled={editing?.supplierVatEnabled}
+                  onChange={(e) => {
+                    if (!editing?.supplierVatEnabled) {
+                      setEditing({ ...(editing as any), purchasePriceTTC: Number(e.target.value) });
+                    }
+                  }}
+                  onFocus={(e) => e.target.select()} 
+                  sx={{ flex: 1 }} 
+                  InputProps={{ 
+                    style: { 
+                      backgroundColor: editing?.supplierVatEnabled ? '#f5f5f5' : undefined 
+                    } 
+                  }}
+                />
               </Stack>
+
+              <Divider><Typography variant="caption" color="text.secondary">PRIX DE VENTE {isAutoEntrepreneur && '(Auto-Entrepreneur - TVA 0%)'}</Typography></Divider>
+              
+              {/* Prix de vente */}
+              <Stack direction="row" spacing={1}>
+                <TextField 
+                  size="small" 
+                  label="Coefficient" 
+                  type="number" 
+                  value={editing?.marginCoeff ?? 1} 
+                  onChange={(e) => {
+                    const coeff = Number(e.target.value);
+                    const purchaseHT = editing?.purchasePriceHT || 0;
+                    const sellHT = purchaseHT * coeff;
+                    const sellTTC = sellHT * (isAutoEntrepreneur ? 1.0 : 1.20);
+                    setEditing({ 
+                      ...(editing as any), 
+                      marginCoeff: coeff,
+                      priceHT: sellHT,
+                      priceTTC: sellTTC,
+                      vatRate: isAutoEntrepreneur ? 0 : 20
+                    });
+                  }} 
+                  onFocus={(e) => e.target.select()} 
+                  sx={{ width: 140 }} 
+                  helperText="×"
+                />
+                <TextField 
+                  size="small" 
+                  label="Prix vente HT" 
+                  type="number" 
+                  value={editing?.priceHT ?? 0}
+                  disabled
+                  sx={{ flex: 1 }} 
+                  InputProps={{ style: { backgroundColor: '#f5f5f5' } }}
+                />
+                <TextField 
+                  size="small" 
+                  label={`Prix vente TTC (${isAutoEntrepreneur ? '0%' : '+20%'})`}
+                  type="number" 
+                  value={editing?.priceTTC ?? 0}
+                  disabled
+                  sx={{ flex: 1 }} 
+                  InputProps={{ style: { backgroundColor: '#e3f2fd', fontWeight: 'bold' } }}
+                  helperText="Utilisé dans tickets/devis/factures"
+                />
+              </Stack>
+              
+              <Divider><Typography variant="caption" color="text.secondary">STOCK</Typography></Divider>
+              
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-                <TextField size="small" label="Stock min" type="number" value={editing?.minStock ?? 0} onChange={(e) => setEditing({ ...(editing as any), minStock: Number(e.target.value) })} />
-                <TextField size="small" label="Qté de réappro" type="number" value={editing?.reorderQty ?? 0} onChange={(e) => setEditing({ ...(editing as any), reorderQty: Number(e.target.value) })} />
+                <TextField size="small" label="Stock min" type="number" value={editing?.minStock ?? 0} onChange={(e) => setEditing({ ...(editing as any), minStock: Number(e.target.value) })} onFocus={(e) => e.target.select()} />
+                <TextField size="small" label="Qté de réappro" type="number" value={editing?.reorderQty ?? 0} onChange={(e) => setEditing({ ...(editing as any), reorderQty: Number(e.target.value) })} onFocus={(e) => e.target.select()} />
                 <TextField size="small" label="Emplacement" value={editing?.location || ''} onChange={(e) => setEditing({ ...(editing as any), location: e.target.value })} />
               </Stack>
             </Stack>

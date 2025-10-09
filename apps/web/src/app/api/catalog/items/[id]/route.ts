@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getPrisma } from "@/lib/db";
+import { handleApiError } from "@/lib/api-error";
 
 export const dynamic = "force-dynamic";
 
@@ -14,12 +15,12 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
 export async function PUT(req: Request, { params }: { params: { id: string } }) {
   const prisma = await getPrisma();
   if (!prisma) return NextResponse.json({ error: "prisma_unavailable" }, { status: 501 });
-  const body = await req.json();
   try {
+    const body = await req.json();
     const updated = await prisma.catalogItem.update({ where: { id: params.id }, data: body });
     return NextResponse.json(updated, { status: 200 });
-  } catch (e: any) {
-    return NextResponse.json({ error: "update_failed", detail: String(e?.message || e) }, { status: 500 });
+  } catch (error) {
+    return handleApiError(error, 'catalog/items/PUT');
   }
 }
 
@@ -29,7 +30,7 @@ export async function DELETE(_req: Request, { params }: { params: { id: string }
   try {
     await prisma.catalogItem.delete({ where: { id: params.id } });
     return NextResponse.json({ ok: true }, { status: 200 });
-  } catch (e: any) {
-    return NextResponse.json({ error: "delete_failed", detail: String(e?.message || e) }, { status: 500 });
+  } catch (error) {
+    return handleApiError(error, 'catalog/items/DELETE');
   }
 }

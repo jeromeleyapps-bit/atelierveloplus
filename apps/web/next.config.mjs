@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'standalone', // ← Mode standalone pour Electron
   reactStrictMode: false, // Désactivé pour éviter les problèmes WebSocket avec Cloudflare Tunnel
   eslint: {
     // Allow production builds to succeed even if there are ESLint errors

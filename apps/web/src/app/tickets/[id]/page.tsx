@@ -47,6 +47,7 @@ import {
   listQuotes,
   convertQuoteToInvoice,
   sendCommunication,
+  saveWorkOrderEstimate,
   type LaborEntry,
   type QuoteResult,
   type WorkOrder,
@@ -313,14 +314,8 @@ export default function TicketDetailPage() {
       if (estimatedMinutes !== "")
         payload.estimatedMinutes = Number(estimatedMinutes);
       if (hourlyRate !== "") payload.hourlyRate = Number(hourlyRate);
-      const base =
-        process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001/api";
-      const res = await fetch(`${base}/workshop/workorders/${id}/estimate`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) throw new Error("API");
+      
+      await saveWorkOrderEstimate(id, payload);
       await refresh();
       setToast({
         open: true,
