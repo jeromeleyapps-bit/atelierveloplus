@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Alert, Button, Chip, Skeleton, Stack, Typography, TextField, Snackbar } from "@mui/material";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import RequireAuth from "../../components/RequireAuth";
 import PageShell from "../../components/PageShell";
 import SectionCard from "../../components/SectionCard";
@@ -29,7 +30,9 @@ type Customer = {
   updatedAt: string;
 };
 
-export default function CustomerDetail({ params }: { params: { id: string } }) {
+export default function CustomerDetail() {
+  const params = useParams<{ id: string }>();
+  const id = (params as any)?.id as string;
   const [row, setRow] = useState<Customer | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -41,7 +44,7 @@ export default function CustomerDetail({ params }: { params: { id: string } }) {
     (async () => {
       setLoading(true);
       try {
-        const res = await fetch(`/api/customers/${params.id}`, { cache: 'no-store' });
+        const res = await fetch(`/api/customers/${id}`, { cache: 'no-store' });
         const data = await res.json();
         if (!res.ok) throw new Error(data?.error || 'load_failed');
         setRow(data as Customer);
@@ -51,9 +54,14 @@ export default function CustomerDetail({ params }: { params: { id: string } }) {
         setLoading(false);
       }
     })();
-  }, [params.id]);
+  }, [id]);
 
   const fullName = [row?.firstName, row?.lastName].filter(Boolean).join(' ');
+  const shortId = row?.id ? row.id.slice(0, 5) : '';
+  const nameSlug = fullName
+    ? fullName.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
+    : (row?.email?.split('@')[0] || 'client');
+  const customerCode = nameSlug && shortId ? `${nameSlug}-id${shortId}` : (row?.id || '');
 
   return (
     <RequireAuth>
@@ -83,6 +91,7 @@ export default function CustomerDetail({ params }: { params: { id: string } }) {
                 </>
               ) : (
                 <>
+                  <Button variant="outlined" component={Link} href={`/customers/${id}/bikes`}>Vélos</Button>
                   <Button variant="outlined" onClick={() => setEdit(true)}>Modifier</Button>
                   <Button variant="outlined" component={Link} href="/customers">Fermer</Button>
                 </>
@@ -102,7 +111,7 @@ export default function CustomerDetail({ params }: { params: { id: string } }) {
           )}
           {!loading && row && (
             <Stack spacing={2}>
-              <Typography variant="body2"><b>ID:</b> {row.id}</Typography>
+              <Typography variant="body2"><b>Code client:</b> {customerCode}</Typography>
               {edit ? (
                 <Stack spacing={2}>
                   <Stack direction={{ xs:'column', sm:'row' }} spacing={2}>

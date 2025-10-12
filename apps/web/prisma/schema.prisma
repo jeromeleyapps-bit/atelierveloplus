@@ -118,7 +118,7 @@ model Customer {
 
 model Invoice {
   id              String           @id @default(cuid())
-  workOrderId     String
+  workOrderId     String?
   number          String?          @unique
   issueDate       DateTime?
   status          String           @default("draft")

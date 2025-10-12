@@ -379,6 +379,10 @@ export async function updateCustomer(id: string, input: Partial<{
   return request(`/customers/${id}`, { method: 'PATCH', body: JSON.stringify(input) });
 }
 
+export async function deleteCustomer(id: string): Promise<{ success: boolean }> {
+  return request(`/customers/${id}`, { method: 'DELETE' });
+}
+
 // Customer Bikes
 export type CustomerBike = {
   id: string;

@@ -114,18 +114,22 @@ export default function CreateInvoiceDialog({ open, onClose, onSuccess }: Create
     setError(null);
 
     try {
-      let workOrderId: string;
+      let workOrderId: string | undefined;
 
-      // Si c'est une réparation et qu'un ticket est sélectionné, l'utiliser
-      if (invoiceType === "service" && selectedWorkOrder) {
-        workOrderId = selectedWorkOrder.id;
-      } else {
-        // Sinon créer un nouveau ticket
-        const ticket = await createWorkOrder({
-          customerId: selectedCustomer.id,
-        });
-        workOrderId = ticket.id;
+      // Créer un ticket UNIQUEMENT pour les réparations/services
+      if (invoiceType === "service") {
+        if (selectedWorkOrder) {
+          // Utiliser le ticket existant
+          workOrderId = selectedWorkOrder.id;
+        } else {
+          // Créer un nouveau ticket pour la réparation
+          const ticket = await createWorkOrder({
+            customerId: selectedCustomer.id,
+          });
+          workOrderId = ticket.id;
+        }
       }
+      // Pour les ventes de produits/équipements/vélos, pas de ticket créé
 
       // Créer la facture
       const invoice = await createInvoice({

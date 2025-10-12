@@ -16,7 +16,8 @@ export async function GET(req: Request) {
   const where: any = {};
   if (status) where.status = status;
   if (from || to) where.issueDate = { gte: from ? new Date(from) : undefined, lte: to ? new Date(to) : undefined };
-  if (q) where.OR = [{ number: { contains: q, mode: 'insensitive' } }, { workOrderId: { contains: q, mode: 'insensitive' } }, { id: { contains: q, mode: 'insensitive' } }];
+  // SQLite ne supporte pas mode: 'insensitive', on utilise contains sans mode
+  if (q) where.OR = [{ number: { contains: q } }, { workOrderId: { contains: q } }, { id: { contains: q } }];
 
   const items = await prisma.invoice.findMany({ where, orderBy: [{ issueDate: "desc" }, { createdAt: "desc" }] });
   // Enrich with customer info via WorkOrder
@@ -50,10 +51,10 @@ export async function POST(req: Request) {
     vatRate = pricingMode === "AE_TTC" ? 0 : 20,
     laborRate = 60,
   } = body || {};
-  if (!workOrderId) return NextResponse.json({ error: "invalid_payload" }, { status: 400 });
+  // workOrderId est optionnel (uniquement pour les réparations/services)
   const inv = await prisma.invoice.create({
     data: {
-      workOrderId,
+      workOrderId: workOrderId || null,
       type: "invoice", // Type par défaut: facture
       pricingMode,
       currency,

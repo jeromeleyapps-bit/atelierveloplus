@@ -136,7 +136,7 @@ export default function CashRegisterPage() {
   }
 
   const totalCash = entries.reduce((sum, e) => {
-    if (e.type === "expense") {
+    if (e.type === "expense_professional" || e.type === "expense_personal") {
       return sum - e.amount;
     }
     return sum + e.amount;

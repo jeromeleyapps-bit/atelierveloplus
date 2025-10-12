@@ -79,14 +79,14 @@ export default function StatsPage() {
         from: fromIso,
         to: toIso
       });
-      setYearlyRevenue(data.invoices?.range?.totalAmount ?? 0);
+      setYearlyRevenue(data.invoices?.range?.paidAmount ?? 0);
     } catch (e) {
       console.error('Failed to load yearly revenue', e);
     }
   }
 
   const kpis = useMemo(() => ({
-    monthlyRevenue: sum?.invoices.range.totalAmount ?? null,
+    monthlyRevenue: sum?.invoices.range.paidAmount ?? null,
     ticketsDelivered: sum?.workOrders.deliveredInRange ?? null,
     paidAmount: sum?.invoices.range.paidAmount ?? null,
   }), [sum]);

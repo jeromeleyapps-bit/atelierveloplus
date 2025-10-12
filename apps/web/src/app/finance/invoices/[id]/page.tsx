@@ -362,7 +362,7 @@ export default function InvoiceDetailPage() {
     try {
       await addInvoiceLine(inv.id, {
         type,
-        description: type === "labor" ? "Main d&apos;oeuvre" : type === "part" ? "Pièce" : "Ligne libre",
+        description: type === "labor" ? "Main d'œuvre" : type === "part" ? "Pièce" : "Ligne libre",
         qty: 1,
         unitPriceHT: inv.pricingMode === "HT_TVA" ? 0 : undefined,
         unitPriceTTC: inv.pricingMode === "AE_TTC" ? 0 : undefined,
@@ -539,12 +539,12 @@ export default function InvoiceDetailPage() {
               {backLabel}
             </Button>
             {/* Nom du client */}
-            {inv.workOrder?.customer && (
+            {(inv as any).workOrder?.customer && (
               <Alert severity="info" icon={false} sx={{ mb: 2, bgcolor: 'primary.light' }}>
                 <Typography variant="h6" fontWeight={600}>
-                  Client : {inv.workOrder.customer.firstName} {inv.workOrder.customer.lastName}
-                  {inv.workOrder.customer.email && ` • ${inv.workOrder.customer.email}`}
-                  {inv.workOrder.customer.phone && ` • ${inv.workOrder.customer.phone}`}
+                  Client : {(inv as any).workOrder.customer.firstName} {(inv as any).workOrder.customer.lastName}
+                  {(inv as any).workOrder.customer.email && ` • ${(inv as any).workOrder.customer.email}`}
+                  {(inv as any).workOrder.customer.phone && ` • ${(inv as any).workOrder.customer.phone}`}
                 </Typography>
               </Alert>
             )}
@@ -589,6 +589,11 @@ export default function InvoiceDetailPage() {
                 )}
                 <Chip size="small" icon={documentIcon} label={documentType} color={documentColor} variant="outlined" sx={{ textTransform: 'none', fontWeight: 600 }} />
                 <Chip size="small" label={inv.status === 'draft' ? 'brouillon' : inv.status === 'issued' ? 'émis' : inv.status} color={inv.status === 'paid' ? 'success' : inv.status === 'issued' ? 'info' : inv.status === 'cancelled' ? 'default' : 'warning'} sx={{ textTransform: 'none' }} />
+                {inv.issueDate && (
+                  <Typography variant="body2" sx={{ ml: 1 }}>
+                    Émise le {new Date(inv.issueDate).toLocaleDateString('fr-FR')}
+                  </Typography>
+                )}
                 
                 {/* Actions spécifiques DEVIS */}
                 {inv.type === "quote" && (
@@ -747,11 +752,14 @@ export default function InvoiceDetailPage() {
                   <TableBody>
                     {inv.lines.map((l) => (
                       <TableRow key={l.id} hover>
-                        <TableCell>{l.type}</TableCell>
+                        <TableCell>{l.type === 'part' ? 'Pièce' : l.type === 'labor' ? "Main d'œuvre" : 'Libre'}</TableCell>
                         <TableCell>
                           <TextField
                             size="small"
                             fullWidth
+                            multiline
+                            minRows={2}
+                            maxRows={6}
                             value={(linePatches[l.id]?.description as any) ?? l.description}
                             disabled={!isDraft}
                             onChange={(e) => setLinePatches((p) => ({ ...p, [l.id]: { ...(p[l.id]||{}), description: e.target.value } }))}
@@ -789,7 +797,22 @@ export default function InvoiceDetailPage() {
                             onBlur={async (e) => { if (!isDraft) return; const v=Number(e.currentTarget.value||0); await onUpdateLine(l, { vatRate: v }); setLinePatches((p)=>{ const { [l.id]:_, ...rest } = p; return rest; }); }}
                             sx={{ width: 100 }} />
                         </TableCell>
-                        <TableCell align="right">{Number(l.totalTTC ?? 0).toFixed(2)} {inv.currency}</TableCell>
+                        <TableCell align="right">
+                          {(() => {
+                            const lp = linePatches[l.id] || {};
+                            const qty = (lp.qty ?? l.qty) || 0;
+                            const vr = (lp.vatRate ?? l.vatRate ?? inv.vatRate) || 0;
+                            if (inv.pricingMode === 'HT_TVA') {
+                              const uht = (lp.unitPriceHT ?? l.unitPriceHT ?? 0);
+                              const t = uht * qty * (1 + vr/100);
+                              return `${t.toFixed(2)} ${inv.currency}`;
+                            } else {
+                              const uttc = (lp.unitPriceTTC ?? l.unitPriceTTC ?? 0);
+                              const t = uttc * qty;
+                              return `${t.toFixed(2)} ${inv.currency}`;
+                            }
+                          })()}
+                        </TableCell>
                         {showMargin && (
                           <TableCell align="right">
                             {(() => {

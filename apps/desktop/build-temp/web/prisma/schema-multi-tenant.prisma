@@ -1,0 +1,567 @@
+// Prisma schema for PostgreSQL with Multi-Tenancy
+// Each workshop (atelier) is a separate tenant with isolated data
+//
+// Migration from single-tenant:
+//   1. Review this schema
+//   2. Run: npx prisma migrate dev --name add_multi_tenancy
+//   3. Run migration script to assign existing data to default tenant
+//
+// Environment variables:
+//   DATABASE_URL="postgresql://user:password@host:5432/atelier_velo?schema=public"
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum CatalogCategory {
+  PIECES
+  EQUIPEMENTS
+  AUTRES
+}
+
+// ============================================
+// MULTI-TENANCY: Tenant Model
+// ============================================
+
+model Tenant {
+  id        String   @id @default(cuid())
+  name      String   // Display name: "Atelier Vélo Paris"
+  slug      String   @unique // URL-safe identifier: "atelier-paris"
+  domain    String?  @unique // Custom domain (optional): "atelier-paris.fr"
+  
+  // Shop information
+  shopName    String?
+  shopEmail   String?
+  shopPhone   String?
+  address1    String?
+  address2    String?
+  zip         String?
+  city        String?
+  country     String?
+  siret       String?
+  tva         String?
+  
+  // Subscription & status
+  active      Boolean  @default(true)
+  plan        String   @default("free") // free | starter | pro | enterprise
+  trialEndsAt DateTime?
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations (all tenant-scoped data)
+  users           User[]
+  customers       Customer[]
+  customerBikes   CustomerBike[]
+  workOrders      WorkOrder[]
+  workOrderParts  WorkOrderPart[]
+  invoices        Invoice[]
+  invoiceLines    InvoiceLine[]
+  invoicePayments InvoicePayment[]
+  invoiceSequences InvoiceSequence[]
+  catalogItems    CatalogItem[]
+  stockMovements  StockMovement[]
+  suppliers       Supplier[]
+  supplierCredentials SupplierCredential[]
+  supplierItems   SupplierItem[]
+  calendarEvents  CalendarEvent[]
+  calendarBlocks  CalendarBlock[]
+  bookings        Booking[]
+  calendarConfigs CalendarConfig[]
+  appSettings     AppSetting[]
+  tenantSettings  TenantSetting[]
+  
+  @@index([slug])
+  @@index([active])
+}
+
+// ============================================
+// AUTHENTICATION & USERS
+// ============================================
+
+model User {
+  id            String    @id @default(cuid())
+  tenantId      String    // ← NEW: Links user to tenant
+  name          String?
+  email         String    // Not globally unique anymore
+  emailVerified DateTime?
+  image         String?
+  password      String?   // hashed password for credentials provider
+  role          String    @default("user") // user | admin | technician | accountant
+  active        Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  tenant   Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  accounts Account[]
+  sessions Session[]
+  settings AppSetting?
+  supplierCredentials SupplierCredential[]
+
+  @@unique([tenantId, email]) // Email unique per tenant
+  @@index([tenantId])
+  @@index([tenantId, email])
+}
+
+// OAuth accounts (shared across tenants if same provider account)
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ============================================
+// CUSTOMERS & BIKES
+// ============================================
+
+model Customer {
+  id             String   @id @default(cuid())
+  tenantId       String   // ← NEW
+  email          String?
+  firstName      String?
+  lastName       String?
+  phone          String?
+  address1       String?
+  address2       String?
+  zip            String?
+  city           String?
+  country        String?
+  bikeBrand      String?
+  bikeModel      String?
+  nationalFileId String?
+  shipAddress1   String?
+  shipAddress2   String?
+  shipZip        String?
+  shipCity       String?
+  shipCountry    String?
+  notes          String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  tenant   Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  bikes    CustomerBike[]
+  bookings Booking[]
+
+  @@index([tenantId])
+  @@index([tenantId, email])
+}
+
+model CustomerBike {
+  id             String   @id @default(cuid())
+  tenantId       String   // ← NEW
+  customerId     String
+  index          Int
+  brand          String?
+  model          String?
+  nationalFileId String?
+  serialNumber   String?
+  color          String?
+  notes          String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  tenant   Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@unique([customerId, index])
+  @@index([tenantId])
+}
+
+// ============================================
+// WORK ORDERS
+// ============================================
+
+model WorkOrder {
+  id         String    @id @default(cuid())
+  tenantId   String    // ← NEW
+  status     String    @default("created")
+  customerId String?
+  bikeId     String?
+  type       String?   @default("repair") // revision | repair | maintenance | upgrade
+  createdAt  DateTime  @default(now())
+  dueAt      DateTime?
+
+  tenant Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  parts  WorkOrderPart[]
+
+  @@index([tenantId])
+  @@index([tenantId, status])
+}
+
+model WorkOrderPart {
+  id            String   @id @default(cuid())
+  tenantId      String   // ← NEW
+  workOrderId   String
+  catalogItemId String?
+  description   String
+  qty           Int      @default(1)
+  priceHT       Float    @default(0)
+  note          String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  tenant      Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  workOrder   WorkOrder    @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+  catalogItem CatalogItem? @relation(fields: [catalogItemId], references: [id])
+
+  @@index([tenantId])
+  @@index([workOrderId])
+}
+
+// ============================================
+// INVOICING
+// ============================================
+
+model Invoice {
+  id              String    @id @default(cuid())
+  tenantId        String    // ← NEW
+  workOrderId     String
+  number          String?
+  issueDate       DateTime?
+  status          String    @default("draft")
+  type            String    @default("invoice") // invoice | credit
+  parentId        String?
+  pricingMode     String    @default("HT_TVA")
+  currency        String    @default("EUR")
+  vatRate         Float     @default(20)
+  laborRate       Float     @default(60)
+  subtotalHT      Float     @default(0)
+  vatAmount       Float     @default(0)
+  totalTTC        Float     @default(0)
+  discountAmount  Float?    @default(0)
+  paidAt          DateTime?
+  paymentMethod   String?
+  cancelledAt     DateTime?
+  cancelledReason String?
+  dueDate         DateTime?
+  reminderCount   Int       @default(0)
+  lastReminderAt  DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  tenant   Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  lines    InvoiceLine[]
+  payments InvoicePayment[]
+
+  @@unique([tenantId, number]) // Invoice number unique per tenant
+  @@index([tenantId])
+  @@index([tenantId, status])
+}
+
+model InvoiceLine {
+  id              String  @id @default(cuid())
+  tenantId        String  // ← NEW
+  invoiceId       String
+  type            String  @default("part")
+  description     String
+  qty             Float   @default(1)
+  unitPriceHT     Float?
+  unitPriceTTC    Float?
+  vatRate         Float?
+  totalHT         Float   @default(0)
+  totalTTC        Float   @default(0)
+  partId          String?
+  purchasePriceHT Float?
+
+  tenant  Tenant  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([invoiceId])
+}
+
+model InvoicePayment {
+  id        String   @id @default(cuid())
+  tenantId  String   // ← NEW
+  invoiceId String
+  amount    Float
+  method    String?
+  paidAt    DateTime
+  note      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenant  Tenant  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([invoiceId])
+}
+
+model InvoiceSequence {
+  id         String   @id @default(cuid())
+  tenantId   String   // ← NEW
+  year       Int
+  lastNumber Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, year]) // Sequence per tenant per year
+  @@index([tenantId])
+}
+
+// ============================================
+// CATALOG & STOCK
+// ============================================
+
+model CatalogItem {
+  id              String          @id @default(cuid())
+  tenantId        String          // ← NEW
+  sku             String?
+  category        CatalogCategory
+  name            String
+  priceHT         Float
+  priceTTC        Float
+  vatRate         Float
+  active          Boolean         @default(true)
+  stockQty        Int             @default(0)
+  minStock        Int             @default(0)
+  reorderQty      Int             @default(0)
+  location        String?
+  purchasePriceHT Float?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  tenant         Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  stockMovements StockMovement[]
+  supplierItems  SupplierItem[]
+  workOrderParts WorkOrderPart[]
+
+  @@unique([tenantId, sku]) // SKU unique per tenant
+  @@index([tenantId])
+  @@index([tenantId, active])
+}
+
+model StockMovement {
+  id        String   @id @default(cuid())
+  tenantId  String   // ← NEW
+  itemId    String
+  type      String   // IN | OUT | ADJUST
+  qty       Int
+  refType   String?  // invoice | workOrder | directSale | manual | purchase
+  refId     String?
+  note      String?
+  createdAt DateTime @default(now())
+
+  tenant Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  item   CatalogItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([itemId])
+}
+
+// ============================================
+// SUPPLIERS
+// ============================================
+
+model Supplier {
+  id            String   @id @default(cuid())
+  tenantId      String   // ← NEW
+  name          String
+  website       String?
+  connectorType String   @default("MOCK")
+  active        Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  tenant      Tenant               @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  items       SupplierItem[]
+  credentials SupplierCredential[]
+
+  @@index([tenantId])
+}
+
+model SupplierCredential {
+  id         String   @id @default(cuid())
+  tenantId   String   // ← NEW
+  supplierId String
+  userId     String
+  username   String?
+  password   String?
+  extraJson  String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  tenant   Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  supplier Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([supplierId])
+}
+
+model SupplierItem {
+  id               String    @id @default(cuid())
+  tenantId         String    // ← NEW
+  supplierId       String
+  catalogItemId    String?
+  supplierSku      String
+  ean              String?
+  lastPriceHT      Float?
+  lastAvailability String?
+  lastCheckedAt    DateTime?
+  favorite         Boolean   @default(false)
+
+  tenant      Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  supplier    Supplier     @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  catalogItem CatalogItem? @relation(fields: [catalogItemId], references: [id])
+
+  @@index([tenantId])
+  @@index([supplierId])
+}
+
+// ============================================
+// CALENDAR & BOOKINGS
+// ============================================
+
+model CalendarEvent {
+  id          String   @id @default(cuid())
+  tenantId    String   // ← NEW
+  title       String
+  description String?
+  start       DateTime
+  end         DateTime
+  status      String   @default("planned") // planned | in_progress | done | cancelled
+  blocksAvail Boolean  @default(true)
+  color       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([tenantId, start, end])
+}
+
+model CalendarBlock {
+  id        String   @id @default(cuid())
+  tenantId  String   // ← NEW
+  reason    String?
+  start     DateTime
+  end       DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([tenantId, start, end])
+}
+
+model Booking {
+  id          String    @id @default(cuid())
+  tenantId    String    // ← NEW
+  start       DateTime
+  end         DateTime
+  status      String    @default("pending") // pending | confirmed | cancelled | done
+  name        String
+  email       String?
+  phone       String?
+  bike        String?
+  description String?
+  customerId  String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  tenant   Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  customer Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId])
+  @@index([tenantId, start, end])
+  @@index([customerId])
+}
+
+model CalendarConfig {
+  id             Int      @id @default(autoincrement())
+  tenantId       String   // ← NEW
+  timezone       String   @default("Europe/Paris")
+  slotMinutes    Int      @default(60)
+  leadTimeHours  Int      @default(6)
+  maxConcurrent  Int      @default(1)
+  saturdayByAppt Boolean  @default(true)
+  businessHours  String?  // JSON string of weekly schedule
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId]) // One config per tenant
+  @@index([tenantId])
+}
+
+// ============================================
+// SETTINGS
+// ============================================
+
+model AppSetting {
+  id          String   @id @default(cuid())
+  tenantId    String   // ← NEW
+  userId      String   @unique
+  shopName    String?
+  shopEmail   String?
+  shopPhone   String?
+  address1    String?
+  address2    String?
+  zip         String?
+  city        String?
+  country     String?
+  pdfPrimary  String?  // hex color like #1976d2
+  legalFooter String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+}
+
+// Renamed from GlobalSetting to TenantSetting (tenant-specific key-value store)
+model TenantSetting {
+  id        String  @id @default(cuid())
+  tenantId  String
+  key       String
+  value     String?
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, key]) // Key unique per tenant
+  @@index([tenantId])
+}

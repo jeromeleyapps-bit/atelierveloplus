@@ -74,7 +74,17 @@ export default function CustomerBikesPage() {
         listCustomerBikes(customerId),
       ]);
       setCustomer(cust);
-      setRows(bikes);
+      // Sort A->Z by brand then model (case-insensitive)
+      const sorted = [...bikes].sort((a, b) => {
+        const ka = `${a.brand || ''}`.toLowerCase();
+        const kb = `${b.brand || ''}`.toLowerCase();
+        if (ka < kb) return -1; if (ka > kb) return 1;
+        const ma = `${a.model || ''}`.toLowerCase();
+        const mb = `${b.model || ''}`.toLowerCase();
+        if (ma < mb) return -1; if (ma > mb) return 1;
+        return 0;
+      });
+      setRows(sorted);
     } catch (e: any) {
       setError(e?.message || "Erreur de chargement");
     } finally {
@@ -88,6 +98,10 @@ export default function CustomerBikesPage() {
   }, [customerId]);
 
   function openCreate() {
+    if (rows.length >= 5) {
+      alert("Limite de 5 vélos par client atteinte.");
+      return;
+    }
     setEditing(null);
     setForm({ brand: "", model: "", serialNumber: "", color: "", nationalFileId: "", notes: "" });
     setDialogOpen(true);
@@ -108,6 +122,10 @@ export default function CustomerBikesPage() {
   async function handleSave() {
     try {
       setFormErrors({});
+      if (!editing && rows.length >= 5) {
+        alert("Limite de 5 vélos par client atteinte.");
+        return;
+      }
       const parsed = formSchema.safeParse(Object.fromEntries(Object.entries(form).map(([k, v]) => [k, v?.toString().trim() ? v : null])));
       if (!parsed.success) {
         const errs: Record<string, string> = {};

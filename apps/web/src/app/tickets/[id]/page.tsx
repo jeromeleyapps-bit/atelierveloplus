@@ -287,7 +287,7 @@ export default function TicketDetailPage() {
         console.error('Erreur import main d\'œuvre:', e);
       }
       
-      router.push(`/finance/invoices/${inv.id}`);
+      router.push(`/finance/invoices/${inv.id}` as any);
       setToast({ open: true, message: "Facture créée avec les pièces et la main d'œuvre !", severity: "success" });
     } catch (e) {
       console.error(e);
@@ -298,7 +298,7 @@ export default function TicketDetailPage() {
   async function onOpenExistingInvoice() {
     try {
       const list = await listInvoices({ q: id });
-      if (list.length > 0) router.push(`/finance/invoices/${list[0].id}`);
+      if (list.length > 0) router.push(`/finance/invoices/${list[0].id}` as any);
       else setToast({ open: true, message: "Aucune facture liée", severity: "error" });
     } catch (e) {
       console.error(e);

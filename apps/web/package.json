@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev -p 3000",
     "dev:tunnel": "powershell -ExecutionPolicy Bypass -File ./start-tunnel.ps1",
-    "build": "next build",
+    "build": "next build && node scripts/copy-standalone-deps.js",
     "start": "next start -p 3000",
     "lint": "next lint",
     "lint:ci": "next lint --max-warnings=0",
@@ -45,7 +45,7 @@
     "framer-motion": "^12.23.22",
     "html5-qrcode": "^2.3.8",
     "jsonwebtoken": "^9.0.2",
-    "next": "^14.2.10",
+    "next": "14.2.10",
     "nodemailer": "^6.9.13",
     "pdf-lib": "^1.17.1",
     "react": "18.3.1",
@@ -64,7 +64,7 @@
     "eslint": "8.57.0",
     "eslint-config-next": "^14.2.10",
     "png-to-ico": "^3.0.1",
-    "prisma": "^6.16.2",
+    "prisma": "6.16.3",
     "sharp": "^0.33.3",
     "ts-node": "^10.9.2",
     "typescript": "5.6.2",
@@ -76,6 +76,10 @@
   "author": "",
   "license": "ISC",
   "type": "commonjs",
+  "engines": {
+    "node": ">=20 <21"
+  },
+  "engineStrict": true,
   "prisma": {
     "seed": "node prisma/seed.cjs"
   }

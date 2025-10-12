@@ -386,6 +386,20 @@ function FinanceContent() {
               </Typography>
               <Button 
                 size="small" 
+                variant="contained" 
+                startIcon={<OpenInNewIcon />}
+                onClick={() => {
+                  if (selected.length !== 1) {
+                    setToast({ open: true, message: 'Sélectionnez une seule facture', severity: 'warning' });
+                    return;
+                  }
+                  router.push(`/finance/invoices/${selected[0]}` as Route);
+                }}
+              >
+                Modifier
+              </Button>
+              <Button 
+                size="small" 
                 variant="outlined" 
                 startIcon={<PaidIcon />}
                 onClick={openBulkPay}

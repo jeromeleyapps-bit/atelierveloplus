@@ -283,6 +283,7 @@ export default function PublicBookingPage() {
               value={form.email} 
               onChange={e=>setForm({ ...form, email: e.target.value })}
               InputLabelProps={{ shrink: true }}
+              helperText="Email ou téléphone requis"
             />
             <TextField 
               label="Téléphone" 
@@ -290,6 +291,7 @@ export default function PublicBookingPage() {
               value={form.phone} 
               onChange={e=>setForm({ ...form, phone: e.target.value })}
               InputLabelProps={{ shrink: true }}
+              helperText="Email ou téléphone requis"
             />
             <TextField 
               label="Vélo" 
@@ -314,7 +316,11 @@ export default function PublicBookingPage() {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpen(false)}>Annuler</Button>
-          <Button variant="contained" onClick={submitBooking} disabled={!form.name || submitting}>
+          <Button 
+            variant="contained" 
+            onClick={submitBooking} 
+            disabled={!form.name || (!form.email && !form.phone) || submitting}
+          >
             {submitting ? 'Envoi…' : 'Confirmer la réservation'}
           </Button>
         </DialogActions>

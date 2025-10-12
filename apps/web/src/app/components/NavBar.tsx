@@ -53,15 +53,14 @@ const NavBar = () => {
   return (
     <AppBar position="static" sx={{ mb: 4 }}>
       <Toolbar>
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontWeight: 700 }}>
-          <Link
-            href={"/" as Route}
-            passHref
-            style={{ color: "inherit", textDecoration: "none" }}
-          >
-            🚴 {shopName}
+        <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
+          <Link href={"/" as Route} passHref style={{ color: "inherit", textDecoration: "none", display: 'flex', alignItems: 'center' }}>
+            <img src="/logo.png" alt="Logo" style={{ height: 28, width: 'auto', marginRight: 8 }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
+            <Typography variant="h6" component="div" sx={{ fontWeight: 700 }}>
+              {shopName}
+            </Typography>
           </Link>
-        </Typography>
+        </Box>
         <Box sx={{ display: { xs: "none", sm: "flex" }, gap: 1, alignItems: "center" }}>
           {navItems.map((item) => {
             const isActive = pathname === item.path;

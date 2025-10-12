@@ -3,15 +3,18 @@
  **********************/
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'standalone', // ← Mode standalone pour Electron
   eslint: {
     // Allow production builds to succeed even if there are ESLint errors
     ignoreDuringBuilds: true,
   },
-  // Autoriser les requêtes depuis le domaine Cloudflare Tunnel
-  allowedDevOrigins: ["https://rdv.upgradedbikes.com"],
   experimental: {
     typedRoutes: true,
     optimizePackageImports: ["@mui/material", "@mui/icons-material"],
+    outputFileTracingRoot: require('path').join(__dirname, '../../'), // Trace depuis la racine du monorepo
+    outputFileTracingIncludes: {
+      '/': ['./node_modules/styled-jsx/**/*'],
+    },
   },
   webpack: (config) => {
     // Ignore problematic Windows system files from file watching to prevent lstat EINVAL errors

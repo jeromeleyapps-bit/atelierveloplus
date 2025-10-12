@@ -53,14 +53,27 @@ export function AppProviders({ children }: { children: ReactNode }) {
   );
 
   const pathname = usePathname();
-  const isPublicPage = pathname === '/rdv' || pathname === '/booking-local';
+  
+  // Détecter si on est sur le domaine public (tunnel Cloudflare)
+  const [isPublicDomain, setIsPublicDomain] = useState<boolean | null>(null);
+  
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const hostname = window.location.hostname;
+      // Si le hostname est rdv.upgradedbikes.com (sous-domaine public)
+      setIsPublicDomain(hostname === 'rdv.upgradedbikes.com');
+    }
+  }, []);
+  
+  // Masquer le NavBanner sur /rdv ET domaine public, ou tant que isPublicDomain n'est pas initialisé
+  const shouldShowNavBanner = isPublicDomain !== null && !((pathname === '/rdv' || pathname === '/booking-local') && isPublicDomain);
 
   return (
     <ThemeContext.Provider value={{ mode, toggleTheme }}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <AuthProvider>
-          {!isPublicPage && <NavBanner />}
+          {shouldShowNavBanner && <NavBanner />}
           {children}
         </AuthProvider>
       </ThemeProvider>

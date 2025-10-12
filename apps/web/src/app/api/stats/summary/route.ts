@@ -24,8 +24,8 @@ export async function GET(req: Request) {
     if (to && d > to) return false;
     return true;
   });
-  const countIssued = invoices.filter(i => i.status === 'issued').length;
-  const countPaid = invoices.filter(i => i.status === 'paid').length;
+  const countIssued = inRange.filter(i => i.status === 'issued').length;
+  const countPaid = inRange.filter(i => i.status === 'paid').length;
   const sumAll = invoices.reduce((s, i) => s + (i.totalTTC || 0), 0);
   const sumInRange = inRange.reduce((s, i) => s + (i.totalTTC || 0), 0);
   const sumPaidInRange = inRange.filter(i => i.status === 'paid').reduce((s, i) => s + (i.totalTTC || 0), 0);

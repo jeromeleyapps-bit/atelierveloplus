@@ -49,3 +49,14 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
     return NextResponse.json({ error: 'customer_update_failed', detail: String(e?.message || e) }, { status: 500 });
   }
 }
+
+export async function DELETE(_req: Request, { params }: { params: { id: string } }) {
+  const prisma = await getPrisma();
+  if (!prisma) return NextResponse.json({ error: "prisma_unavailable" }, { status: 501 });
+  try {
+    await prisma.customer.delete({ where: { id: params.id } });
+    return NextResponse.json({ success: true }, { status: 200 });
+  } catch (e: any) {
+    return NextResponse.json({ error: 'customer_delete_failed', detail: String(e?.message || e) }, { status: 500 });
+  }
+}

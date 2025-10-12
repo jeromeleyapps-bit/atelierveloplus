@@ -63,10 +63,17 @@ export async function POST(req: Request) {
   }
 
   try {
+    // Vérifier si un utilisateur existe déjà (limite 1 utilisateur pour l'app desktop)
+    const userCount = await prisma.user.count();
+    if (userCount > 0) {
+      await jitter(250);
+      return NextResponse.json({ error: "user_limit_reached", message: "Un compte existe déjà. Cette application est limitée à un seul utilisateur." }, { status: 400 });
+    }
+
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) {
       await jitter(250);
-      return NextResponse.json({ error: "register_failed" }, { status: 400 });
+      return NextResponse.json({ error: "email_already_exists", message: "Un compte existe déjà avec cet email" }, { status: 400 });
     }
     // Optionally reset database before creating the first user
     // ⚠️ DÉSACTIVÉ PAR DÉFAUT POUR SÉCURITÉ - Activer uniquement si nécessaire

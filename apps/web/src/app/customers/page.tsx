@@ -26,7 +26,7 @@ import {
   Divider,
 } from "@mui/material";
 import Link from "next/link";
-import { createCustomer, listCustomers, updateCustomer, listCustomerBikes, saveCustomerBike, deleteCustomerBike, type Customer } from "@/lib/api";
+import { createCustomer, listCustomers, updateCustomer, deleteCustomer, listCustomerBikes, saveCustomerBike, deleteCustomerBike, type Customer } from "@/lib/api";
 import RequireAuth from "../components/RequireAuth";
 import PageShell from "../components/PageShell";
 import SectionCard from "../components/SectionCard";
@@ -35,10 +35,13 @@ import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 import EditIcon from "@mui/icons-material/Edit";
 import DirectionsBikeIcon from "@mui/icons-material/DirectionsBike";
+import DeleteIcon from "@mui/icons-material/Delete";
+import Checkbox from "@mui/material/Checkbox";
 
 export default function CustomersPage() {
   const [items, setItems] = useState<Customer[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selected, setSelected] = useState<string[]>([]);
   // Important: démarre à true pour un rendu initial déterministe SSR/CSR
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -212,6 +215,40 @@ export default function CustomersPage() {
     refresh();
   }, []);
 
+  function handleSelectAll(checked: boolean) {
+    if (checked) {
+      setSelected(filtered.map(c => c.id));
+    } else {
+      setSelected([]);
+    }
+  }
+
+  function handleSelectOne(id: string, checked: boolean) {
+    if (checked) {
+      setSelected([...selected, id]);
+    } else {
+      setSelected(selected.filter(s => s !== id));
+    }
+  }
+
+  async function handleDeleteSelected() {
+    if (selected.length === 0) return;
+    if (!confirm(`Supprimer ${selected.length} client(s) ?`)) return;
+    
+    setSubmitting(true);
+    try {
+      await Promise.all(selected.map(id => deleteCustomer(id)));
+      setSelected([]);
+      await refresh();
+      setToast({ open: true, message: `${selected.length} client(s) supprimé(s)`, severity: "success" });
+    } catch (e) {
+      console.error(e);
+      setToast({ open: true, message: "Erreur lors de la suppression", severity: "error" });
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   async function onCreate(e: React.FormEvent) {
     e.preventDefault();
     setSubmitting(true);
@@ -255,6 +292,15 @@ export default function CustomersPage() {
     }
   }
 
+  const filtered = items.filter((c) => {
+    if (!searchQuery.trim()) return true;
+    const query = searchQuery.toLowerCase();
+    const firstName = (c.firstName || "").toLowerCase();
+    const lastName = (c.lastName || "").toLowerCase();
+    const email = (c.email || "").toLowerCase();
+    return firstName.includes(query) || lastName.includes(query) || email.includes(query);
+  });
+
   return (
     <RequireAuth>
       <PageShell title="Clients">
@@ -294,7 +340,19 @@ export default function CustomersPage() {
 
         <SectionCard title="Liste des clients" icon={<ListAltIcon color="primary" />}>
           <Box sx={{ mb: 2 }}>
-            <Stack direction="row" spacing={1}>
+            <Stack direction="row" spacing={1} alignItems="center">
+              {selected.length > 0 && (
+                <Button
+                  variant="contained"
+                  color="error"
+                  size="small"
+                  startIcon={<DeleteIcon />}
+                  onClick={handleDeleteSelected}
+                  disabled={submitting}
+                >
+                  Supprimer ({selected.length})
+                </Button>
+              )}
               <TextField
                 label="Rechercher par nom ou prénom"
                 size="small"
@@ -319,6 +377,13 @@ export default function CustomersPage() {
           <Table size="small" sx={{ tableLayout: 'fixed', width: '100%' }}>
             <TableHead>
               <TableRow>
+                <TableCell padding="checkbox">
+                  <Checkbox
+                    checked={filtered.length > 0 && selected.length === filtered.length}
+                    indeterminate={selected.length > 0 && selected.length < filtered.length}
+                    onChange={(e) => handleSelectAll(e.target.checked)}
+                  />
+                </TableCell>
                 <TableCell>ID</TableCell>
                 <TableCell>Email</TableCell>
                 <TableCell>Nom</TableCell>
@@ -353,18 +418,14 @@ export default function CustomersPage() {
                   ))}
                 </>
               )}
-              {!loading &&
-                items
-                  .filter((c) => {
-                    if (!searchQuery.trim()) return true;
-                    const query = searchQuery.toLowerCase();
-                    const firstName = (c.firstName || "").toLowerCase();
-                    const lastName = (c.lastName || "").toLowerCase();
-                    const email = (c.email || "").toLowerCase();
-                    return firstName.includes(query) || lastName.includes(query) || email.includes(query);
-                  })
-                  .map((c) => (
-                  <TableRow key={c.id} hover>
+              {!loading && filtered.map((c) => (
+                <TableRow key={c.id} hover>
+                    <TableCell padding="checkbox">
+                      <Checkbox
+                        checked={selected.includes(c.id)}
+                        onChange={(e) => handleSelectOne(c.id, e.target.checked)}
+                      />
+                    </TableCell>
                     <TableCell>
                       <Tooltip title={c.id}>
                         <Box component="span" sx={{ display:'inline-block', maxWidth:'100%', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>

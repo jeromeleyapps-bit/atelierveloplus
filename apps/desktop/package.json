@@ -7,41 +7,81 @@
   "license": "ISC",
   "scripts": {
     "start": "electron .",
-    "build": "electron-builder --win portable",
+    "build": "electron-builder --win portable nsis",
+    "build:portable": "electron-builder --win portable",
     "build:installer": "electron-builder --win nsis"
   },
   "devDependencies": {
     "electron": "^28.3.3",
-    "electron-builder": "^24.9.1"
+    "electron-builder": "^24.9.1",
+    "fs-extra": "^11.1.1"
   },
   "build": {
     "appId": "com.ateliervelo.app",
     "productName": "Atelier Vélo+",
+    "asar": false,
+    "icon": "../../logo.ico",
     "directories": {
       "output": "dist"
     },
     "files": [
       "main.js",
-      "preload.js",
-      "icon.ico",
-      "../web/.next/standalone/**/*",
-      "../web/public/**/*",
-      "../web/prisma/**/*",
-      "../web/data/**/*"
+      "preload.js"
+    ],
+    "extraResources": [
+      {
+        "from": "../web/.next/standalone/apps/web",
+        "to": "web"
+      },
+      {
+        "from": "../web/.next/static",
+        "to": "web/.next/static"
+      },
+      {
+        "from": "../web/public",
+        "to": "web/public"
+      },
+      {
+        "from": "../web/prisma",
+        "to": "web/prisma"
+      },
+      {
+        "from": "../../logo.ico",
+        "to": "logo.ico"
+      }
+    ],
+    "asarUnpack": [
+      "**/*.node"
     ],
     "win": {
+      "icon": "../../logo.ico",
       "target": [
         {
           "target": "portable",
-          "arch": [
-            "x64"
-          ]
+          "arch": ["x64"]
+        },
+        {
+          "target": "nsis",
+          "arch": ["x64"]
         }
       ],
-      "icon": "icon.ico"
+      "sign": null,
+      "signingHashAlgorithms": []
     },
     "portable": {
-      "artifactName": "AtelierVelo-${version}.exe"
+      "artifactName": "AtelierVelo-${version}-Portable.exe"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Atelier Vélo+",
+      "artifactName": "AtelierVelo-${version}-Setup.exe",
+      "installerIcon": "../../logo.ico",
+      "uninstallerIcon": "../../logo.ico",
+      "license": null,
+      "perMachine": false
     }
   }
 }

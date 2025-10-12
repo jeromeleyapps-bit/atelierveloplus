@@ -47,16 +47,34 @@ function buildInvoiceData(inv: any, customer: any, settings: any) {
     customerZip: customer?.zip,
     customerCity: customer?.city,
     
-    // Lines
-    lines: (inv.lines || []).map((ln: any) => ({
-      description: ln.description,
-      qty: ln.qty,
-      unitPriceHT: ln.unitPriceHT,
-      unitPriceTTC: ln.unitPriceTTC,
-      vatRate: ln.vatRate,
-      totalHT: ln.totalHT,
-      totalTTC: ln.totalTTC,
-    })),
+    // Lines with computed totals fallback
+    lines: (inv.lines || []).map((ln: any) => {
+      const qty = ln.qty ?? 1;
+      const vr = (ln.vatRate ?? inv.vatRate) || 0;
+      let totalHT = ln.totalHT;
+      let totalTTC = ln.totalTTC;
+      if (totalHT == null || totalTTC == null) {
+        if (inv.pricingMode === 'HT_TVA') {
+          const uht = ln.unitPriceHT ?? 0;
+          totalHT = uht * qty;
+          totalTTC = totalHT * (1 + vr / 100);
+        } else {
+          const uttc = ln.unitPriceTTC ?? 0;
+          totalTTC = uttc * qty;
+          // derive HT for completeness
+          totalHT = vr > 0 ? totalTTC / (1 + vr / 100) : totalTTC;
+        }
+      }
+      return {
+        description: ln.description,
+        qty,
+        unitPriceHT: ln.unitPriceHT,
+        unitPriceTTC: ln.unitPriceTTC,
+        vatRate: ln.vatRate,
+        totalHT,
+        totalTTC,
+      };
+    }),
     
     // Totals
     subtotalHT: inv.subtotalHT,
@@ -120,14 +138,52 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
   invoiceData.remainingAmount = remainingAmount;
   invoiceData.payments = payments;
 
-  // Optional logo: fetch from env SHOP_LOGO_URL if provided and looks like http(s)
+  // Optional logo: prefer env SHOP_LOGO_URL; fallback to local public/logo.png
   const logoUrl = process.env.SHOP_LOGO_URL;
-  if (logoUrl && /^https?:\/\//i.test(logoUrl)) {
+  async function tryLoadLogoFromUrl(url: string) {
     try {
-      const resp = await fetch(logoUrl, { cache: 'no-store' });
+      const resp = await fetch(url, { cache: 'no-store' });
       if (resp.ok) {
         const arr = new Uint8Array(await resp.arrayBuffer());
         (invoiceData as any).logoBytes = arr;
+        return true;
+      }
+    } catch {}
+    return false;
+  }
+  let logoLoaded = false;
+  if (logoUrl && /^https?:\/\//i.test(logoUrl)) {
+    logoLoaded = await tryLoadLogoFromUrl(logoUrl);
+  }
+  if (!logoLoaded) {
+    try {
+      // In Next.js app route, we can fetch the same host's public asset via absolute path
+      const origin = new URL(req.url).origin;
+      const localUrl = `${origin}/logo.png`;
+      logoLoaded = await tryLoadLogoFromUrl(localUrl);
+    } catch {}
+  }
+  if (!logoLoaded) {
+    // Filesystem fallbacks: packaged Electron (resources), then local dev
+    try {
+      const fs = await import('fs');
+      const path = await import('path');
+      const resPath = process.env.RESOURCES_PATH;
+      if (resPath) {
+        const p = path.join(resPath, 'web', 'public', 'logo.png');
+        if (fs.existsSync(p)) {
+          const buf = fs.readFileSync(p);
+          (invoiceData as any).logoBytes = new Uint8Array(buf);
+          logoLoaded = true;
+        }
+      }
+      if (!logoLoaded) {
+        const p2 = path.join(process.cwd(), 'public', 'logo.png');
+        if (fs.existsSync(p2)) {
+          const buf = fs.readFileSync(p2);
+          (invoiceData as any).logoBytes = new Uint8Array(buf);
+          logoLoaded = true;
+        }
       }
     } catch {}
   }

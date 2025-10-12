@@ -257,20 +257,23 @@ export default function PublicBookingPage() {
                 const name = `${option.firstName || ''} ${option.lastName || ''}`.trim();
                 return name || option.email || 'Client sans nom';
               }}
-              renderOption={(props, option) => (
-                <li {...props}>
-                  <Box>
-                    <Typography variant="body2">
-                      {`${option.firstName || ''} ${option.lastName || ''}`.trim() || option.email}
-                    </Typography>
-                    {option.phone && (
-                      <Typography variant="caption" color="text.secondary">
-                        {option.phone}
+              renderOption={(props, option) => {
+                const { key, ...otherProps } = props;
+                return (
+                  <li key={key} {...otherProps}>
+                    <Box>
+                      <Typography variant="body2">
+                        {`${option.firstName || ''} ${option.lastName || ''}`.trim() || option.email}
                       </Typography>
-                    )}
-                  </Box>
-                </li>
-              )}
+                      {option.phone && (
+                        <Typography variant="caption" color="text.secondary">
+                          {option.phone}
+                        </Typography>
+                      )}
+                    </Box>
+                  </li>
+                );
+              }}
               freeSolo
               loading={loadingCustomers}
               onChange={(e, value) => {
