@@ -222,16 +222,18 @@ export async function setWorkOrderStatus(
 }
 
 export type QuoteLine = {
-  type: "part" | "labor";
+  type?: string;
   description: string;
   qty: number;
   priceHT: number;
-  lineTotalHT: number;
+  totalHT: number;
 };
 export type QuoteResult = {
   workOrderId: string;
-  partsHT: number;
-  laborHT: number;
+  customerId?: string;
+  customerName?: string;
+  partsHT?: number;
+  laborHT?: number;
   totalHT: number;
   tvaRate: number;
   totalTVA: number;

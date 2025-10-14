@@ -1,3 +1,16 @@
+/**
+ * Atelier Vélo+ - Application Desktop Electron
+ * 
+ * Copyright © 2024-2025 Jérôme Leyssard - Upgraded Bikes
+ * Tous droits réservés.
+ * 
+ * Ce logiciel est la propriété exclusive de Jérôme Leyssard.
+ * Toute reproduction, distribution ou modification non autorisée est interdite.
+ * 
+ * Contact: jerome.leyssard@upgradedbikes.com
+ * Site: https://upgradedbikes.com
+ */
+
 const { app, BrowserWindow, Menu } = require('electron');
 const { spawn } = require('child_process');
 const path = require('path');

@@ -63,6 +63,8 @@ import SmsIcon from "@mui/icons-material/Sms";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import Link from "next/link";
 import { AppointmentPicker } from "@/components/AppointmentPicker";
+import LineItemSelector, { LineItem } from "@/app/components/LineItemSelector";
+import LineItemsTable from "@/app/components/LineItemsTable";
 
 export default function TicketDetailPage() {
   const params = useParams();
@@ -98,6 +100,10 @@ export default function TicketDetailPage() {
   // Quotes state
   const [quotes, setQuotes] = useState<Invoice[]>([]);
   const [loadingQuotes, setLoadingQuotes] = useState(false);
+  // Lines state (nouveau système)
+  const [lines, setLines] = useState<LineItem[]>([]);
+  const [loadingLines, setLoadingLines] = useState(false);
+  const [isAutoEntrepreneur, setIsAutoEntrepreneur] = useState(false);
 
   async function refresh() {
     if (!id) return;
@@ -142,7 +148,142 @@ export default function TicketDetailPage() {
 
   useEffect(() => {
     refresh();
+    if (id) {
+      loadLines();
+      loadUserSettings();
+    }
   }, [id]);
+
+  async function loadLines() {
+    if (!id) return;
+    setLoadingLines(true);
+    try {
+      const token = localStorage.getItem("jwt_token");
+      const response = await fetch(`/api/workorders/${id}/lines`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      if (response.ok) {
+        const data = await response.json();
+        // L'API peut retourner un tableau direct ou un objet {lines: [...]}
+        const linesArray = Array.isArray(data) ? data : (data.lines || []);
+        console.log("[Ticket] Lines loaded:", linesArray);
+        setLines(linesArray);
+      }
+    } catch (error) {
+      console.error("Error loading lines:", error);
+    } finally {
+      setLoadingLines(false);
+    }
+  }
+
+  async function loadUserSettings() {
+    try {
+      const token = localStorage.getItem("jwt_token");
+      const response = await fetch("/api/account/settings", {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      
+      if (!response.ok) {
+        console.error("Settings API error:", response.status);
+        setIsAutoEntrepreneur(false);
+        return;
+      }
+      
+      const data = await response.json();
+      console.log("[Ticket] ========== USER SETTINGS ==========");
+      console.log("[Ticket] Full response:", data);
+      console.log("[Ticket] isAutoEntrepreneur:", data.isAutoEntrepreneur);
+      console.log("[Ticket] Type:", typeof data.isAutoEntrepreneur);
+      console.log("[Ticket] =====================================");
+      const isAE = data.isAutoEntrepreneur === true;
+      console.log("[Ticket] Setting isAutoEntrepreneur to:", isAE);
+      setIsAutoEntrepreneur(isAE);
+    } catch (error) {
+      console.error("[Ticket] Error loading settings:", error);
+    }
+  }
+
+  async function handleAddLine(line: LineItem) {
+    try {
+      const token = localStorage.getItem("jwt_token");
+      const response = await fetch(`/api/workorders/${id}/lines`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          type: line.type,
+          description: line.description,
+          quantity: line.quantity,
+          priceHT: line.priceHT,
+          vatRate: line.vatRate,
+          duration: line.duration,
+          sourceId: line.sourceId,
+          notes: line.notes,
+        }),
+      });
+
+      if (response.ok) {
+        await loadLines();
+        setToast({ open: true, message: "Ligne ajoutée", severity: "success" });
+      } else {
+        throw new Error("Failed to add line");
+      }
+    } catch (error) {
+      console.error("Error adding line:", error);
+      setToast({ open: true, message: "Erreur lors de l'ajout", severity: "error" });
+    }
+  }
+
+  async function handleUpdateLine(index: number, updates: Partial<LineItem>) {
+    const line = lines[index];
+    if (!line.id) return;
+
+    try {
+      const token = localStorage.getItem("jwt_token");
+      const response = await fetch(`/api/workorders/${id}/lines/${line.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify(updates),
+      });
+
+      if (response.ok) {
+        await loadLines();
+      } else {
+        throw new Error("Failed to update line");
+      }
+    } catch (error) {
+      console.error("Error updating line:", error);
+      setToast({ open: true, message: "Erreur lors de la modification", severity: "error" });
+    }
+  }
+
+  async function handleDeleteLine(index: number) {
+    const line = lines[index];
+    if (!line.id) return;
+
+    try {
+      const token = localStorage.getItem("jwt_token");
+      const response = await fetch(`/api/workorders/${id}/lines/${line.id}`, {
+        method: "DELETE",
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+
+      if (response.ok) {
+        await loadLines();
+        setToast({ open: true, message: "Ligne supprimée", severity: "success" });
+      } else {
+        throw new Error("Failed to delete line");
+      }
+    } catch (error) {
+      console.error("Error deleting line:", error);
+      setToast({ open: true, message: "Erreur lors de la suppression", severity: "error" });
+    }
+  }
 
   // Catalog live search (outside refresh)
   useEffect(() => {
@@ -569,9 +710,34 @@ export default function TicketDetailPage() {
         )}
       </Paper>
 
+      {/* Prestations et Pièces - Nouveau système */}
+      <Paper sx={{ p: 2, mt: 2 }}>
+        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
+          <Typography variant="h6">Prestations et Pièces</Typography>
+          <LineItemSelector
+            onAddLine={handleAddLine}
+            bikeType={undefined}
+            isAutoEntrepreneur={isAutoEntrepreneur}
+          />
+        </Stack>
+
+        {loadingLines ? (
+          <Box sx={{ textAlign: "center", py: 3 }}>
+            <CircularProgress size={24} />
+          </Box>
+        ) : (
+          <LineItemsTable
+            lines={lines}
+            onUpdateLine={handleUpdateLine}
+            onDeleteLine={handleDeleteLine}
+            isAutoEntrepreneur={isAutoEntrepreneur}
+          />
+        )}
+      </Paper>
+
       {/* Pièces liées au ticket */}
       <Paper sx={{ p: 2, mt: 2 }}>
-        <Typography variant="h6" sx={{ mb: 1 }}>Pièces</Typography>
+        <Typography variant="h6" sx={{ mb: 1 }}>Pièces (ancien système)</Typography>
         <Stack spacing={1}>
           {parts.length === 0 && (
             <Typography variant="body2" color="text.secondary">Aucune pièce</Typography>

@@ -1,6 +1,10 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
   "name": "atelier-velo-monorepo",
+  "version": "1.0.0",
+  "description": "Système de gestion d'atelier vélo - Application complète de gestion",
+  "author": "Jérôme Leyssard <jerome.leyssard@upgradedbikes.com>",
+  "license": "UNLICENSED",
   "private": true,
   "workspaces": [
     "apps/web",

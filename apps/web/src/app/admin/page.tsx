@@ -52,6 +52,10 @@ import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import DirectionsBikeIcon from "@mui/icons-material/DirectionsBike";
 import LinkIcon from "@mui/icons-material/Link";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import SecurityIcon from "@mui/icons-material/Security";
+import LockIcon from "@mui/icons-material/Lock";
+import VpnKeyIcon from "@mui/icons-material/VpnKey";
+import ShieldIcon from "@mui/icons-material/Shield";
 
 export default function AdminPage() {
   const [loading, setLoading] = useState(true);
@@ -595,6 +599,162 @@ export default function AdminPage() {
               </Paper>
             </Grid>
           </Grid>
+
+          {/* Sécurité & Protection */}
+          <Paper sx={{ p: 3, mb: 3 }}>
+            <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 3 }}>
+              <SecurityIcon color="error" />
+              <Typography variant="h6">Sécurité & Protection</Typography>
+              <Chip label="Score: 5.5/10" color="warning" size="small" />
+            </Stack>
+
+            <Grid container spacing={2}>
+              {/* Authentification */}
+              <Grid item xs={12} md={6}>
+                <Alert severity="success" icon={<CheckCircleIcon />}>
+                  <Typography variant="subtitle2" gutterBottom>
+                    <strong>✓ Authentification JWT</strong>
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Tokens sécurisés avec expiration automatique
+                  </Typography>
+                </Alert>
+              </Grid>
+
+              {/* Chiffrement */}
+              <Grid item xs={12} md={6}>
+                <Alert severity="success" icon={<LockIcon />}>
+                  <Typography variant="subtitle2" gutterBottom>
+                    <strong>✓ Mots de passe chiffrés</strong>
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    bcrypt avec salt rounds = 10
+                  </Typography>
+                </Alert>
+              </Grid>
+
+              {/* Protection CSRF */}
+              <Grid item xs={12} md={6}>
+                <Alert severity="success" icon={<ShieldIcon />}>
+                  <Typography variant="subtitle2" gutterBottom>
+                    <strong>✓ Protection CSRF</strong>
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Headers sécurisés et validation des requêtes
+                  </Typography>
+                </Alert>
+              </Grid>
+
+              {/* Validation des données */}
+              <Grid item xs={12} md={6}>
+                <Alert severity="success" icon={<CheckCircleIcon />}>
+                  <Typography variant="subtitle2" gutterBottom>
+                    <strong>✓ Validation des données</strong>
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Sanitization et validation côté serveur
+                  </Typography>
+                </Alert>
+              </Grid>
+
+              {/* Base de données locale */}
+              <Grid item xs={12} md={6}>
+                <Alert severity="info" icon={<StorageIcon />}>
+                  <Typography variant="subtitle2" gutterBottom>
+                    <strong>ℹ Base de données locale</strong>
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    SQLite - Données stockées localement
+                  </Typography>
+                </Alert>
+              </Grid>
+
+              {/* Sauvegardes */}
+              <Grid item xs={12} md={6}>
+                <Alert severity="info" icon={<CloudDownloadIcon />}>
+                  <Typography variant="subtitle2" gutterBottom>
+                    <strong>ℹ Sauvegardes manuelles</strong>
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Dernière sauvegarde: {stats.lastBackup}
+                  </Typography>
+                </Alert>
+              </Grid>
+
+              {/* Avertissement PostgreSQL */}
+              <Grid item xs={12}>
+                <Alert severity="warning" icon={<WarningIcon />}>
+                  <Typography variant="subtitle2" gutterBottom>
+                    <strong>⚠ PostgreSQL (si utilisé)</strong>
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Si vous utilisez PostgreSQL en production, assurez-vous de:
+                  </Typography>
+                  <List dense sx={{ mt: 1 }}>
+                    <ListItem sx={{ py: 0 }}>
+                      <ListItemText 
+                        primary="• Définir un mot de passe fort pour l'utilisateur postgres"
+                        primaryTypographyProps={{ variant: 'body2' }}
+                      />
+                    </ListItem>
+                    <ListItem sx={{ py: 0 }}>
+                      <ListItemText 
+                        primary="• Utiliser scram-sha-256 au lieu de 'trust' dans pg_hba.conf"
+                        primaryTypographyProps={{ variant: 'body2' }}
+                      />
+                    </ListItem>
+                    <ListItem sx={{ py: 0 }}>
+                      <ListItemText 
+                        primary="• Ne jamais commiter les fichiers .env dans Git"
+                        primaryTypographyProps={{ variant: 'body2' }}
+                      />
+                    </ListItem>
+                    <ListItem sx={{ py: 0 }}>
+                      <ListItemText 
+                        primary="• Utiliser des variables d'environnement en production"
+                        primaryTypographyProps={{ variant: 'body2' }}
+                      />
+                    </ListItem>
+                  </List>
+                </Alert>
+              </Grid>
+
+              {/* Recommandations */}
+              <Grid item xs={12}>
+                <Alert severity="info" icon={<VpnKeyIcon />}>
+                  <Typography variant="subtitle2" gutterBottom>
+                    <strong>📋 Bonnes pratiques</strong>
+                  </Typography>
+                  <List dense sx={{ mt: 1 }}>
+                    <ListItem sx={{ py: 0 }}>
+                      <ListItemText 
+                        primary="• Effectuez des sauvegardes régulières de votre base de données"
+                        primaryTypographyProps={{ variant: 'body2' }}
+                      />
+                    </ListItem>
+                    <ListItem sx={{ py: 0 }}>
+                      <ListItemText 
+                        primary="• Mettez à jour régulièrement l'application et ses dépendances"
+                        primaryTypographyProps={{ variant: 'body2' }}
+                      />
+                    </ListItem>
+                    <ListItem sx={{ py: 0 }}>
+                      <ListItemText 
+                        primary="• Utilisez des mots de passe forts et uniques pour chaque utilisateur"
+                        primaryTypographyProps={{ variant: 'body2' }}
+                      />
+                    </ListItem>
+                    <ListItem sx={{ py: 0 }}>
+                      <ListItemText 
+                        primary="• Limitez l'accès physique à la machine hébergeant l'application"
+                        primaryTypographyProps={{ variant: 'body2' }}
+                      />
+                    </ListItem>
+                  </List>
+                </Alert>
+              </Grid>
+            </Grid>
+          </Paper>
 
           {/* Actions Rapides */}
           <Paper sx={{ p: 3 }}>

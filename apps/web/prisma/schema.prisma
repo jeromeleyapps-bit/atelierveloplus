@@ -31,12 +31,36 @@ model CustomerBike {
   serialNumber   String?
   color          String?
   notes          String?
+  // Spécifications techniques pour historique
+  wheelSize      String?     // Ex: "700c", "26\"", "27.5\"", "29\""
+  tireSize       String?     // Ex: "700x25c", "26x2.1"
+  frameMaterial  String?     // Ex: "Aluminium", "Carbone", "Acier"
+  frameSize      String?     // Ex: "M", "54cm"
+  brakeType      String?     // Ex: "Disque hydraulique", "V-Brake", "Cantilever"
+  gearSystem     String?     // Ex: "Shimano 105", "SRAM GX"
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
   customer       Customer    @relation(fields: [customerId], references: [id], onDelete: Cascade)
   workOrders     WorkOrder[]
 
   @@unique([customerId, index])
+}
+
+model ServiceRate {
+  id          String   @id @default(cuid())
+  name        String   // Nom de la prestation (ex: "Révision complète")
+  description String?  // Description détaillée
+  priceHT     Float    // Prix HT
+  bikeType    String?  // Type de vélo (ex: "VTT", "Route", "Ville", "Électrique", null = tous)
+  category    String?  // Catégorie (ex: "Entretien", "Réparation", "Diagnostic")
+  duration    Int?     // Durée estimée en minutes
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([active])
+  @@index([bikeType])
+  @@index([category])
 }
 
 model GlobalSetting {
@@ -85,7 +109,6 @@ model CatalogItem {
   stockMovements     StockMovement[]
   supplierItems      SupplierItem[]
   supplierOffers     SupplierOffer[]
-  workOrderParts     WorkOrderPart[]
 }
 
 model Customer {
@@ -144,6 +167,7 @@ model Invoice {
   convertedToId   String?
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
+  workOrder       WorkOrder?       @relation(fields: [workOrderId], references: [id])
   cashPayments    CashRegister[]
   lines           InvoiceLine[]
   payments        InvoicePayment[]
@@ -262,27 +286,33 @@ model WorkOrder {
   communications     Communication[]
   bike               CustomerBike?   @relation(fields: [bikeId], references: [id])
   customer           Customer?       @relation(fields: [customerId], references: [id])
-  parts              WorkOrderPart[]
+  lines              WorkOrderLine[]
+  invoices           Invoice[]
   calendarEvent      CalendarEvent?  @relation(fields: [calendarEventId], references: [id])
 
   @@index([customerId])
   @@index([bikeId])
-  @@index([appointmentDate])
-  @@index([calendarEventId])
+  @@index([status])
 }
 
-model WorkOrderPart {
-  id            String       @id @default(cuid())
+model WorkOrderLine {
+  id            String    @id @default(cuid())
   workOrderId   String
-  catalogItemId String?
+  type          String    // 'service' | 'part' | 'manual'
   description   String
-  qty           Int          @default(1)
-  priceHT       Float        @default(0)
-  note          String?
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
-  catalogItem   CatalogItem? @relation(fields: [catalogItemId], references: [id])
-  workOrder     WorkOrder    @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+  quantity      Int       @default(1)
+  priceHT       Float
+  vatRate       Float     // 0, 10, 20
+  duration      Int?      // minutes (pour prestations)
+  sourceId      String?   // ID de ServiceRate ou CatalogItem
+  notes         String?   // Notes additionnelles
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  workOrder     WorkOrder @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+  
+  @@index([workOrderId])
+  @@index([type])
 }
 
 model User {

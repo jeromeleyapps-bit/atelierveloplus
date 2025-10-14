@@ -63,13 +63,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    // Vérifier si un utilisateur existe déjà (limite 1 utilisateur pour l'app desktop)
-    const userCount = await prisma.user.count();
-    if (userCount > 0) {
-      await jitter(250);
-      return NextResponse.json({ error: "user_limit_reached", message: "Un compte existe déjà. Cette application est limitée à un seul utilisateur." }, { status: 400 });
-    }
-
+    // Vérifier si l'email existe déjà
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) {
       await jitter(250);

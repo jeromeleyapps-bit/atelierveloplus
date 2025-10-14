@@ -82,9 +82,21 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Uint8Array>
   if (data.logoBytes && data.logoBytes.byteLength > 0) {
     try {
       const img = await pdfDoc.embedPng(data.logoBytes).catch(async () => await pdfDoc.embedJpg(data.logoBytes!));
-      const imgWidth = 100;
-      const scale = imgWidth / img.width;
-      const imgHeight = img.height * scale;
+      // Réduire la taille du logo: max 60px de largeur
+      const maxWidth = 60;
+      const maxHeight = 60;
+      let imgWidth = img.width;
+      let imgHeight = img.height;
+      
+      // Calculer le ratio pour respecter les proportions
+      if (imgWidth > maxWidth || imgHeight > maxHeight) {
+        const widthRatio = maxWidth / imgWidth;
+        const heightRatio = maxHeight / imgHeight;
+        const scale = Math.min(widthRatio, heightRatio);
+        imgWidth = imgWidth * scale;
+        imgHeight = imgHeight * scale;
+      }
+      
       page.drawImage(img, { x: 50, y: y - imgHeight + 10, width: imgWidth, height: imgHeight });
       y -= Math.max(25, imgHeight);
     } catch {

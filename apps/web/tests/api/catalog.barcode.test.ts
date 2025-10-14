@@ -77,7 +77,7 @@ describe('Barcode Lookup API', () => {
 
   describe('Data mapping', () => {
     it('should combine brand and name correctly', () => {
-      const productData = {
+      const productData: { name: string; brand?: string } = {
         brand: 'Shimano',
         name: 'Chain 11-speed',
       };
@@ -90,7 +90,7 @@ describe('Barcode Lookup API', () => {
     });
 
     it('should handle missing brand', () => {
-      const productData = {
+      const productData: { name: string; brand?: string } = {
         name: 'Generic Chain',
       };
 

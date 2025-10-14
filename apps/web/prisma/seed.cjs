@@ -6,15 +6,19 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 async function main() {
-  // Admin user (password = "password123")
+  // Admin user (password = "Admin123!@#")
+  // Respecte les critères: min 10 chars, 3 classes (majuscule, minuscule, chiffre, spéciaux)
   const admin = await prisma.user.upsert({
     where: { email: 'admin@test.fr' },
-    update: {},
+    update: {
+      password: '$2a$10$jC35Nv4vwoPbYXkEJUkg7.EvbPv7QF2pexZcU7AWMY2nQ3z60HuNS',
+      active: true,
+    },
     create: {
       email: 'admin@test.fr',
       name: 'Admin',
       password:
-        '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYIq.Brq3EW', // bcrypt of password123
+        '$2a$10$jC35Nv4vwoPbYXkEJUkg7.EvbPv7QF2pexZcU7AWMY2nQ3z60HuNS', // bcrypt of Admin123!@#
       role: 'admin',
       active: true,
     },
@@ -73,7 +77,7 @@ async function main() {
     create: { year, lastNumber: 0 },
   });
 
-  console.log('✅ Seed completed. Admin: admin@test.fr / password123');
+  console.log('✅ Seed completed. Admin: admin@test.fr / Admin123!@#');
 }
 
 main()

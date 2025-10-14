@@ -48,6 +48,7 @@ export default function NavBanner() {
     { href: "/dashboard" as Route, label: "Dashboard" },
     { href: "/customers" as Route, label: "Clients" },
     { href: "/tickets" as Route, label: "Tickets" },
+    { href: "/bikes/history" as Route, label: "Historique Vélos" },
     { href: "/catalog" as Route, label: "Catalogue" },
     { href: "/suppliers" as Route, label: "Fournisseurs" },
     { href: "/admin/booking" as Route, label: "Calendrier" },
@@ -58,7 +59,8 @@ export default function NavBanner() {
   ];
   // Extra links only shown in the dropdown menu
   const linksMenuExtra: { href: Route; label: string }[] = [
-    { href: "/settings" as Route, label: "Paramètres" },
+    { href: "/account" as Route, label: "Mon compte" },
+    { href: "/admin/service-rates" as Route, label: "Tarifs & Prestations" },
     { href: "/admin" as Route, label: "Admin" },
   ];
 

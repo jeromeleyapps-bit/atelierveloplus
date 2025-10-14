@@ -17,6 +17,8 @@ import {
   Typography,
 } from "@mui/material";
 import { createQuote, searchWorkOrders, createWorkOrder, listCustomers, type WorkOrder, type Customer } from "@/lib/api";
+import LineItemSelector, { LineItem } from "@/app/components/LineItemSelector";
+import LineItemsTable from "@/app/components/LineItemsTable";
 
 interface CreateQuoteDialogProps {
   open: boolean;
@@ -38,6 +40,8 @@ export default function CreateQuoteDialog({
   const [error, setError] = useState("");
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
+  const [lines, setLines] = useState<LineItem[]>([]);
+  const [isAutoEntrepreneur, setIsAutoEntrepreneur] = useState(false);
 
   // Charger les tickets et clients au montage
   useEffect(() => {
@@ -47,8 +51,46 @@ export default function CreateQuoteDialog({
       } else {
         loadCustomers();
       }
+      loadUserSettings();
+      setLines([]); // Reset lines
     }
   }, [open, quoteType]);
+
+  const loadUserSettings = async () => {
+    try {
+      const token = localStorage.getItem("jwt_token");
+      const response = await fetch("/api/account/settings", {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      
+      if (!response.ok) {
+        console.error("Settings API error:", response.status);
+        setIsAutoEntrepreneur(false);
+        return;
+      }
+      
+      const data = await response.json();
+      console.log("[Devis] isAutoEntrepreneur:", data.isAutoEntrepreneur);
+      setIsAutoEntrepreneur(data.isAutoEntrepreneur === true);
+    } catch (error) {
+      console.error("Error loading settings:", error);
+      setIsAutoEntrepreneur(false);
+    }
+  };
+
+  const handleAddLine = (line: LineItem) => {
+    setLines([...lines, { ...line, id: `temp-${Date.now()}` }]);
+  };
+
+  const handleUpdateLine = (index: number, updates: Partial<LineItem>) => {
+    const newLines = [...lines];
+    newLines[index] = { ...newLines[index], ...updates };
+    setLines(newLines);
+  };
+
+  const handleDeleteLine = (index: number) => {
+    setLines(lines.filter((_, i) => i !== index));
+  };
 
   const loadWorkOrders = async () => {
     setLoading(true);
@@ -104,6 +146,31 @@ export default function CreateQuoteDialog({
       }
 
       const quote = await createQuote({ workOrderId: finalWorkOrderId, validDays });
+      
+      // Ajouter les lignes si devis direct
+      if (quoteType === "direct" && lines.length > 0) {
+        const token = localStorage.getItem("jwt_token");
+        for (const line of lines) {
+          await fetch(`/api/workorders/${finalWorkOrderId}/lines`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            },
+            body: JSON.stringify({
+              type: line.type,
+              description: line.description,
+              quantity: line.quantity,
+              priceHT: line.priceHT,
+              vatRate: line.vatRate,
+              duration: line.duration,
+              sourceId: line.sourceId,
+              notes: line.notes,
+            }),
+          });
+        }
+      }
+      
       onSuccess(quote.id);
       onClose();
       // Rediriger vers la page du devis (route dédiée)
@@ -202,6 +269,25 @@ export default function CreateQuoteDialog({
                     />
                   )}
                 />
+              )}
+
+              {/* Prestations et Pièces */}
+              {quoteType === "direct" && (
+                <>
+                  <Typography variant="subtitle1" sx={{ mt: 2 }}>
+                    Prestations et Pièces
+                  </Typography>
+                  <LineItemSelector
+                    onAddLine={handleAddLine}
+                    isAutoEntrepreneur={isAutoEntrepreneur}
+                  />
+                  <LineItemsTable
+                    lines={lines}
+                    onUpdateLine={handleUpdateLine}
+                    onDeleteLine={handleDeleteLine}
+                    isAutoEntrepreneur={isAutoEntrepreneur}
+                  />
+                </>
               )}
 
               <TextField

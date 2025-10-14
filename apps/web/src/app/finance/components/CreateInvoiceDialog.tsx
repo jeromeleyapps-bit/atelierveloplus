@@ -19,6 +19,8 @@ import {
   Alert,
 } from "@mui/material";
 import { listCustomers, createCustomer, createWorkOrder, createInvoice, type Customer, type WorkOrder } from "@/lib/api";
+import LineItemSelector, { LineItem } from "@/app/components/LineItemSelector";
+import LineItemsTable from "@/app/components/LineItemsTable";
 
 interface CreateInvoiceDialogProps {
   open: boolean;
@@ -43,6 +45,10 @@ export default function CreateInvoiceDialog({ open, onClose, onSuccess }: Create
   // Dialog nouveau client
   const [newCustomerOpen, setNewCustomerOpen] = useState(false);
   const [newCustomer, setNewCustomer] = useState({ firstName: "", lastName: "", email: "", phone: "" });
+  
+  // Lignes de facturation
+  const [lines, setLines] = useState<LineItem[]>([]);
+  const [isAutoEntrepreneur, setIsAutoEntrepreneur] = useState(false);
 
   async function loadCustomers() {
     setLoadingCustomers(true);
@@ -59,7 +65,10 @@ export default function CreateInvoiceDialog({ open, onClose, onSuccess }: Create
   async function loadWorkOrders(customerId: string) {
     setLoadingWorkOrders(true);
     try {
-      const res = await fetch(`/api/workshop/workorders?customerId=${customerId}`);
+      const token = localStorage.getItem("jwt_token");
+      const res = await fetch(`/api/workshop/workorders?customerId=${customerId}`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
       if (res.ok) {
         const data = await res.json();
         setWorkOrders(data);
@@ -74,8 +83,46 @@ export default function CreateInvoiceDialog({ open, onClose, onSuccess }: Create
   useEffect(() => {
     if (open) {
       loadCustomers();
+      loadUserSettings();
+      setLines([]); // Reset lines
     }
   }, [open]);
+
+  async function loadUserSettings() {
+    try {
+      const token = localStorage.getItem("jwt_token");
+      const response = await fetch("/api/account/settings", {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      
+      if (!response.ok) {
+        console.error("Settings API error:", response.status);
+        setIsAutoEntrepreneur(false);
+        return;
+      }
+      
+      const data = await response.json();
+      console.log("[Facture] isAutoEntrepreneur:", data.isAutoEntrepreneur);
+      setIsAutoEntrepreneur(data.isAutoEntrepreneur === true);
+    } catch (error) {
+      console.error("Error loading settings:", error);
+      setIsAutoEntrepreneur(false);
+    }
+  }
+
+  function handleAddLine(line: LineItem) {
+    setLines([...lines, { ...line, id: `temp-${Date.now()}` }]);
+  }
+
+  function handleUpdateLine(index: number, updates: Partial<LineItem>) {
+    const newLines = [...lines];
+    newLines[index] = { ...newLines[index], ...updates };
+    setLines(newLines);
+  }
+
+  function handleDeleteLine(index: number) {
+    setLines(lines.filter((_, i) => i !== index));
+  }
 
   useEffect(() => {
     if (selectedCustomer && invoiceType === "service") {
@@ -139,6 +186,30 @@ export default function CreateInvoiceDialog({ open, onClose, onSuccess }: Create
         vatRate: pricingMode === "HT_TVA" ? 20 : 0,
         laborRate: 60,
       });
+
+      // Ajouter les lignes si présentes
+      if (lines.length > 0 && workOrderId) {
+        const token = localStorage.getItem("jwt_token");
+        for (const line of lines) {
+          await fetch(`/api/workorders/${workOrderId}/lines`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            },
+            body: JSON.stringify({
+              type: line.type,
+              description: line.description,
+              quantity: line.quantity,
+              priceHT: line.priceHT,
+              vatRate: line.vatRate,
+              duration: line.duration,
+              sourceId: line.sourceId,
+              notes: line.notes,
+            }),
+          });
+        }
+      }
 
       onSuccess(invoice.id);
       handleClose();
@@ -234,9 +305,24 @@ export default function CreateInvoiceDialog({ open, onClose, onSuccess }: Create
               </RadioGroup>
             </FormControl>
 
-            <Typography variant="body2" color="text.secondary">
-              💡 Après création, vous pourrez ajouter les lignes (pièces, main d'œuvre) dans la page de facture.
-            </Typography>
+            {/* Prestations et Pièces */}
+            {invoiceType === "service" && (
+              <>
+                <Typography variant="subtitle1" sx={{ mt: 2 }}>
+                  Prestations et Pièces
+                </Typography>
+                <LineItemSelector
+                  onAddLine={handleAddLine}
+                  isAutoEntrepreneur={isAutoEntrepreneur}
+                />
+                <LineItemsTable
+                  lines={lines}
+                  onUpdateLine={handleUpdateLine}
+                  onDeleteLine={handleDeleteLine}
+                  isAutoEntrepreneur={isAutoEntrepreneur}
+                />
+              </>
+            )}
           </Stack>
         </DialogContent>
         <DialogActions>

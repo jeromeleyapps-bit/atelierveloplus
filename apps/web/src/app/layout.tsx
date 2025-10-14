@@ -1,3 +1,16 @@
+/**
+ * Atelier Vélo+ - Système de Gestion d'Atelier Vélo
+ * 
+ * Copyright © 2024-2025 Jérôme Leyssard - Upgraded Bikes
+ * Tous droits réservés.
+ * 
+ * Ce logiciel est la propriété exclusive de Jérôme Leyssard.
+ * Toute reproduction, distribution ou modification non autorisée est interdite.
+ * 
+ * Contact: jerome.leyssard@upgradedbikes.com
+ * Site: https://upgradedbikes.com
+ */
+
 // apps/web/src/app/layout.tsx (Server Component)
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
@@ -6,9 +19,12 @@ import { AppProviders } from "./providers";
 
 const inter = Inter({ subsets: ["latin"] });
 
+// Force dynamic rendering for all pages (fixes useContext pre-rendering issues)
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
-  title: "Atelier Vélo",
-  description: "Application de gestion pour atelier vélo",
+  title: "Atelier Vélo+ | Upgraded Bikes",
+  description: "Système de gestion d'atelier vélo - Copyright © 2024-2025 Jérôme Leyssard",
   // Note: viewport + themeColor doivent être exportés via `export const viewport`
   // Pour éviter des warnings Next sur chaque route.
   icons: {

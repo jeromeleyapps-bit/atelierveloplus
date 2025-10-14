@@ -55,7 +55,7 @@ export async function POST(req: Request) {
         where: { id: workOrderId },
         include: {
           bike: true,
-          parts: true
+          lines: true // Remplacé parts par lines (nouveau système)
         }
       });
     }
