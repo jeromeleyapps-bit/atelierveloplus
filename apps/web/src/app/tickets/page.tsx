@@ -539,7 +539,18 @@ export default function TicketsPage() {
                 <Button
                   variant="contained"
                   startIcon={<AddIcon />}
-                  onClick={() => setDialogOpen(true)}
+                  onClick={() => {
+                    // Scroller vers le formulaire de création
+                    const form = document.querySelector('form');
+                    if (form) {
+                      form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      // Focus sur le premier champ
+                      setTimeout(() => {
+                        const firstInput = form.querySelector('input');
+                        if (firstInput) firstInput.focus();
+                      }, 500);
+                    }
+                  }}
                   sx={{
                     bgcolor: theme.primary,
                     '&:hover': {
@@ -632,73 +643,8 @@ export default function TicketsPage() {
           </Stack>
         </Paper>
 
-        {/* Widget 2 : Création rapide */}
-        <SectionCard title="Nouveau ticket" icon={<AddIcon color="primary" />}>
-          <form onSubmit={onCreate}>
-            <Stack spacing={2}>
-              {/* Ligne 1: Client + Vélo */}
-              <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems={{ xs: "stretch", sm: "center" }}>
-                <Autocomplete
-                  options={customers}
-                  loading={loadingCustomers}
-                  getOptionLabel={(c) => [c.firstName, c.lastName].filter(Boolean).join(" ") || c.email || "Client"}
-                  onChange={(_, val) => setCustomerId(val?.id || "")}
-                  renderInput={(params) => (
-                    <TextField {...params} label="Client *" size="small" placeholder="Rechercher un client..." />
-                  )}
-                  sx={{ flex: 1, minWidth: 280 }}
-                />
-                <Autocomplete
-                  options={customerBikes}
-                  getOptionLabel={(b) => [b.brand, b.model, b.serialNumber ? `SN:${b.serialNumber}` : ""].filter(Boolean).join(" • ") || "Vélo"}
-                  value={customerBikes.find(b => b.id === bikeId) || null}
-                  onChange={(_, v) => setBikeId(v?.id || "")}
-                  disabled={!customerId}
-                  renderInput={(params) => (
-                    <TextField {...params} label="Vélo (optionnel)" size="small" placeholder={customerId ? "Choisir un vélo" : "Sélectionner d'abord un client"} />
-                  )}
-                  sx={{ flex: 1, minWidth: 240 }}
-                />
-                <Button size="small" variant="outlined" disabled={!customerId} onClick={() => setAddBikeOpen(true)}>+ Vélo</Button>
-              </Stack>
-
-              {/* Ligne 2: Type + Créer */}
-              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} alignItems={{ xs: 'stretch', sm: 'center' }} justifyContent="space-between">
-                <ButtonGroup size="small" variant="outlined">
-                  <Button 
-                    onClick={() => setTicketType('revision' as WorkOrderType)}
-                    variant={ticketType === 'revision' ? 'contained' : 'outlined'}
-                  >
-                    Révision
-                  </Button>
-                  <Button 
-                    onClick={() => setTicketType('repair' as WorkOrderType)}
-                    variant={ticketType === 'repair' ? 'contained' : 'outlined'}
-                  >
-                    Réparation
-                  </Button>
-                  <Button 
-                    onClick={() => setTicketType('maintenance' as WorkOrderType)}
-                    variant={ticketType === 'maintenance' ? 'contained' : 'outlined'}
-                  >
-                    Entretien
-                  </Button>
-                  <Button 
-                    onClick={() => setTicketType('upgrade' as WorkOrderType)}
-                    variant={ticketType === 'upgrade' ? 'contained' : 'outlined'}
-                  >
-                    Upgrade
-                  </Button>
-                </ButtonGroup>
-                <Button type="submit" variant="contained" size="medium" startIcon={<AddIcon />} disabled={creating || !customerId}>
-                  {creating ? "Création..." : "Créer le ticket"}
-                </Button>
-              </Stack>
-            </Stack>
-          </form>
-        </SectionCard>
-
-        <SectionCard title="Liste des tickets" icon={<ListAltIcon color="primary" />} sx={{ overflow: 'hidden' }}>
+        {/* Liste des tickets */}
+        <Paper elevation={0} sx={{ border: 2, borderColor: theme.border, bgcolor: theme.background, overflow: 'hidden' }}>
           <Box sx={{ position: 'sticky', top: 0, zIndex: 4, bgcolor: 'background.paper', borderBottom: '1px solid', borderColor: 'divider' }}>
             <Stack direction="row" alignItems="center" spacing={1} sx={{ px: 2 }}>
               <TablePagination
@@ -1132,7 +1078,7 @@ export default function TicketsPage() {
               <Button size="small" variant="outlined" onClick={goToPage}>Aller</Button>
             </Stack>
           </Box>
-        </SectionCard>
+        </Paper>
 
         <Snackbar
           open={toast.open}
