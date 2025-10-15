@@ -34,10 +34,14 @@ import { AppointmentPicker } from "@/components/AppointmentPicker";
 // API
 import { getWorkOrder, type WorkOrder } from "@/lib/api";
 
+// Theme
+import { usePageTheme } from "@/hooks/usePageTheme";
+
 export default function TicketDetailPageNew() {
   const params = useParams();
   const id = (params?.id as string) || "";
   const router = useRouter();
+  const theme = usePageTheme('ticket');
 
   // États principaux
   const [wo, setWo] = useState<WorkOrder | null>(null);
@@ -48,7 +52,7 @@ export default function TicketDetailPageNew() {
   const [toast, setToast] = useState<{
     open: boolean;
     message: string;
-    severity: "success" | "error";
+    severity: "success" | "error" | "info";
   }>({ open: false, message: "", severity: "success" });
 
   // Chargement du ticket
@@ -234,7 +238,7 @@ export default function TicketDetailPageNew() {
 
   // Nom complet client
   const fullName = wo?.customer
-    ? `${wo.customer.firstName || ""} ${wo.customer.name || ""}`.trim()
+    ? `${wo.customer.firstName || ""} ${wo.customer.lastName || ""}`.trim()
     : "";
 
   if (loading && !wo) {
@@ -247,13 +251,19 @@ export default function TicketDetailPageNew() {
 
   return (
     <>
-      {/* Header moderne */}
-      <Box sx={{ bgcolor: 'background.paper', borderBottom: 1, borderColor: 'divider', px: 3, py: 2 }}>
+      {/* Header moderne avec thème */}
+      <Box sx={{ 
+        bgcolor: theme.background, 
+        borderBottom: 2, 
+        borderColor: theme.border, 
+        px: 3, 
+        py: 2 
+      }}>
         <Container maxWidth="xl">
           <Stack direction="row" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={2}>
             <Box>
-              <Typography variant="h4" fontWeight="bold">
-                Ticket #{id.slice(-8)}
+              <Typography variant="h4" fontWeight="bold" sx={{ color: theme.text }}>
+                🔧 Ticket #{id.slice(-8)}
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 Créé le {wo?.createdAt ? new Date(wo.createdAt).toLocaleDateString("fr-FR") : ""}
@@ -264,7 +274,11 @@ export default function TicketDetailPageNew() {
               {wo?.status && (
                 <Chip
                   label={wo.status}
-                  color={wo.status === 'completed' ? 'success' : wo.status === 'in_progress' ? 'warning' : 'default'}
+                  sx={{
+                    bgcolor: theme.primary,
+                    color: 'white',
+                    fontWeight: 'bold'
+                  }}
                   size="medium"
                 />
               )}
@@ -273,6 +287,14 @@ export default function TicketDetailPageNew() {
                 size="small"
                 startIcon={<RefreshIcon />}
                 onClick={refresh}
+                sx={{
+                  borderColor: theme.primary,
+                  color: theme.text,
+                  '&:hover': {
+                    borderColor: theme.primaryDark,
+                    bgcolor: theme.primaryLight
+                  }
+                }}
               >
                 Actualiser
               </Button>
@@ -281,6 +303,14 @@ export default function TicketDetailPageNew() {
                 size="small"
                 startIcon={<ArrowBackIcon />}
                 onClick={() => router.push('/tickets')}
+                sx={{
+                  borderColor: theme.primary,
+                  color: theme.text,
+                  '&:hover': {
+                    borderColor: theme.primaryDark,
+                    bgcolor: theme.primaryLight
+                  }
+                }}
               >
                 Retour
               </Button>
@@ -311,7 +341,7 @@ export default function TicketDetailPageNew() {
             )}
 
             {/* Prestations et Pièces */}
-            <Card elevation={0} sx={{ mt: 3, border: 1, borderColor: 'divider' }}>
+            <Card elevation={0} sx={{ mt: 3, border: 2, borderColor: theme.border, bgcolor: theme.background }}>
               <CardHeader
                 title="Prestations et Pièces"
                 action={
@@ -361,7 +391,7 @@ export default function TicketDetailPageNew() {
             )}
 
             {/* Actions rapides */}
-            <Card elevation={0} sx={{ mt: 3, border: 1, borderColor: 'divider' }}>
+            <Card elevation={0} sx={{ mt: 3, border: 2, borderColor: theme.border, bgcolor: theme.background }}>
               <CardHeader title="Actions" />
               <CardContent>
                 <Stack spacing={2}>
@@ -370,6 +400,12 @@ export default function TicketDetailPageNew() {
                     fullWidth
                     startIcon={<DescriptionIcon />}
                     onClick={() => window.open(`/api/pos/workorders/${id}/quote-pdf`, '_blank')}
+                    sx={{
+                      bgcolor: theme.primary,
+                      '&:hover': {
+                        bgcolor: theme.primaryDark
+                      }
+                    }}
                   >
                     Générer Devis PDF
                   </Button>
@@ -380,6 +416,14 @@ export default function TicketDetailPageNew() {
                     onClick={() => {
                       // TODO: Implémenter création facture
                       setToast({ open: true, message: "Fonctionnalité à venir", severity: "info" });
+                    }}
+                    sx={{
+                      borderColor: theme.primary,
+                      color: theme.text,
+                      '&:hover': {
+                        borderColor: theme.primaryDark,
+                        bgcolor: theme.primaryLight
+                      }
                     }}
                   >
                     Créer Facture
