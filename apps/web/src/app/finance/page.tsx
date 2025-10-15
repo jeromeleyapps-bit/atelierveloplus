@@ -50,6 +50,8 @@ import Tab from "@mui/material/Tab";
 import Link from "next/link";
 import RequireAuth from "../components/RequireAuth";
 import PageShell from "../components/PageShell";
+import Container from "@mui/material/Container";
+import AddIcon from "@mui/icons-material/Add";
 import { listInvoices, createInvoice, payInvoice, listCustomers, createCustomer, createWorkOrder, sendInvoiceEmail, deleteInvoice, addInvoicePayment, type Invoice, type PricingMode, type Customer } from "@/lib/api";
 import CreateQuoteDialog from "./components/CreateQuoteDialog";
 import CreateInvoiceDialog from "./components/CreateInvoiceDialog";
@@ -268,17 +270,129 @@ function FinanceContent() {
 
   // Removed: createDirectInvoice and customer loading (now in CreateInvoiceDialog)
 
+  // Couleurs thématiques
+  const tabColors = {
+    quotes: { bg: '#EDE7F6', border: '#BA68C8', text: '#6A1B9A' },
+    invoices: { bg: '#E8F5E9', border: '#81C784', text: '#2E7D32' },
+    credits: { bg: '#FFF3E0', border: '#FFB74D', text: '#E65100' },
+  };
+  const currentTheme = tabColors[documentType];
+
   return (
-        <PageShell title="Facturation" maxWidth="lg">
-        <Tabs 
-          value={documentType} 
-          onChange={(_, val) => setDocumentType(val)}
-          sx={{ mb: 2, borderBottom: 1, borderColor: 'divider' }}
+    <RequireAuth>
+      <Box sx={{ bgcolor: 'background.default', minHeight: '100vh' }}>
+        {/* Header Moderne avec Tabs */}
+        <Box
+          sx={{
+            bgcolor: currentTheme.bg,
+            borderBottom: 2,
+            borderColor: currentTheme.border,
+            py: 2,
+          }}
         >
-          <Tab value="quotes" label="Devis" icon={<DescriptionIcon />} iconPosition="start" />
-          <Tab value="invoices" label="Factures" icon={<ReceiptIcon />} iconPosition="start" />
-          <Tab value="credits" label="Avoirs" icon={<CreditCardIcon />} iconPosition="start" />
-        </Tabs>
+          <Container maxWidth="xl">
+            <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2} sx={{ mb: 2 }}>
+              <Stack direction="row" alignItems="center" spacing={2}>
+                <EuroIcon sx={{ fontSize: 40, color: currentTheme.text }} />
+                <Box>
+                  <Typography variant="h4" fontWeight={700} sx={{ color: currentTheme.text }}>
+                    💰 Facturation
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Gestion des devis, factures et avoirs
+                  </Typography>
+                </Box>
+              </Stack>
+              <Stack direction="row" spacing={1}>
+                <Button
+                  variant="outlined"
+                  startIcon={<RefreshIcon />}
+                  onClick={refresh}
+                  disabled={loading}
+                  sx={{
+                    borderColor: currentTheme.border,
+                    color: currentTheme.text,
+                    '&:hover': {
+                      borderColor: currentTheme.text,
+                      bgcolor: currentTheme.bg,
+                    },
+                  }}
+                >
+                  Actualiser
+                </Button>
+                {documentType === 'quotes' && (
+                  <Button
+                    variant="contained"
+                    startIcon={<AddIcon />}
+                    onClick={() => setCreateQuoteDialogOpen(true)}
+                    sx={{
+                      bgcolor: tabColors.quotes.border,
+                      '&:hover': { bgcolor: tabColors.quotes.text },
+                    }}
+                  >
+                    Nouveau Devis
+                  </Button>
+                )}
+                {documentType === 'invoices' && (
+                  <Button
+                    variant="contained"
+                    startIcon={<AddIcon />}
+                    onClick={() => setCreateInvoiceDialogOpen(true)}
+                    sx={{
+                      bgcolor: tabColors.invoices.border,
+                      '&:hover': { bgcolor: tabColors.invoices.text },
+                    }}
+                  >
+                    Nouvelle Facture
+                  </Button>
+                )}
+              </Stack>
+            </Stack>
+            
+            {/* Tabs Colorés */}
+            <Tabs 
+              value={documentType} 
+              onChange={(_, val) => setDocumentType(val)}
+              sx={{ 
+                '& .MuiTab-root': {
+                  fontWeight: 600,
+                  fontSize: '1rem',
+                },
+                '& .Mui-selected': {
+                  color: `${currentTheme.text} !important`,
+                },
+                '& .MuiTabs-indicator': {
+                  backgroundColor: currentTheme.border,
+                  height: 3,
+                },
+              }}
+            >
+              <Tab 
+                value="quotes" 
+                label="Devis" 
+                icon={<DescriptionIcon />} 
+                iconPosition="start"
+                sx={{ color: tabColors.quotes.text }}
+              />
+              <Tab 
+                value="invoices" 
+                label="Factures" 
+                icon={<ReceiptIcon />} 
+                iconPosition="start"
+                sx={{ color: tabColors.invoices.text }}
+              />
+              <Tab 
+                value="credits" 
+                label="Avoirs" 
+                icon={<CreditCardIcon />} 
+                iconPosition="start"
+                sx={{ color: tabColors.credits.text }}
+              />
+            </Tabs>
+          </Container>
+        </Box>
+
+        <Container maxWidth="xl" sx={{ py: 3 }}>
 
         {/* Onglet Devis - Interface simplifiée */}
         {documentType === "quotes" && (
@@ -698,6 +812,8 @@ function FinanceContent() {
             router.push(`/finance/invoices/${invoiceId}` as Route);
           }}
         />
+        </>
+        )}
 
         <CreateQuoteDialog
           open={createQuoteDialogOpen}
@@ -707,9 +823,9 @@ function FinanceContent() {
             refresh();
           }}
         />
-        </>
-        )}
-        </PageShell>
+        </Container>
+      </Box>
+    </RequireAuth>
   );
 }
 
