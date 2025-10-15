@@ -306,9 +306,10 @@ function createWindow() {
       if (res.statusCode && res.statusCode < 500) {
         console.log('[Electron] Server is up, loading UI...');
         mainWindow.loadURL(url);
-        // Start Cloudflare tunnel only after UI/server is reachable
-        if (process.env.START_TUNNEL === '1' && !tunnelStarted) {
-          console.log('[Tunnel] Conditions met (server ready). Starting tunnel...');
+        // Start Cloudflare tunnel automatically after UI/server is reachable
+        // This enables clients to book appointments online via public URL
+        if (!tunnelStarted) {
+          console.log('[Tunnel] Server ready. Starting Cloudflare tunnel for client bookings...');
           tunnelStarted = true;
           setTimeout(() => startCloudfareTunnel(), 200); // small delay to keep UI snappy
         }
@@ -358,12 +359,10 @@ app.whenReady().then(() => {
   console.log('[Electron] App ready');
   startNextServer();
   
-  // Do not start the tunnel here; it will start after the server is reachable in waitForServer().
-  if (process.env.START_TUNNEL !== '1') {
-    console.log('[Tunnel] Skipped (START_TUNNEL not set to 1). To enable, set START_TUNNEL=1 in apps/web/.env and rebuild.');
-  } else {
-    console.log('[Tunnel] Deferred start: will launch after server is ready.');
-  }
+  // Tunnel Cloudflare: Auto-start activé pour RDV clients
+  // Le tunnel permet aux clients de prendre RDV en ligne via URL publique
+  console.log('[Tunnel] Auto-start enabled: Tunnel will launch after server is ready.');
+  console.log('[Tunnel] This allows clients to book appointments online.');
   
   createWindow();
 
