@@ -1,13 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Alert, Button, Chip, Skeleton, Stack, Typography, TextField, Snackbar } from "@mui/material";
+import { Alert, Button, Chip, Skeleton, Stack, Typography, TextField, Snackbar, Box, Container, Card, CardHeader, CardContent, Grid } from "@mui/material";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import RequireAuth from "../../components/RequireAuth";
 import PageShell from "../../components/PageShell";
 import SectionCard from "../../components/SectionCard";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
+import PeopleIcon from "@mui/icons-material/People";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import EditIcon from "@mui/icons-material/Edit";
+import SaveIcon from "@mui/icons-material/Save";
 
 type Customer = {
   id: string;
@@ -32,6 +36,7 @@ type Customer = {
 
 export default function CustomerDetail() {
   const params = useParams<{ id: string }>();
+  const router = useRouter();
   const id = (params as any)?.id as string;
   const [row, setRow] = useState<Customer | null>(null);
   const [loading, setLoading] = useState(true);
@@ -63,9 +68,76 @@ export default function CustomerDetail() {
     : (row?.email?.split('@')[0] || 'client');
   const customerCode = nameSlug && shortId ? `${nameSlug}-id${shortId}` : (row?.id || '');
 
+  // Thème rose pour clients
+  const theme = {
+    bg: '#FCE4EC',
+    border: '#EC407A',
+    text: '#C2185B',
+    primary: '#EC407A',
+    primaryDark: '#D81B60',
+    primaryLight: '#FCE4EC',
+  };
+
   return (
     <RequireAuth>
-      <PageShell title="Client">
+      <Box sx={{ bgcolor: 'background.default', minHeight: '100vh' }}>
+        {/* Header Moderne Rose */}
+        <Box
+          sx={{
+            bgcolor: theme.bg,
+            borderBottom: 2,
+            borderColor: theme.border,
+            py: 3,
+            mb: 3,
+          }}
+        >
+          <Container maxWidth="xl">
+            <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2}>
+              <Stack direction="row" alignItems="center" spacing={2}>
+                <PeopleIcon sx={{ fontSize: 40, color: theme.text }} />
+                <Box>
+                  <Typography variant="h4" fontWeight={700} sx={{ color: theme.text }}>
+                    👤 {fullName || row?.email || 'Client'}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Code: {customerCode}
+                  </Typography>
+                </Box>
+              </Stack>
+              <Stack direction="row" spacing={1}>
+                <Button
+                  variant="outlined"
+                  startIcon={<ArrowBackIcon />}
+                  onClick={() => router.push('/customers')}
+                  sx={{
+                    borderColor: theme.border,
+                    color: theme.text,
+                    '&:hover': {
+                      borderColor: theme.primaryDark,
+                      bgcolor: theme.primaryLight,
+                    },
+                  }}
+                >
+                  Retour
+                </Button>
+                {!edit && (
+                  <Button
+                    variant="contained"
+                    startIcon={<EditIcon />}
+                    onClick={() => setEdit(true)}
+                    sx={{
+                      bgcolor: theme.primary,
+                      '&:hover': { bgcolor: theme.primaryDark },
+                    }}
+                  >
+                    Modifier
+                  </Button>
+                )}
+              </Stack>
+            </Stack>
+          </Container>
+        </Box>
+        <Container maxWidth="xl">
         <SectionCard
           title={fullName || row?.email || row?.id || "Client"}
           icon={<PersonOutlineIcon color="primary" />}
@@ -168,7 +240,8 @@ export default function CustomerDetail() {
         >
           <Alert severity={toast.severity} onClose={() => setToast(t => ({ ...t, open: false }))}>{toast.message}</Alert>
         </Snackbar>
-      </PageShell>
+        </Container>
+      </Box>
     </RequireAuth>
   );
 }
