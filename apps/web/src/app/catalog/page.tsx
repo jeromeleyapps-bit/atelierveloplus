@@ -363,6 +363,21 @@ export default function CatalogPage() {
                   Actualiser
                 </Button>
                 <Button
+                  variant="outlined"
+                  startIcon={<StorefrontIcon />}
+                  onClick={() => setB2bSearchOpen(true)}
+                  sx={{
+                    borderColor: theme.border,
+                    color: theme.text,
+                    '&:hover': {
+                      borderColor: theme.primaryDark,
+                      bgcolor: theme.primaryLight,
+                    },
+                  }}
+                >
+                  Recherche B2B
+                </Button>
+                <Button
                   variant="contained"
                   startIcon={<AddIcon />}
                   onClick={() => { setEditing({}); setEditOpen(true); }}
@@ -378,17 +393,7 @@ export default function CatalogPage() {
           </Container>
         </Box>
         <Container maxWidth="lg">
-        <SectionCard title="Produits en stock" icon={<InventoryIcon color="primary" />}
-          actions={
-            <Stack direction="row" spacing={1}>
-              <Button startIcon={<StorefrontIcon />} variant="outlined" onClick={() => setB2bSearchOpen(true)}>
-                Recherche B2B
-              </Button>
-              <Button startIcon={<AddIcon />} variant="contained" onClick={openCreate}>
-                Ajouter un produit
-              </Button>
-            </Stack>
-          }>
+        <SectionCard title="Produits en stock" icon={<InventoryIcon color="primary" />}>
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ mb: 2, flexWrap: 'wrap', rowGap: 1 }}>
             <TextField size="small" placeholder="Rechercher (nom, SKU)" value={q} onChange={(e) => setQ(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter') refresh(); }}
@@ -826,12 +831,69 @@ export default function CatalogPage() {
           </DialogActions>
         </Dialog>
 
-        {/* B2B Search Dialog */}
-        <B2BSearchDialog
-          open={b2bSearchOpen}
-          onClose={() => setB2bSearchOpen(false)}
-          onAddToCatalog={handleB2BAddToCatalog}
-        />
+        {/* Dialog Liste Fournisseurs */}
+        <Dialog open={b2bSearchOpen} onClose={() => setB2bSearchOpen(false)} maxWidth="sm" fullWidth>
+          <DialogTitle sx={{ bgcolor: theme.primaryLight, color: theme.text }}>
+            🏭 Fournisseurs
+          </DialogTitle>
+          <DialogContent sx={{ mt: 2 }}>
+            <Stack spacing={2}>
+              {suppliers.length === 0 && (
+                <Typography color="text.secondary">Aucun fournisseur enregistré</Typography>
+              )}
+              {suppliers.map((supplier) => (
+                <Paper
+                  key={supplier.id}
+                  elevation={0}
+                  sx={{
+                    p: 2,
+                    border: 1,
+                    borderColor: 'divider',
+                    '&:hover': {
+                      borderColor: theme.border,
+                      bgcolor: theme.primaryLight,
+                    },
+                  }}
+                >
+                  <Stack direction="row" justifyContent="space-between" alignItems="center">
+                    <Box>
+                      <Typography variant="subtitle1" fontWeight={600}>
+                        {supplier.name}
+                      </Typography>
+                      {supplier.website && (
+                        <Typography variant="caption" color="text.secondary">
+                          {supplier.website}
+                        </Typography>
+                      )}
+                    </Box>
+                    {supplier.website && (
+                      <Button
+                        variant="contained"
+                        size="small"
+                        startIcon={<StorefrontIcon />}
+                        onClick={() => {
+                          const url = supplier.website?.startsWith('http') 
+                            ? supplier.website 
+                            : `https://${supplier.website}`;
+                          window.open(url, '_blank');
+                        }}
+                        sx={{
+                          bgcolor: theme.primary,
+                          '&:hover': { bgcolor: theme.primaryDark },
+                        }}
+                      >
+                        Ouvrir le site
+                      </Button>
+                    )}
+                  </Stack>
+                </Paper>
+              ))}
+            </Stack>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setB2bSearchOpen(false)}>Fermer</Button>
+          </DialogActions>
+        </Dialog>
 
         <Snackbar open={toast.open} autoHideDuration={3000} onClose={() => setToast((t) => ({ ...t, open: false }))} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
           <Alert onClose={() => setToast((t) => ({ ...t, open: false }))} severity={toast.severity} sx={{ width: '100%' }}>
