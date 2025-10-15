@@ -1,9 +1,10 @@
 "use client";
 
-import { Typography, Paper, Stack, Box, TextField, Button } from "@mui/material";
+import { Typography, Paper, Stack, Box, TextField, Button, Container } from "@mui/material";
 import RequireAuth from "../components/RequireAuth";
 import PageShell from "../components/PageShell";
 import SectionCard from "../components/SectionCard";
+import BarChartIcon from "@mui/icons-material/BarChart";
 import InsightsIcon from "@mui/icons-material/Insights";
 import QueryStatsIcon from "@mui/icons-material/QueryStats";
 import PaidIcon from "@mui/icons-material/Paid";
@@ -24,6 +25,16 @@ type Summary = {
 };
 
 export default function StatsPage() {
+  // Thème bleu pour statistiques
+  const theme = {
+    bg: '#E3F2FD',
+    border: '#42A5F5',
+    text: '#1565C0',
+    primary: '#42A5F5',
+    primaryDark: '#1E88E5',
+    primaryLight: '#E3F2FD',
+  };
+
   const [fromDate, setFromDate] = useState(() => {
     const d = new Date();
     return new Date(d.getFullYear(), d.getMonth(), 1).toISOString().slice(0,10);
@@ -62,7 +73,15 @@ export default function StatsPage() {
   async function loadCashTotal() {
     try {
       const data = await listCashRegisterEntries();
-      const total = data.reduce((sum: number, entry: any) => sum + entry.amount, 0);
+      // Calculer correctement: entrées (+) - sorties (-)
+      const total = data.reduce((sum: number, entry: any) => {
+        // Si c'est une dépense (type="expense" ou amount négatif), soustraire
+        if (entry.type === 'expense' || entry.amount < 0) {
+          return sum - Math.abs(entry.amount);
+        }
+        // Sinon, c'est une entrée, ajouter
+        return sum + entry.amount;
+      }, 0);
       setCashTotal(total);
     } catch (e) {
       console.error('Failed to load cash total', e);
@@ -93,7 +112,32 @@ export default function StatsPage() {
 
   return (
     <RequireAuth>
-      <PageShell title="Statistiques">
+      <Box sx={{ bgcolor: 'background.default', minHeight: '100vh' }}>
+        {/* Header Moderne Bleu */}
+        <Box
+          sx={{
+            bgcolor: theme.bg,
+            borderBottom: 2,
+            borderColor: theme.border,
+            py: 3,
+            mb: 3,
+          }}
+        >
+          <Container maxWidth="lg">
+            <Stack direction="row" alignItems="center" spacing={2}>
+              <BarChartIcon sx={{ fontSize: 40, color: theme.text }} />
+              <Box>
+                <Typography variant="h4" fontWeight={700} sx={{ color: theme.text }}>
+                  📊 Statistiques
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Analyse des performances
+                </Typography>
+              </Box>
+            </Stack>
+          </Container>
+        </Box>
+        <Container maxWidth="lg">
         {/* Période */}
         <SectionCard title="Période" icon={<InsightsIcon color="primary" />}
           actions={<Button variant="outlined" size="small" onClick={load} disabled={loading}>{loading ? 'Chargement...' : 'Mettre à jour'}</Button>}
@@ -183,7 +227,8 @@ export default function StatsPage() {
             Cette page affichera les statistiques de votre atelier.
           </Typography>
         </SectionCard>
-      </PageShell>
+        </Container>
+      </Box>
     </RequireAuth>
   );
 }
