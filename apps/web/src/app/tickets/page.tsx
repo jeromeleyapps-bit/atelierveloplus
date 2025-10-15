@@ -94,6 +94,7 @@ export default function TicketsPage() {
   const [ticketType, setTicketType] = useState<WorkOrderType | "">("");
   // Add bike dialog state
   const [addBikeOpen, setAddBikeOpen] = useState(false);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [nbBrand, setNbBrand] = useState("");
   const [nbModel, setNbModel] = useState("");
   const [nbSN, setNbSN] = useState("");
@@ -448,8 +449,8 @@ export default function TicketsPage() {
     URL.revokeObjectURL(url);
   }
 
-  async function onCreate(e: React.FormEvent) {
-    e.preventDefault();
+  async function onCreate(e?: React.FormEvent | React.MouseEvent) {
+    if (e) e.preventDefault();
     if (!customerId) {
       setToast({ open: true, message: "customerId requis", severity: "error" });
       return;
@@ -460,6 +461,12 @@ export default function TicketsPage() {
       if (ticketType) {
         try { await setWorkOrderType(created.id, ticketType as WorkOrderType); } catch {}
       }
+      // Fermer le dialog
+      setCreateDialogOpen(false);
+      // Reset form
+      setCustomerId("");
+      setBikeId("");
+      setTicketType("");
       // Redirect to detail page for streamlined workflow
       window.location.href = `/tickets/${created.id}`;
     } catch (e) {
@@ -539,18 +546,7 @@ export default function TicketsPage() {
                 <Button
                   variant="contained"
                   startIcon={<AddIcon />}
-                  onClick={() => {
-                    // Scroller vers le formulaire de création
-                    const form = document.querySelector('form');
-                    if (form) {
-                      form.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                      // Focus sur le premier champ
-                      setTimeout(() => {
-                        const firstInput = form.querySelector('input');
-                        if (firstInput) firstInput.focus();
-                      }, 500);
-                    }
-                  }}
+                  onClick={() => setCreateDialogOpen(true)}
                   sx={{
                     bgcolor: theme.primary,
                     '&:hover': {
@@ -1094,6 +1090,88 @@ export default function TicketsPage() {
             {toast.message}
           </Alert>
         </Snackbar>
+
+        {/* Dialog Création Ticket */}
+        <Dialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} maxWidth="sm" fullWidth>
+          <DialogTitle sx={{ bgcolor: theme.primaryLight, color: theme.text }}>
+            🔧 Nouveau Ticket
+          </DialogTitle>
+          <DialogContent sx={{ mt: 2 }}>
+            <Stack spacing={2}>
+              {/* Client */}
+              <Autocomplete
+                options={customers}
+                loading={loadingCustomers}
+                getOptionLabel={(c) => [c.firstName, c.lastName].filter(Boolean).join(" ") || c.email || "Client"}
+                onChange={(_, val) => setCustomerId(val?.id || "")}
+                renderInput={(params) => (
+                  <TextField {...params} label="Client *" size="small" placeholder="Rechercher un client..." />
+                )}
+              />
+              
+              {/* Vélo */}
+              <Stack direction="row" spacing={1}>
+                <Autocomplete
+                  options={customerBikes}
+                  getOptionLabel={(b) => [b.brand, b.model, b.serialNumber ? `SN:${b.serialNumber}` : ""].filter(Boolean).join(" • ") || "Vélo"}
+                  value={customerBikes.find(b => b.id === bikeId) || null}
+                  onChange={(_, v) => setBikeId(v?.id || "")}
+                  disabled={!customerId}
+                  renderInput={(params) => (
+                    <TextField {...params} label="Vélo (optionnel)" size="small" placeholder={customerId ? "Choisir un vélo" : "Sélectionner d'abord un client"} />
+                  )}
+                  sx={{ flex: 1 }}
+                />
+                <Button size="small" variant="outlined" disabled={!customerId} onClick={() => setAddBikeOpen(true)}>+ Vélo</Button>
+              </Stack>
+
+              {/* Type */}
+              <Box>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>Type d'intervention</Typography>
+                <ButtonGroup size="small" variant="outlined" fullWidth>
+                  <Button 
+                    onClick={() => setTicketType('revision' as WorkOrderType)}
+                    variant={ticketType === 'revision' ? 'contained' : 'outlined'}
+                  >
+                    Révision
+                  </Button>
+                  <Button 
+                    onClick={() => setTicketType('repair' as WorkOrderType)}
+                    variant={ticketType === 'repair' ? 'contained' : 'outlined'}
+                  >
+                    Réparation
+                  </Button>
+                  <Button 
+                    onClick={() => setTicketType('maintenance' as WorkOrderType)}
+                    variant={ticketType === 'maintenance' ? 'contained' : 'outlined'}
+                  >
+                    Entretien
+                  </Button>
+                  <Button 
+                    onClick={() => setTicketType('upgrade' as WorkOrderType)}
+                    variant={ticketType === 'upgrade' ? 'contained' : 'outlined'}
+                  >
+                    Upgrade
+                  </Button>
+                </ButtonGroup>
+              </Box>
+            </Stack>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setCreateDialogOpen(false)}>Annuler</Button>
+            <Button 
+              variant="contained" 
+              onClick={onCreate}
+              disabled={creating || !customerId}
+              sx={{
+                bgcolor: theme.primary,
+                '&:hover': { bgcolor: theme.primaryDark }
+              }}
+            >
+              {creating ? "Création..." : "Créer le ticket"}
+            </Button>
+          </DialogActions>
+        </Dialog>
         </Container>
       </Box>
     </RequireAuth>
