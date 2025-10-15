@@ -21,6 +21,7 @@ import {
 import { listCustomers, createCustomer, createWorkOrder, createInvoice, type Customer, type WorkOrder } from "@/lib/api";
 import LineItemSelector, { LineItem } from "@/app/components/LineItemSelector";
 import LineItemsTable from "@/app/components/LineItemsTable";
+import VatRateSelector from "@/app/components/VatRateSelector";
 import { usePageTheme } from "@/hooks/usePageTheme";
 
 interface CreateInvoiceDialogProps {
@@ -50,7 +51,7 @@ export default function CreateInvoiceDialog({ open, onClose, onSuccess }: Create
   
   // Lignes de facturation
   const [lines, setLines] = useState<LineItem[]>([]);
-  const [isAutoEntrepreneur, setIsAutoEntrepreneur] = useState(false);
+  const [defaultVatRate, setDefaultVatRate] = useState(20);
 
   async function loadCustomers() {
     setLoadingCustomers(true);
@@ -99,16 +100,12 @@ export default function CreateInvoiceDialog({ open, onClose, onSuccess }: Create
       
       if (!response.ok) {
         console.error("Settings API error:", response.status);
-        setIsAutoEntrepreneur(false);
         return;
       }
       
-      const data = await response.json();
-      console.log("[Facture] isAutoEntrepreneur:", data.isAutoEntrepreneur);
-      setIsAutoEntrepreneur(data.isAutoEntrepreneur === true);
+      // Settings chargés mais plus utilisés pour TVA
     } catch (error) {
       console.error("Error loading settings:", error);
-      setIsAutoEntrepreneur(false);
     }
   }
 
@@ -185,7 +182,7 @@ export default function CreateInvoiceDialog({ open, onClose, onSuccess }: Create
         workOrderId,
         pricingMode,
         currency: "EUR",
-        vatRate: pricingMode === "HT_TVA" ? 20 : 0,
+        vatRate: defaultVatRate,
         laborRate: 60,
       });
 
@@ -204,7 +201,7 @@ export default function CreateInvoiceDialog({ open, onClose, onSuccess }: Create
               description: line.description,
               quantity: line.quantity,
               priceHT: line.priceHT,
-              vatRate: isAutoEntrepreneur ? 0 : (line.vatRate || 20),  // Auto-entrepreneur = TVA 0%
+              vatRate: line.vatRate || defaultVatRate,
               duration: line.duration,
               sourceId: line.sourceId,
               notes: line.notes,
@@ -326,15 +323,19 @@ export default function CreateInvoiceDialog({ open, onClose, onSuccess }: Create
                 <Typography variant="subtitle1" sx={{ mt: 2 }}>
                   Prestations et Pièces
                 </Typography>
+                <VatRateSelector
+                  value={defaultVatRate}
+                  onChange={setDefaultVatRate}
+                  label="TVA par défaut"
+                  fullWidth
+                />
                 <LineItemSelector
                   onAddLine={handleAddLine}
-                  isAutoEntrepreneur={isAutoEntrepreneur}
                 />
                 <LineItemsTable
                   lines={lines}
                   onUpdateLine={handleUpdateLine}
                   onDeleteLine={handleDeleteLine}
-                  isAutoEntrepreneur={isAutoEntrepreneur}
                 />
               </>
             )}
