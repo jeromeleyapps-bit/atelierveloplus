@@ -1103,6 +1103,7 @@ export default function TicketsPage() {
                 options={customers}
                 loading={loadingCustomers}
                 getOptionLabel={(c) => [c.firstName, c.lastName].filter(Boolean).join(" ") || c.email || "Client"}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
                 onChange={(_, val) => setCustomerId(val?.id || "")}
                 renderInput={(params) => (
                   <TextField {...params} label="Client *" size="small" placeholder="Rechercher un client..." />
@@ -1114,6 +1115,7 @@ export default function TicketsPage() {
                 <Autocomplete
                   options={customerBikes}
                   getOptionLabel={(b) => [b.brand, b.model, b.serialNumber ? `SN:${b.serialNumber}` : ""].filter(Boolean).join(" • ") || "Vélo"}
+                  isOptionEqualToValue={(option, value) => option.id === value.id}
                   value={customerBikes.find(b => b.id === bikeId) || null}
                   onChange={(_, v) => setBikeId(v?.id || "")}
                   disabled={!customerId}
