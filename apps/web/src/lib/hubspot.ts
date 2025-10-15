@@ -18,7 +18,7 @@ export interface SendEmailOptions {
   replyTo?: string;
   attachments?: Array<{
     filename: string;
-    content: Buffer | string;
+    content: string; // Base64 encoded
     contentType: string;
   }>;
 }
@@ -31,24 +31,70 @@ export interface SendSMSOptions {
 
 /**
  * Send email via HubSpot
+ * Supports attachments (e.g., PDF invoices)
  */
 export async function sendEmail(options: SendEmailOptions) {
   try {
-    // HubSpot Transactional Email API
+    // Si pas d'EMAIL_ID, utiliser l'API simple (sans template)
+    if (!process.env.HUBSPOT_EMAIL_ID) {
+      console.warn('HUBSPOT_EMAIL_ID not set, using simple email API');
+      
+      // API simple sans template
+      const payload: any = {
+        from: options.from || process.env.HUBSPOT_FROM_EMAIL || 'contact@atelier-velo.fr',
+        to: [options.to],
+        subject: options.subject,
+        htmlBody: options.htmlContent,
+      };
+      
+      // Ajouter pièces jointes si présentes
+      if (options.attachments && options.attachments.length > 0) {
+        payload.attachments = options.attachments.map(att => ({
+          name: att.filename,
+          data: att.content, // Base64
+          type: att.contentType,
+        }));
+      }
+      
+      const response = await hubspotClient.apiRequest({
+        method: 'POST',
+        path: '/crm/v3/objects/emails',
+        body: payload
+      });
+      
+      return {
+        success: true,
+        messageId: (response as any).id,
+        data: response
+      };
+    }
+    
+    // Avec template EMAIL_ID
+    const payload: any = {
+      emailId: parseInt(process.env.HUBSPOT_EMAIL_ID),
+      message: {
+        to: options.to,
+        from: options.from || process.env.HUBSPOT_FROM_EMAIL,
+        replyTo: options.replyTo,
+        subject: options.subject,
+        html: options.htmlContent,
+        text: options.textContent
+      }
+    };
+    
+    // Ajouter pièces jointes si présentes
+    if (options.attachments && options.attachments.length > 0) {
+      payload.message.attachments = options.attachments.map(att => ({
+        name: att.filename,
+        data: att.content, // Base64
+        type: att.contentType,
+      }));
+    }
+    
     const response = await hubspotClient.apiRequest({
       method: 'POST',
       path: '/marketing/v3/transactional/single-send/send',
-      body: {
-        emailId: parseInt(process.env.HUBSPOT_EMAIL_ID || '0'),
-        message: {
-          to: options.to,
-          from: options.from || process.env.HUBSPOT_FROM_EMAIL,
-          replyTo: options.replyTo,
-          subject: options.subject,
-          html: options.htmlContent,
-          text: options.textContent
-        }
-      }
+      body: payload
     });
 
     return {

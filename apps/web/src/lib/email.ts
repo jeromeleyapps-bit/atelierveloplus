@@ -1,4 +1,8 @@
-import nodemailer from 'nodemailer';
+/**
+ * Email module - Now uses HubSpot for all email communications
+ * Migrated from Resend/Nodemailer to HubSpot for unified communications
+ */
+import { sendEmail as sendHubSpotEmail } from './hubspot';
 
 interface EmailOptions {
   to: string;
@@ -12,69 +16,31 @@ interface EmailOptions {
 }
 
 /**
- * Send email using Resend (production) or Nodemailer (development)
+ * Send email using HubSpot
+ * All emails now go through HubSpot for centralized tracking and CRM integration
  */
 export async function sendEmail(options: EmailOptions): Promise<void> {
-  const from = process.env.EMAIL_FROM || 'noreply@atelier-velo.fr';
+  const from = process.env.HUBSPOT_FROM_EMAIL || process.env.EMAIL_FROM || 'contact@atelier-velo.fr';
   
-  // Production: Use Resend
-  if (process.env.RESEND_API_KEY) {
-    const resendUrl = 'https://api.resend.com/emails';
-    
-    const payload: any = {
-      from,
-      to: options.to,
-      subject: options.subject,
-      html: options.html,
-    };
-    
-    // Resend attachments format
-    if (options.attachments && options.attachments.length > 0) {
-      payload.attachments = options.attachments.map(att => ({
-        filename: att.filename,
-        content: Buffer.from(att.content).toString('base64'),
-      }));
-    }
-    
-    const response = await fetch(resendUrl, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    });
-    
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`Resend API error: ${error}`);
-    }
-    
-    return;
-  }
+  // Convert attachments to HubSpot format
+  const hubspotAttachments = options.attachments?.map(att => ({
+    filename: att.filename,
+    content: Buffer.from(att.content).toString('base64'),
+    contentType: att.contentType || 'application/octet-stream',
+  }));
   
-  // Development: Use Nodemailer with SMTP
-  const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST || 'localhost',
-    port: parseInt(process.env.SMTP_PORT || '1025', 10),
-    secure: process.env.SMTP_SECURE === 'true',
-    auth: process.env.SMTP_USER ? {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    } : undefined,
-  });
-  
-  await transporter.sendMail({
-    from,
+  // Send via HubSpot
+  const result = await sendHubSpotEmail({
     to: options.to,
     subject: options.subject,
-    html: options.html,
-    attachments: options.attachments?.map(att => ({
-      filename: att.filename,
-      content: Buffer.from(att.content),
-      contentType: att.contentType,
-    })),
+    htmlContent: options.html,
+    from,
+    attachments: hubspotAttachments,
   });
+  
+  if (!result.success) {
+    throw new Error(result.error || 'Failed to send email via HubSpot');
+  }
 }
 
 /**
