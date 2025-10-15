@@ -303,50 +303,6 @@ function FinanceContent() {
                   </Typography>
                 </Box>
               </Stack>
-              <Stack direction="row" spacing={1}>
-                <Button
-                  variant="outlined"
-                  startIcon={<RefreshIcon />}
-                  onClick={refresh}
-                  disabled={loading}
-                  sx={{
-                    borderColor: currentTheme.border,
-                    color: currentTheme.text,
-                    '&:hover': {
-                      borderColor: currentTheme.text,
-                      bgcolor: currentTheme.bg,
-                    },
-                  }}
-                >
-                  Actualiser
-                </Button>
-                {documentType === 'quotes' && (
-                  <Button
-                    variant="contained"
-                    startIcon={<AddIcon />}
-                    onClick={() => setCreateQuoteDialogOpen(true)}
-                    sx={{
-                      bgcolor: tabColors.quotes.border,
-                      '&:hover': { bgcolor: tabColors.quotes.text },
-                    }}
-                  >
-                    Nouveau Devis
-                  </Button>
-                )}
-                {documentType === 'invoices' && (
-                  <Button
-                    variant="contained"
-                    startIcon={<AddIcon />}
-                    onClick={() => setCreateInvoiceDialogOpen(true)}
-                    sx={{
-                      bgcolor: tabColors.invoices.border,
-                      '&:hover': { bgcolor: tabColors.invoices.text },
-                    }}
-                  >
-                    Nouvelle Facture
-                  </Button>
-                )}
-              </Stack>
             </Stack>
             
             {/* Tabs Colorés */}
