@@ -1,5 +1,21 @@
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 
+/**
+ * Formate un numéro de document de manière lisible
+ * Exemples:
+ * - cmgrwozdl001wec7g6d0ir879 → DEV-001WEC
+ * - cmgrw6x1r000gec7gd319km6z → FAC-000GEC
+ */
+function formatDocumentNumber(fullId: string, type: string): string {
+  // Préfixe selon le type
+  const prefix = type === 'quote' ? 'DEV' : type === 'credit' ? 'AVO' : 'FAC';
+  
+  // Extraire une partie significative de l'ID (8 caractères du milieu)
+  const shortId = fullId.length > 12 ? fullId.substring(8, 16).toUpperCase() : fullId.substring(0, 8).toUpperCase();
+  
+  return `${prefix}-${shortId}`;
+}
+
 interface InvoiceData {
   number: string;
   issueDate: string;
@@ -78,7 +94,7 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Uint8Array>
   let y = height - 50;
   
   // === HEADER - INFORMATIONS ATELIER ===
-  // Logo ou nom
+  // Logo
   if (data.logoBytes && data.logoBytes.byteLength > 0) {
     try {
       const img = await pdfDoc.embedPng(data.logoBytes).catch(async () => await pdfDoc.embedJpg(data.logoBytes!));
@@ -100,13 +116,15 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Uint8Array>
       page.drawImage(img, { x: 50, y: y - imgHeight + 10, width: imgWidth, height: imgHeight });
       y -= Math.max(25, imgHeight);
     } catch {
+      // Si erreur logo, afficher le nom
       page.drawText(data.shopName.toUpperCase(), { x: 50, y, size: 18, font: fontBold, color: primaryColor });
       y -= 25;
     }
-  } else {
-    page.drawText(data.shopName.toUpperCase(), { x: 50, y, size: 18, font: fontBold, color: primaryColor });
-    y -= 25;
   }
+  
+  // Nom de l'atelier (toujours affiché, sous le logo si présent)
+  page.drawText(data.shopName.toUpperCase(), { x: 50, y, size: 14, font: fontBold, color: primaryColor });
+  y -= 25;
   
   // Adresse
   page.drawText(`${data.shopAddress}`, { x: 50, y, size: 9, font, color: textColor });
@@ -175,7 +193,8 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Uint8Array>
   });
   
   y -= 50;
-  page.drawText(`N° ${data.number}`, {
+  const formattedNumber = formatDocumentNumber(data.number, data.type || 'invoice');
+  page.drawText(`N° ${formattedNumber}`, {
     x: width - 170,
     y,
     size: 11,
@@ -194,7 +213,8 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Uint8Array>
     page.drawText(`Valide jusqu'au : ${validDate}`, { x: width - 170, y, size: 9, font: fontBold, color: rgb(0.8, 0.4, 0) });
   } else if (data.type === 'credit' && data.parentId) {
     y -= 15;
-    page.drawText(`Avoir sur facture : ${data.parentId}`, { x: width - 170, y, size: 9, font: fontBold, color: rgb(0.8, 0.2, 0.2) });
+    const parentNumber = formatDocumentNumber(data.parentId, 'invoice');
+    page.drawText(`Avoir sur facture : ${parentNumber}`, { x: width - 170, y, size: 9, font: fontBold, color: rgb(0.8, 0.2, 0.2) });
   } else if (data.dueDate) {
     y -= 15;
     const dueDate = new Date(data.dueDate).toLocaleDateString('fr-FR');
