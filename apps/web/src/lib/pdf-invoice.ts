@@ -115,6 +115,7 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Uint8Array>
       
       page.drawImage(img, { x: 50, y: y - imgHeight + 10, width: imgWidth, height: imgHeight });
       y -= Math.max(25, imgHeight);
+      y -= 10; // Espace supplémentaire entre logo et nom
     } catch {
       // Si erreur logo, afficher le nom
       page.drawText(data.shopName.toUpperCase(), { x: 50, y, size: 18, font: fontBold, color: primaryColor });
