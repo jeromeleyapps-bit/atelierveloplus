@@ -160,7 +160,7 @@ export default function PublicBookingPage() {
               </Typography>
               {isSaturday && (
                 <Alert severity="info" sx={{ mb: 1, py: 0 }}>
-                  Horaires spéciaux : 10h-17h
+                  RDV à confirmer au 0768184875
                 </Alert>
               )}
               <Stack spacing={1}>
