@@ -74,8 +74,8 @@ export async function POST(req: Request) {
           create: workOrderLines.map(line => ({
             type: line.type,
             description: line.description,
-            qty: line.qty || 1,
-            unitPriceHT: line.unitPriceHT || 0,
+            qty: line.quantity || 1,           // WorkOrderLine.quantity → InvoiceLine.qty
+            unitPriceHT: line.priceHT || 0,    // WorkOrderLine.priceHT → InvoiceLine.unitPriceHT
             vatRate: line.vatRate || (isAE ? 0 : 20),
           })),
         },
