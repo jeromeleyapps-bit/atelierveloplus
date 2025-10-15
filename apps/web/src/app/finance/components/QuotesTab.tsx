@@ -125,6 +125,7 @@ export default function QuotesTab({ quotes, onRefresh }: QuotesTabProps) {
               onClick={async () => {
                 if (!confirm(`Supprimer définitivement ${selected.length} devis ? Cette action est irréversible.`)) return;
                 let successCount = 0;
+                const token = window.localStorage.getItem("jwt_token");
                 const userId = window.localStorage.getItem("auth:userId");
                 for (const id of selected) {
                   try {
@@ -133,6 +134,7 @@ export default function QuotesTab({ quotes, onRefresh }: QuotesTabProps) {
                       headers: {
                         'Content-Type': 'application/json',
                         'x-user-id': userId || '',
+                        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
                       }
                     });
                     if (res.ok) successCount++;

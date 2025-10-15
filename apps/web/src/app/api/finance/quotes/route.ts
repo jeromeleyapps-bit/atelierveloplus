@@ -49,6 +49,11 @@ export async function POST(req: Request) {
     });
     const isAE = aeSetting?.value === "true";
 
+    // Get work order lines to copy
+    const workOrderLines = await prisma.workOrderLine.findMany({
+      where: { workOrderId },
+    });
+
     // Create the quote
     const quote = await prisma.invoice.create({
       data: {
@@ -64,6 +69,18 @@ export async function POST(req: Request) {
         subtotalHT: 0,
         vatAmount: 0,
         totalTTC: 0,
+        // Copy lines from work order
+        lines: {
+          create: workOrderLines.map(line => ({
+            type: line.type,
+            description: line.description,
+            qty: line.qty || 1,
+            unitPriceHT: line.unitPriceHT || 0,
+            vatRate: line.vatRate || (isAE ? 0 : 20),
+            sourceId: line.sourceId,
+            notes: line.notes,
+          })),
+        },
       },
       include: { lines: true },
     });
