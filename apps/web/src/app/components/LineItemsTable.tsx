@@ -41,14 +41,12 @@ interface LineItemsTableProps {
   lines: LineItem[];
   onUpdateLine: (index: number, updates: Partial<LineItem>) => void;
   onDeleteLine: (index: number) => void;
-  isAutoEntrepreneur?: boolean;
 }
 
 export default function LineItemsTable({
   lines,
   onUpdateLine,
   onDeleteLine,
-  isAutoEntrepreneur = false,
 }: LineItemsTableProps) {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
 
@@ -267,9 +265,9 @@ export default function LineItemsTable({
             </Typography>
           </Stack>
 
-          {isAutoEntrepreneur && totals.totalTVA === 0 && (
+          {totals.totalTVA === 0 && (
             <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
-              TVA non applicable, art. 293 B du CGI
+              TVA non applicable (taux 0%)
             </Typography>
           )}
         </Stack>
