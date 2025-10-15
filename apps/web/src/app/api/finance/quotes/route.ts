@@ -44,16 +44,13 @@ export async function POST(req: Request) {
     const validUntil = new Date();
     validUntil.setDate(validUntil.getDate() + validDays);
 
-    // Check if user is auto-entrepreneur
-    const aeSetting = await prisma.globalSetting.findUnique({
-      where: { key: "autoEntrepreneur" },
-    });
-    const isAE = aeSetting?.value === "true";
-
     // Get work order lines to copy
     const workOrderLines = await prisma.workOrderLine.findMany({
       where: { workOrderId },
     });
+
+    // Default VAT rate from body or 20%
+    const defaultVatRate = body.vatRate != null ? Number(body.vatRate) : 20;
 
     // Create the quote
     const quote = await prisma.invoice.create({
@@ -62,10 +59,10 @@ export async function POST(req: Request) {
         type: "quote",
         status: "draft",
         validUntil,
-        // Default values - TVA 0% si auto-entrepreneur
-        pricingMode: isAE ? "AE_TTC" : "HT_TVA",
+        // Default values
+        pricingMode: "HT_TVA",
         currency: "EUR",
-        vatRate: isAE ? 0 : 20,
+        vatRate: defaultVatRate,
         laborRate: 60,
         subtotalHT: 0,
         vatAmount: 0,
@@ -75,22 +72,14 @@ export async function POST(req: Request) {
           create: workOrderLines.map(line => ({
             type: line.type,
             description: line.description,
-            qty: line.quantity || 1,           // WorkOrderLine.quantity → InvoiceLine.qty
-            unitPriceHT: line.priceHT || 0,    // WorkOrderLine.priceHT → InvoiceLine.unitPriceHT
-            vatRate: isAE ? 0 : (line.vatRate || 20),  // Auto-entrepreneur = TVA 0%
+            qty: line.quantity || 1,
+            unitPriceHT: line.priceHT || 0,
+            vatRate: line.vatRate != null ? line.vatRate : defaultVatRate,
           })),
         },
       },
       include: { lines: true },
     });
-
-    // Si AE, forcer toutes les lignes à TVA 0% (au cas où)
-    if (isAE && workOrderLines.length > 0) {
-      await prisma.invoiceLine.updateMany({
-        where: { invoiceId: quote.id },
-        data: { vatRate: 0 }
-      });
-    }
 
     // Recalculer les totaux si des lignes ont été copiées
     if (workOrderLines.length > 0) {
@@ -105,7 +94,7 @@ export async function POST(req: Request) {
           qty: l.qty,
           unitPriceHT: l.unitPriceHT,
           unitPriceTTC: l.unitPriceTTC,
-          vatRate: isAE ? 0 : l.vatRate  // Forcer 0 si AE
+          vatRate: l.vatRate
         }))
       });
       

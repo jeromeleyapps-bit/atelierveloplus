@@ -14,7 +14,6 @@ export type InvoiceWithLines = {
 };
 
 export function recomputeTotals(inv: InvoiceWithLines) {
-  const isAE = inv.pricingMode === 'AE_TTC';
   const invVat = Number(inv.vatRate || 0);
   let subtotalHT = 0;
   let vatAmount = 0;
@@ -22,20 +21,13 @@ export function recomputeTotals(inv: InvoiceWithLines) {
 
   for (const l of inv.lines) {
     const qty = Number(l.qty || 0);
-    // En mode AE, forcer TVA à 0
-    const lineVat = isAE ? 0 : (l.vatRate != null ? Number(l.vatRate) : invVat);
-    if (isAE) {
-      const unitTTC = Number(l.unitPriceTTC || 0);
-      const lineTTC = unitTTC * qty;
-      // En mode AE, pas de TVA donc HT = TTC
-      subtotalHT += lineTTC;
-      totalTTC += lineTTC;
-    } else {
-      const unitHT = Number(l.unitPriceHT || 0);
-      const lineHT = unitHT * qty;
-      subtotalHT += lineHT;
-      totalTTC += lineHT * (1 + (lineVat > 0 ? lineVat / 100 : 0));
-    }
+    const lineVat = l.vatRate != null ? Number(l.vatRate) : invVat;
+    
+    // Calcul standard HT + TVA
+    const unitHT = Number(l.unitPriceHT || 0);
+    const lineHT = unitHT * qty;
+    subtotalHT += lineHT;
+    totalTTC += lineHT * (1 + (lineVat > 0 ? lineVat / 100 : 0));
   }
 
   // Apply discountAmount to totalTTC directly (simple approach)
