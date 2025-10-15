@@ -605,7 +605,7 @@ export default function InvoiceDetailPage() {
                 {inv.type !== "credit" && (
                   <Button size="small" variant="text" onClick={() => setShowMargin(v => !v)} sx={{ textTransform: 'none' }}>{showMargin ? 'Masquer marge' : 'Afficher marge'}</Button>
                 )}
-                <Chip size="small" icon={documentIcon} label={documentType} color={documentColor} variant="outlined" sx={{ textTransform: 'none', fontWeight: 600 }} />
+                <Chip size="small" label={`${documentIcon} ${documentType}`} sx={{ textTransform: 'none', fontWeight: 600, bgcolor: theme.primary, color: 'white', borderColor: theme.primaryDark }} />
                 <Chip size="small" label={inv.status === 'draft' ? 'brouillon' : inv.status === 'issued' ? 'émis' : inv.status} color={inv.status === 'paid' ? 'success' : inv.status === 'issued' ? 'info' : inv.status === 'cancelled' ? 'default' : 'warning'} sx={{ textTransform: 'none' }} />
                 {inv.issueDate && (
                   <Typography variant="body2" sx={{ ml: 1 }}>
