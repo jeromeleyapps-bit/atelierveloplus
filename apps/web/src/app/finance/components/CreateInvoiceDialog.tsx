@@ -308,15 +308,6 @@ export default function CreateInvoiceDialog({ open, onClose, onSuccess }: Create
               />
             )}
 
-            {/* Mode de facturation */}
-            <FormControl component="fieldset">
-              <FormLabel component="legend">Mode de facturation</FormLabel>
-              <RadioGroup value={pricingMode} onChange={(e) => setPricingMode(e.target.value as any)}>
-                <FormControlLabel value="HT_TVA" control={<Radio />} label="HT + TVA (20%)" />
-                <FormControlLabel value="AE_TTC" control={<Radio />} label="TTC (Auto-entrepreneur)" />
-              </RadioGroup>
-            </FormControl>
-
             {/* Prestations et Pièces - Toujours afficher */}
             <Typography variant="subtitle1" sx={{ mt: 2 }}>
               {invoiceType === "service" ? "Prestations et Pièces" : "Articles"}
