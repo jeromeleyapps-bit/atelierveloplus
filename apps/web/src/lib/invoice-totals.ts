@@ -22,12 +22,13 @@ export function recomputeTotals(inv: InvoiceWithLines) {
 
   for (const l of inv.lines) {
     const qty = Number(l.qty || 0);
-    const lineVat = l.vatRate != null ? Number(l.vatRate) : invVat;
+    // En mode AE, forcer TVA à 0
+    const lineVat = isAE ? 0 : (l.vatRate != null ? Number(l.vatRate) : invVat);
     if (isAE) {
       const unitTTC = Number(l.unitPriceTTC || 0);
       const lineTTC = unitTTC * qty;
-      const baseHT = lineVat > 0 ? lineTTC / (1 + lineVat / 100) : lineTTC;
-      subtotalHT += baseHT;
+      // En mode AE, pas de TVA donc HT = TTC
+      subtotalHT += lineTTC;
       totalTTC += lineTTC;
     } else {
       const unitHT = Number(l.unitPriceHT || 0);
