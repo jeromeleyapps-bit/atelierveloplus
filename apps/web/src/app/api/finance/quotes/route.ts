@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getPrisma } from "@/lib/db";
+import { recomputeTotals } from "@/lib/invoice-totals";
 
 export const dynamic = "force-dynamic";
 
@@ -82,6 +83,37 @@ export async function POST(req: Request) {
       },
       include: { lines: true },
     });
+
+    // Recalculer les totaux si des lignes ont été copiées
+    if (workOrderLines.length > 0) {
+      const totals = recomputeTotals({
+        id: quote.id,
+        pricingMode: quote.pricingMode,
+        vatRate: quote.vatRate,
+        discountAmount: quote.discountAmount || 0,
+        lines: quote.lines.map(l => ({
+          id: l.id,
+          type: l.type,
+          qty: l.qty,
+          unitPriceHT: l.unitPriceHT,
+          unitPriceTTC: l.unitPriceTTC,
+          vatRate: l.vatRate
+        }))
+      });
+      
+      await prisma.invoice.update({
+        where: { id: quote.id },
+        data: totals
+      });
+      
+      // Recharger le devis avec les totaux mis à jour
+      const updatedQuote = await prisma.invoice.findUnique({
+        where: { id: quote.id },
+        include: { lines: true },
+      });
+      
+      return NextResponse.json(updatedQuote, { status: 201 });
+    }
 
     return NextResponse.json(quote, { status: 201 });
   } catch (error: any) {

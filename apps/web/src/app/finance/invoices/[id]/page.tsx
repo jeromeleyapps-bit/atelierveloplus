@@ -277,7 +277,7 @@ export default function InvoiceDetailPageNew() {
                     variant="contained"
                     fullWidth
                     startIcon={<PictureAsPdfIcon />}
-                    onClick={() => window.open(`/api/invoices/${id}/pdf`, '_blank')}
+                    onClick={() => window.open(`/api/finance/invoices/${id}/pdf`, '_blank')}
                     sx={{
                       bgcolor: theme.primary,
                       '&:hover': {
