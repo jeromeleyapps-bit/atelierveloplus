@@ -59,12 +59,17 @@ import {
   convertQuoteToInvoice,
 } from "@/lib/api";
 import { searchCatalog, type CatalogItem as CatalogItemExt } from "@/lib/catalog";
+import { usePageTheme } from "@/hooks/usePageTheme";
+import { type PageTheme } from "@/lib/theme-colors";
 
 export const dynamic = 'force-dynamic';
 
 export default function InvoiceDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
+  
+  // Détection automatique du thème depuis l'URL
+  const defaultTheme = usePageTheme();
   const [inv, setInv] = useState<(Invoice & { lines: InvoiceLine[] }) | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -517,15 +522,19 @@ export default function InvoiceDetailPage() {
 
   // Déterminer le type de document pour l'affichage
   const documentType = inv?.type === "quote" ? "Devis" : inv?.type === "credit" ? "Avoir" : "Facture";
-  const documentIcon = inv?.type === "quote" ? <DescriptionIcon /> : inv?.type === "credit" ? <CreditCardIcon /> : <ReceiptIcon />;
-  const documentColor = inv?.type === "quote" ? "info" : inv?.type === "credit" ? "error" : "primary";
+  const documentIcon = inv?.type === "quote" ? "📋" : inv?.type === "credit" ? "🔄" : "💰";
   const backUrl = inv?.type === "quote" ? "/finance?tab=quotes" : inv?.type === "credit" ? "/finance?tab=credits" : "/finance?tab=invoices";
   const backLabel = inv?.type === "quote" ? "Retour aux devis" : inv?.type === "credit" ? "Retour aux avoirs" : "Retour aux factures";
+  
+  // Thème de couleur selon le type de document
+  const themeType: PageTheme = inv?.type === "quote" ? "quote" : inv?.type === "credit" ? "credit" : "invoice";
+  const theme = usePageTheme(themeType);
 
   return (
     <RequireAuth>
       <div data-test="invoice-root" style={{ background: '#fff' }}>
-        <PageShell title={inv ? `${documentType} ${inv.number || "(brouillon)"}` : "Chargement..."} maxWidth="lg">
+        <Box sx={{ bgcolor: theme.background, minHeight: '100vh' }}>
+        <PageShell title={inv ? `${documentIcon} ${documentType} ${inv.number || "(brouillon)"}` : "Chargement..."} maxWidth="lg">
         {!inv && <Typography sx={{ p: 3 }}>Chargement...</Typography>}
         {inv && (
           <Stack spacing={2}>
@@ -533,14 +542,23 @@ export default function InvoiceDetailPage() {
             <Button
               startIcon={<ArrowBackIcon />}
               onClick={() => router.push(backUrl)}
-              variant="text"
-              sx={{ alignSelf: 'flex-start', textTransform: 'none' }}
+              variant="outlined"
+              sx={{ 
+                alignSelf: 'flex-start', 
+                textTransform: 'none',
+                borderColor: theme.primary,
+                color: theme.text,
+                '&:hover': {
+                  borderColor: theme.primaryDark,
+                  bgcolor: theme.primaryLight
+                }
+              }}
             >
               {backLabel}
             </Button>
             {/* Nom du client */}
             {(inv as any).workOrder?.customer && (
-              <Alert severity="info" icon={false} sx={{ mb: 2, bgcolor: 'primary.light' }}>
+              <Alert severity="info" icon={false} sx={{ mb: 2, bgcolor: theme.primaryLight, borderColor: theme.border, border: 2 }}>
                 <Typography variant="h6" fontWeight={600}>
                   Client : {(inv as any).workOrder.customer.firstName} {(inv as any).workOrder.customer.lastName}
                   {(inv as any).workOrder.customer.email && ` • ${(inv as any).workOrder.customer.email}`}
@@ -620,7 +638,7 @@ export default function InvoiceDetailPage() {
                     </Button>
                     {isDraft && (
                       <>
-                        <Button size="small" variant="contained" onClick={onIssue} sx={{ textTransform: 'none' }}>Émettre</Button>
+                        <Button size="small" variant="contained" onClick={onIssue} sx={{ textTransform: 'none', bgcolor: theme.primary, '&:hover': { bgcolor: theme.primaryDark } }}>Émettre</Button>
                         <Button size="small" variant="contained" color="primary" onClick={saveAllChanges} disabled={saving || (!hasLinePatches && !discountChanged)} sx={{ textTransform: 'none' }}>
                           {saving ? "Enregistrement..." : "Enregistrer"}
                         </Button>
@@ -667,7 +685,7 @@ export default function InvoiceDetailPage() {
                     </Button>
                     {isDraft && (
                       <>
-                        <Button size="small" variant="contained" onClick={onIssue} sx={{ textTransform: 'none' }}>Émettre</Button>
+                        <Button size="small" variant="contained" onClick={onIssue} sx={{ textTransform: 'none', bgcolor: theme.primary, '&:hover': { bgcolor: theme.primaryDark } }}>Émettre</Button>
                         <Button size="small" variant="contained" color="primary" onClick={saveAllChanges} disabled={saving || (!hasLinePatches && !discountChanged)} sx={{ textTransform: 'none' }}>
                           {saving ? "Enregistrement..." : "Enregistrer"}
                         </Button>
@@ -701,7 +719,7 @@ export default function InvoiceDetailPage() {
                     </Button>
                     {isDraft && (
                       <>
-                        <Button size="small" variant="contained" onClick={onIssue} sx={{ textTransform: 'none' }}>Émettre</Button>
+                        <Button size="small" variant="contained" onClick={onIssue} sx={{ textTransform: 'none', bgcolor: theme.primary, '&:hover': { bgcolor: theme.primaryDark } }}>Émettre</Button>
                         <Button size="small" variant="contained" color="primary" onClick={saveAllChanges} disabled={saving || (!hasLinePatches && !discountChanged)} sx={{ textTransform: 'none' }}>
                           {saving ? "Enregistrement..." : "Enregistrer"}
                         </Button>
@@ -1010,6 +1028,7 @@ export default function InvoiceDetailPage() {
           />
         )}
         </PageShell>
+        </Box>
       </div>
     </RequireAuth>
   );
