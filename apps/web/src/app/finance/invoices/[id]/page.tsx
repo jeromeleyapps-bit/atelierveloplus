@@ -48,6 +48,7 @@ import { type PageTheme } from "@/lib/theme-colors";
 import { getInvoice, convertQuoteToInvoice, type Invoice, type InvoiceLine } from "@/lib/api";
 import { Dialog, DialogTitle, DialogContent, DialogActions, Select, MenuItem, FormControl, InputLabel } from "@mui/material";
 import VatRateSelector from "@/app/components/VatRateSelector";
+import LineItemSelector from "@/app/components/LineItemSelector";
 
 export const dynamic = 'force-dynamic';
 
@@ -414,53 +415,14 @@ export default function InvoiceDetailPageNew() {
         </Grid>
       </Container>
 
-      {/* Dialog Ajout Ligne */}
-      <Dialog open={addLineDialogOpen} onClose={() => setAddLineDialogOpen(false)} maxWidth="sm" fullWidth>
+      {/* Dialog Ajout Ligne avec LineItemSelector */}
+      <Dialog open={addLineDialogOpen} onClose={() => setAddLineDialogOpen(false)} maxWidth="md" fullWidth>
         <DialogTitle sx={{ bgcolor: theme.primaryLight, color: theme.text }}>
           Ajouter une ligne
         </DialogTitle>
         <DialogContent sx={{ mt: 2 }}>
-          <Stack spacing={2}>
-            <TextField
-              label="Description"
-              value={newLine.description}
-              onChange={(e) => setNewLine({ ...newLine, description: e.target.value })}
-              fullWidth
-              required
-            />
-            <TextField
-              label="Quantité"
-              type="number"
-              value={newLine.qty}
-              onChange={(e) => setNewLine({ ...newLine, qty: Number(e.target.value) })}
-              inputProps={{ min: 0.01, step: 0.01 }}
-              fullWidth
-            />
-            <TextField
-              label="Prix HT unitaire"
-              type="number"
-              value={newLine.unitPriceHT}
-              onChange={(e) => setNewLine({ ...newLine, unitPriceHT: Number(e.target.value) })}
-              inputProps={{ min: 0, step: 0.01 }}
-              fullWidth
-            />
-            <VatRateSelector
-              value={newLine.vatRate}
-              onChange={(value) => setNewLine({ ...newLine, vatRate: value })}
-              label="TVA"
-              fullWidth
-            />
-          </Stack>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setAddLineDialogOpen(false)}>Annuler</Button>
-          <Button
-            variant="contained"
-            onClick={async () => {
-              if (!newLine.description) {
-                setToast({ open: true, message: "Description requise", severity: "error" });
-                return;
-              }
+          <LineItemSelector
+            onAddLine={async (line) => {
               try {
                 const token = localStorage.getItem("jwt_token");
                 await fetch(`/api/finance/invoices/${id}/lines`, {
@@ -470,28 +432,26 @@ export default function InvoiceDetailPageNew() {
                     ...(token ? { Authorization: `Bearer ${token}` } : {}),
                   },
                   body: JSON.stringify({
-                    type: "custom",
-                    description: newLine.description,
-                    qty: newLine.qty,
-                    unitPriceHT: newLine.unitPriceHT,
-                    vatRate: newLine.vatRate,
+                    type: line.type,
+                    description: line.description,
+                    qty: line.qty,
+                    unitPriceHT: line.unitPriceHT,
+                    vatRate: line.vatRate,
+                    sourceId: line.sourceId,
+                    duration: line.duration,
                   }),
                 });
                 setAddLineDialogOpen(false);
-                setNewLine({ description: "", qty: 1, unitPriceHT: 0, vatRate: 20 });
                 loadInvoice();
                 setToast({ open: true, message: "Ligne ajoutée", severity: "success" });
               } catch (error) {
                 setToast({ open: true, message: "Erreur lors de l'ajout", severity: "error" });
               }
             }}
-            sx={{
-              bgcolor: theme.primary,
-              '&:hover': { bgcolor: theme.primaryDark }
-            }}
-          >
-            Ajouter
-          </Button>
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setAddLineDialogOpen(false)}>Fermer</Button>
         </DialogActions>
       </Dialog>
 
