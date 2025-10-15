@@ -393,80 +393,177 @@ export default function DashboardPage() {
           },
           alignItems: 'stretch',
         }}>
-          <Card sx={{ height: 160, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-            <CardContent sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+          <Card 
+            elevation={0}
+            sx={{ 
+              height: 180, 
+              display: 'flex', 
+              flexDirection: 'column', 
+              border: 3,
+              borderColor: '#FF9800',
+              bgcolor: '#FFF3E0',
+              transition: 'transform 0.2s',
+              '&:hover': { transform: 'translateY(-4px)' }
+            }}
+          >
+            <CardContent sx={{ display: 'flex', flexDirection: 'column', height: '100%', gap: 1 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Box sx={{ width: 28, height: 28, borderRadius: '50%', bgcolor: 'warning.light', color: 'warning.contrastText', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <BuildIcon fontSize="small" />
+                <Box sx={{ width: 40, height: 40, borderRadius: '50%', bgcolor: '#FF9800', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <BuildIcon />
                 </Box>
-                <Typography color="textSecondary" gutterBottom>Réparations en attente</Typography>
+                <Typography variant="subtitle2" fontWeight={600} color="#E65100">Réparations en attente</Typography>
               </Box>
-              <Typography variant="h4" component="div">{stats.pendingRepairs}</Typography>
+              <Typography variant="h3" component="div" fontWeight={700} color="#E65100">{stats.pendingRepairs}</Typography>
               <Box sx={{ mt: 'auto' }}>
-                <Button size="small" onClick={() => (window.location.href = "/tickets?status=En cours,En attente")}>Voir les tickets</Button>
+                <Button 
+                  size="small" 
+                  variant="contained"
+                  onClick={() => (window.location.href = "/tickets?status=En cours,En attente")}
+                  sx={{ bgcolor: '#FF9800', '&:hover': { bgcolor: '#F57C00' } }}
+                >
+                  Voir les tickets
+                </Button>
               </Box>
             </CardContent>
           </Card>
 
-          <Card sx={{ height: 160, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-            <CardContent sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+          <Card 
+            elevation={0}
+            sx={{ 
+              height: 180, 
+              display: 'flex', 
+              flexDirection: 'column', 
+              border: 3,
+              borderColor: '#66BB6A',
+              bgcolor: '#E8F5E9',
+              transition: 'transform 0.2s',
+              '&:hover': { transform: 'translateY(-4px)' }
+            }}
+          >
+            <CardContent sx={{ display: 'flex', flexDirection: 'column', height: '100%', gap: 1 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Box sx={{ width: 28, height: 28, borderRadius: '50%', bgcolor: 'success.light', color: 'success.contrastText', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <DoneAllIcon fontSize="small" />
+                <Box sx={{ width: 40, height: 40, borderRadius: '50%', bgcolor: '#66BB6A', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <DoneAllIcon />
                 </Box>
-                <Typography color="textSecondary" gutterBottom>Terminés ce mois</Typography>
+                <Typography variant="subtitle2" fontWeight={600} color="#2E7D32">Terminés ce mois</Typography>
               </Box>
-              <Typography variant="h4" component="div">{stats.completedThisMonth}</Typography>
+              <Typography variant="h3" component="div" fontWeight={700} color="#2E7D32">{stats.completedThisMonth}</Typography>
               <Box sx={{ mt: 'auto' }}>
-                <Button size="small" onClick={() => (window.location.href = "/tickets?status=Terminé")}>Voir l&apos;historique</Button>
+                <Button 
+                  size="small" 
+                  variant="contained"
+                  onClick={() => (window.location.href = "/tickets?status=Terminé")}
+                  sx={{ bgcolor: '#66BB6A', '&:hover': { bgcolor: '#4CAF50' } }}
+                >
+                  Voir l'historique
+                </Button>
               </Box>
             </CardContent>
           </Card>
 
-          <Card sx={{ height: 160, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-            <CardContent sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+          <Card 
+            elevation={0}
+            sx={{ 
+              height: 180, 
+              display: 'flex', 
+              flexDirection: 'column', 
+              border: 3,
+              borderColor: '#42A5F5',
+              bgcolor: '#E3F2FD',
+              transition: 'transform 0.2s',
+              '&:hover': { transform: 'translateY(-4px)' }
+            }}
+          >
+            <CardContent sx={{ display: 'flex', flexDirection: 'column', height: '100%', gap: 1 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Box sx={{ width: 28, height: 28, borderRadius: '50%', bgcolor: 'primary.light', color: 'primary.contrastText', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <EuroIcon fontSize="small" />
+                <Box sx={{ width: 40, height: 40, borderRadius: '50%', bgcolor: '#42A5F5', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <EuroIcon />
                 </Box>
-                <Typography color="textSecondary" gutterBottom>Chiffre d&apos;affaires du mois</Typography>
+                <Typography variant="subtitle2" fontWeight={600} color="#1565C0">CA du mois</Typography>
               </Box>
-              <Typography variant="h4" component="div"><span suppressHydrationWarning>{(paidRevenueMonth ?? stats.monthlyRevenue).toLocaleString('fr-FR',{style:'currency',currency:'EUR'})}</span></Typography>
+              <Typography variant="h3" component="div" fontWeight={700} color="#1565C0">
+                <span suppressHydrationWarning>{(paidRevenueMonth ?? stats.monthlyRevenue).toLocaleString('fr-FR',{style:'currency',currency:'EUR',minimumFractionDigits:0})}</span>
+              </Typography>
               {paidRevenueMonth != null && (
-                <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5 }}>Basé sur factures payées</Typography>
+                <Typography variant="caption" color="#1565C0" sx={{ mt: 0.5 }}>Factures payées</Typography>
               )}
               <Box sx={{ mt: 'auto' }}>
-                <Button size="small" onClick={() => (window.location.href = "/finance")}>Voir factures</Button>
+                <Button 
+                  size="small" 
+                  variant="contained"
+                  onClick={() => (window.location.href = "/finance")}
+                  sx={{ bgcolor: '#42A5F5', '&:hover': { bgcolor: '#1E88E5' } }}
+                >
+                  Voir factures
+                </Button>
               </Box>
             </CardContent>
           </Card>
 
-          <Card sx={{ height: 160, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-            <CardContent sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+          <Card 
+            elevation={0}
+            sx={{ 
+              height: 180, 
+              display: 'flex', 
+              flexDirection: 'column', 
+              border: 3,
+              borderColor: '#AB47BC',
+              bgcolor: '#F3E5F5',
+              transition: 'transform 0.2s',
+              '&:hover': { transform: 'translateY(-4px)' }
+            }}
+          >
+            <CardContent sx={{ display: 'flex', flexDirection: 'column', height: '100%', gap: 1 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Box sx={{ width: 28, height: 28, borderRadius: '50%', bgcolor: 'info.light', color: 'info.contrastText', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <ReceiptLongIcon fontSize="small" />
+                <Box sx={{ width: 40, height: 40, borderRadius: '50%', bgcolor: '#AB47BC', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <ReceiptLongIcon />
                 </Box>
-                <Typography color="textSecondary" gutterBottom>Factures émises (à payer)</Typography>
+                <Typography variant="subtitle2" fontWeight={600} color="#6A1B9A">Factures à payer</Typography>
               </Box>
-              <Typography variant="h4" component="div">{invoiceIssuedCount ?? '—'}</Typography>
+              <Typography variant="h3" component="div" fontWeight={700} color="#6A1B9A">{invoiceIssuedCount ?? '—'}</Typography>
               <Box sx={{ mt: 'auto' }}>
-                <Button size="small" onClick={() => (window.location.href = "/finance?status=issued")}>Voir les factures à payer</Button>
+                <Button 
+                  size="small" 
+                  variant="contained"
+                  onClick={() => (window.location.href = "/finance?status=issued")}
+                  sx={{ bgcolor: '#AB47BC', '&:hover': { bgcolor: '#8E24AA' } }}
+                >
+                  Voir factures
+                </Button>
               </Box>
             </CardContent>
           </Card>
 
-          <Card sx={{ height: 160, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-            <CardContent sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+          <Card 
+            elevation={0}
+            sx={{ 
+              height: 180, 
+              display: 'flex', 
+              flexDirection: 'column', 
+              border: 3,
+              borderColor: '#EC407A',
+              bgcolor: '#FCE4EC',
+              transition: 'transform 0.2s',
+              '&:hover': { transform: 'translateY(-4px)' }
+            }}
+          >
+            <CardContent sx={{ display: 'flex', flexDirection: 'column', height: '100%', gap: 1 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Box sx={{ width: 28, height: 28, borderRadius: '50%', bgcolor: 'secondary.light', color: 'secondary.contrastText', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <PeopleAltIcon fontSize="small" />
+                <Box sx={{ width: 40, height: 40, borderRadius: '50%', bgcolor: '#EC407A', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <PeopleAltIcon />
                 </Box>
-                <Typography color="textSecondary" gutterBottom>Clients actifs</Typography>
+                <Typography variant="subtitle2" fontWeight={600} color="#C2185B">Clients actifs</Typography>
               </Box>
-              <Typography variant="h4" component="div">{stats.activeCustomers}</Typography>
+              <Typography variant="h3" component="div" fontWeight={700} color="#C2185B">{stats.activeCustomers}</Typography>
               <Box sx={{ mt: 'auto' }}>
-                <Button size="small" onClick={() => (window.location.href = "/customers")}>Voir les clients</Button>
+                <Button 
+                  size="small" 
+                  variant="contained"
+                  onClick={() => (window.location.href = "/customers")}
+                  sx={{ bgcolor: '#EC407A', '&:hover': { bgcolor: '#D81B60' } }}
+                >
+                  Voir clients
+                </Button>
               </Box>
             </CardContent>
           </Card>
@@ -475,10 +572,28 @@ export default function DashboardPage() {
         <Grid container spacing={3}>
           {/* Alerte stock bas */}
           <Grid item xs={12} md={6}>
-            <Paper sx={{ p: 2, height: "100%" }}>
+            <Paper 
+              elevation={0}
+              sx={{ 
+                p: 3, 
+                height: "100%",
+                border: 3,
+                borderColor: '#FF5722',
+                bgcolor: '#FBE9E7'
+              }}
+            >
               <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-                <Typography variant="h6" component="h2">Alerte stock bas</Typography>
-                <Button size="small" onClick={() => (window.location.href = "/catalog")}>Voir le catalogue</Button>
+                <Typography variant="h6" component="h2" fontWeight={700} color="#BF360C">
+                  ⚠️ Alerte stock bas
+                </Typography>
+                <Button 
+                  size="small" 
+                  variant="contained"
+                  onClick={() => (window.location.href = "/catalog")}
+                  sx={{ bgcolor: '#FF5722', '&:hover': { bgcolor: '#E64A19' } }}
+                >
+                  Catalogue
+                </Button>
               </Box>
               <List sx={{ width: "100%", bgcolor: "background.paper" }}>
                 {lowStock.length === 0 ? (
@@ -501,19 +616,30 @@ export default function DashboardPage() {
             </Paper>
           </Grid>
           <Grid item xs={12} md={6}>
-            <Paper sx={{ p: 2, height: "100%" }}>
+            <Paper 
+              elevation={0}
+              sx={{ 
+                p: 3, 
+                height: "100%",
+                border: 3,
+                borderColor: '#26C6DA',
+                bgcolor: '#E0F7FA'
+              }}
+            >
               <Box
                 display="flex"
                 justifyContent="space-between"
                 alignItems="center"
                 mb={2}
               >
-                <Typography variant="h6" component="h2">
-                  Prochains rendez-vous
+                <Typography variant="h6" component="h2" fontWeight={700} color="#00838F">
+                  📅 Prochains rendez-vous
                 </Typography>
                 <Button
                   size="small"
+                  variant="contained"
                   onClick={() => (window.location.href = "/calendar")}
+                  sx={{ bgcolor: '#26C6DA', '&:hover': { bgcolor: '#00ACC1' } }}
                 >
                   Voir tout
                 </Button>
