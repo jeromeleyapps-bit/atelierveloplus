@@ -245,8 +245,10 @@ export async function POST(req: NextRequest) {
         htmlContent: shopHTML,
       });
     }
-  } catch (e) {
-    console.error("booking_email_error", e);
+  } catch (e: any) {
+    console.error("❌ ERREUR ENVOI EMAIL RDV:", e);
+    console.error("Message:", e.message);
+    console.error("Details:", e.response?.data || e.stack);
   }
 
   return NextResponse.json(created, { status: 201 });
