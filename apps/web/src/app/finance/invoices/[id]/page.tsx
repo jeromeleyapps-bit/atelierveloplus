@@ -269,7 +269,7 @@ export default function InvoiceDetailPageNew() {
                         <TableCell>{line.description}</TableCell>
                         <TableCell align="right">{line.qty}</TableCell>
                         <TableCell align="right">{(line.unitPriceHT || 0).toFixed(2)} €</TableCell>
-                        <TableCell align="right">{line.vatRate || inv?.vatRate || 0}%</TableCell>
+                        <TableCell align="right">{inv?.pricingMode === 'AE_TTC' ? 0 : (line.vatRate || inv?.vatRate || 0)}%</TableCell>
                         <TableCell align="right">{((line.unitPriceHT || 0) * (line.qty || 0)).toFixed(2)} €</TableCell>
                       </TableRow>
                     ))}
