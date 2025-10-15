@@ -251,7 +251,32 @@ export default function DashboardPage() {
   if (isLoading) {
     return (
       <RequireAuth>
-        <PageShell title="Tableau de bord" maxWidth="lg">
+        <Box sx={{ bgcolor: 'background.default', minHeight: '100vh' }}>
+          {/* Header Moderne Gradient */}
+          <Box
+            sx={{
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              borderBottom: 2,
+              borderColor: '#667eea',
+              py: 3,
+              mb: 3,
+            }}
+          >
+            <Container maxWidth="lg">
+              <Stack direction="row" alignItems="center" spacing={2}>
+                <DashboardIcon sx={{ fontSize: 40, color: 'white' }} />
+                <Box>
+                  <Typography variant="h4" fontWeight={700} color="white">
+                    📊 Tableau de Bord
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.9)' }}>
+                    Vue d'ensemble de votre activité
+                  </Typography>
+                </Box>
+              </Stack>
+            </Container>
+          </Box>
+          <Container maxWidth="lg">
           <Grid container spacing={3} sx={{ mb: 4 }}>
             {[0, 1, 2, 3].map((i) => (
               <Grid item xs={12} sm={6} md={3} key={i}>
@@ -348,7 +373,8 @@ export default function DashboardPage() {
               </Paper>
             </Grid>
           </Grid>
-        </PageShell>
+          </Container>
+        </Box>
       </RequireAuth>
     );
   }
