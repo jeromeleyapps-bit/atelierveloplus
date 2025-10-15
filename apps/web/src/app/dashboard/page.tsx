@@ -17,6 +17,9 @@ import {
 } from "@mui/material";
 import RequireAuth from "../components/RequireAuth";
 import PageShell from "../components/PageShell";
+import Container from "@mui/material/Container";
+import Stack from "@mui/material/Stack";
+import DashboardIcon from "@mui/icons-material/Dashboard";
 import { useCachedData } from "@/hooks/useCachedData";
 import { listInvoices, listCustomers, searchWorkOrders, type WorkOrder, getLowStock, type LowStockItem } from "@/lib/api";
 import BuildIcon from "@mui/icons-material/Build";
@@ -350,7 +353,32 @@ export default function DashboardPage() {
 
   return (
     <RequireAuth>
-      <PageShell title="Tableau de bord" maxWidth="lg">
+      <Box sx={{ bgcolor: 'background.default', minHeight: '100vh' }}>
+        {/* Header Moderne Gradient */}
+        <Box
+          sx={{
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            borderBottom: 2,
+            borderColor: '#667eea',
+            py: 3,
+            mb: 3,
+          }}
+        >
+          <Container maxWidth="lg">
+            <Stack direction="row" alignItems="center" spacing={2}>
+              <DashboardIcon sx={{ fontSize: 40, color: 'white' }} />
+              <Box>
+                <Typography variant="h4" fontWeight={700} color="white">
+                  📊 Tableau de Bord
+                </Typography>
+                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.9)' }}>
+                  Vue d'ensemble de votre activité
+                </Typography>
+              </Box>
+            </Stack>
+          </Container>
+        </Box>
+        <Container maxWidth="lg">
         {/* Cartes de statistiques (responsive: 1/2/3/4/5 colonnes selon taille écran) */}
         <Box sx={{
           mb: 4,
@@ -592,7 +620,8 @@ export default function DashboardPage() {
             </Paper>
           </Grid>
         </Grid>
-      </PageShell>
+        </Container>
+      </Box>
     </RequireAuth>
   );
 }
