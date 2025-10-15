@@ -77,8 +77,6 @@ export async function POST(req: Request) {
             qty: line.qty || 1,
             unitPriceHT: line.unitPriceHT || 0,
             vatRate: line.vatRate || (isAE ? 0 : 20),
-            sourceId: line.sourceId,
-            notes: line.notes,
           })),
         },
       },
