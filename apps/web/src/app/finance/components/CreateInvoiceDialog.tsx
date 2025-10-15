@@ -21,6 +21,7 @@ import {
 import { listCustomers, createCustomer, createWorkOrder, createInvoice, type Customer, type WorkOrder } from "@/lib/api";
 import LineItemSelector, { LineItem } from "@/app/components/LineItemSelector";
 import LineItemsTable from "@/app/components/LineItemsTable";
+import { usePageTheme } from "@/hooks/usePageTheme";
 
 interface CreateInvoiceDialogProps {
   open: boolean;
@@ -29,6 +30,7 @@ interface CreateInvoiceDialogProps {
 }
 
 export default function CreateInvoiceDialog({ open, onClose, onSuccess }: CreateInvoiceDialogProps) {
+  const theme = usePageTheme('invoice'); // Vert pour factures
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [loadingCustomers, setLoadingCustomers] = useState(false);
@@ -231,8 +233,21 @@ export default function CreateInvoiceDialog({ open, onClose, onSuccess }: Create
 
   return (
     <>
-      <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-        <DialogTitle>Créer une nouvelle facture</DialogTitle>
+      <Dialog 
+        open={open} 
+        onClose={handleClose} 
+        maxWidth="sm" 
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderTop: 4,
+            borderColor: theme.primary,
+          }
+        }}
+      >
+        <DialogTitle sx={{ bgcolor: theme.primaryLight, color: theme.text }}>
+          💰 Créer une nouvelle facture
+        </DialogTitle>
         <DialogContent>
           <Stack spacing={3} sx={{ mt: 1 }}>
             {error && <Alert severity="error">{error}</Alert>}
@@ -331,6 +346,12 @@ export default function CreateInvoiceDialog({ open, onClose, onSuccess }: Create
             variant="contained"
             onClick={handleSubmit}
             disabled={!selectedCustomer || submitting}
+            sx={{
+              bgcolor: theme.primary,
+              '&:hover': {
+                bgcolor: theme.primaryDark
+              }
+            }}
           >
             {submitting ? "Création..." : "Créer et éditer →"}
           </Button>

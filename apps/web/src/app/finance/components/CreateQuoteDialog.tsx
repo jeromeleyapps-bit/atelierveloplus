@@ -19,6 +19,7 @@ import {
 import { createQuote, searchWorkOrders, createWorkOrder, listCustomers, type WorkOrder, type Customer } from "@/lib/api";
 import LineItemSelector, { LineItem } from "@/app/components/LineItemSelector";
 import LineItemsTable from "@/app/components/LineItemsTable";
+import { usePageTheme } from "@/hooks/usePageTheme";
 
 interface CreateQuoteDialogProps {
   open: boolean;
@@ -31,6 +32,7 @@ export default function CreateQuoteDialog({
   onClose,
   onSuccess,
 }: CreateQuoteDialogProps) {
+  const theme = usePageTheme('quote'); // Violet pour devis
   const [quoteType, setQuoteType] = useState<"ticket" | "direct">("ticket");
   const [workOrderId, setWorkOrderId] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
@@ -194,8 +196,21 @@ export default function CreateQuoteDialog({
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Créer un devis</DialogTitle>
+    <Dialog 
+      open={open} 
+      onClose={handleClose} 
+      maxWidth="sm" 
+      fullWidth
+      PaperProps={{
+        sx: {
+          borderTop: 4,
+          borderColor: theme.primary,
+        }
+      }}
+    >
+      <DialogTitle sx={{ bgcolor: theme.primaryLight, color: theme.text }}>
+        📋 Créer un devis
+      </DialogTitle>
       <DialogContent>
         <Stack spacing={2} sx={{ mt: 1 }}>
           {error && <Alert severity="error">{error}</Alert>}
@@ -316,6 +331,12 @@ export default function CreateQuoteDialog({
             (quoteType === "ticket" && !workOrderId) ||
             (quoteType === "direct" && !selectedCustomer)
           }
+          sx={{
+            bgcolor: theme.primary,
+            '&:hover': {
+              bgcolor: theme.primaryDark
+            }
+          }}
         >
           {creating ? "Création..." : "Créer le devis"}
         </Button>
