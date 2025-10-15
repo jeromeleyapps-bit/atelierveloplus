@@ -9,6 +9,9 @@ import PublicIcon from "@mui/icons-material/Public";
 import RequireAuth from "../components/RequireAuth";
 import PageShell from "../components/PageShell";
 import SectionCard from "../components/SectionCard";
+import Container from "@mui/material/Container";
+import BusinessIcon from "@mui/icons-material/Business";
+import RefreshIcon from "@mui/icons-material/Refresh";
 import { createSupplier, getSupplierCredentials, listSuppliers, saveSupplierCredentials, deleteSupplier, type Supplier } from "@/lib/api";
 
 export default function SuppliersPage() {
@@ -159,9 +162,75 @@ export default function SuppliersPage() {
     }
   }
 
+  // Thème violet pour fournisseurs
+  const theme = {
+    bg: '#F3E5F5',
+    border: '#9C27B0',
+    text: '#6A1B9A',
+    primary: '#9C27B0',
+    primaryDark: '#7B1FA2',
+    primaryLight: '#F3E5F5',
+  };
+
   return (
     <RequireAuth>
-      <PageShell title="Fournisseurs" maxWidth="md">
+      <Box sx={{ bgcolor: 'background.default', minHeight: '100vh' }}>
+        {/* Header Moderne Violet */}
+        <Box
+          sx={{
+            bgcolor: theme.bg,
+            borderBottom: 2,
+            borderColor: theme.border,
+            py: 3,
+            mb: 3,
+          }}
+        >
+          <Container maxWidth="md">
+            <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2}>
+              <Stack direction="row" alignItems="center" spacing={2}>
+                <BusinessIcon sx={{ fontSize: 40, color: theme.text }} />
+                <Box>
+                  <Typography variant="h4" fontWeight={700} sx={{ color: theme.text }}>
+                    🏭 Fournisseurs
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Gestion des partenaires et connexions
+                  </Typography>
+                </Box>
+              </Stack>
+              <Stack direction="row" spacing={1}>
+                <Button
+                  variant="outlined"
+                  startIcon={<RefreshIcon />}
+                  onClick={refresh}
+                  disabled={loading}
+                  sx={{
+                    borderColor: theme.border,
+                    color: theme.text,
+                    '&:hover': {
+                      borderColor: theme.primaryDark,
+                      bgcolor: theme.primaryLight,
+                    },
+                  }}
+                >
+                  Actualiser
+                </Button>
+                <Button
+                  variant="contained"
+                  startIcon={<AddIcon />}
+                  onClick={openCreate}
+                  sx={{
+                    bgcolor: theme.primary,
+                    '&:hover': { bgcolor: theme.primaryDark },
+                  }}
+                >
+                  Nouveau
+                </Button>
+              </Stack>
+            </Stack>
+          </Container>
+        </Box>
+        <Container maxWidth="md">
         <SectionCard title="Annuaire fournisseurs" actions={<Button startIcon={<AddIcon />} variant="contained" onClick={openCreate}>Nouveau fournisseur</Button>}>
           <TableContainer component={Paper} variant="outlined">
             <Table size="small">
@@ -244,7 +313,8 @@ export default function SuppliersPage() {
             {toast.message}
           </Alert>
         </Snackbar>
-      </PageShell>
+        </Container>
+      </Box>
     </RequireAuth>
   );
 }
