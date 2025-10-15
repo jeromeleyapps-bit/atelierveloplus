@@ -187,10 +187,11 @@ export default function CreateInvoiceDialog({ open, onClose, onSuccess }: Create
       });
 
       // Ajouter les lignes si présentes
-      if (lines.length > 0 && workOrderId) {
+      if (lines.length > 0) {
         const token = localStorage.getItem("jwt_token");
         for (const line of lines) {
-          await fetch(`/api/workorders/${workOrderId}/lines`, {
+          // Ajouter directement à la facture (pas au workOrder)
+          await fetch(`/api/finance/invoices/${invoice.id}/lines`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -199,12 +200,11 @@ export default function CreateInvoiceDialog({ open, onClose, onSuccess }: Create
             body: JSON.stringify({
               type: line.type,
               description: line.description,
-              quantity: line.quantity,
-              priceHT: line.priceHT,
+              qty: line.quantity,
+              unitPriceHT: line.priceHT,
               vatRate: line.vatRate || defaultVatRate,
               duration: line.duration,
               sourceId: line.sourceId,
-              notes: line.notes,
             }),
           });
         }
