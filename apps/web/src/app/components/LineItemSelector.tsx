@@ -43,13 +43,11 @@ export interface LineItem {
 interface LineItemSelectorProps {
   onAddLine: (line: LineItem) => void;
   bikeType?: string;
-  isAutoEntrepreneur?: boolean;
 }
 
 export default function LineItemSelector({
   onAddLine,
   bikeType,
-  isAutoEntrepreneur = false,
 }: LineItemSelectorProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [dialogType, setDialogType] = useState<"service" | "part" | "manual" | null>(null);
@@ -123,7 +121,7 @@ export default function LineItemSelector({
       description: "",
       quantity: 1,
       priceHT: 0,
-      vatRate: isAutoEntrepreneur ? 0 : (type === "service" ? 10 : 20),
+      vatRate: type === "service" ? 10 : 20,
       duration: 0,
       notes: "",
       customType: "service",
@@ -136,7 +134,7 @@ export default function LineItemSelector({
       ...formData,
       description: service.name,
       priceHT: service.priceHT,
-      vatRate: isAutoEntrepreneur ? 0 : 10,
+      vatRate: 10,
       duration: service.duration || 0,
     });
   }
@@ -147,7 +145,7 @@ export default function LineItemSelector({
       ...formData,
       description: part.name,
       priceHT: part.priceHT,
-      vatRate: isAutoEntrepreneur ? 0 : 20,
+      vatRate: 20,
     });
   }
 
@@ -405,12 +403,12 @@ export default function LineItemSelector({
                   setFormData({
                     ...formData,
                     customType: type,
-                    vatRate: isAutoEntrepreneur ? 0 : (type === "service" ? 10 : 20),
+                    vatRate: type === "service" ? 10 : 20,
                   });
                 }}
               >
-                <MenuItem value="service">Prestation (TVA {isAutoEntrepreneur ? 0 : 10}%)</MenuItem>
-                <MenuItem value="part">Pièce (TVA {isAutoEntrepreneur ? 0 : 20}%)</MenuItem>
+                <MenuItem value="service">Prestation (TVA 10%)</MenuItem>
+                <MenuItem value="part">Pièce (TVA 20%)</MenuItem>
                 <MenuItem value="custom">Personnalisé</MenuItem>
               </Select>
             </FormControl>
