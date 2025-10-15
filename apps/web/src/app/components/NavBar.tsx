@@ -76,7 +76,11 @@ const NavBar = () => {
         <Box sx={{ display: { xs: "none", sm: "flex" }, gap: 1, alignItems: "center" }}>
           {navItems.map((item) => {
             // Actif si pathname commence par le path de l'item
-            const isActive = pathname === item.path || pathname.startsWith(item.path + '/');
+            // Cas spécial: "/" est considéré comme dashboard
+            const isActive = 
+              pathname === item.path || 
+              pathname.startsWith(item.path + '/') ||
+              (pathname === '/' && item.path === '/dashboard');
             const themeColor = pageColors[item.path] || '#64B5F6';
             return (
               <Link key={item.path} href={item.path} passHref legacyBehavior>

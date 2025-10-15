@@ -29,6 +29,8 @@ import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import ModernStatCard from "@/components/ModernStatCard";
 
+export const dynamic = 'force-dynamic';
+
 async function fetchLowStockReal(): Promise<LowStockItem[]> {
   try {
     const data = await getLowStock();
