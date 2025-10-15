@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "../../../../lib/prisma";
 import { z } from "zod";
-import sendMail from "../../../../lib/mailer";
+import { sendEmail } from "../../../../lib/hubspot";
+import { generateBookingConfirmationHTML, generateBookingNotificationHTML } from "../../../../lib/email-templates";
 import {
   getCalendarConfig,
   parseBusinessHours,
@@ -191,14 +192,59 @@ export async function POST(req: NextRequest) {
     },
   });
 
-  // Send confirmation emails (best effort)
+  // Send confirmation emails via HubSpot (best effort)
   try {
-    const shop = await prisma.appSetting.findFirst({ select: { shopEmail: true, shopName: true } });
-    const shopEmail = shop?.shopEmail || process.env.SHOP_EMAIL || process.env.NEXT_PUBLIC_SHOP_EMAIL;
-    const subject = `Nouvelle réservation: ${new Date(start).toLocaleString()}`;
-    const text = `Réservation atelier\n\nClient: ${data.name}\nEmail: ${data.email || "-"}\nTéléphone: ${normalizedPhone || "-"}\nCréneau: ${new Date(start).toLocaleString()} → ${new Date(end).toLocaleString()}\nVélo: ${data.bike || "-"}\nBesoin: ${data.description || "-"}`;
-    if (data.email) await sendMail({ to: data.email, subject: `Confirmation de réservation - ${shop?.shopName || "Atelier"}`, text });
-    if (shopEmail) await sendMail({ to: shopEmail, subject, text });
+    const shop = await prisma.appSetting.findFirst({ 
+      select: { 
+        shopEmail: true, 
+        shopName: true, 
+        shopPhone: true, 
+        address1: true, 
+        city: true 
+      } 
+    });
+    
+    const shopName = shop?.shopName || process.env.SHOP_NAME || "Atelier Vélo+";
+    const shopEmail = shop?.shopEmail || process.env.SHOP_EMAIL;
+    const shopPhone = shop?.shopPhone || process.env.SHOP_PHONE;
+    const shopAddress = shop?.address1 || process.env.SHOP_ADDRESS1;
+    const shopCity = shop?.city || process.env.SHOP_CITY;
+    
+    const emailData = {
+      customerName: data.name,
+      startDate: start,
+      endDate: end,
+      bike: data.bike,
+      description: data.description,
+      shopName,
+      shopAddress,
+      shopCity,
+      shopPhone,
+      customerEmail: data.email,
+      customerPhone: normalizedPhone,
+    };
+    
+    // Email de confirmation au client
+    if (data.email) {
+      const customerHTML = generateBookingConfirmationHTML(emailData);
+      await sendEmail({
+        to: data.email,
+        subject: `📅 Confirmation de rendez-vous - ${shopName}`,
+        htmlContent: customerHTML,
+      });
+    }
+    
+    // Email de notification à l'atelier
+    if (shopEmail) {
+      const shopHTML = generateBookingNotificationHTML(emailData);
+      const dateStr = start.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+      const timeStr = start.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+      await sendEmail({
+        to: shopEmail,
+        subject: `🔔 Nouvelle réservation - ${dateStr} ${timeStr}`,
+        htmlContent: shopHTML,
+      });
+    }
   } catch (e) {
     console.error("booking_email_error", e);
   }
