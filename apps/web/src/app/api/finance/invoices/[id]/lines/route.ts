@@ -14,8 +14,9 @@ export async function POST(req: Request, { params }: { params: { id: string } })
 
   // Calculer les totaux de ligne
   const qty = Number(body.qty || 1);
-  const vatRate = body.vatRate != null ? Number(body.vatRate) : inv.vatRate;
   const isAE = inv.pricingMode === 'AE_TTC';
+  // Si AE, forcer TVA à 0
+  const vatRate = isAE ? 0 : (body.vatRate != null ? Number(body.vatRate) : inv.vatRate);
   
   let unitPriceHT = 0;
   let unitPriceTTC = 0;
@@ -24,7 +25,8 @@ export async function POST(req: Request, { params }: { params: { id: string } })
   
   if (isAE) {
     unitPriceTTC = Number(body.unitPriceTTC || 0);
-    unitPriceHT = vatRate > 0 ? unitPriceTTC / (1 + vatRate / 100) : unitPriceTTC;
+    // En mode AE, pas de TVA donc HT = TTC
+    unitPriceHT = unitPriceTTC;
     totalTTC = unitPriceTTC * qty;
     totalHT = unitPriceHT * qty;
   } else {

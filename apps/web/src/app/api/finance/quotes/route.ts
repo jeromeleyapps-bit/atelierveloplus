@@ -84,6 +84,14 @@ export async function POST(req: Request) {
       include: { lines: true },
     });
 
+    // Si AE, forcer toutes les lignes à TVA 0% (au cas où)
+    if (isAE && workOrderLines.length > 0) {
+      await prisma.invoiceLine.updateMany({
+        where: { invoiceId: quote.id },
+        data: { vatRate: 0 }
+      });
+    }
+
     // Recalculer les totaux si des lignes ont été copiées
     if (workOrderLines.length > 0) {
       const totals = recomputeTotals({
@@ -97,7 +105,7 @@ export async function POST(req: Request) {
           qty: l.qty,
           unitPriceHT: l.unitPriceHT,
           unitPriceTTC: l.unitPriceTTC,
-          vatRate: l.vatRate
+          vatRate: isAE ? 0 : l.vatRate  // Forcer 0 si AE
         }))
       });
       
