@@ -13,6 +13,9 @@ import StorefrontIcon from "@mui/icons-material/Storefront";
 import PageShell from "../components/PageShell";
 import SectionCard from "../components/SectionCard";
 import RequireAuth from "../components/RequireAuth";
+import { Box, Container } from "@mui/material";
+import CategoryIcon from "@mui/icons-material/Category";
+import RefreshIcon from "@mui/icons-material/Refresh";
 import B2BSearchDialog from "../../components/B2BSearchDialog";
 import { CatalogItem, createCatalogItem, createStockMovement, getItemOffers, listCatalogItems, updateCatalogItem, listSuppliers, type Supplier, upsertItemSupplierItem, refreshItemOffers, getSetting, setSetting, searchSupplierOffers, type SupplierOffer, type B2BSearchResult, getAppSettings } from "@/lib/api";
 
@@ -306,9 +309,75 @@ export default function CatalogPage() {
     }
   }
 
+  // Thème orange pour catalogue
+  const theme = {
+    bg: '#FFF3E0',
+    border: '#FF9800',
+    text: '#E65100',
+    primary: '#FF9800',
+    primaryDark: '#F57C00',
+    primaryLight: '#FFF3E0',
+  };
+
   return (
     <RequireAuth>
-      <PageShell title="Catalogue" maxWidth="lg">
+      <Box sx={{ bgcolor: 'background.default', minHeight: '100vh' }}>
+        {/* Header Moderne Orange */}
+        <Box
+          sx={{
+            bgcolor: theme.bg,
+            borderBottom: 2,
+            borderColor: theme.border,
+            py: 3,
+            mb: 3,
+          }}
+        >
+          <Container maxWidth="lg">
+            <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2}>
+              <Stack direction="row" alignItems="center" spacing={2}>
+                <CategoryIcon sx={{ fontSize: 40, color: theme.text }} />
+                <Box>
+                  <Typography variant="h4" fontWeight={700} sx={{ color: theme.text }}>
+                    📦 Catalogue
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Gestion des produits et du stock
+                  </Typography>
+                </Box>
+              </Stack>
+              <Stack direction="row" spacing={1}>
+                <Button
+                  variant="outlined"
+                  startIcon={<RefreshIcon />}
+                  onClick={refresh}
+                  disabled={loading}
+                  sx={{
+                    borderColor: theme.border,
+                    color: theme.text,
+                    '&:hover': {
+                      borderColor: theme.primaryDark,
+                      bgcolor: theme.primaryLight,
+                    },
+                  }}
+                >
+                  Actualiser
+                </Button>
+                <Button
+                  variant="contained"
+                  startIcon={<AddIcon />}
+                  onClick={() => { setEditing({}); setEditOpen(true); }}
+                  sx={{
+                    bgcolor: theme.primary,
+                    '&:hover': { bgcolor: theme.primaryDark },
+                  }}
+                >
+                  Nouveau Produit
+                </Button>
+              </Stack>
+            </Stack>
+          </Container>
+        </Box>
+        <Container maxWidth="lg">
         <SectionCard title="Produits en stock" icon={<InventoryIcon color="primary" />}
           actions={
             <Stack direction="row" spacing={1}>
@@ -769,7 +838,8 @@ export default function CatalogPage() {
             {toast.message}
           </Alert>
         </Snackbar>
-      </PageShell>
+        </Container>
+      </Box>
     </RequireAuth>
   );
 }
