@@ -44,7 +44,7 @@ import { usePageTheme } from "@/hooks/usePageTheme";
 import { type PageTheme } from "@/lib/theme-colors";
 
 // API
-import { getInvoice, type Invoice, type InvoiceLine } from "@/lib/api";
+import { getInvoice, convertQuoteToInvoice, type Invoice, type InvoiceLine } from "@/lib/api";
 
 export const dynamic = 'force-dynamic';
 
@@ -55,6 +55,7 @@ export default function InvoiceDetailPageNew() {
   // États principaux
   const [inv, setInv] = useState<(Invoice & { lines: InvoiceLine[] }) | null>(null);
   const [loading, setLoading] = useState(false);
+  const [converting, setConverting] = useState(false);
   const [toast, setToast] = useState<{
     open: boolean;
     message: string;
@@ -95,6 +96,35 @@ export default function InvoiceDetailPageNew() {
       loadInvoice();
     }
   }, [id]);
+
+  // Convertir devis en facture
+  async function handleConvertToInvoice() {
+    if (!inv || inv.type !== 'quote') return;
+    if (!confirm('Convertir ce devis en facture ? Le devis sera marqué comme converti.')) return;
+    
+    setConverting(true);
+    try {
+      const result = await convertQuoteToInvoice(id);
+      setToast({
+        open: true,
+        message: 'Devis converti en facture avec succès !',
+        severity: 'success'
+      });
+      // Rediriger vers la nouvelle facture
+      setTimeout(() => {
+        router.push(`/finance/invoices/${result.invoice.id}`);
+      }, 1000);
+    } catch (error: any) {
+      console.error('Error converting quote:', error);
+      setToast({
+        open: true,
+        message: error.message || 'Erreur lors de la conversion',
+        severity: 'error'
+      });
+    } finally {
+      setConverting(false);
+    }
+  }
 
   // Calcul totaux
   function calculateTotals() {
@@ -287,6 +317,23 @@ export default function InvoiceDetailPageNew() {
                   >
                     Télécharger PDF
                   </Button>
+                  {inv?.type === 'quote' && (
+                    <Button
+                      variant="contained"
+                      fullWidth
+                      startIcon={<ReceiptIcon />}
+                      onClick={handleConvertToInvoice}
+                      disabled={converting || inv?.convertedAt != null}
+                      sx={{
+                        bgcolor: '#81C784',
+                        '&:hover': {
+                          bgcolor: '#66BB6A'
+                        }
+                      }}
+                    >
+                      {converting ? 'Conversion...' : inv?.convertedAt ? 'Déjà converti' : 'Convertir en Facture'}
+                    </Button>
+                  )}
                   <Button
                     variant="outlined"
                     fullWidth
