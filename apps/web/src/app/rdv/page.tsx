@@ -33,6 +33,15 @@ function isoLocal(d: Date) {
 function addDays(d: Date, days: number) { return new Date(d.getTime() + days*24*3600*1000); }
 
 export default function PublicBookingPage() {
+  // Thème cyan pour calendrier/RDV
+  const theme = {
+    bg: '#E0F7FA',
+    border: '#26C6DA',
+    text: '#00838F',
+    primary: '#26C6DA',
+    primaryDark: '#00ACC1',
+  };
+
   const [rangeStart, setRangeStart] = useState<string>(() => isoLocal(new Date()));
   const [rangeEnd, setRangeEnd] = useState<string>(() => isoLocal(addDays(new Date(), 7)));
   const [loading, setLoading] = useState(false);
@@ -174,10 +183,11 @@ export default function PublicBookingPage() {
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
-      {/* Header avec Logo */}
+      {/* Header Moderne Cyan */}
       <Box sx={{ 
-        bgcolor: 'primary.main', 
-        color: 'white', 
+        bgcolor: theme.bg,
+        borderBottom: 2,
+        borderColor: theme.border,
         py: 3,
         boxShadow: 2
       }}>
@@ -192,11 +202,11 @@ export default function PublicBookingPage() {
               />
             </Box>
             <Box>
-              <Typography variant="h4" fontWeight="bold">
-                Atelier Vélo+
+              <Typography variant="h4" fontWeight={700} sx={{ color: theme.text }}>
+                📅 Prise de Rendez-vous
               </Typography>
-              <Typography variant="subtitle1">
-                Upgraded Bikes
+              <Typography variant="subtitle1" color="text.secondary">
+                Atelier Vélo+ - Upgraded Bikes
               </Typography>
             </Box>
           </Stack>
