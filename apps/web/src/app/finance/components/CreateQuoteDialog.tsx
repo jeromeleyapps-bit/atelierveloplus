@@ -164,7 +164,7 @@ export default function CreateQuoteDialog({
               description: line.description,
               quantity: line.quantity,
               priceHT: line.priceHT,
-              vatRate: line.vatRate,
+              vatRate: isAutoEntrepreneur ? 0 : (line.vatRate || 20),  // Auto-entrepreneur = TVA 0%
               duration: line.duration,
               sourceId: line.sourceId,
               notes: line.notes,

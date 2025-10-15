@@ -76,7 +76,7 @@ export async function POST(req: Request) {
             description: line.description,
             qty: line.quantity || 1,           // WorkOrderLine.quantity → InvoiceLine.qty
             unitPriceHT: line.priceHT || 0,    // WorkOrderLine.priceHT → InvoiceLine.unitPriceHT
-            vatRate: line.vatRate || (isAE ? 0 : 20),
+            vatRate: isAE ? 0 : (line.vatRate || 20),  // Auto-entrepreneur = TVA 0%
           })),
         },
       },
