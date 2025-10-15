@@ -14,17 +14,28 @@ try {
     # Ignore les erreurs
 }
 
-# Vérifier cloudflared
-if (-not (Test-Path "C:\cloudflared\cloudflared.exe")) {
+# Vérifier cloudflared (chercher dans les 2 emplacements possibles)
+$cloudflaredPath = ""
+if (Test-Path "C:\cloudflared\cloudflared.exe") {
+    $cloudflaredPath = "C:\cloudflared\cloudflared.exe"
+    $configPath = "C:\cloudflared\config.yml"
+} elseif (Test-Path "$env:USERPROFILE\.cloudflared\cloudflared.exe") {
+    $cloudflaredPath = "$env:USERPROFILE\.cloudflared\cloudflared.exe"
+    $configPath = "$env:USERPROFILE\.cloudflared\config.yml"
+} else {
     Write-Host "Erreur: cloudflared.exe introuvable" -ForegroundColor Red
+    Write-Host "Cherche dans: C:\cloudflared\ ou $env:USERPROFILE\.cloudflared\" -ForegroundColor Yellow
     exit 1
 }
 
 # Vérifier config
-if (-not (Test-Path "C:\cloudflared\config.yml")) {
-    Write-Host "Erreur: config.yml introuvable" -ForegroundColor Red
+if (-not (Test-Path $configPath)) {
+    Write-Host "Erreur: config.yml introuvable dans $configPath" -ForegroundColor Red
     exit 1
 }
+
+Write-Host "Utilisation de cloudflared: $cloudflaredPath" -ForegroundColor Green
+Write-Host "Configuration: $configPath" -ForegroundColor Green
 
 Write-Host "Demarrage Next.js (sans WebSocket HMR)..." -ForegroundColor Cyan
 $nextJob = Start-Job -ScriptBlock {
@@ -41,10 +52,12 @@ Write-Host "Next.js demarre (Job ID: $($nextJob.Id))" -ForegroundColor Green
 Start-Sleep -Seconds 5
 
 Write-Host "Demarrage Cloudflare Tunnel (logs filtres)..." -ForegroundColor Cyan
-$tunnelJob = Start-Job -ScriptBlock {
-    Set-Location "C:\cloudflared"
+$tunnelJob = Start-Job -ArgumentList $cloudflaredPath, $configPath -ScriptBlock {
+    param($cfPath, $cfConfig)
+    $dir = Split-Path $cfPath
+    Set-Location $dir
     # Filtrer les erreurs webpack-hmr qui sont normales en dev
-    .\cloudflared.exe tunnel --config C:\cloudflared\config.yml run atelier-velo 2>&1 | 
+    & $cfPath tunnel --config $cfConfig run 2>&1 | 
         Where-Object { $_ -notmatch 'webpack-hmr' -and $_ -notmatch 'Unauthorized.*_next' }
 }
 
