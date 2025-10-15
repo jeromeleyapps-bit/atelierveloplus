@@ -30,6 +30,10 @@ import { createCustomer, listCustomers, updateCustomer, deleteCustomer, listCust
 import RequireAuth from "../components/RequireAuth";
 import PageShell from "../components/PageShell";
 import SectionCard from "../components/SectionCard";
+import Container from "@mui/material/Container";
+import PeopleIcon from "@mui/icons-material/People";
+import AddIcon from "@mui/icons-material/Add";
+import RefreshIcon from "@mui/icons-material/Refresh";
 import GroupIcon from "@mui/icons-material/Group";
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import ListAltIcon from "@mui/icons-material/ListAlt";
@@ -301,9 +305,64 @@ export default function CustomersPage() {
     return firstName.includes(query) || lastName.includes(query) || email.includes(query);
   });
 
+  // Thème rose pour clients
+  const theme = {
+    bg: '#FCE4EC',
+    border: '#EC407A',
+    text: '#C2185B',
+    primary: '#EC407A',
+    primaryDark: '#D81B60',
+    primaryLight: '#FCE4EC',
+  };
+
   return (
     <RequireAuth>
-      <PageShell title="Clients">
+      <Box sx={{ bgcolor: 'background.default', minHeight: '100vh' }}>
+        {/* Header Moderne Rose */}
+        <Box
+          sx={{
+            bgcolor: theme.bg,
+            borderBottom: 2,
+            borderColor: theme.border,
+            py: 3,
+            mb: 3,
+          }}
+        >
+          <Container maxWidth="xl">
+            <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2}>
+              <Stack direction="row" alignItems="center" spacing={2}>
+                <PeopleIcon sx={{ fontSize: 40, color: theme.text }} />
+                <Box>
+                  <Typography variant="h4" fontWeight={700} sx={{ color: theme.text }}>
+                    👥 Clients
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Gestion de la clientèle
+                  </Typography>
+                </Box>
+              </Stack>
+              <Stack direction="row" spacing={1}>
+                <Button
+                  variant="outlined"
+                  startIcon={<RefreshIcon />}
+                  onClick={refresh}
+                  disabled={loading}
+                  sx={{
+                    borderColor: theme.border,
+                    color: theme.text,
+                    '&:hover': {
+                      borderColor: theme.primaryDark,
+                      bgcolor: theme.primaryLight,
+                    },
+                  }}
+                >
+                  Actualiser
+                </Button>
+              </Stack>
+            </Stack>
+          </Container>
+        </Box>
+        <Container maxWidth="xl">
         <SectionCard title="Créer un client" icon={<PersonAddAlt1Icon color="primary" />} actions={
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} alignItems={{ xs: 'stretch', sm: 'center' }}>
             <Button variant="outlined" onClick={onExportCsv}>Exporter CSV</Button>
@@ -583,7 +642,8 @@ export default function CustomersPage() {
             {toast.message}
           </Alert>
         </Snackbar>
-      </PageShell>
+        </Container>
+      </Box>
     </RequireAuth>
   );
 }
