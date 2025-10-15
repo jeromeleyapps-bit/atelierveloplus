@@ -1,7 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Box, Button, Divider, Grid, Paper, Stack, TextField, Typography, Alert, Dialog, DialogTitle, DialogContent, DialogActions, MenuItem, Select, FormControl, InputLabel } from "@mui/material";
+import { Box, Button, Divider, Grid, Paper, Stack, TextField, Typography, Alert, Dialog, DialogTitle, DialogContent, DialogActions, MenuItem, Select, FormControl, InputLabel, Container } from "@mui/material";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import RefreshIcon from "@mui/icons-material/Refresh";
+import AddIcon from "@mui/icons-material/Add";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
@@ -19,6 +22,15 @@ function isoLocal(d: Date) {
 }
 
 export default function AdminCalendarPage() {
+  // Thème cyan pour calendrier
+  const theme = {
+    bg: '#E0F7FA',
+    border: '#26C6DA',
+    text: '#00838F',
+    primary: '#26C6DA',
+    primaryDark: '#00ACC1',
+    primaryLight: '#E0F7FA',
+  };
   const [events, setEvents] = useState<any[]>([]);
   const [blocks, setBlocks] = useState<any[]>([]);
   const [bookings, setBookings] = useState<any[]>([]);
@@ -133,8 +145,50 @@ export default function AdminCalendarPage() {
   }
 
   return (
-    <Box sx={{ p: { xs:2, md:3 } }}>
-      <Typography variant="h5" sx={{ mb: 2 }}>Calendrier (Admin)</Typography>
+    <Box sx={{ bgcolor: 'background.default', minHeight: '100vh' }}>
+      {/* Header Moderne Cyan */}
+      <Box
+        sx={{
+          bgcolor: theme.bg,
+          borderBottom: 2,
+          borderColor: theme.border,
+          py: 3,
+          mb: 3,
+        }}
+      >
+        <Container maxWidth="xl">
+          <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2}>
+            <Stack direction="row" alignItems="center" spacing={2}>
+              <CalendarMonthIcon sx={{ fontSize: 40, color: theme.text }} />
+              <Box>
+                <Typography variant="h4" fontWeight={700} sx={{ color: theme.text }}>
+                  📅 Calendrier
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Gestion des rendez-vous et disponibilités
+                </Typography>
+              </Box>
+            </Stack>
+            <Button
+              variant="outlined"
+              startIcon={<RefreshIcon />}
+              onClick={refresh}
+              disabled={loading}
+              sx={{
+                borderColor: theme.border,
+                color: theme.text,
+                '&:hover': {
+                  borderColor: theme.primaryDark,
+                  bgcolor: theme.primaryLight,
+                },
+              }}
+            >
+              Actualiser
+            </Button>
+          </Stack>
+        </Container>
+      </Box>
+      <Container maxWidth="xl">
       {err && <Alert severity="error" sx={{ mb:2 }}>{String(err)}</Alert>}
 
       <Paper variant="outlined" sx={{ p:1, mb:3 }}>
@@ -224,6 +278,7 @@ export default function AdminCalendarPage() {
           </Paper>
         </Grid>
       </Grid>
+      </Container>
     </Box>
   );
 }
