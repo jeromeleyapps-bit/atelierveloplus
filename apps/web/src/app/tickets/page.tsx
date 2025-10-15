@@ -76,10 +76,14 @@ import PageShell from "../components/PageShell";
 import SectionCard from "../components/SectionCard";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import ListAltIcon from "@mui/icons-material/ListAlt";
+import { usePageTheme } from "@/hooks/usePageTheme";
+import Container from "@mui/material/Container";
+import RefreshIcon from "@mui/icons-material/Refresh";
 
 export default function TicketsPage() {
-  const theme = useTheme();
-  const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
+  const muiTheme = useTheme();
+  const isSmall = useMediaQuery(muiTheme.breakpoints.down('sm'));
+  const theme = usePageTheme('ticket'); // Thème bleu pour tickets
   const [items, setItems] = useState<WorkOrder[]>([]);
   // Démarre en chargement pour un rendu initial identique SSR/CSR
   const [loading, setLoading] = useState(true);
@@ -491,9 +495,68 @@ export default function TicketsPage() {
 
   return (
     <RequireAuth>
-      <PageShell title="Tickets atelier">
-        {/* Widget 1 : Filtres & Recherche */}
-        <SectionCard title="Recherche & Filtres" icon={<SearchIcon color="primary" />}>
+      <Box sx={{ bgcolor: 'background.default', minHeight: '100vh' }}>
+        {/* Header Moderne Bleu */}
+        <Box
+          sx={{
+            bgcolor: theme.primaryLight,
+            borderBottom: 2,
+            borderColor: theme.primary,
+            py: 3,
+            mb: 3,
+          }}
+        >
+          <Container maxWidth="xl">
+            <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2}>
+              <Stack direction="row" alignItems="center" spacing={2}>
+                <AssignmentIcon sx={{ fontSize: 40, color: theme.primary }} />
+                <Box>
+                  <Typography variant="h4" fontWeight={700} color={theme.text}>
+                    🔧 Tickets Atelier
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Gestion des réparations et interventions
+                  </Typography>
+                </Box>
+              </Stack>
+              <Stack direction="row" spacing={1}>
+                <Button
+                  variant="outlined"
+                  startIcon={<RefreshIcon />}
+                  onClick={refresh}
+                  disabled={loading}
+                  sx={{
+                    borderColor: theme.primary,
+                    color: theme.text,
+                    '&:hover': {
+                      borderColor: theme.primaryDark,
+                      bgcolor: theme.primaryLight,
+                    },
+                  }}
+                >
+                  Actualiser
+                </Button>
+                <Button
+                  variant="contained"
+                  startIcon={<AddIcon />}
+                  onClick={() => setDialogOpen(true)}
+                  sx={{
+                    bgcolor: theme.primary,
+                    '&:hover': {
+                      bgcolor: theme.primaryDark,
+                    },
+                  }}
+                >
+                  Nouveau Ticket
+                </Button>
+              </Stack>
+            </Stack>
+          </Container>
+        </Box>
+
+        <Container maxWidth="xl">
+        {/* Filtres & Recherche */}
+        <Paper elevation={0} sx={{ p: 3, mb: 3, border: 2, borderColor: theme.border, bgcolor: theme.background }}>
           <Stack spacing={2}>
             {/* Ligne 1: Recherche + Tabs statut */}
             <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} alignItems={{ xs: 'stretch', md: 'center' }}>
@@ -567,7 +630,7 @@ export default function TicketsPage() {
               <FormControlLabel control={<Switch size="small" checked={dense} onChange={(e) => setDense(e.target.checked)} />} label="Compact" />
             </Stack>
           </Stack>
-        </SectionCard>
+        </Paper>
 
         {/* Widget 2 : Création rapide */}
         <SectionCard title="Nouveau ticket" icon={<AddIcon color="primary" />}>
@@ -1085,7 +1148,8 @@ export default function TicketsPage() {
             {toast.message}
           </Alert>
         </Snackbar>
-      </PageShell>
+        </Container>
+      </Box>
     </RequireAuth>
   );
 }
