@@ -28,6 +28,8 @@ import {
 } from "@mui/material";
 import PageShell from "@/app/components/PageShell";
 import RequireAuth from "@/app/components/RequireAuth";
+import Container from "@mui/material/Container";
+import PedalBikeIcon from "@mui/icons-material/PedalBike";
 import SearchIcon from "@mui/icons-material/Search";
 import DirectionsBikeIcon from "@mui/icons-material/DirectionsBike";
 import PersonIcon from "@mui/icons-material/Person";
@@ -139,9 +141,44 @@ export default function BikeHistoryPage() {
     });
   }
 
+  // Thème bleu pour vélos
+  const theme = {
+    bg: '#E3F2FD',
+    border: '#42A5F5',
+    text: '#1565C0',
+    primary: '#42A5F5',
+    primaryDark: '#1E88E5',
+    primaryLight: '#E3F2FD',
+  };
+
   return (
     <RequireAuth>
-      <PageShell title="Historique des Vélos">
+      <Box sx={{ bgcolor: 'background.default', minHeight: '100vh' }}>
+        {/* Header Moderne Bleu */}
+        <Box
+          sx={{
+            bgcolor: theme.bg,
+            borderBottom: 2,
+            borderColor: theme.border,
+            py: 3,
+            mb: 3,
+          }}
+        >
+          <Container maxWidth="xl">
+            <Stack direction="row" alignItems="center" spacing={2}>
+              <PedalBikeIcon sx={{ fontSize: 40, color: theme.text }} />
+              <Box>
+                <Typography variant="h4" fontWeight={700} sx={{ color: theme.text }}>
+                  🚲 Historique des Vélos
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Recherche et suivi des interventions
+                </Typography>
+              </Box>
+            </Stack>
+          </Container>
+        </Box>
+        <Container maxWidth="xl">
         <Stack spacing={3}>
           {/* Recherche */}
           <Paper sx={{ p: 3 }}>
@@ -562,7 +599,8 @@ export default function BikeHistoryPage() {
             </Paper>
           )}
         </Stack>
-      </PageShell>
+        </Container>
+      </Box>
     </RequireAuth>
   );
 }
