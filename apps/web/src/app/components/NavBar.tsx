@@ -39,6 +39,18 @@ const NavBar = () => {
     return () => window.removeEventListener('shopNameUpdated', handleShopNameUpdate);
   }, []);
 
+  // Couleurs thématiques par page
+  const pageColors: Record<string, string> = {
+    '/dashboard': '#667eea',
+    '/customers': '#EC407A',
+    '/tickets': '#64B5F6',
+    '/finance': '#81C784',
+    '/catalog': '#FF9800',
+    '/calendar': '#26C6DA',
+    '/cash-register': '#9C27B0',
+    '/stats': '#42A5F5',
+  };
+
   const navItems: NavItem[] = [
     { text: "Tableau de bord", path: "/dashboard" as Route },
     { text: "Clients", path: "/customers" as Route },
@@ -64,16 +76,17 @@ const NavBar = () => {
         <Box sx={{ display: { xs: "none", sm: "flex" }, gap: 1, alignItems: "center" }}>
           {navItems.map((item) => {
             const isActive = pathname === item.path;
+            const themeColor = pageColors[item.path] || '#64B5F6';
             return (
               <Link key={item.path} href={item.path} passHref legacyBehavior>
                 <Button
                   component="a"
-                  color={isActive ? "secondary" : "inherit"}
-                  variant={isActive ? "outlined" : "text"}
+                  variant={isActive ? "contained" : "text"}
                   sx={{
-                    color: "inherit",
+                    color: isActive ? "white" : "inherit",
+                    bgcolor: isActive ? themeColor : "transparent",
                     "&:hover": {
-                      bgcolor: "rgba(255, 255, 255, 0.1)",
+                      bgcolor: isActive ? themeColor : "rgba(255, 255, 255, 0.1)",
                     },
                   }}
                 >
