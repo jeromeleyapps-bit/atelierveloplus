@@ -19,6 +19,7 @@ import {
 import { createQuote, searchWorkOrders, createWorkOrder, listCustomers, type WorkOrder, type Customer } from "@/lib/api";
 import LineItemSelector, { LineItem } from "@/app/components/LineItemSelector";
 import LineItemsTable from "@/app/components/LineItemsTable";
+import VatRateSelector from "@/app/components/VatRateSelector";
 import { usePageTheme } from "@/hooks/usePageTheme";
 
 interface CreateQuoteDialogProps {
@@ -43,7 +44,7 @@ export default function CreateQuoteDialog({
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [lines, setLines] = useState<LineItem[]>([]);
-  const [isAutoEntrepreneur, setIsAutoEntrepreneur] = useState(false);
+  const [defaultVatRate, setDefaultVatRate] = useState(20);
 
   // Charger les tickets et clients au montage
   useEffect(() => {
@@ -53,32 +54,10 @@ export default function CreateQuoteDialog({
       } else {
         loadCustomers();
       }
-      loadUserSettings();
       setLines([]); // Reset lines
+      setDefaultVatRate(20); // Reset TVA
     }
   }, [open, quoteType]);
-
-  const loadUserSettings = async () => {
-    try {
-      const token = localStorage.getItem("jwt_token");
-      const response = await fetch("/api/account/settings", {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
-      
-      if (!response.ok) {
-        console.error("Settings API error:", response.status);
-        setIsAutoEntrepreneur(false);
-        return;
-      }
-      
-      const data = await response.json();
-      console.log("[Devis] isAutoEntrepreneur:", data.isAutoEntrepreneur);
-      setIsAutoEntrepreneur(data.isAutoEntrepreneur === true);
-    } catch (error) {
-      console.error("Error loading settings:", error);
-      setIsAutoEntrepreneur(false);
-    }
-  };
 
   const handleAddLine = (line: LineItem) => {
     setLines([...lines, { ...line, id: `temp-${Date.now()}` }]);
@@ -147,7 +126,7 @@ export default function CreateQuoteDialog({
         }
       }
 
-      const quote = await createQuote({ workOrderId: finalWorkOrderId, validDays });
+      const quote = await createQuote({ workOrderId: finalWorkOrderId, validDays, vatRate: defaultVatRate });
       
       // Ajouter les lignes manuelles (si présentes)
       if (lines.length > 0) {
@@ -164,7 +143,7 @@ export default function CreateQuoteDialog({
               description: line.description,
               quantity: line.quantity,
               priceHT: line.priceHT,
-              vatRate: isAutoEntrepreneur ? 0 : (line.vatRate || 20),  // Auto-entrepreneur = TVA 0%
+              vatRate: line.vatRate || defaultVatRate,
               duration: line.duration,
               sourceId: line.sourceId,
               notes: line.notes,
@@ -286,24 +265,30 @@ export default function CreateQuoteDialog({
                 />
               )}
 
+              {/* TVA par défaut */}
+              <VatRateSelector
+                value={defaultVatRate}
+                onChange={setDefaultVatRate}
+                label="TVA par défaut"
+                fullWidth
+              />
+
               {/* Prestations et Pièces - Toujours afficher */}
               <Typography variant="subtitle1" sx={{ mt: 2 }}>
                 Prestations et Pièces
               </Typography>
               {quoteType === "ticket" && (
                 <Alert severity="info" sx={{ mb: 2 }}>
-                  Les lignes du ticket seront automatiquement copiées. Vous pouvez en ajouter d'autres ci-dessous.
+                  Les lignes du ticket seront automatiquement copiées avec la TVA par défaut ci-dessus.
                 </Alert>
               )}
               <LineItemSelector
                 onAddLine={handleAddLine}
-                isAutoEntrepreneur={isAutoEntrepreneur}
               />
               <LineItemsTable
                 lines={lines}
                 onUpdateLine={handleUpdateLine}
                 onDeleteLine={handleDeleteLine}
-                isAutoEntrepreneur={isAutoEntrepreneur}
               />
 
               <TextField

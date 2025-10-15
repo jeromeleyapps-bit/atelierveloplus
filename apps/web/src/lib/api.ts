@@ -651,6 +651,7 @@ export async function importLaborToInvoice(invoiceId: string, workOrderId: strin
 export async function createQuote(input: {
   workOrderId: string;
   validDays?: number; // Default 30 days
+  vatRate?: number; // Default VAT rate (0, 10, or 20)
 }): Promise<Invoice> {
   return request(`/finance/quotes`, {
     method: "POST",
