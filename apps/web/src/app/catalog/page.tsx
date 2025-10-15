@@ -69,6 +69,7 @@ export default function CatalogPage() {
   const [supSort, setSupSort] = useState<'priceAsc' | 'priceDesc' | 'recent'>('priceAsc');
   // B2B Search Dialog
   const [b2bSearchOpen, setB2bSearchOpen] = useState(false);
+  const [supplierSearchQuery, setSupplierSearchQuery] = useState("");
   const visibleSupOffers = useMemo(() => {
     let list = [...supOffers];
     if (supOnlyInStock) list = list.filter(o => (o.lastAvailability || '').toLowerCase().includes('stock'));
@@ -103,6 +104,21 @@ export default function CatalogPage() {
       }
     })();
   }, []);
+
+  // Charger les fournisseurs quand le dialog B2B s'ouvre
+  useEffect(() => {
+    if (b2bSearchOpen) {
+      (async () => {
+        try {
+          const data = await listSuppliers();
+          setSuppliers(data);
+        } catch (e) {
+          console.error('Error loading suppliers:', e);
+          setToast({ open: true, message: 'Erreur chargement fournisseurs', severity: 'error' });
+        }
+      })();
+    }
+  }, [b2bSearchOpen]);
 
   async function linkSupplierOffer(o: SupplierOffer) {
     try {
@@ -832,16 +848,48 @@ export default function CatalogPage() {
         </Dialog>
 
         {/* Dialog Liste Fournisseurs */}
-        <Dialog open={b2bSearchOpen} onClose={() => setB2bSearchOpen(false)} maxWidth="sm" fullWidth>
+        <Dialog 
+          open={b2bSearchOpen} 
+          onClose={() => {
+            setB2bSearchOpen(false);
+            setSupplierSearchQuery("");
+          }} 
+          maxWidth="sm" 
+          fullWidth
+        >
           <DialogTitle sx={{ bgcolor: theme.primaryLight, color: theme.text }}>
-            🏭 Fournisseurs
+            🏭 Fournisseurs ({suppliers.length})
           </DialogTitle>
           <DialogContent sx={{ mt: 2 }}>
             <Stack spacing={2}>
-              {suppliers.length === 0 && (
-                <Typography color="text.secondary">Aucun fournisseur enregistré</Typography>
-              )}
-              {suppliers.map((supplier) => (
+              {/* Barre de recherche */}
+              <TextField
+                size="small"
+                placeholder="Rechercher un fournisseur..."
+                value={supplierSearchQuery}
+                onChange={(e) => setSupplierSearchQuery(e.target.value)}
+                InputProps={{
+                  startAdornment: <InputAdornment position="start"><SearchIcon /></InputAdornment>
+                }}
+                fullWidth
+              />
+              
+              {/* Liste scrollable limitée à 8 fournisseurs visibles */}
+              <Box sx={{ maxHeight: '480px', overflow: 'auto', pr: 1 }}>
+                <Stack spacing={2}>
+                  {suppliers.length === 0 && (
+                    <Typography color="text.secondary">Aucun fournisseur enregistré</Typography>
+                  )}
+                  {suppliers
+                    .filter((supplier) => {
+                      if (!supplierSearchQuery.trim()) return true;
+                      const query = supplierSearchQuery.toLowerCase();
+                      return (
+                        supplier.name?.toLowerCase().includes(query) ||
+                        supplier.website?.toLowerCase().includes(query)
+                      );
+                    })
+                    .map((supplier) => (
                 <Paper
                   key={supplier.id}
                   elevation={0}
@@ -887,11 +935,25 @@ export default function CatalogPage() {
                     )}
                   </Stack>
                 </Paper>
-              ))}
+                  ))}
+                  {suppliers.filter((s) => {
+                    if (!supplierSearchQuery.trim()) return true;
+                    const query = supplierSearchQuery.toLowerCase();
+                    return s.name?.toLowerCase().includes(query) || s.website?.toLowerCase().includes(query);
+                  }).length === 0 && supplierSearchQuery && (
+                    <Typography color="text.secondary" textAlign="center" py={2}>
+                      Aucun fournisseur ne correspond à votre recherche
+                    </Typography>
+                  )}
+                </Stack>
+              </Box>
             </Stack>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setB2bSearchOpen(false)}>Fermer</Button>
+            <Button onClick={() => {
+              setB2bSearchOpen(false);
+              setSupplierSearchQuery("");
+            }}>Fermer</Button>
           </DialogActions>
         </Dialog>
 
