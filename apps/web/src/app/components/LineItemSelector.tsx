@@ -223,18 +223,21 @@ export default function LineItemSelector({
               getOptionLabel={(option) => option.name}
               value={selectedService}
               onChange={(_, value) => value && handleServiceSelect(value)}
-              renderOption={(props, option) => (
-                <Box component="li" {...props}>
-                  <Box>
-                    <Typography variant="body2">{option.name}</Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      {option.priceHT.toFixed(2)}€ HT
-                      {option.duration && ` • ${option.duration} min`}
-                      {option.bikeType && ` • ${option.bikeType}`}
-                    </Typography>
+              renderOption={(props, option) => {
+                const { key, ...otherProps } = props;
+                return (
+                  <Box component="li" key={key} {...otherProps}>
+                    <Box>
+                      <Typography variant="body2">{option.name}</Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {option.priceHT.toFixed(2)}€ HT
+                        {option.duration && ` • ${option.duration} min`}
+                        {option.bikeType && ` • ${option.bikeType}`}
+                      </Typography>
+                    </Box>
                   </Box>
-                </Box>
-              )}
+                );
+              }}
               renderInput={(params) => (
                 <TextField {...params} label="Rechercher une prestation" />
               )}
@@ -301,16 +304,19 @@ export default function LineItemSelector({
               getOptionLabel={(option) => option.name}
               value={selectedPart}
               onChange={(_, value) => value && handlePartSelect(value)}
-              renderOption={(props, option) => (
-                <Box component="li" {...props}>
-                  <Box>
-                    <Typography variant="body2">{option.name}</Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      {option.priceHT.toFixed(2)}€ HT • Stock: {option.stockQty}
-                    </Typography>
+              renderOption={(props, option) => {
+                const { key, ...otherProps } = props;
+                return (
+                  <Box component="li" key={key} {...otherProps}>
+                    <Box>
+                      <Typography variant="body2">{option.name}</Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {option.priceHT.toFixed(2)}€ HT • Stock: {option.stockQty}
+                      </Typography>
+                    </Box>
                   </Box>
-                </Box>
-              )}
+                );
+              }}
               renderInput={(params) => (
                 <TextField {...params} label="Rechercher une pièce" />
               )}

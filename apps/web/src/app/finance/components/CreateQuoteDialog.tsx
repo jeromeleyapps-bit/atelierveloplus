@@ -149,8 +149,8 @@ export default function CreateQuoteDialog({
 
       const quote = await createQuote({ workOrderId: finalWorkOrderId, validDays });
       
-      // Ajouter les lignes si devis direct
-      if (quoteType === "direct" && lines.length > 0) {
+      // Ajouter les lignes manuelles (si présentes)
+      if (lines.length > 0) {
         const token = localStorage.getItem("jwt_token");
         for (const line of lines) {
           await fetch(`/api/workorders/${finalWorkOrderId}/lines`, {
@@ -286,24 +286,25 @@ export default function CreateQuoteDialog({
                 />
               )}
 
-              {/* Prestations et Pièces */}
-              {quoteType === "direct" && (
-                <>
-                  <Typography variant="subtitle1" sx={{ mt: 2 }}>
-                    Prestations et Pièces
-                  </Typography>
-                  <LineItemSelector
-                    onAddLine={handleAddLine}
-                    isAutoEntrepreneur={isAutoEntrepreneur}
-                  />
-                  <LineItemsTable
-                    lines={lines}
-                    onUpdateLine={handleUpdateLine}
-                    onDeleteLine={handleDeleteLine}
-                    isAutoEntrepreneur={isAutoEntrepreneur}
-                  />
-                </>
+              {/* Prestations et Pièces - Toujours afficher */}
+              <Typography variant="subtitle1" sx={{ mt: 2 }}>
+                Prestations et Pièces
+              </Typography>
+              {quoteType === "ticket" && (
+                <Alert severity="info" sx={{ mb: 2 }}>
+                  Les lignes du ticket seront automatiquement copiées. Vous pouvez en ajouter d'autres ci-dessous.
+                </Alert>
               )}
+              <LineItemSelector
+                onAddLine={handleAddLine}
+                isAutoEntrepreneur={isAutoEntrepreneur}
+              />
+              <LineItemsTable
+                lines={lines}
+                onUpdateLine={handleUpdateLine}
+                onDeleteLine={handleDeleteLine}
+                isAutoEntrepreneur={isAutoEntrepreneur}
+              />
 
               <TextField
                 label="Validité (jours)"

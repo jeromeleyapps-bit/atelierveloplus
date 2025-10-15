@@ -27,9 +27,9 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import CustomerCard from "@/app/components/CustomerCard";
 import BikeCard from "@/app/components/BikeCard";
 import FinancialSummaryCard from "@/app/components/FinancialSummaryCard";
-import LineItemSelector, { LineItem } from "@/app/components/LineItemSelector";
 import LineItemsTable from "@/app/components/LineItemsTable";
-import { AppointmentPicker } from "@/components/AppointmentPicker";
+import LineItemSelector, { type LineItem } from "@/app/components/LineItemSelector";
+import CreateQuoteDialog from "@/app/finance/components/CreateQuoteDialog";
 
 // API
 import { getWorkOrder, type WorkOrder } from "@/lib/api";
@@ -49,6 +49,7 @@ export default function TicketDetailPageNew() {
   const [lines, setLines] = useState<LineItem[]>([]);
   const [loadingLines, setLoadingLines] = useState(false);
   const [isAutoEntrepreneur, setIsAutoEntrepreneur] = useState(false);
+  const [quoteDialogOpen, setQuoteDialogOpen] = useState(false);
   const [toast, setToast] = useState<{
     open: boolean;
     message: string;
@@ -379,17 +380,6 @@ export default function TicketDetailPageNew() {
               highlighted={true}
             />
 
-            {/* Rendez-vous Retour */}
-            {wo && (
-              <Box sx={{ mt: 3 }}>
-                <AppointmentPicker
-                  workOrderId={id}
-                  currentAppointment={wo.appointmentDate}
-                  onAppointmentChanged={refresh}
-                />
-              </Box>
-            )}
-
             {/* Actions rapides */}
             <Card elevation={0} sx={{ mt: 3, border: 2, borderColor: theme.border, bgcolor: theme.background }}>
               <CardHeader title="Actions" />
@@ -399,7 +389,7 @@ export default function TicketDetailPageNew() {
                     variant="contained"
                     fullWidth
                     startIcon={<DescriptionIcon />}
-                    onClick={() => window.open(`/api/pos/workorders/${id}/quote-pdf`, '_blank')}
+                    onClick={() => setQuoteDialogOpen(true)}
                     sx={{
                       bgcolor: theme.primary,
                       '&:hover': {
@@ -407,7 +397,7 @@ export default function TicketDetailPageNew() {
                       }
                     }}
                   >
-                    Générer Devis PDF
+                    Créer un Devis
                   </Button>
                   <Button
                     variant="outlined"
@@ -450,6 +440,22 @@ export default function TicketDetailPageNew() {
           {toast.message}
         </Alert>
       </Snackbar>
+
+      {/* Dialog Création Devis */}
+      <CreateQuoteDialog
+        open={quoteDialogOpen}
+        onClose={() => setQuoteDialogOpen(false)}
+        onSuccess={(quoteId) => {
+          setQuoteDialogOpen(false);
+          setToast({
+            open: true,
+            message: "Devis créé avec succès !",
+            severity: "success"
+          });
+          // Rediriger vers le devis
+          router.push(`/finance/quotes/${quoteId}`);
+        }}
+      />
     </>
   );
 }
