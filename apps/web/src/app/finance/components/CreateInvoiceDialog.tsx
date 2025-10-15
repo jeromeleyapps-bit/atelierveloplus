@@ -317,28 +317,24 @@ export default function CreateInvoiceDialog({ open, onClose, onSuccess }: Create
               </RadioGroup>
             </FormControl>
 
-            {/* Prestations et Pièces */}
-            {invoiceType === "service" && (
-              <>
-                <Typography variant="subtitle1" sx={{ mt: 2 }}>
-                  Prestations et Pièces
-                </Typography>
-                <VatRateSelector
-                  value={defaultVatRate}
-                  onChange={setDefaultVatRate}
-                  label="TVA par défaut"
-                  fullWidth
-                />
-                <LineItemSelector
-                  onAddLine={handleAddLine}
-                />
-                <LineItemsTable
-                  lines={lines}
-                  onUpdateLine={handleUpdateLine}
-                  onDeleteLine={handleDeleteLine}
-                />
-              </>
-            )}
+            {/* Prestations et Pièces - Toujours afficher */}
+            <Typography variant="subtitle1" sx={{ mt: 2 }}>
+              {invoiceType === "service" ? "Prestations et Pièces" : "Articles"}
+            </Typography>
+            <VatRateSelector
+              value={defaultVatRate}
+              onChange={setDefaultVatRate}
+              label="TVA par défaut"
+              fullWidth
+            />
+            <LineItemSelector
+              onAddLine={handleAddLine}
+            />
+            <LineItemsTable
+              lines={lines}
+              onUpdateLine={handleUpdateLine}
+              onDeleteLine={handleDeleteLine}
+            />
           </Stack>
         </DialogContent>
         <DialogActions>
