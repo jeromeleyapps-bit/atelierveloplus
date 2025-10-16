@@ -25,7 +25,6 @@ import {
   DialogActions,
 } from "@mui/material";
 import EmailIcon from "@mui/icons-material/Email";
-import SmsIcon from "@mui/icons-material/Sms";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ErrorIcon from "@mui/icons-material/Error";
 import PendingIcon from "@mui/icons-material/Pending";
@@ -131,7 +130,6 @@ export default function CommunicationsPage() {
               >
                 <MenuItem value="">Tous</MenuItem>
                 <MenuItem value="email">📧 Email</MenuItem>
-                <MenuItem value="sms">📱 SMS</MenuItem>
               </Select>
             </FormControl>
 
@@ -188,13 +186,9 @@ export default function CommunicationsPage() {
                         <TableCell>{formatDate(comm.sentAt || comm.createdAt)}</TableCell>
                         <TableCell>
                           <Stack direction="row" spacing={1} alignItems="center">
-                            {comm.type === 'email' ? (
-                              <EmailIcon fontSize="small" color="primary" />
-                            ) : (
-                              <SmsIcon fontSize="small" color="secondary" />
-                            )}
+                            <EmailIcon fontSize="small" color="primary" />
                             <Typography variant="body2">
-                              {comm.type === 'email' ? 'Email' : 'SMS'}
+                              Email
                             </Typography>
                           </Stack>
                         </TableCell>
@@ -248,7 +242,7 @@ export default function CommunicationsPage() {
             {selectedComm && (
               <Stack spacing={2} sx={{ mt: 1 }}>
                 <Typography>
-                  <strong>Type :</strong> {selectedComm.type === 'email' ? '📧 Email' : '📱 SMS'}
+                  <strong>Type :</strong> 📧 Email
                 </Typography>
                 <Typography>
                   <strong>Événement :</strong> {getEventLabel(selectedComm.event)}

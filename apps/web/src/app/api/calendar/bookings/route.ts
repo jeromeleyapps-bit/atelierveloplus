@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "../../../../lib/prisma";
 import { z } from "zod";
-import { sendEmail } from "../../../../lib/hubspot";
+import { sendEmail } from "../../../../lib/email";
 import { generateBookingConfirmationHTML, generateBookingNotificationHTML } from "../../../../lib/email-templates";
 import {
   getCalendarConfig,
@@ -230,7 +230,7 @@ export async function POST(req: NextRequest) {
       await sendEmail({
         to: data.email,
         subject: `📅 Confirmation de rendez-vous - ${shopName}`,
-        htmlContent: customerHTML,
+        html: customerHTML,
       });
     }
     
@@ -242,7 +242,7 @@ export async function POST(req: NextRequest) {
       await sendEmail({
         to: shopEmail,
         subject: `🔔 Nouvelle réservation - ${dateStr} ${timeStr}`,
-        htmlContent: shopHTML,
+        html: shopHTML,
       });
     }
   } catch (e: any) {

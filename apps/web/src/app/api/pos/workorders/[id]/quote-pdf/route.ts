@@ -44,12 +44,9 @@ export async function GET(
     const workOrder = await prisma.workOrder.findUnique({
       where: { id },
       include: {
-        parts: {
-          include: {
-            catalogItem: true,
-          },
-        },
+        lines: true,
         customer: true,
+        bike: true,
       },
     });
 
@@ -66,18 +63,19 @@ export async function GET(
         ? (workOrder.estimatedMinutes / 60) * workOrder.hourlyRate
         : 0;
 
-    // Calculer le coût des pièces
-    const partsCostHT = workOrder.parts.reduce(
-      (sum, part) => sum + part.priceHT * part.qty,
-      0,
-    );
+    // Calculer le coût des pièces et TVA
+    let partsCostHT = 0;
+    let partsTVA = 0;
+    for (const line of workOrder.lines) {
+      const lineHT = line.priceHT * line.quantity;
+      const lineTVA = lineHT * (line.vatRate / 100);
+      partsCostHT += lineHT;
+      partsTVA += lineTVA;
+    }
 
-    // TVA différenciée
-    const laborTvaRate = isAutoEntrepreneur ? 0 : 0.1;
-    const partsTvaRate = isAutoEntrepreneur ? 0 : 0.2;
-
-    const laborTVA = laborCostHT * laborTvaRate;
-    const partsTVA = partsCostHT * partsTvaRate;
+    // TVA main d'œuvre (0% si AE, sinon 10%)
+    const laborTvaRate = isAutoEntrepreneur ? 0 : 10;
+    const laborTVA = laborCostHT * (laborTvaRate / 100);
 
     // Totaux
     const totalHT = laborCostHT + partsCostHT;
@@ -104,23 +102,24 @@ export async function GET(
         description: `Main d'œuvre - ${workOrder.estimatedMinutes} minutes`,
         qty: 1,
         unitPriceHT: laborCostHT,
-        unitPriceTTC: laborCostHT * (1 + laborTvaRate),
-        vatRate: laborTvaRate * 100,
+        unitPriceTTC: laborCostHT * (1 + laborTvaRate / 100),
+        vatRate: laborTvaRate,
         totalHT: laborCostHT,
-        totalTTC: laborCostHT * (1 + laborTvaRate),
+        totalTTC: laborCostHT * (1 + laborTvaRate / 100),
       });
     }
 
     // Lignes pièces
-    for (const part of workOrder.parts) {
+    for (const line of workOrder.lines) {
+      const lineVatRate = line.vatRate ?? 0;
       lines.push({
-        description: part.description,
-        qty: part.qty,
-        unitPriceHT: part.priceHT,
-        unitPriceTTC: part.priceHT * (1 + partsTvaRate),
-        vatRate: partsTvaRate * 100,
-        totalHT: part.priceHT * part.qty,
-        totalTTC: part.priceHT * part.qty * (1 + partsTvaRate),
+        description: line.description,
+        qty: line.quantity,
+        unitPriceHT: line.priceHT,
+        unitPriceTTC: line.priceHT * (1 + lineVatRate / 100),
+        vatRate: lineVatRate,
+        totalHT: line.priceHT * line.quantity,
+        totalTTC: line.priceHT * line.quantity * (1 + lineVatRate / 100),
       });
     }
 

@@ -60,6 +60,7 @@ export default function InvoiceDetailPageNew() {
   const [inv, setInv] = useState<(Invoice & { lines: InvoiceLine[] }) | null>(null);
   const [loading, setLoading] = useState(false);
   const [converting, setConverting] = useState(false);
+  const [issuing, setIssuing] = useState(false);
   const [addLineDialogOpen, setAddLineDialogOpen] = useState(false);
   const [newLine, setNewLine] = useState({
     description: "",
@@ -107,6 +108,33 @@ export default function InvoiceDetailPageNew() {
       loadInvoice();
     }
   }, [id]);
+
+  // Émettre la facture/devis
+  async function handleIssue() {
+    if (!inv || inv.status !== 'draft') return;
+    if (!confirm('Émettre ce document ? Il ne pourra plus être modifié.')) return;
+    
+    setIssuing(true);
+    try {
+      const token = localStorage.getItem('jwt_token');
+      const res = await fetch(`/api/finance/invoices/${id}/issue`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      });
+      
+      if (!res.ok) throw new Error('Erreur lors de l\'émission');
+      
+      setToast({ open: true, message: 'Document émis avec succès', severity: 'success' });
+      loadInvoice();
+    } catch (error: any) {
+      setToast({ open: true, message: error.message || 'Erreur', severity: 'error' });
+    } finally {
+      setIssuing(false);
+    }
+  }
 
   // Convertir devis en facture
   async function handleConvertToInvoice() {
@@ -330,11 +358,32 @@ export default function InvoiceDetailPageNew() {
               <CardHeader title="Actions" />
               <CardContent>
                 <Stack spacing={2}>
+                  {inv?.status === 'draft' && (
+                    <Button
+                      variant="contained"
+                      fullWidth
+                      startIcon={<ReceiptIcon />}
+                      onClick={handleIssue}
+                      disabled={issuing}
+                      sx={{
+                        bgcolor: '#FF9800',
+                        color: 'white',
+                        '&:hover': {
+                          bgcolor: '#F57C00'
+                        }
+                      }}
+                    >
+                      {issuing ? 'Émission...' : 'Émettre'}
+                    </Button>
+                  )}
                   <Button
                     variant="contained"
                     fullWidth
                     startIcon={<PictureAsPdfIcon />}
-                    onClick={() => window.open(`/api/finance/invoices/${id}/pdf`, '_blank')}
+                    component="a"
+                    href={`/api/finance/invoices/${id}/pdf`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     sx={{
                       bgcolor: theme.primary,
                       '&:hover': {
@@ -344,7 +393,7 @@ export default function InvoiceDetailPageNew() {
                   >
                     Télécharger PDF
                   </Button>
-                  {inv?.type === 'quote' && (
+                  {inv?.type === 'quote' && inv?.status !== 'draft' && (
                     <Button
                       variant="contained"
                       fullWidth
@@ -365,8 +414,26 @@ export default function InvoiceDetailPageNew() {
                     variant="outlined"
                     fullWidth
                     startIcon={<EmailIcon />}
-                    onClick={() => {
-                      setToast({ open: true, message: "Fonctionnalité à venir", severity: "info" });
+                    onClick={async () => {
+                      try {
+                        const token = localStorage.getItem('jwt_token');
+                        const res = await fetch(`/api/finance/invoices/${id}/send-email`, { 
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json',
+                            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                          },
+                        });
+                        if (!res.ok) {
+                          const error = await res.json().catch(() => ({}));
+                          const message = error.message || error.error || 'Erreur envoi email';
+                          throw new Error(message);
+                        }
+                        setToast({ open: true, message: "Email envoyé avec succès", severity: "success" });
+                      } catch (error: any) {
+                        console.error('Email error:', error);
+                        setToast({ open: true, message: error.message || "Erreur lors de l'envoi", severity: "error" });
+                      }
                     }}
                     sx={{
                       borderColor: theme.primary,
@@ -434,8 +501,8 @@ export default function InvoiceDetailPageNew() {
                   body: JSON.stringify({
                     type: line.type,
                     description: line.description,
-                    qty: line.qty,
-                    unitPriceHT: line.unitPriceHT,
+                    quantity: line.quantity,
+                    priceHT: line.priceHT,
                     vatRate: line.vatRate,
                     sourceId: line.sourceId,
                     duration: line.duration,

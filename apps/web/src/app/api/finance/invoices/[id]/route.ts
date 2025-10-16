@@ -18,6 +18,28 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
     });
     if (!row) return NextResponse.json({ error: "not_found" }, { status: 404 });
     
+    // Récupérer le statut auto-entrepreneur
+    const firstUser = await prisma.user.findFirst();
+    const settings = firstUser 
+      ? await prisma.appSetting.findUnique({ where: { userId: firstUser.id } })
+      : null;
+    const isAutoEntrepreneur = settings?.isAutoEntrepreneur || false;
+    
+    // Forcer TVA à 0 si auto-entrepreneur
+    if (isAutoEntrepreneur) {
+      // Forcer TVA à 0 dans les lignes
+      if (row.lines) {
+        row.lines = row.lines.map((line: any) => ({
+          ...line,
+          vatRate: 0,
+        }));
+      }
+      
+      // Forcer les totaux de l'invoice
+      (row as any).vatAmount = 0;
+      (row as any).totalTTC = row.subtotalHT;
+    }
+    
     // Charger le WorkOrder séparément avec le customer
     let workOrder = null;
     let workOrderType = null;

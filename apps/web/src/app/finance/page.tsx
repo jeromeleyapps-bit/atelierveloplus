@@ -470,6 +470,37 @@ function FinanceContent() {
               </Button>
               <Button 
                 size="small" 
+                variant="contained"
+                sx={{ bgcolor: '#FF9800', '&:hover': { bgcolor: '#F57C00' } }}
+                onClick={async () => {
+                  const token = localStorage.getItem('jwt_token');
+                  let successCount = 0;
+                  for (const id of selected) {
+                    try {
+                      const res = await fetch(`/api/finance/invoices/${id}/issue`, {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json',
+                          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                        },
+                      });
+                      if (res.ok) successCount++;
+                    } catch (e) {
+                      console.error('Issue error:', e);
+                    }
+                  }
+                  if (successCount > 0) {
+                    setToast({ open: true, message: `${successCount} document(s) émis`, severity: 'success' });
+                    refresh();
+                  } else {
+                    setToast({ open: true, message: 'Erreur lors de l\'émission', severity: 'error' });
+                  }
+                }}
+              >
+                Émettre
+              </Button>
+              <Button 
+                size="small" 
                 variant="outlined" 
                 startIcon={<PaidIcon />}
                 onClick={openBulkPay}

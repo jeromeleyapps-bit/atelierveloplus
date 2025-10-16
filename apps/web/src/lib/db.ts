@@ -66,9 +66,9 @@ function getDatabaseUrl(): string {
   const provider = getDatabaseProvider();
   
   if (provider === 'sqlite') {
-    // SQLite: Use local file
-    const dbPath = process.env.SQLITE_DB_PATH || './data/atelier-velo.db';
-    return `file:${dbPath}`;
+    // SQLite: Use schema.prisma URL (don't override it)
+    // Return undefined to let Prisma use the schema.prisma datasource URL
+    return undefined as any;
   } else {
     // PostgreSQL: Use Supabase or custom URL
     const url = process.env.DATABASE_URL;
@@ -102,14 +102,18 @@ export async function getPrisma() {
     // Reuse in dev to avoid too many connections
     const g = globalThis as any;
     if (!g.__prisma__) {
-      g.__prisma__ = new PrismaClient({
-        datasources: {
-          db: {
-            url: databaseUrl
-          }
-        },
+      const config: any = {
         log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error']
-      });
+      };
+      
+      // Only override datasource URL if provided (for PostgreSQL)
+      if (databaseUrl) {
+        config.datasources = {
+          db: { url: databaseUrl }
+        };
+      }
+      
+      g.__prisma__ = new PrismaClient(config);
     }
     
     prismaSingleton = g.__prisma__;

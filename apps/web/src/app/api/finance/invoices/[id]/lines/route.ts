@@ -12,9 +12,16 @@ export async function POST(req: Request, { params }: { params: { id: string } })
   const inv = await prisma.invoice.findUnique({ where: { id: params.id }, include: { lines: true } });
   if (!inv) return NextResponse.json({ error: "not_found" }, { status: 404 });
 
+  // Récupérer le statut auto-entrepreneur
+  const firstUser = await prisma.user.findFirst();
+  const settings = firstUser 
+    ? await prisma.appSetting.findUnique({ where: { userId: firstUser.id } })
+    : null;
+  const isAutoEntrepreneur = settings?.isAutoEntrepreneur || false;
+
   // Calculer les totaux de ligne
   const qty = Number(body.qty || 1);
-  const vatRate = body.vatRate != null ? Number(body.vatRate) : (inv.vatRate || 20);
+  const vatRate = isAutoEntrepreneur ? 0 : (body.vatRate != null ? Number(body.vatRate) : (inv.vatRate || 20));
   
   let unitPriceHT = 0;
   let unitPriceTTC = 0;

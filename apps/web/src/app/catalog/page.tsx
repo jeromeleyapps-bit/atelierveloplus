@@ -396,13 +396,13 @@ export default function CatalogPage() {
                 <Button
                   variant="contained"
                   startIcon={<AddIcon />}
-                  onClick={() => { setEditing({}); setEditOpen(true); }}
+                  onClick={openCreate}
                   sx={{
                     bgcolor: theme.primary,
                     '&:hover': { bgcolor: theme.primaryDark },
                   }}
                 >
-                  Nouveau Produit
+                  Ajouter un article
                 </Button>
               </Stack>
             </Stack>

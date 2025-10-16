@@ -16,10 +16,25 @@ export async function GET(
   try {
     const { id } = await context.params;
 
-    const lines = await prisma.workOrderLine.findMany({
+    let lines = await prisma.workOrderLine.findMany({
       where: { workOrderId: id },
       orderBy: { createdAt: "asc" },
     });
+
+    // Récupérer le statut auto-entrepreneur
+    const firstUser = await prisma.user.findFirst();
+    const settings = firstUser 
+      ? await prisma.appSetting.findUnique({ where: { userId: firstUser.id } })
+      : null;
+    const isAutoEntrepreneur = settings?.isAutoEntrepreneur || false;
+
+    // Forcer TVA à 0 si auto-entrepreneur
+    if (isAutoEntrepreneur) {
+      lines = lines.map((line: any) => ({
+        ...line,
+        vatRate: 0,
+      }));
+    }
 
     return NextResponse.json({ lines });
   } catch (error) {
@@ -43,6 +58,13 @@ export async function POST(
     const { id } = await context.params;
     const body = await request.json();
 
+    // Récupérer le statut auto-entrepreneur
+    const firstUser = await prisma.user.findFirst();
+    const settings = firstUser 
+      ? await prisma.appSetting.findUnique({ where: { userId: firstUser.id } })
+      : null;
+    const isAutoEntrepreneur = settings?.isAutoEntrepreneur || false;
+
     const line = await prisma.workOrderLine.create({
       data: {
         workOrderId: id,
@@ -50,7 +72,7 @@ export async function POST(
         description: body.description,
         quantity: body.quantity || 1,
         priceHT: parseFloat(body.priceHT),
-        vatRate: parseFloat(body.vatRate),
+        vatRate: isAutoEntrepreneur ? 0 : parseFloat(body.vatRate),
         duration: body.duration ? parseInt(body.duration) : null,
         sourceId: body.sourceId || null,
         notes: body.notes || null,

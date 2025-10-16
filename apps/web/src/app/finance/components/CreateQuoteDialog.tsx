@@ -16,7 +16,7 @@ import {
   ToggleButton,
   Typography,
 } from "@mui/material";
-import { createQuote, searchWorkOrders, createWorkOrder, listCustomers, type WorkOrder, type Customer } from "@/lib/api";
+import { createQuote, searchWorkOrders, createWorkOrder, listCustomers, getAppSettings, type WorkOrder, type Customer } from "@/lib/api";
 import LineItemSelector, { LineItem } from "@/app/components/LineItemSelector";
 import LineItemsTable from "@/app/components/LineItemsTable";
 import VatRateSelector from "@/app/components/VatRateSelector";
@@ -45,6 +45,17 @@ export default function CreateQuoteDialog({
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [lines, setLines] = useState<LineItem[]>([]);
   const [defaultVatRate, setDefaultVatRate] = useState(20);
+  const [isAutoEntrepreneur, setIsAutoEntrepreneur] = useState(false);
+
+  // Charger les settings au montage
+  useEffect(() => {
+    if (open) {
+      getAppSettings().then(settings => {
+        setIsAutoEntrepreneur(settings?.isAutoEntrepreneur || false);
+        setDefaultVatRate(settings?.isAutoEntrepreneur ? 0 : 20);
+      });
+    }
+  }, [open]);
 
   // Charger les tickets et clients au montage
   useEffect(() => {
@@ -55,12 +66,13 @@ export default function CreateQuoteDialog({
         loadCustomers();
       }
       setLines([]); // Reset lines
-      setDefaultVatRate(20); // Reset TVA
     }
   }, [open, quoteType]);
 
   const handleAddLine = (line: LineItem) => {
-    setLines([...lines, { ...line, id: `temp-${Date.now()}` }]);
+    // Forcer TVA à 0 si auto-entrepreneur
+    const vatRate = isAutoEntrepreneur ? 0 : line.vatRate;
+    setLines([...lines, { ...line, vatRate, id: `temp-${Date.now()}` }]);
   };
 
   const handleUpdateLine = (index: number, updates: Partial<LineItem>) => {
@@ -126,9 +138,7 @@ export default function CreateQuoteDialog({
         }
       }
 
-      const quote = await createQuote({ workOrderId: finalWorkOrderId, validDays, vatRate: defaultVatRate });
-      
-      // Ajouter les lignes manuelles (si présentes)
+      // Ajouter les lignes manuelles au workOrder AVANT de créer le devis
       if (lines.length > 0) {
         const token = localStorage.getItem("jwt_token");
         for (const line of lines) {
@@ -151,6 +161,9 @@ export default function CreateQuoteDialog({
           });
         }
       }
+      
+      // Créer le devis (qui copiera les lignes du workOrder)
+      const quote = await createQuote({ workOrderId: finalWorkOrderId, validDays, vatRate: defaultVatRate });
       
       onSuccess(quote.id);
       onClose();
@@ -265,13 +278,15 @@ export default function CreateQuoteDialog({
                 />
               )}
 
-              {/* TVA par défaut */}
-              <VatRateSelector
-                value={defaultVatRate}
-                onChange={setDefaultVatRate}
-                label="TVA par défaut"
-                fullWidth
-              />
+              {/* TVA par défaut - masqué si auto-entrepreneur */}
+              {!isAutoEntrepreneur && (
+                <VatRateSelector
+                  value={defaultVatRate}
+                  onChange={setDefaultVatRate}
+                  label="TVA par défaut"
+                  fullWidth
+                />
+              )}
 
               {/* Prestations et Pièces - Toujours afficher */}
               <Typography variant="subtitle1" sx={{ mt: 2 }}>

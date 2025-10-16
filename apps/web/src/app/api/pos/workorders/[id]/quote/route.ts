@@ -29,12 +29,9 @@ export async function GET(
     const workOrder = await prisma.workOrder.findUnique({
       where: { id },
       include: {
-        parts: {
-          include: {
-            catalogItem: true,
-          },
-        },
+        lines: true,
         customer: true,
+        bike: true,
       },
     });
 
@@ -52,8 +49,8 @@ export async function GET(
         : 0;
 
     // Calculer le coût des pièces
-    const partsCostHT = workOrder.parts.reduce(
-      (sum, part) => sum + part.priceHT * part.qty,
+    const partsCostHT = workOrder.lines.reduce(
+      (sum, line) => sum + line.priceHT * line.quantity,
       0,
     );
 
@@ -88,12 +85,12 @@ export async function GET(
     }
 
     // Lignes pièces
-    for (const part of workOrder.parts) {
+    for (const line of workOrder.lines) {
       lines.push({
-        description: part.description,
-        qty: part.qty,
-        priceHT: part.priceHT,
-        totalHT: part.priceHT * part.qty,
+        description: line.description,
+        qty: line.quantity,
+        priceHT: line.priceHT,
+        totalHT: line.priceHT * line.quantity,
       });
     }
 

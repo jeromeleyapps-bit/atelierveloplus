@@ -1,8 +1,7 @@
 /**
- * Email module - Now uses HubSpot for all email communications
- * Migrated from Resend/Nodemailer to HubSpot for unified communications
+ * Email module - Resend only
+ * Simple and reliable email sending via Resend API
  */
-import { sendEmail as sendHubSpotEmail } from './hubspot';
 
 interface EmailOptions {
   to: string;
@@ -16,31 +15,49 @@ interface EmailOptions {
 }
 
 /**
- * Send email using HubSpot
- * All emails now go through HubSpot for centralized tracking and CRM integration
+ * Send email using Resend
  */
 export async function sendEmail(options: EmailOptions): Promise<void> {
-  const from = process.env.HUBSPOT_FROM_EMAIL || process.env.EMAIL_FROM || 'contact@atelier-velo.fr';
+  const from = process.env.EMAIL_FROM || 'onboarding@resend.dev';
   
-  // Convert attachments to HubSpot format
-  const hubspotAttachments = options.attachments?.map(att => ({
-    filename: att.filename,
-    content: Buffer.from(att.content).toString('base64'),
-    contentType: att.contentType || 'application/octet-stream',
-  }));
+  if (!process.env.RESEND_API_KEY) {
+    throw new Error('RESEND_API_KEY is not configured in environment variables');
+  }
   
-  // Send via HubSpot
-  const result = await sendHubSpotEmail({
+  const payload: any = {
+    from,
     to: options.to,
     subject: options.subject,
-    htmlContent: options.html,
-    from,
-    attachments: hubspotAttachments,
-  });
-  
-  if (!result.success) {
-    throw new Error(result.error || 'Failed to send email via HubSpot');
+    html: options.html,
+  };
+
+  // Resend attachments format (base64)
+  if (options.attachments && options.attachments.length > 0) {
+    payload.attachments = options.attachments.map(att => ({
+      filename: att.filename,
+      content: Buffer.from(att.content).toString('base64'),
+    }));
   }
+
+  console.log('📧 Envoi email via Resend à:', options.to);
+
+  const response = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error('❌ Erreur Resend:', errorText);
+    throw new Error(`Resend API error: ${errorText}`);
+  }
+  
+  const result = await response.json();
+  console.log('✅ Email envoyé via Resend - ID:', result.id);
 }
 
 /**

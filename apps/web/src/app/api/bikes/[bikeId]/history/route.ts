@@ -31,11 +31,7 @@ export async function GET(
         },
         workOrders: {
           include: {
-            parts: {
-              include: {
-                catalogItem: true,
-              },
-            },
+            lines: true,
           },
           orderBy: {
             createdAt: "desc",
@@ -54,8 +50,8 @@ export async function GET(
     // Construire l'historique détaillé
     const history = bike.workOrders.map((wo) => {
       // Calculer le coût total
-      const partsCost = wo.parts.reduce(
-        (sum, part) => sum + part.priceHT * part.qty,
+      const partsCost = wo.lines.reduce(
+        (sum, line) => sum + line.priceHT * line.quantity,
         0,
       );
       const laborCost =
@@ -74,24 +70,14 @@ export async function GET(
         laborCost,
         partsCost,
         totalCost,
-        parts: wo.parts.map((part) => ({
-          id: part.id,
-          description: part.description,
-          qty: part.qty,
-          priceHT: part.priceHT,
-          totalHT: part.priceHT * part.qty,
-          note: part.note,
-          catalogItem: part.catalogItem
-            ? {
-                id: part.catalogItem.id,
-                name: part.catalogItem.name,
-                sku: part.catalogItem.sku,
-                category: part.catalogItem.category,
-              }
-            : null,
+        parts: wo.lines.map((line) => ({
+          id: line.id,
+          description: line.description,
+          qty: line.quantity,
+          priceHT: line.priceHT,
+          totalHT: line.priceHT * line.quantity,
+          note: line.notes,
         })),
-        inProgressAt: wo.inProgressAt,
-        readyAt: wo.readyAt,
         appointmentDate: wo.appointmentDate,
       };
     });
@@ -147,16 +133,16 @@ function getMostUsedParts(workOrders: any[]): Array<{
   >();
 
   for (const wo of workOrders) {
-    for (const part of wo.parts || []) {
-      const existing = partsMap.get(part.description);
+    for (const line of wo.lines || []) {
+      const existing = partsMap.get(line.description);
       if (existing) {
         existing.count++;
-        existing.totalQty += part.qty;
+        existing.totalQty += line.quantity;
       } else {
-        partsMap.set(part.description, {
-          description: part.description,
+        partsMap.set(line.description, {
+          description: line.description,
           count: 1,
-          totalQty: part.qty,
+          totalQty: line.quantity,
         });
       }
     }

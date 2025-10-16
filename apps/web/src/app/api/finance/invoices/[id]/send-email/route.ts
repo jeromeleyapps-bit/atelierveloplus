@@ -70,9 +70,11 @@ export async function POST(req: Request, { params }: { params: { id: string } })
       : null;
 
     const shopName = settings?.shopName || process.env.SHOP_NAME || 'Atelier Vélo+';
+    const isAutoEntrepreneur = settings?.isAutoEntrepreneur || false;
 
     // Build invoice data for PDF
     const invoiceData = {
+      type: invoice.type,
       number: invoice.number || invoice.id,
       issueDate: invoice.issueDate || invoice.createdAt,
       dueDate: invoice.dueDate,
@@ -84,8 +86,11 @@ export async function POST(req: Request, { params }: { params: { id: string } })
       shopCity: settings?.city || process.env.SHOP_CITY || '',
       shopPhone: settings?.shopPhone || process.env.SHOP_PHONE,
       shopEmail: settings?.shopEmail || process.env.SHOP_EMAIL,
-      shopSiret: process.env.SHOP_SIRET,
-      shopTVA: process.env.SHOP_TVA,
+      shopSiret: settings?.siret || process.env.SHOP_SIRET,
+      shopTVA: settings?.tva || process.env.SHOP_TVA,
+      shopRCS: settings?.rcs || process.env.SHOP_RCS,
+      shopCapital: settings?.capital || process.env.SHOP_CAPITAL,
+      shopInsurance: settings?.insurance || process.env.SHOP_INSURANCE,
       
       customerName: customer 
         ? [customer.firstName, customer.lastName].filter(Boolean).join(' ') || customer.email
@@ -94,20 +99,30 @@ export async function POST(req: Request, { params }: { params: { id: string } })
       customerZip: customer?.zip,
       customerCity: customer?.city,
       
-      lines: invoice.lines.map((ln: any) => ({
-        description: ln.description,
-        qty: ln.qty,
-        unitPriceHT: ln.unitPriceHT,
-        unitPriceTTC: ln.unitPriceTTC,
-        vatRate: ln.vatRate,
-        totalHT: ln.totalHT,
-        totalTTC: ln.totalTTC,
-      })),
+      lines: invoice.lines.map((ln: any) => {
+        const qty = ln.qty ?? 1;
+        const unitPriceHT = ln.unitPriceHT ?? 0;
+        // Forcer TVA à 0 si auto-entrepreneur
+        const vatRate = isAutoEntrepreneur ? 0 : (ln.vatRate ?? 0);
+        const totalHT = ln.totalHT ?? (unitPriceHT * qty);
+        const totalTTC = isAutoEntrepreneur ? totalHT : (ln.totalTTC ?? (totalHT * (1 + vatRate / 100)));
+        
+        return {
+          description: ln.description,
+          qty,
+          unitPriceHT,
+          unitPriceTTC: unitPriceHT * (1 + vatRate / 100),
+          vatRate,
+          totalHT,
+          totalTTC,
+        };
+      }),
       
       subtotalHT: invoice.subtotalHT,
-      vatAmount: invoice.vatAmount,
+      vatAmount: isAutoEntrepreneur ? 0 : invoice.vatAmount,
       totalTTC: invoice.totalTTC,
-      pricingMode: invoice.pricingMode as 'AE_TTC' | 'HT_TVA',
+      pricingMode: isAutoEntrepreneur ? 'AE_TTC' : (invoice.pricingMode as 'AE_TTC' | 'HT_TVA'),
+      isAutoEntrepreneur,
       
       paymentMethod: invoice.paymentMethod,
       paidAt: invoice.paidAt,
@@ -128,12 +143,15 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     });
 
     // Send email
+    const docType = invoice.type === 'quote' ? 'Devis' : invoice.type === 'credit' ? 'Avoir' : 'Facture';
+    const docTypeFile = invoice.type === 'quote' ? 'devis' : invoice.type === 'credit' ? 'avoir' : 'facture';
+    
     await sendEmail({
       to: customerEmail,
-      subject: `Facture ${invoice.number || invoice.id} - ${shopName}`,
+      subject: `${docType} ${invoice.number || invoice.id} - ${shopName}`,
       html: emailHTML,
       attachments: [{
-        filename: `facture_${invoice.number || invoice.id}.pdf`,
+        filename: `${docTypeFile}_${invoice.number || invoice.id}.pdf`,
         content: pdfBytes,
         contentType: 'application/pdf',
       }],
@@ -141,7 +159,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
 
     return NextResponse.json({ 
       success: true, 
-      message: `Facture envoyée à ${customerEmail}`,
+      message: `${docType} envoyé${invoice.type === 'quote' ? '' : 'e'} à ${customerEmail}`,
       sentTo: customerEmail,
     }, { status: 200 });
 

@@ -90,6 +90,37 @@ export default function QuotesTab({ quotes, onRefresh }: QuotesTabProps) {
             </Typography>
             <Button 
               size="small" 
+              variant="contained"
+              sx={{ bgcolor: '#FF9800', '&:hover': { bgcolor: '#F57C00' } }}
+              onClick={async () => {
+                const token = localStorage.getItem('jwt_token');
+                let successCount = 0;
+                for (const id of selected) {
+                  try {
+                    const res = await fetch(`/api/finance/invoices/${id}/issue`, {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                      },
+                    });
+                    if (res.ok) successCount++;
+                  } catch (e) {
+                    console.error('Issue error:', e);
+                  }
+                }
+                if (successCount > 0) {
+                  setToast({ open: true, message: `${successCount} devis émis`, severity: 'success' });
+                  onRefresh();
+                } else {
+                  setToast({ open: true, message: 'Erreur lors de l\'émission', severity: 'error' });
+                }
+              }}
+            >
+              Émettre
+            </Button>
+            <Button 
+              size="small" 
               variant="outlined"
               startIcon={<PictureAsPdfIcon />}
               onClick={() => {
@@ -105,14 +136,27 @@ export default function QuotesTab({ quotes, onRefresh }: QuotesTabProps) {
               variant="outlined"
               startIcon={<EmailIcon />}
               onClick={async () => {
+                const token = localStorage.getItem('jwt_token');
+                let successCount = 0;
                 for (const id of selected) {
                   try {
-                    await fetch(`/api/finance/invoices/${id}/email`, { method: 'POST' });
+                    const res = await fetch(`/api/finance/invoices/${id}/send-email`, { 
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                      },
+                    });
+                    if (res.ok) successCount++;
                   } catch (e) {
                     console.error('Email error:', e);
                   }
                 }
-                setToast({ open: true, message: `${selected.length} devis envoyé${selected.length > 1 ? 's' : ''}`, severity: 'success' });
+                if (successCount > 0) {
+                  setToast({ open: true, message: `${successCount} devis envoyé${successCount > 1 ? 's' : ''}`, severity: 'success' });
+                } else {
+                  setToast({ open: true, message: 'Erreur lors de l\'envoi des emails', severity: 'error' });
+                }
               }}
             >
               Envoyer par email

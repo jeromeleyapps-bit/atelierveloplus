@@ -17,11 +17,18 @@ export async function PATCH(
     const { lineId } = await context.params;
     const body = await request.json();
 
+    // Récupérer le statut auto-entrepreneur
+    const firstUser = await prisma.user.findFirst();
+    const settings = firstUser 
+      ? await prisma.appSetting.findUnique({ where: { userId: firstUser.id } })
+      : null;
+    const isAutoEntrepreneur = settings?.isAutoEntrepreneur || false;
+
     const data: any = {};
     if (body.description !== undefined) data.description = body.description;
     if (body.quantity !== undefined) data.quantity = parseInt(body.quantity);
     if (body.priceHT !== undefined) data.priceHT = parseFloat(body.priceHT);
-    if (body.vatRate !== undefined) data.vatRate = parseFloat(body.vatRate);
+    if (body.vatRate !== undefined) data.vatRate = isAutoEntrepreneur ? 0 : parseFloat(body.vatRate);
     if (body.duration !== undefined) data.duration = body.duration ? parseInt(body.duration) : null;
     if (body.notes !== undefined) data.notes = body.notes || null;
 

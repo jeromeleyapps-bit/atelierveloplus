@@ -29,12 +29,9 @@ export async function POST(
     const workOrder = await prisma.workOrder.findUnique({
       where: { id },
       include: {
-        parts: {
-          include: {
-            catalogItem: true,
-          },
-        },
+        lines: true,
         customer: true,
+        bike: true,
       },
     });
 
@@ -59,8 +56,8 @@ export async function POST(
         : 0;
 
     // Calculer le coût des pièces
-    const partsCostHT = workOrder.parts.reduce(
-      (sum, part) => sum + part.priceHT * part.qty,
+    const partsCostHT = workOrder.lines.reduce(
+      (sum, line) => sum + line.priceHT * line.quantity,
       0,
     );
 
@@ -110,16 +107,15 @@ export async function POST(
                 ]
               : []),
             // Lignes pièces
-            ...workOrder.parts.map((part) => ({
+            ...workOrder.lines.map((line) => ({
               type: "part",
-              description: part.description,
-              qty: part.qty,
-              unitPriceHT: part.priceHT,
-              unitPriceTTC: part.priceHT * (1 + partsTvaRate),
+              description: line.description,
+              qty: line.quantity,
+              unitPriceHT: line.priceHT,
+              unitPriceTTC: line.priceHT * (1 + partsTvaRate),
               vatRate: partsTvaRate * 100, // 20%
-              totalHT: part.priceHT * part.qty,
-              totalTTC: part.priceHT * part.qty * (1 + partsTvaRate),
-              partId: part.catalogItemId,
+              totalHT: line.priceHT * line.quantity,
+              totalTTC: line.priceHT * line.quantity * (1 + partsTvaRate),
             })),
           ],
         },
@@ -160,11 +156,11 @@ export async function POST(
                 },
               ]
             : []),
-          ...workOrder.parts.map((part) => ({
-            description: part.description,
-            qty: part.qty,
-            priceHT: part.priceHT,
-            totalHT: part.priceHT * part.qty,
+          ...workOrder.lines.map((line) => ({
+            description: line.description,
+            qty: line.quantity,
+            priceHT: line.priceHT,
+            totalHT: line.priceHT * line.quantity,
           })),
         ],
       },

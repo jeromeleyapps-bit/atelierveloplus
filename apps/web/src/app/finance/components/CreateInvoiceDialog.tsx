@@ -18,7 +18,7 @@ import {
   Typography,
   Alert,
 } from "@mui/material";
-import { listCustomers, createCustomer, createWorkOrder, createInvoice, type Customer, type WorkOrder } from "@/lib/api";
+import { listCustomers, createCustomer, createWorkOrder, createInvoice, getAppSettings, type Customer, type WorkOrder } from "@/lib/api";
 import LineItemSelector, { LineItem } from "@/app/components/LineItemSelector";
 import LineItemsTable from "@/app/components/LineItemsTable";
 import VatRateSelector from "@/app/components/VatRateSelector";
@@ -52,6 +52,17 @@ export default function CreateInvoiceDialog({ open, onClose, onSuccess }: Create
   // Lignes de facturation
   const [lines, setLines] = useState<LineItem[]>([]);
   const [defaultVatRate, setDefaultVatRate] = useState(20);
+  const [isAutoEntrepreneur, setIsAutoEntrepreneur] = useState(false);
+
+  // Charger les settings au montage
+  useEffect(() => {
+    if (open) {
+      getAppSettings().then(settings => {
+        setIsAutoEntrepreneur(settings?.isAutoEntrepreneur || false);
+        setDefaultVatRate(settings?.isAutoEntrepreneur ? 0 : 20);
+      });
+    }
+  }, [open]);
 
   async function loadCustomers() {
     setLoadingCustomers(true);
@@ -110,7 +121,9 @@ export default function CreateInvoiceDialog({ open, onClose, onSuccess }: Create
   }
 
   function handleAddLine(line: LineItem) {
-    setLines([...lines, { ...line, id: `temp-${Date.now()}` }]);
+    // Forcer TVA à 0 si auto-entrepreneur
+    const vatRate = isAutoEntrepreneur ? 0 : line.vatRate;
+    setLines([...lines, { ...line, vatRate, id: `temp-${Date.now()}` }]);
   }
 
   function handleUpdateLine(index: number, updates: Partial<LineItem>) {
@@ -312,12 +325,15 @@ export default function CreateInvoiceDialog({ open, onClose, onSuccess }: Create
             <Typography variant="subtitle1" sx={{ mt: 2 }}>
               {invoiceType === "service" ? "Prestations et Pièces" : "Articles"}
             </Typography>
-            <VatRateSelector
-              value={defaultVatRate}
-              onChange={setDefaultVatRate}
-              label="TVA par défaut"
-              fullWidth
-            />
+            {/* TVA par défaut - masqué si auto-entrepreneur */}
+            {!isAutoEntrepreneur && (
+              <VatRateSelector
+                value={defaultVatRate}
+                onChange={setDefaultVatRate}
+                label="TVA par défaut"
+                fullWidth
+              />
+            )}
             <LineItemSelector
               onAddLine={handleAddLine}
             />

@@ -1,11 +1,11 @@
 /**
  * POST /api/communications/send
- * Send email or SMS communication
+ * Send email communication (SMS removed)
  */
 
 import { NextResponse } from "next/server";
 import { getPrisma } from "@/lib/db";
-import { sendEmail, sendSMS } from "@/lib/hubspot";
+import { sendEmail } from "@/lib/email";
 import { replaceVariables, type TemplateVariables } from "@/lib/template-engine";
 
 export const dynamic = "force-dynamic";
@@ -132,73 +132,77 @@ export async function POST(req: Request) {
       ? replaceVariables(template.htmlContent, variables)
       : replaceVariables(template.content, variables);
 
-    // Send communication
-    let result;
-    let recipient: string;
-
-    if (type === 'email') {
-      if (!customer.email) {
-        return NextResponse.json({ 
-          error: "no_email", 
-          message: "Customer has no email address" 
-        }, { status: 400 });
-      }
-
-      recipient = customer.email;
-      result = await sendEmail({
-        to: customer.email,
-        subject: subject!,
-        htmlContent: content,
-        textContent: 'textContent' in template ? template.textContent : undefined
-      });
-    } else {
-      if (!customer.phone) {
-        return NextResponse.json({ 
-          error: "no_phone", 
-          message: "Customer has no phone number" 
-        }, { status: 400 });
-      }
-
-      recipient = customer.phone;
-      result = await sendSMS({
-        to: customer.phone,
-        content
-      });
+    // Send communication (email only, SMS removed)
+    if (type !== 'email') {
+      return NextResponse.json({ 
+        error: "unsupported_type", 
+        message: "Only email communications are supported. SMS has been removed." 
+      }, { status: 400 });
     }
 
-    // Save to database
-    const communication = await prisma.communication.create({
-      data: {
-        customerId,
-        workOrderId,
-        invoiceId,
-        type,
-        event,
-        recipient,
-        subject,
-        content,
-        status: result.success ? 'sent' : 'failed',
-        provider: 'hubspot',
-        externalId: result.messageId,
-        sentAt: result.success ? new Date() : null,
-        error: result.success ? null : result.error,
-        metadata: JSON.stringify({ variables, result })
-      }
-    });
+    if (!customer.email) {
+      return NextResponse.json({ 
+        error: "no_email", 
+        message: "Customer has no email address" 
+      }, { status: 400 });
+    }
 
-    if (!result.success) {
+    // Send email
+    try {
+      await sendEmail({
+        to: customer.email,
+        subject: subject!,
+        html: content,
+      });
+
+      // Save to database
+      const communication = await prisma.communication.create({
+        data: {
+          customerId,
+          workOrderId,
+          invoiceId,
+          type,
+          event,
+          recipient: customer.email,
+          subject,
+          content,
+          status: 'sent',
+          provider: 'resend',
+          sentAt: new Date(),
+          metadata: JSON.stringify({ variables })
+        }
+      });
+
+      return NextResponse.json({ 
+        success: true,
+        communicationId: communication.id
+      }, { status: 200 });
+
+    } catch (emailError: any) {
+      // Save failed communication
+      const communication = await prisma.communication.create({
+        data: {
+          customerId,
+          workOrderId,
+          invoiceId,
+          type,
+          event,
+          recipient: customer.email,
+          subject,
+          content,
+          status: 'failed',
+          provider: 'resend',
+          error: emailError.message,
+          metadata: JSON.stringify({ variables, error: emailError.message })
+        }
+      });
+
       return NextResponse.json({ 
         error: "send_failed", 
-        message: result.error,
+        message: emailError.message,
         communicationId: communication.id
       }, { status: 500 });
     }
-
-    return NextResponse.json({ 
-      success: true,
-      communicationId: communication.id,
-      messageId: result.messageId
-    }, { status: 200 });
 
   } catch (error: any) {
     console.error('Communication send error:', error);

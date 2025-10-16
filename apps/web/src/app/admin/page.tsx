@@ -434,8 +434,8 @@ export default function AdminPage() {
                       <EmailIcon color="warning" />
                     </ListItemIcon>
                     <ListItemText
-                      primary="HubSpot"
-                      secondary="Emails & SMS"
+                      primary="Resend"
+                      secondary="Emails transactionnels"
                     />
                     <Chip label="À configurer" color="default" size="small" />
                   </ListItem>

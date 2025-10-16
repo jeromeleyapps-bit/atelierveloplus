@@ -23,9 +23,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const customers = await prisma.customer.findMany({
       where: {
         OR: [
-          { firstName: { contains: searchTerm, mode: "insensitive" } },
-          { lastName: { contains: searchTerm, mode: "insensitive" } },
-          { email: { contains: searchTerm, mode: "insensitive" } },
+          { firstName: { contains: searchTerm } },
+          { lastName: { contains: searchTerm } },
+          { email: { contains: searchTerm } },
           { phone: { contains: searchTerm } },
         ],
       },

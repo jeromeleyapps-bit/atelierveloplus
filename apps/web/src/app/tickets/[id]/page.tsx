@@ -349,7 +349,6 @@ export default function TicketDetailPageNew() {
                   <LineItemSelector
                     onAddLine={handleAddLine}
                     bikeType={undefined}
-                    isAutoEntrepreneur={isAutoEntrepreneur}
                   />
                 }
               />
@@ -363,7 +362,6 @@ export default function TicketDetailPageNew() {
                     lines={lines}
                     onUpdateLine={handleUpdateLine}
                     onDeleteLine={handleDeleteLine}
-                    isAutoEntrepreneur={isAutoEntrepreneur}
                   />
                 )}
               </CardContent>
