@@ -1167,3 +1167,19 @@ export async function deleteCashRegisterEntry(id: string): Promise<{ ok: true }>
     method: 'DELETE'
   });
 }
+
+// ============================================
+// ADMIN - Recent Emails
+// ============================================
+
+export interface RecentEmail {
+  id: string;
+  to: string | string[];
+  subject: string;
+  status: string;
+  createdAt: string;
+}
+
+export async function getRecentEmails(): Promise<{ emails: RecentEmail[] }> {
+  return requestLocal(`/admin/recent-emails`);
+}

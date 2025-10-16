@@ -23,7 +23,10 @@
     "db:reset": "prisma generate && prisma migrate reset --force && prisma migrate dev",
     "db:studio": "prisma studio",
     "db:seed": "ts-node scripts/seed.ts",
-    "audit:deps": "depcheck"
+    "audit:deps": "depcheck",
+    "electron:dev": "electron .",
+    "electron:build": "next build && electron-builder --win --x64",
+    "electron:build:portable": "next build && electron-builder --win portable"
   },
   "dependencies": {
     "@emotion/cache": "^11.14.0",
@@ -62,6 +65,9 @@
     "@vitest/ui": "^3.2.4",
     "better-sqlite3": "^12.4.1",
     "depcheck": "^1.4.7",
+    "electron": "^38.3.0",
+    "electron-builder": "^26.0.12",
+    "electron-is-dev": "^3.0.1",
     "eslint": "8.57.0",
     "eslint-config-next": "^14.2.10",
     "png-to-ico": "^3.0.1",
@@ -72,7 +78,7 @@
     "vitest": "^3.2.4"
   },
   "description": "",
-  "main": "next.config.js",
+  "main": "electron/main.js",
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -83,5 +89,40 @@
   "engineStrict": true,
   "prisma": {
     "seed": "node prisma/seed.cjs"
+  },
+  "build": {
+    "appId": "com.upgradedbikes.atelier-velo",
+    "productName": "Atelier Vélo+",
+    "directories": {
+      "output": "dist-electron",
+      "buildResources": "public"
+    },
+    "files": [
+      ".next/**/*",
+      "electron/**/*",
+      "public/**/*",
+      "data/**/*",
+      "prisma/schema.prisma",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "icon": "public/logo.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "installerIcon": "public/logo.png",
+      "uninstallerIcon": "public/logo.png"
+    },
+    "portable": {
+      "artifactName": "AtelierVeloPlus-Portable.exe"
+    }
   }
 }
