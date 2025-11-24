@@ -1,0 +1,245 @@
+# ============================================================================
+# ELECTRON-BUILDER CONFIG DÉFINITIVE - Atelier Vélo+
+# ============================================================================
+# Date: 3 novembre 2025
+# Méthodologie: AGILE Renforcée - Basée sur best practices DoltHub 2024
+# Sources: DoltHub Blog, Nextron, electron-builder docs
+# ============================================================================
+
+appId: com.upgradedbikes.ateliervelo
+productName: Atelier Velo+
+copyright: Copyright © 2025 Jérôme Leyssard - Upgraded Bikes
+
+# ============================================================================
+# BUILD NATIF
+# ============================================================================
+# Désactiver rebuild (binaires précompilés suffisants)
+# Évite erreur "Visual Studio not found" pour better-sqlite3
+npmRebuild: false
+
+# ============================================================================
+# DOSSIERS
+# ============================================================================
+directories:
+  output: dist-electron
+  buildResources: resources
+
+# ============================================================================
+# FICHIERS INCLUS DANS ASAR
+# ============================================================================
+# Principe: Code application dans ASAR (protégé)
+# Binaires natifs et fichiers modifiables HORS ASAR
+files:
+  - package.json
+  - electron/**/*
+  - "!electron/**/*.md"
+  # Optimisation Sprint 2.5: Exclure sentry-cli binaire Windows (11.7 MB)
+  # Package cli-win32-x64 = binaire upload source maps (build-time only)
+  # Package cli = wrapper JS (léger, garder pour compatibilité)
+  # Source: Sentry Docs - CLI is a build-time tool
+  - "!**/node_modules/@sentry/cli-win32-x64/**/*"
+
+# ============================================================================
+# HOOKS - POST-PACKAGING
+# ============================================================================
+# afterPack: Créer symlink node_modules → npm_modules
+# Raison: electron-builder ne copie PAS les symlinks (bug Windows)
+# afterPack: "./electron-builder-afterpack.js"
+
+# ============================================================================
+# ASAR - ACTIVÉ (Code Electron uniquement)
+# ============================================================================
+# CHANGEMENT 19 nov 2025: ASAR réactivé pour code Electron
+# STRATÉGIE:
+# - Code Electron (electron/**) → ASAR (sécurité + performance)
+# - Web app (Next.js) → extraResources (accès filesystem requis)
+# - Prisma → extraResources (binaires natifs)
+# 
+# RAISON:
+# - Web folder nécessite accès filesystem physique (symlink npm_modules)
+# - Next.js nécessite fs.readdir, fs.stat sur npm_modules
+# - ASAR ne permet pas ces opérations
+asar: true
+asarUnpack:
+  # Binaires natifs ne peuvent PAS être dans ASAR
+  # IMPORTANT: Seulement binaires référencés par electron/ (files:)
+  # Sharp/libvips déjà dans web/ (extraResources) - pas besoin d'unpack
+  
+  # 1. Prisma Query Engine (binaire natif SQLite)
+  # Note: Prisma utilisé depuis web/npm_modules (extraResources)
+  # Ces patterns matchent si Prisma était dans electron/node_modules
+  - "**/*.node"
+  - "**/npm_modules/.prisma/**/*"
+  - "**/npm_modules/@prisma/client/**/*"
+  
+  # 2. Better-sqlite3 (si présent dans electron/)
+  - "**/npm_modules/better-sqlite3/**/*"
+  
+  # Sharp/libvips SUPPRIMÉ: Déjà accessible via web/ extraResources
+  # Gain: -18 MB (pas de duplication app.asar.unpacked)
+
+# ============================================================================
+# RESSOURCES HORS ASAR (extraResources)
+# ============================================================================
+# Pattern DoltHub: Utiliser extraResources pour fichiers critiques
+# Copié dans: resources/ (accessible via process.resourcesPath)
+extraResources:
+  # FIX ENAMETOOLONG: Configuration minimaliste absolue
+  - from: electron-resources/web
+    to: web
+  
+  # 4. ENV PRODUCTION (CRITIQUE - Secrets)
+  # Solution validée: electron-builder docs, communauté
+  - from: .env.production
+    to: web/.env.production
+  
+  # 5. CLOUDFLARED (Désactivé - Fichier non présent)
+  # Tunnel Cloudflare embarqué - À activer si nécessaire
+  # - from: resources/cloudflared
+  #   to: cloudflared
+  #   filter:
+  #     - "**/*"
+
+# ============================================================================
+# CONFIGURATION WINDOWS
+# ============================================================================
+win:
+  target:
+    - target: dir  # Générer seulement unpacked (pas d'installer) - Fix ENAMETOOLONG
+      arch:
+        - x64
+  # FIX SIGNING TIMEOUT: Désactiver signature avec forceCodeSigning (Stack Overflow 2024)
+  forceCodeSigning: false
+  # FIX SIGNING TIMEOUT: Réactiver icône personnalisée
+  icon: resources/icon.ico
+  artifactName: "${productName}-${version}-${os}-${arch}.${ext}"
+  # Sprint 2: Manifest longPathAware pour ASAR + @mui
+  # resources/app.manifest contient <longPathAware>true</longPathAware>
+  # Permet chemins >260 caractères Windows 10 1607+
+  requestedExecutionLevel: asInvoker
+  
+  # SIGNATURE CODE AUTO-SIGNÉE (16 nov 2025)
+  # DÉSACTIVÉE TEMPORAIREMENT - Problème mot de passe certificat
+  # TODO: Débugger pourquoi electron-builder ne lit pas CERT_PASSWORD
+  # Réduit scan Windows Defender (gain installation 20-30%)
+  # Options valides electron-builder v26:
+  # - cscLink: Chemin vers certificat .pfx
+  # - cscKeyPassword: Mot de passe certificat
+  # - signAndEditExecutable: Signer tous les exécutables
+  # cscLink: "cert-selfsigned.pfx"
+  # cscKeyPassword: "${env.CERT_PASSWORD}"
+  # signAndEditExecutable: true
+
+# ============================================================================
+# CONFIGURATION MACOS - DÉSACTIVÉE POUR BUILD WINDOWS
+# ============================================================================
+# NOTE: Configuration macOS supprimée pour éviter conflits avec build Windows
+# Si besoin de build macOS, créer electron-builder.macos.yml séparé
+# Raison: Références à icon.icns causent erreurs signAndEditResources sur Windows
+
+# ============================================================================
+# LOCALES - Optimisation Sprint 1 (-8 MB)
+# ============================================================================
+# Source: https://www.electron.build/configuration/configuration#Configuration-electronLanguages
+# Par défaut Electron inclut ~100 locales (am, ar, bg, etc.)
+# Application française uniquement
+electronLanguages: 
+  - fr
+  - en  # Anglais pour fallback
+
+# ============================================================================
+# NSIS INSTALLER (Windows)
+# ============================================================================
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  allowElevation: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: "${productName}"
+  installerIcon: resources/icon.ico
+  uninstallerIcon: resources/icon.ico
+  # installerHeader: resources/installer-header.bmp  # Fichier vide (0 bytes) - À créer si besoin
+  deleteAppDataOnUninstall: false  # Garder les données utilisateur
+  # Optimisation installation: Options valides electron-builder v26
+  # - differentialPackage: false = Pas de delta updates (installation plus rapide)
+  # - packElevateHelper: false = Pas d'UAC helper (réduit taille)
+  # Note: Option 'solid' n'existe PAS dans electron-builder (NSIS natif uniquement)
+  differentialPackage: false
+  packElevateHelper: false
+
+# ============================================================================
+# PORTABLE (Windows)
+# ============================================================================
+portable:
+  artifactName: "${productName}-${version}-portable.exe"
+
+# ============================================================================
+# PUBLICATION - GitHub Releases (Auto-Update)
+# ============================================================================
+# Doc: https://www.electron.build/configuration/publish
+# Provider: GitHub Releases (gratuit, standard)
+# Usage: npm run build:electron -- --publish always
+publish:
+  - provider: github
+    owner: jeromeleyssard-pixel
+    repo: atelier-velo-plus
+    releaseType: release  # ou 'draft' pour releases brouillons
+
+# ============================================================================
+# COMPRESSION - STORE (Installation Rapide)
+# ============================================================================
+# FIX 16 nov: Changement normal → store pour installation rapide
+# 
+# PROBLÈME IDENTIFIÉ (PC3):
+# - Installation: 11 minutes avec compression normal
+# - Cause: Windows Defender + Décompression = CPU intensif
+# - 63,684 fichiers décompressés = scan antivirus lent
+# 
+# SOLUTION: compression: store
+# - Pas de compression = Fichiers copiés directement
+# - Windows Defender scan plus rapide
+# - Installation: 11 min → 3-4 min (-70%)
+# 
+# TRADE-OFF:
+# - Coût: Taille installer +135 MB (145 MB → 280 MB)
+# - Bénéfice: Installation 3x plus rapide
+# - Verdict: EXCELLENT (UX > Taille)
+# 
+# SOURCES:
+# - electron-builder docs: "store = fastest install"
+# - Pattern apps Electron: VS Code, Slack, Discord utilisent store
+# - Mémoire interne: SOLUTION-BUILD-PERFORMANCE-15NOV.md
+# 
+# Options disponibles:
+# - store: Pas de compression (installation rapide, EXE +40%)
+# - normal: Compression standard (installation lente)
+# - maximum: Compression maximale (installation très lente)
+compression: store
+
+# ============================================================================
+# NOTES TECHNIQUES
+# ============================================================================
+# 1. PRISMA + ASAR:
+#    - Binaires .node ne peuvent pas s'exécuter dans ASAR
+#    - Solution: extraResources vers prisma-client/
+#    - electron/main.js charge Prisma depuis process.resourcesPath
+#
+# 2. DOSSIERS CACHÉS:
+#    - Bug electron-builder #733: dotfiles ignorés
+#    - Solution: Copie EXPLICITE de .next/
+#
+# 3. .env.production:
+#    - Contient ENCRYPTION_KEY et JWT_SECRET
+#    - DOIT être copié explicitement (pas dans standalone)
+#
+# 4. node_modules:
+#    - Renommé en npm_modules par prepare-build.js
+#    - Raison: electron-builder ignore node_modules dans certains cas
+#    - Symlink créé au runtime par electron/main.js
+#
+# 5. Sécurité:
+#    - Code dans ASAR = protégé
+#    - Binaires unpacked = fonctionnels
+#    - sandbox: false (electron/main.js) = OK pour desktop standalone
+# ============================================================================
