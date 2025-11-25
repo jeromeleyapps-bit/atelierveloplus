@@ -23,6 +23,17 @@ const nextConfig = {
       config.cache = false;
     }
     
+    // OPTIMISATIONS SPRINT 1.3 - 25 nov 2024
+    // Minification aggressive en production
+    if (!isServer && process.env.NODE_ENV === 'production') {
+      config.optimization = {
+        ...config.optimization,
+        minimize: true,
+        usedExports: true,
+        sideEffects: true,
+      };
+    }
+    
     return config;
   },
 };

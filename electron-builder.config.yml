@@ -47,6 +47,35 @@ files:
   - "!**/node_modules/electron-builder/**/*"
   - "!**/node_modules/electron-builder-squirrel-windows/**/*"
   
+  # OPTIMISATIONS SPRINT 1.3 - 25 nov 2024
+  # Exclure Playwright (tests E2E uniquement)
+  - "!**/node_modules/@playwright/**/*"
+  - "!**/node_modules/playwright/**/*"
+  - "!**/node_modules/playwright-core/**/*"
+  
+  # Exclure Jest (tests unitaires uniquement)
+  - "!**/node_modules/jest/**/*"
+  - "!**/node_modules/jest-*/**/*"
+  - "!**/node_modules/@jest/**/*"
+  
+  # Exclure TypeScript (dev uniquement)
+  - "!**/node_modules/typescript/**/*"
+  - "!**/node_modules/@types/**/*"
+  
+  # Exclure ESLint (dev uniquement)
+  - "!**/node_modules/eslint/**/*"
+  - "!**/node_modules/eslint-*/**/*"
+  - "!**/node_modules/@eslint/**/*"
+  
+  # Exclure fichiers volumineux inutiles
+  - "!**/node_modules/**/*.md"
+  - "!**/node_modules/**/LICENSE*"
+  - "!**/node_modules/**/CHANGELOG*"
+  - "!**/node_modules/**/README*"
+  - "!**/node_modules/**/.github/**/*"
+  - "!**/node_modules/**/docs/**/*"
+  - "!**/node_modules/**/examples/**/*"
+  
   # Exclure fichiers de développement
   - "!**/*.map"
   - "!**/*.d.ts"
