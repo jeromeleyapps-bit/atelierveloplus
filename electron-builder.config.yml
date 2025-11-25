@@ -22,7 +22,9 @@ npmRebuild: false
 # ============================================================================
 directories:
   output: dist-electron
-  buildResources: resources
+  buildResources: resources  # ✅ BEST PRACTICE: Icône doit être dans resources/icon.ico
+                             # electron-builder copie automatiquement l'icône dans l'exe Windows
+                             # L'icône sera utilisée pour: exe, barre des tâches, fenêtre
 
 # ============================================================================
 # FICHIERS INCLUS DANS ASAR
@@ -33,11 +35,46 @@ files:
   - package.json
   - electron/**/*
   - "!electron/**/*.md"
-  # Optimisation Sprint 2.5: Exclure sentry-cli binaire Windows (11.7 MB)
-  # Package cli-win32-x64 = binaire upload source maps (build-time only)
-  # Package cli = wrapper JS (léger, garder pour compatibilité)
-  # Source: Sentry Docs - CLI is a build-time tool
+  
+  # ============================================================================
+  # OPTIMISATIONS SPRINT 1.3 - Réduction Taille Build
+  # ============================================================================
+  
+  # Exclure outils de build (ne doivent PAS être dans le build final)
   - "!**/node_modules/@sentry/cli-win32-x64/**/*"
+  - "!**/node_modules/app-builder-bin/**/*"
+  - "!**/node_modules/app-builder-lib/**/*"
+  - "!**/node_modules/electron-builder/**/*"
+  - "!**/node_modules/electron-builder-squirrel-windows/**/*"
+  
+  # Exclure fichiers de développement
+  - "!**/*.map"
+  - "!**/*.d.ts"
+  - "!**/__tests__/**/*"
+  - "!**/__mocks__/**/*"
+  - "!**/test/**/*"
+  - "!**/tests/**/*"
+  - "!**/*.test.js"
+  - "!**/*.test.ts"
+  - "!**/*.spec.js"
+  - "!**/*.spec.ts"
+  
+  # Exclure documentation
+  - "!**/examples/**/*"
+  - "!**/docs/**/*"
+  - "!**/documentation/**/*"
+  - "!**/*.md"
+  - "!**/LICENSE"
+  - "!**/CHANGELOG*"
+  - "!**/README*"
+  
+  # Exclure fichiers de configuration
+  - "!**/.eslintrc*"
+  - "!**/.prettierrc*"
+  - "!**/tsconfig*.json"
+  - "!**/jest.config*"
+  - "!**/.gitignore"
+  - "!**/.npmignore"
 
 # ============================================================================
 # HOOKS - POST-PACKAGING
@@ -61,19 +98,23 @@ files:
 # - ASAR ne permet pas ces opérations
 asar: true
 asarUnpack:
+  # ============================================================================
+  # OPTIMISATION SPRINT 1.3 - Dédupliquer binaires natifs
+  # ============================================================================
   # Binaires natifs ne peuvent PAS être dans ASAR
-  # IMPORTANT: Seulement binaires référencés par electron/ (files:)
-  # Sharp/libvips déjà dans web/ (extraResources) - pas besoin d'unpack
+  # STRATÉGIE: Garder UNE SEULE copie de chaque binaire
   
   # 1. Prisma Query Engine (binaire natif SQLite)
   # Note: Prisma utilisé depuis web/npm_modules (extraResources)
-  # Ces patterns matchent si Prisma était dans electron/node_modules
-  - "**/*.node"
-  - "**/npm_modules/.prisma/**/*"
-  - "**/npm_modules/@prisma/client/**/*"
+  # Pattern spécifique pour éviter duplications
+  - "**/npm_modules/.prisma/client/*.node"
+  - "**/npm_modules/@prisma/client/runtime/*.node"
   
   # 2. Better-sqlite3 (si présent dans electron/)
-  - "**/npm_modules/better-sqlite3/**/*"
+  - "**/npm_modules/better-sqlite3/build/Release/*.node"
+  
+  # 3. Autres binaires natifs (.node)
+  - "**/*.node"
   
   # Sharp/libvips SUPPRIMÉ: Déjà accessible via web/ extraResources
   # Gain: -18 MB (pas de duplication app.asar.unpacked)
@@ -115,7 +156,15 @@ win:
   # Avec node_modules complet, trop de fichiers → ENAMETOOLONG
   # Solution: Désactiver via variable d'environnement CSC_IDENTITY_AUTO_DISCOVERY=false
   forceCodeSigning: false
-  # FIX SIGNING TIMEOUT: Réactiver icône personnalisée
+  
+  # ✅ BEST PRACTICE ELECTRON: Configuration icône Windows
+  # Format: .ico avec plusieurs tailles (16x16, 32x32, 48x48, 256x256)
+  # Chemin relatif depuis buildResources (resources/)
+  # electron-builder intègre automatiquement l'icône dans l'exe Windows
+  # L'icône sera utilisée pour:
+  # - L'exécutable dans l'explorateur Windows
+  # - La barre des tâches
+  # - La fenêtre de l'application (si pas définie dans BrowserWindow)
   icon: resources/icon.ico
   artifactName: "${productName}-${version}-${os}-${arch}.${ext}"
   # Sprint 2: Manifest longPathAware pour ASAR + @mui
