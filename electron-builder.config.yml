@@ -105,10 +105,15 @@ extraResources:
 # ============================================================================
 win:
   target:
-    - target: dir  # Générer seulement unpacked (pas d'installer) - Fix ENAMETOOLONG
+    # ✅ FIX: Construire seulement NSIS pour éviter ENAMETOOLONG avec dir + nsis
+    # Le build dir est fait séparément si nécessaire
+    - target: nsis  # Créer installateur .exe pour distribution
       arch:
         - x64
-  # FIX SIGNING TIMEOUT: Désactiver signature avec forceCodeSigning (Stack Overflow 2024)
+  # FIX SIGNING TIMEOUT: Désactiver COMPLÈTEMENT la signature (évite ENAMETOOLONG)
+  # Même avec forceCodeSigning: false, electron-builder essaie de signer certains fichiers
+  # Avec node_modules complet, trop de fichiers → ENAMETOOLONG
+  # Solution: Désactiver via variable d'environnement CSC_IDENTITY_AUTO_DISCOVERY=false
   forceCodeSigning: false
   # FIX SIGNING TIMEOUT: Réactiver icône personnalisée
   icon: resources/icon.ico
@@ -164,9 +169,11 @@ nsis:
   # Optimisation installation: Options valides electron-builder v26
   # - differentialPackage: false = Pas de delta updates (installation plus rapide)
   # - packElevateHelper: false = Pas d'UAC helper (réduit taille)
+  # - useZip: true = Utiliser compression ZIP (évite ENAMETOOLONG avec beaucoup de fichiers)
   # Note: Option 'solid' n'existe PAS dans electron-builder (NSIS natif uniquement)
   differentialPackage: false
   packElevateHelper: false
+  useZip: true  # Compression ZIP pour éviter ENAMETOOLONG
 
 # ============================================================================
 # PORTABLE (Windows)

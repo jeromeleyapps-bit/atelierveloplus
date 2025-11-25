@@ -66,6 +66,8 @@ const SERVER_ONLY_MODULES = [
   '@swc/helpers',
   'caniuse-lite',
   'postcss',
+  'watchpack',          // Next.js dependency (file watching)
+  'graceful-fs',        // watchpack dependency (CRITIQUE - manquant causait écran noir)
   
   // ===== REACT CORE (OBLIGATOIRE) =====
   'react',
@@ -359,137 +361,61 @@ try {
 }
 
 // ============================================================================
-// ÉTAPE 6: COPIE NODE_MODULES OPTIMISÉE (LISTE BLANCHE)
+// ÉTAPE 6: COPIE NODE_MODULES COMPLÈTE (BUILD AUTONOME)
 // ============================================================================
 
 console.log('');
-log('📚', 'ÉTAPE 6/7 - Copie node_modules OPTIMISÉE (liste blanche)...');
-log('ℹ️', `Modules serveur uniquement: ${SERVER_ONLY_MODULES.length} packages`);
+log('📚', 'ÉTAPE 6/7 - Copie node_modules COMPLÈTE (build autonome)...');
+log('ℹ️', 'Objectif: aucun copier/coller manuel post-build, zéro écran noir');
 console.log('');
 
 const nodeModulesDest = path.join(PATHS.resources, 'node_modules');
-fs.ensureDirSync(nodeModulesDest);
 
-// Copier modules critiques (LISTE BLANCHE)
-let copiedCount = 0;
-let skippedCount = 0;
-const _savedMB = 0;
-
-for (const moduleName of SERVER_ONLY_MODULES) {
-  const moduleSrc = path.join(PATHS.nodeModules, moduleName);
-  const moduleDest = path.join(nodeModulesDest, moduleName);
-  
-  if (fs.existsSync(moduleSrc)) {
-    try {
-      // Calculer taille avant copie (cross-platform)
-      let sizeMB = 0;
-      try {
-        if (process.platform === 'win32') {
-          const sizeBytes = execSync(`powershell "(Get-ChildItem -Path '${moduleSrc}' -Recurse -File | Measure-Object -Property Length -Sum).Sum"`, { encoding: 'utf8' });
-          sizeMB = parseInt(sizeBytes) / (1024 * 1024);
-        } else {
-          // macOS/Linux: utiliser du
-          const sizeKB = execSync(`du -sk "${moduleSrc}"`, { encoding: 'utf8' }).split('\t')[0];
-          sizeMB = parseInt(sizeKB) / 1024;
-        }
-      } catch (_sizeError) {
-        // Si calcul taille échoue, continuer sans afficher la taille
-        sizeMB = 0;
-      }
-      
-      fs.copySync(moduleSrc, moduleDest, {
-        filter: (src) => {
-          // OPTIMISATION: Exclure fichiers inutiles SAUF fichiers critiques Next.js
-          const basename = path.basename(src);
-          
-          // Toujours inclure fichiers critiques Next.js
-          if (moduleName === 'next' && (
-            basename === 'next-test.js' ||
-            basename === 'next-test.d.ts' ||
-            src.includes('cli/next-test')
-          )) {
-            return true;
-          }
-          
-          // ✅ OPTIMISATION PHASE 1: Filtrage Prisma amélioré (-20 à -30 MB)
-          // Exclure fichiers temporaires, tests, documentation Prisma
-          if (moduleName === '@prisma/client' || moduleName === '.prisma') {
-            // Exclure fichiers temporaires Prisma (gain: -5 à -10 MB)
-            if (src.match(/\.tmp\d*$/) || src.match(/\.tmp$/) || 
-                src.includes('.tmp') || src.includes('/tmp/')) {
-              return false;
-            }
-            // Exclure tests et examples Prisma (gain: -5 à -10 MB)
-            if (src.includes('__tests__') || src.includes('/tests/') ||
-                src.includes('.test.') || src.includes('.spec.') ||
-                src.includes('/examples/') || src.includes('/example/')) {
-              return false;
-            }
-            // Exclure documentation Prisma (gain: -2 à -5 MB)
-            if (basename.endsWith('.md') || basename === 'LICENSE' ||
-                basename === 'CHANGELOG.md' || basename === 'README.md' ||
-                src.includes('/docs/') || src.includes('/doc/')) {
-              return false;
-            }
-            // Inclure tous les autres fichiers Prisma (runtime critique)
-            return true;
-          }
-          
-          // Exclure fichiers inutiles pour autres modules
-          return !src.match(/\.tmp\d*$/) 
-            && !src.match(/\.tmp$/)
-            && !src.includes('__tests__')  // Dossiers tests uniquement
-            && !src.includes('.test.js')   // Fichiers tests unitaires
-            && !src.includes('.spec.js')   // Fichiers specs
-            && !src.includes('/examples/')  // Dossier examples (pas fichier)
-            && !src.includes('/benchmarks/') // Dossier benchmarks
-            && !basename.endsWith('.md')    // Markdown (pas dans chemin)
-            && basename !== 'LICENSE'
-            && basename !== 'CHANGELOG.md';
-        }
-      });
-      
-      copiedCount++;
-      if (sizeMB > 0) {
-        log('  ✓', `${moduleName} (${sizeMB.toFixed(1)} MB)`);
-      } else {
-        log('  ✓', moduleName);
-      }
-    } catch (error) {
-      logWarning(`Échec copie ${moduleName}: ${error.message}`);
-      skippedCount++;
-    }
-  } else {
-    logWarning(`${moduleName} absent`);
-    skippedCount++;
-  }
-}
-
-console.log('');
-logSuccess(`${copiedCount} modules copiés, ${skippedCount} ignorés`);
-
-// Calculer modules exclus
-const pkgJsonPath = path.join(__dirname, 'package.json');
-if (fs.existsSync(pkgJsonPath)) {
-  const pkg = JSON.parse(fs.readFileSync(pkgJsonPath, 'utf8'));
-  const allDeps = Object.keys(pkg.dependencies || {});
-  const excluded = allDeps.filter(dep => !SERVER_ONLY_MODULES.includes(dep));
-  
-  if (excluded.length > 0) {
-    log('🎯', `Modules exclus (client-only): ${excluded.length}`);
-    log('ℹ️', 'Exemples: @mui/*, @fullcalendar/*, recharts, framer-motion');
-    log('💾', `Gain estimé: -200 à -300 MB`);
-  }
-}
-
-// Copier package.json racine (pour version info)
 try {
-  const pkgSrc = path.join(__dirname, 'package.json');
-  const pkgDest = path.join(PATHS.resources, 'package.json');
-  fs.copySync(pkgSrc, pkgDest);
-  logSuccess('package.json copié');
-} catch (_error) {
-  logWarning('package.json non copié');
+  if (!fs.existsSync(PATHS.nodeModules)) {
+    logError(`node_modules introuvable: ${PATHS.nodeModules}`);
+    process.exit(1);
+  }
+
+  // Copie complète de node_modules vers electron-resources/web/node_modules
+  // On garde un filtrage léger (tmp, tests, docs) pour éviter les fichiers inutiles,
+  // mais on ne fait PLUS de liste blanche de paquets.
+  fs.copySync(PATHS.nodeModules, nodeModulesDest, {
+    filter: (src) => {
+      const basename = path.basename(src);
+
+      // Exclure fichiers temporaires évidents
+      if (src.match(/\.tmp\d*$/) || src.match(/\.tmp$/)) return false;
+
+      // Exclure caches et dossiers de test/documentation non nécessaires au runtime
+      if (src.includes('__tests__') || src.includes('/tests/') || src.includes('\\tests\\')) return false;
+      if (src.includes('/examples/') || src.includes('\\examples\\')) return false;
+      if (src.includes('/benchmarks/') || src.includes('\\benchmarks\\')) return false;
+
+      if (basename === 'CHANGELOG.md' || basename === 'CHANGELOG' ||
+          basename === 'LICENSE' || basename === 'LICENSE.md') {
+        return false;
+      }
+
+      return true;
+    }
+  });
+
+  logSuccess('node_modules complet copié vers electron-resources/web/node_modules');
+
+  // Copier package.json racine (pour version info)
+  try {
+    const pkgSrc = path.join(__dirname, 'package.json');
+    const pkgDest = path.join(PATHS.resources, 'package.json');
+    fs.copySync(pkgSrc, pkgDest);
+    logSuccess('package.json copié');
+  } catch (_error) {
+    logWarning('package.json non copié');
+  }
+
+} catch (error) {
+  logError(`Échec copie node_modules complet: ${error.message}`);
+  process.exit(1);
 }
 
 // ============================================================================
@@ -613,9 +539,8 @@ Object.entries(stats).forEach(([name, exists]) => {
 });
 
 console.log('');
-log('🎯', `Modules serveur: ${copiedCount}/${SERVER_ONLY_MODULES.length}`);
-log('💾', 'Gain estimé: -200 à -300 MB vs build standard');
-log('⏱️', 'Gain estimé: -5 à -10 min build time');
+log('📦', 'node_modules complet copié (tous les modules inclus)');
+log('💾', 'Taille: ~220-300 MB (dépendances complètes pour fonctionnement garanti)');
 console.log('');
 log('🚀', 'Prêt pour electron-builder!');
 console.log('='.repeat(80));
