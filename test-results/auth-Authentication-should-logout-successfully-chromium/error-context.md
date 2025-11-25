@@ -1,0 +1,208 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4]:
+        - link [ref=e5] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e7]: votre logo
+        - heading [level=6] [ref=e8]: Mon Atelier
+      - generic [ref=e9]:
+        - link [ref=e10] [cursor=pointer]:
+          - /url: /account
+          - text: Mon compte
+        - button [ref=e11] [cursor=pointer]:
+          - img [ref=e13]
+        - link [ref=e15] [cursor=pointer]:
+          - /url: /admin/guide
+          - img [ref=e16]
+        - button [ref=e19] [cursor=pointer]:
+          - img [ref=e20]
+        - button [ref=e22] [cursor=pointer]:
+          - img [ref=e23]
+    - generic [ref=e25]:
+      - link [ref=e27] [cursor=pointer]:
+        - /url: /dashboard
+        - text: Tableau de bord
+      - link [ref=e30] [cursor=pointer]:
+        - /url: /customers
+        - text: Clients
+      - link [ref=e32] [cursor=pointer]:
+        - /url: /tickets
+        - text: Réparations
+      - link [ref=e34] [cursor=pointer]:
+        - /url: /finance
+        - text: Facturation
+      - link [ref=e36] [cursor=pointer]:
+        - /url: /admin/booking
+        - text: Calendrier atelier
+      - link [ref=e38] [cursor=pointer]:
+        - /url: /booking
+        - text: RDV client
+      - link [ref=e40] [cursor=pointer]:
+        - /url: /bikes/history
+        - text: Historique Vélos
+      - link [ref=e42] [cursor=pointer]:
+        - /url: /catalog
+        - text: Catalogue
+      - link [ref=e44] [cursor=pointer]:
+        - /url: /cash-register
+        - text: Caisse
+      - link [ref=e46] [cursor=pointer]:
+        - /url: /stats
+        - text: Statistiques
+  - alert [ref=e51]:
+    - img [ref=e53]
+    - generic [ref=e56]:
+      - generic [ref=e57]:
+        - paragraph [ref=e58]: 🎉 Essai PRO gratuit
+        - paragraph [ref=e59]:
+          - strong [ref=e60]: 12 jours
+          - text: restants
+        - generic [ref=e61]: Jusqu'au 7 décembre
+      - generic [ref=e62]:
+        - progressbar [ref=e63]
+        - generic [ref=e65]: 14%
+    - generic [ref=e67]:
+      - button [ref=e68] [cursor=pointer]:
+        - img [ref=e70]
+        - text: Voir les offres
+      - button [ref=e72] [cursor=pointer]:
+        - img [ref=e73]
+  - generic [ref=e75]:
+    - generic [ref=e78]:
+      - img [ref=e79]
+      - generic [ref=e81]:
+        - heading [level=4] [ref=e82]: 📊 Tableau de Bord
+        - paragraph [ref=e83]: Vue d'ensemble de votre activité
+    - generic [ref=e84]:
+      - generic [ref=e85]:
+        - generic [ref=e87]:
+          - generic [ref=e88]:
+            - img [ref=e90]
+            - heading [level=6] [ref=e92]: Réparations en attente
+          - generic [ref=e93]: "0"
+          - button [ref=e95] [cursor=pointer]: Voir les tickets
+        - generic [ref=e97]:
+          - generic [ref=e98]:
+            - img [ref=e100]
+            - heading [level=6] [ref=e102]: Terminés ce mois
+          - generic [ref=e103]: "0"
+          - button [ref=e105] [cursor=pointer]: Voir l'historique
+        - generic [ref=e107]:
+          - generic [ref=e108]:
+            - img [ref=e110]
+            - heading [level=6] [ref=e112]: CA du mois
+          - generic [ref=e113]: 0 €
+          - button [ref=e115] [cursor=pointer]: Voir factures
+        - generic [ref=e117]:
+          - generic [ref=e118]:
+            - img [ref=e120]
+            - heading [level=6] [ref=e123]: En attente d'encaissement
+          - generic [ref=e124]: 0 €
+          - button [ref=e126] [cursor=pointer]: Voir factures
+        - generic [ref=e128]:
+          - generic [ref=e129]:
+            - img [ref=e131]
+            - heading [level=6] [ref=e135]: Clients actifs
+          - generic [ref=e136]: "0"
+          - button [ref=e138] [cursor=pointer]: Voir clients
+      - generic [ref=e139]:
+        - generic [ref=e141]:
+          - generic [ref=e142]:
+            - heading [level=2] [ref=e143]: ⚠️ Alerte stock bas
+            - button [ref=e144] [cursor=pointer]: Catalogue
+          - heading [level=6] [ref=e147]: ✅ Aucun article en alerte - Stock OK
+        - generic [ref=e150]:
+          - heading [level=2] [ref=e151]: 📅 Prochains rendez-vous
+          - button [ref=e152] [cursor=pointer]: Voir tout
+        - generic [ref=e156]:
+          - heading [level=2] [ref=e157]: Derniers tickets
+          - button [ref=e158] [cursor=pointer]: Voir tout
+        - generic [ref=e161]:
+          - generic [ref=e162]:
+            - heading [level=2] [ref=e163]: Dernière facture émise
+            - button [ref=e164] [cursor=pointer]: Voir tout
+          - paragraph [ref=e166]: Aucune facture émise
+        - generic [ref=e168]:
+          - generic [ref=e169]:
+            - heading [level=2] [ref=e170]: 📰 Actualités Vélo
+            - generic [ref=e171]: Derniers articles des magazines spécialisés
+          - generic [ref=e172]:
+            - generic [ref=e173] [cursor=pointer]:
+              - generic [ref=e174]: Weelz
+              - paragraph [ref=e175]: « J’ai bu 8 litres et j’avançais pas » – Loïc nous raconte son Bikingman Maroc, 1000 km avec le Orbea Terra (un interview… sans les freins)
+              - generic [ref=e176]: Mobilité
+            - generic [ref=e177] [cursor=pointer]:
+              - generic [ref=e178]: enDHurobike
+              - paragraph [ref=e179]: "Match &#124; LOOK Trail Roc Vs SIXPACK Millenium 3.0 : Le Made in France face au Made in Allemagne !"
+              - generic [ref=e180]: Enduro
+            - generic [ref=e181] [cursor=pointer]:
+              - generic [ref=e182]: Top Vélo
+              - paragraph [ref=e183]: Nouvelle gamme de roues Prymahl 2026
+              - generic [ref=e184]: Matériel
+            - generic [ref=e185] [cursor=pointer]:
+              - generic [ref=e186]: Vélo 101
+              - paragraph [ref=e187]: Estaban Chaves stoppe sa carrière
+              - generic [ref=e188]: Pro
+            - generic [ref=e189] [cursor=pointer]:
+              - generic [ref=e190]: Full Attack
+              - paragraph [ref=e191]: Mega de La Réunion 2025 &#8211; Le run embarqué d'Alex Rudeau
+              - generic [ref=e192]: DH/Enduro
+  - generic [ref=e193]:
+    - img [ref=e195]
+    - button [ref=e243] [cursor=pointer]:
+      - img [ref=e244]
+  - alert [ref=e292]
+  - dialog [ref=e295]:
+    - generic [ref=e296]:
+      - generic [ref=e297]:
+        - generic [ref=e299]:
+          - img [ref=e301]:
+            - generic [ref=e303]: "1"
+          - generic [ref=e305]: Bienvenue
+        - generic [ref=e307]:
+          - img [ref=e309]:
+            - generic [ref=e311]: "2"
+          - generic [ref=e313]: Identité personnelle
+        - generic [ref=e315]:
+          - img [ref=e317]:
+            - generic [ref=e319]: "3"
+          - generic [ref=e321]: Identité de l'atelier
+        - generic [ref=e323]:
+          - img [ref=e325]:
+            - generic [ref=e327]: "4"
+          - generic [ref=e329]: Coordonnées
+        - generic [ref=e331]:
+          - img [ref=e333]:
+            - generic [ref=e335]: "5"
+          - generic [ref=e337]: Statut fiscal
+        - generic [ref=e339]:
+          - img [ref=e341]:
+            - generic [ref=e343]: "6"
+          - generic [ref=e345]: Tarification
+        - generic [ref=e347]:
+          - img [ref=e349]:
+            - generic [ref=e351]: "7"
+          - generic [ref=e353]: Confirmation
+      - generic [ref=e354]:
+        - heading "🚴 Bienvenue dans Atelier Vélo+" [level=4] [ref=e355]
+        - paragraph [ref=e356]:
+          - text: Configurons votre atelier en quelques étapes simples.
+          - text: Cela ne prendra que 2 minutes !
+        - generic [ref=e357]:
+          - paragraph [ref=e358]: "Ce que nous allons configurer :"
+          - generic [ref=e359]:
+            - paragraph [ref=e360]: ✓ Votre identité personnelle
+            - paragraph [ref=e361]: ✓ Nom et coordonnées de votre atelier
+            - paragraph [ref=e362]: ✓ Tarification (tarif horaire, multiplicateur, TVA)
+            - paragraph [ref=e363]: ✓ Statut fiscal (auto-entrepreneur ou société)
+            - paragraph [ref=e364]: ✓ Informations légales pour vos factures
+      - generic [ref=e365]:
+        - generic [ref=e366]:
+          - button "Retour" [disabled]
+          - button "Passer l'assistant de configuration" [ref=e367] [cursor=pointer]: Passer l'assistant de configuration
+        - button "Suivant" [ref=e368] [cursor=pointer]: Suivant
+```

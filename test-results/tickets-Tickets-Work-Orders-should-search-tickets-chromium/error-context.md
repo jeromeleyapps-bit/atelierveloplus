@@ -1,0 +1,109 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4]:
+        - link "votre logo" [ref=e5] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e7]:
+            - text: votre
+            - text: logo
+        - heading "Atelier velo +" [level=6] [ref=e8]
+      - generic [ref=e9]:
+        - link "Mon compte" [ref=e10] [cursor=pointer]:
+          - /url: /account
+          - text: Mon compte
+        - button [ref=e11] [cursor=pointer]:
+          - img [ref=e13]
+        - link "aide" [ref=e15] [cursor=pointer]:
+          - /url: /admin/guide
+          - img [ref=e16]
+        - button "toggle theme" [ref=e19] [cursor=pointer]:
+          - img [ref=e20]
+        - button "menu" [ref=e22] [cursor=pointer]:
+          - img [ref=e23]
+    - generic [ref=e25]:
+      - link "Tableau de bord" [ref=e27] [cursor=pointer]:
+        - /url: /dashboard
+        - text: Tableau de bord
+      - link "Clients" [ref=e30] [cursor=pointer]:
+        - /url: /customers
+        - text: Clients
+      - link "Réparations" [ref=e32] [cursor=pointer]:
+        - /url: /tickets
+        - text: Réparations
+      - link "Facturation" [ref=e34] [cursor=pointer]:
+        - /url: /finance
+        - text: Facturation
+      - link "Calendrier atelier" [ref=e36] [cursor=pointer]:
+        - /url: /admin/booking
+        - text: Calendrier atelier
+      - link "RDV client" [ref=e38] [cursor=pointer]:
+        - /url: /booking
+        - text: RDV client
+      - link "Historique Vélos" [ref=e40] [cursor=pointer]:
+        - /url: /bikes/history
+        - text: Historique Vélos
+      - link "Catalogue" [ref=e42] [cursor=pointer]:
+        - /url: /catalog
+        - text: Catalogue
+      - link "Caisse" [ref=e44] [cursor=pointer]:
+        - /url: /cash-register
+        - text: Caisse
+      - link "Statistiques" [ref=e46] [cursor=pointer]:
+        - /url: /stats
+        - text: Statistiques
+  - generic [ref=e47]:
+    - generic [ref=e50]:
+      - img [ref=e51]
+      - generic [ref=e53]:
+        - heading "📊 Tableau de Bord" [level=4] [ref=e54]
+        - paragraph [ref=e55]: Vue d'ensemble de votre activité
+    - generic [ref=e56]:
+      - generic [ref=e57]:
+        - paragraph [ref=e61]
+        - paragraph [ref=e70]
+        - paragraph [ref=e79]
+        - paragraph [ref=e88]
+      - generic [ref=e94]:
+        - generic [ref=e96]:
+          - generic [ref=e97]:
+            - heading "Prochains rendez-vous" [level=2] [ref=e98]
+            - button "Voir tout" [disabled]
+          - list [ref=e99]:
+            - generic [ref=e100]:
+              - listitem [ref=e101]:
+                - paragraph [ref=e106]
+              - separator [ref=e108]
+            - generic [ref=e109]:
+              - listitem [ref=e110]:
+                - paragraph [ref=e115]
+              - separator [ref=e117]
+            - listitem [ref=e119]:
+              - paragraph [ref=e124]
+        - generic [ref=e127]:
+          - generic [ref=e128]:
+            - heading "Derniers tickets" [level=2] [ref=e129]
+            - button "Voir tout" [disabled]
+          - list [ref=e130]:
+            - generic [ref=e131]:
+              - listitem [ref=e132]:
+                - paragraph [ref=e136]
+                - paragraph [ref=e138]
+              - separator [ref=e140]
+            - generic [ref=e141]:
+              - listitem [ref=e142]:
+                - paragraph [ref=e146]
+                - paragraph [ref=e148]
+              - separator [ref=e150]
+            - listitem [ref=e152]:
+              - paragraph [ref=e156]
+              - paragraph [ref=e158]
+  - generic [ref=e160]:
+    - img [ref=e162]
+    - button "Open Tanstack query devtools" [ref=e210] [cursor=pointer]:
+      - img [ref=e211]
+  - alert [ref=e259]
+```

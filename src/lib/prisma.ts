@@ -1,7 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import path from "path";
 import { logger } from "./logger";
-import { logger } from '@/lib/logger';
 
 // Fix Prisma ASAR: En production Electron, pointer vers extraResources
 // SOLUTION FORUMS 2024: Basée sur GitHub discussions #10562, #21027

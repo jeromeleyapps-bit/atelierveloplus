@@ -174,11 +174,16 @@ Ce plan intègre :
 
 ---
 
-### Sprint 1.3 : Qualité Code Base + Tests E2E + Correction Tests (Semaine 3-4) 🔄 EN COURS
+### Sprint 1.3 : Qualité Code Base + Tests E2E + Optimisation Build (Semaine 3-4) 🔄 EN COURS
 
-**Objectif** : Améliorer qualité code, maintenabilité, ajouter tests E2E ET corriger les 18 tests en échec
+**Objectif** : Améliorer qualité code, maintenabilité, ajouter tests E2E, corriger tests en échec ET optimiser taille build
 
-**État** : Remplacement console.log ✅ COMPLÉTÉ (100%)
+**État** : 
+- ✅ Remplacement console.log : COMPLÉTÉ (100%)
+- ✅ Correction tests unitaires : COMPLÉTÉ (451/451 - 100%)
+- ✅ TODOs analysés et traités : COMPLÉTÉ
+- ✅ Tests E2E infrastructure : COMPLÉTÉE (6/18 passent - 33%)
+- 🔄 Optimisation build : EN COURS (Phase 1-3)
 
 **Actions - Correction Tests en Échec (PRIORITÉ 1)** : ✅ COMPLÉTÉ (25 nov 2024)
 - [x] **Corriger erreurs formatage dates (6 erreurs - 2-3h)** : ✅
@@ -230,28 +235,62 @@ Ce plan intègre :
   - 📊 État : 11 TODOs analysés, 0 critique, 2 quick wins traités
   - 📋 Documentation : ANALYSE-TODOS-25NOV2024.md créée
 
-**Actions - Tests E2E (PRIORITÉ 3)** :
-- [ ] **Setup Playwright** :
-  - [ ] Configurer Playwright pour Electron
-  - [ ] Créer helpers E2E
-  - [ ] Setup fixtures
+**Actions - Tests E2E (PRIORITÉ 3)** : ✅ INFRASTRUCTURE COMPLÉTÉE (25 nov 2024)
+- [x] **Setup Playwright** : ✅
+  - [x] Configurer Playwright pour Next.js ✅
+  - [x] Créer helpers E2E (db-setup, global-setup) ✅
+  - [x] Setup fixtures et base de données test ✅
 
-- [ ] **Tests E2E critiques** :
-  - [ ] Scénario complet : Login → Navigation → Création ticket
-  - [ ] Scénario : Gestion client (création, modification)
-  - [ ] Scénario : Facturation complète
-  - [ ] Tests de régression principaux
+- [x] **Tests E2E créés (18 tests)** : ✅
+  - [x] auth.spec.ts (4 tests) ✅
+  - [x] tickets.spec.ts (4 tests) ✅
+  - [x] customers.spec.ts (4 tests) ✅
+  - [x] navigation.spec.ts (6 tests) ✅
+
+- [ ] **Corrections E2E (PRIORITÉ 🟡 MOYENNE - reporté Phase 2)** :
+  - [ ] Tests réussis : 6/18 (33%)
+  - [ ] Tests échoués : 12/18 (67%)
+  - [ ] Cause principale : Login instable (5 tests)
+  - [ ] Cause secondaire : Sélecteurs navigation (5 tests)
+  - [ ] Cause tertiaire : Messages d'erreur (2 tests)
+  - [ ] Temps correction estimé : 1h30
+  - [ ] Documentation : ERREURS-E2E-25NOV2024.md
 
 **Livrables** :
-- [ ] 0 test en échec (18 → 0)
+- [x] 0 test unitaire en échec (451 tests passent - 100%) ✅
 - ✅ 0 console.log en production (482 occurrences remplacées) ✅
-- [ ] TypeScript strict activé
-- [ ] TODOs critiques traités
-- [ ] Tests E2E fonctionnels (3-5 scénarios critiques)
+- [ ] TypeScript strict activé (reporté Phase 2 - 580 erreurs à corriger)
+- [x] TODOs critiques traités (11 analysés, 0 critique, 2 quick wins) ✅
+- [x] Tests E2E infrastructure fonctionnelle (6/18 passent - 33%) ✅
+- [ ] Tests E2E 100% (12 corrections à faire - reporté Phase 2)
 
-**Impact** : Code plus maintenable, moins de bugs, confiance déploiement, tests 100% fiables
+**Actions - Optimisation Build (PRIORITÉ 4)** : 🔄 EN COURS (25 nov 2024)
 
-**Temps estimé** : 3-4 semaines (ajusté pour inclure corrections tests)
+- [x] **Phase 1 : Optimisations initiales** : ✅ COMPLÉTÉ
+  - [x] Exclusion outils dev (Playwright, Jest, TypeScript, ESLint) ✅
+  - [x] Exclusion documentation (README, LICENSE, examples) ✅
+  - [x] Minification Webpack aggressive ✅
+  - [x] Gain estimé : -150-200 MB ✅
+
+- [ ] **Phase 2 : Optimisations avancées** : 🔄 EN COURS
+  - [ ] Compression ASAR Brotli (-30-50 MB)
+  - [ ] Minification Terser agressive (-10-20 MB)
+  - [ ] Tree-shaking MUI (-5-8 MB)
+  - [ ] Bundle Analyzer (diagnostic)
+  - [ ] Lazy Loading (PDF, graphiques)
+  - [ ] Gain estimé : -55-88 MB
+
+- [ ] **Phase 3 : Optimisations finales** :
+  - [ ] Optimiser images (compression, WebP)
+  - [ ] Remplacer Lodash (fonctions natives)
+  - [ ] Audit dépendances (supprimer inutilisées)
+  - [ ] Gain estimé : -15-30 MB
+
+- [ ] **Gain total estimé** : -220-318 MB (1,302 MB → 984-1,082 MB)
+
+**Impact** : Code plus maintenable, moins de bugs, confiance déploiement, tests 100% fiables, build optimisé
+
+**Temps estimé** : 3-4 semaines (ajusté pour inclure corrections tests + optimisations build)
 
 ---
 

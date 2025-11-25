@@ -7,6 +7,9 @@ import { defineConfig, devices } from '@playwright/test';
 export default defineConfig({
   testDir: './e2e',
   
+  /* Setup global avant tous les tests */
+  globalSetup: require.resolve('./e2e/global-setup.js'),
+  
   /* Timeout par test */
   timeout: 30 * 1000,
   

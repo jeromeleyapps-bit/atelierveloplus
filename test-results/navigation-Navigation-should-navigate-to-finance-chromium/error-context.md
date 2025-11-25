@@ -1,0 +1,129 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4]:
+        - link "votre logo" [ref=e5] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e7]:
+            - text: votre
+            - text: logo
+        - heading "Atelier velo +" [level=6] [ref=e8]
+      - generic [ref=e9]:
+        - link "Mon compte" [ref=e10] [cursor=pointer]:
+          - /url: /account
+          - text: Mon compte
+        - button "0" [ref=e11] [cursor=pointer]:
+          - generic [ref=e12]:
+            - img [ref=e13]
+            - generic: "0"
+        - link "aide" [ref=e15] [cursor=pointer]:
+          - /url: /admin/guide
+          - img [ref=e16]
+        - button "toggle theme" [ref=e19] [cursor=pointer]:
+          - img [ref=e20]
+        - button "menu" [ref=e22] [cursor=pointer]:
+          - img [ref=e23]
+    - generic [ref=e25]:
+      - link "Tableau de bord" [ref=e27] [cursor=pointer]:
+        - /url: /dashboard
+        - text: Tableau de bord
+      - link "Clients" [ref=e30] [cursor=pointer]:
+        - /url: /customers
+        - text: Clients
+      - link "Réparations" [ref=e32] [cursor=pointer]:
+        - /url: /tickets
+        - text: Réparations
+      - link "Facturation" [active] [ref=e34] [cursor=pointer]:
+        - /url: /finance
+        - text: Facturation
+      - link "Calendrier atelier" [ref=e36] [cursor=pointer]:
+        - /url: /admin/booking
+        - text: Calendrier atelier
+      - link "RDV client" [ref=e38] [cursor=pointer]:
+        - /url: /booking
+        - text: RDV client
+      - link "Historique Vélos" [ref=e40] [cursor=pointer]:
+        - /url: /bikes/history
+        - text: Historique Vélos
+      - link "Catalogue" [ref=e42] [cursor=pointer]:
+        - /url: /catalog
+        - text: Catalogue
+      - link "Caisse" [ref=e44] [cursor=pointer]:
+        - /url: /cash-register
+        - text: Caisse
+      - link "Statistiques" [ref=e46] [cursor=pointer]:
+        - /url: /stats
+        - text: Statistiques
+  - alert [ref=e51]:
+    - img [ref=e53]
+    - generic [ref=e56]:
+      - generic [ref=e57]:
+        - paragraph [ref=e58]: 🎉 Essai PRO gratuit
+        - paragraph [ref=e59]:
+          - strong [ref=e60]: 12 jours
+          - text: restants
+        - generic [ref=e61]: Jusqu'au 7 décembre
+      - generic [ref=e62]:
+        - progressbar [ref=e63]
+        - generic [ref=e65]: 14%
+    - generic [ref=e67]:
+      - button "Voir les offres" [ref=e68] [cursor=pointer]:
+        - img [ref=e70]
+        - text: Voir les offres
+      - button [ref=e72] [cursor=pointer]:
+        - img [ref=e73]
+  - generic [ref=e75]:
+    - generic [ref=e78]:
+      - img [ref=e79]
+      - generic [ref=e81]:
+        - heading "📊 Tableau de Bord" [level=4] [ref=e82]
+        - paragraph [ref=e83]: Vue d'ensemble de votre activité
+    - generic [ref=e84]:
+      - generic [ref=e85]:
+        - paragraph [ref=e89]
+        - paragraph [ref=e98]
+        - paragraph [ref=e107]
+        - paragraph [ref=e116]
+      - generic [ref=e122]:
+        - generic [ref=e124]:
+          - generic [ref=e125]:
+            - heading "Prochains rendez-vous" [level=2] [ref=e126]
+            - button "Voir tout" [disabled]
+          - list [ref=e127]:
+            - generic [ref=e128]:
+              - listitem [ref=e129]:
+                - paragraph [ref=e134]
+              - separator [ref=e136]
+            - generic [ref=e137]:
+              - listitem [ref=e138]:
+                - paragraph [ref=e143]
+              - separator [ref=e145]
+            - listitem [ref=e147]:
+              - paragraph [ref=e152]
+        - generic [ref=e155]:
+          - generic [ref=e156]:
+            - heading "Derniers tickets" [level=2] [ref=e157]
+            - button "Voir tout" [disabled]
+          - list [ref=e158]:
+            - generic [ref=e159]:
+              - listitem [ref=e160]:
+                - paragraph [ref=e164]
+                - paragraph [ref=e166]
+              - separator [ref=e168]
+            - generic [ref=e169]:
+              - listitem [ref=e170]:
+                - paragraph [ref=e174]
+                - paragraph [ref=e176]
+              - separator [ref=e178]
+            - listitem [ref=e180]:
+              - paragraph [ref=e184]
+              - paragraph [ref=e186]
+  - generic [ref=e188]:
+    - img [ref=e190]
+    - button "Open Tanstack query devtools" [ref=e238] [cursor=pointer]:
+      - img [ref=e239]
+  - alert [ref=e287]
+```

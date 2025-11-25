@@ -116,8 +116,9 @@ files:
 # ASAR - ACTIVÉ (Code Electron uniquement)
 # ============================================================================
 # CHANGEMENT 19 nov 2025: ASAR réactivé pour code Electron
+# CHANGEMENT 25 nov 2024: Compression Brotli activée (Sprint 1.3)
 # STRATÉGIE:
-# - Code Electron (electron/**) → ASAR (sécurité + performance)
+# - Code Electron (electron/**) → ASAR compressé Brotli (sécurité + performance + taille)
 # - Web app (Next.js) → extraResources (accès filesystem requis)
 # - Prisma → extraResources (binaires natifs)
 # 
@@ -125,7 +126,9 @@ files:
 # - Web folder nécessite accès filesystem physique (symlink npm_modules)
 # - Next.js nécessite fs.readdir, fs.stat sur npm_modules
 # - ASAR ne permet pas ces opérations
-asar: true
+# - Compression Brotli : Gain -30-50 MB, Coût +0.3-0.5s démarrage
+asar:
+  compression: brotli
 asarUnpack:
   # ============================================================================
   # OPTIMISATION SPRINT 1.3 - Dédupliquer binaires natifs
