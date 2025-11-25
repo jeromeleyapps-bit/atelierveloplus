@@ -214,18 +214,20 @@ Ce plan intègre :
   - [x] Objectif : 0 console.log en production ✅
   - **Progression** : 165/165 fichiers (100%), 482 occurrences remplacées ✅
 
-- [ ] **TypeScript Strict** :
+- [ ] **TypeScript Strict** : 🔄 EN COURS
   - [ ] Activer `strict: true` dans tsconfig
   - [ ] Corriger erreurs types progressivement
   - [ ] Supprimer `any` explicites
   - [ ] Désactiver `ignoreBuildErrors: true` dans next.config
   - [ ] Objectif : 0 erreur TypeScript
+  - 📊 État : `strict: false` actuellement
 
-- [ ] **Traitement TODOs** :
-  - [ ] Analyser 104 TODOs/FIXMEs
+- [ ] **Traitement TODOs** : 🔄 EN COURS
+  - [ ] Analyser TODOs/FIXMEs (11 occurrences dans 8 fichiers)
   - [ ] Prioriser et traiter critiques
   - [ ] Créer tickets pour non-critiques
   - [ ] Objectif : 0 TODO critique
+  - 📊 État : 11 TODOs identifiés (beaucoup moins que prévu !)
 
 **Actions - Tests E2E (PRIORITÉ 3)** :
 - [ ] **Setup Playwright** :

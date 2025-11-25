@@ -3,8 +3,8 @@
  * https://www.p2r-expert.com
  */
 
-import type { 
 import { logger } from '@/lib/logger';
+import type { 
   SupplierConnector, 
   AvailabilityResult, 
   LookupInput,
