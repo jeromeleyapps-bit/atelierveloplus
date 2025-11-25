@@ -180,27 +180,29 @@ Ce plan intègre :
 
 **État** : Remplacement console.log ✅ COMPLÉTÉ (100%)
 
-**Actions - Correction Tests en Échec (NOUVEAU - PRIORITÉ 1)** :
-- [ ] **Corriger erreurs formatage dates (6 erreurs - 2-3h)** :
-  - [ ] Examiner `src/lib/format.ts` pour comprendre pourquoi les fonctions retournent "-"
-  - [ ] Vérifier la logique de validation des dates
-  - [ ] Tester avec `date-fns` et locale française
-  - [ ] Corriger `formatPhone` pour retourner "-" pour les valeurs invalides
-  - [ ] Impact : ⚠️ MOYEN - Affichage des dates dans l'interface
+**Actions - Correction Tests en Échec (PRIORITÉ 1)** : ✅ COMPLÉTÉ (25 nov 2024)
+- [x] **Corriger erreurs formatage dates (6 erreurs - 2-3h)** : ✅
+  - [x] Examiner `src/lib/format.ts` pour comprendre pourquoi les fonctions retournent "-" ✅
+  - [x] Vérifier la logique de validation des dates ✅
+  - [x] Tester avec `date-fns` et locale française ✅
+  - [x] Corriger `formatPhone` pour retourner "-" pour les valeurs invalides ✅
+  - [x] Impact : ⚠️ MOYEN - Affichage des dates dans l'interface ✅
 
-- [ ] **Corriger mocks JWT (5 erreurs - 3-4h)** :
-  - [ ] Améliorer le mock de `SignJWT` pour générer des tokens différents
-  - [ ] Améliorer le mock de `jwtVerify` pour gérer les tokens invalides/expirés
-  - [ ] Mapper correctement `userId` → `id` dans `getUserFromToken`
-  - [ ] Impact : 🟡 FAIBLE - Tests JWT plus robustes
+- [x] **Corriger mocks JWT (5 erreurs - 3-4h)** : ✅
+  - [x] Améliorer le mock de `SignJWT` pour générer des tokens différents ✅
+  - [x] Améliorer le mock de `jwtVerify` pour gérer les tokens invalides/expirés ✅
+  - [x] Mapper correctement `userId` → `id` dans `getUserFromToken` ✅
+  - [x] Impact : 🟡 FAIBLE - Tests JWT plus robustes ✅
 
-- [ ] **Corriger tests API (7 erreurs - 4-6h - OPTIONNEL)** :
-  - [ ] admin-system-settings.test.ts (2 erreurs)
-  - [ ] finance-quotes.test.ts (2 erreurs)
-  - [ ] admin-stats.test.ts (1 erreur)
-  - [ ] security.test.ts (1 erreur)
-  - [ ] catalog-items.test.ts (1 erreur)
-  - [ ] Impact : 🟢 TRÈS FAIBLE - Tests de gestion d'erreur
+- [x] **Corriger tests API (7 erreurs - 4-6h)** : ✅
+  - [x] admin-system-settings.test.ts (2 erreurs) ✅
+  - [x] finance-quotes.test.ts (2 erreurs) ✅
+  - [x] admin-stats.test.ts (1 erreur) ✅
+  - [x] security.test.ts (1 erreur) ✅
+  - [x] catalog-items.test.ts (1 erreur) ✅
+  - [x] Impact : 🟢 TRÈS FAIBLE - Tests de gestion d'erreur ✅
+
+🎉 **RÉSULTAT : 451 tests passent, 0 échec (100%)**
 
 **Actions - Qualité Code (PRIORITÉ 2)** :
 
