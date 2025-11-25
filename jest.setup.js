@@ -63,37 +63,39 @@ jest.mock('next/navigation', () => ({
   },
 }))
 
-// Mock window.matchMedia
-Object.defineProperty(window, 'matchMedia', {
-  writable: true,
-  value: jest.fn().mockImplementation(query => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener: jest.fn(), // deprecated
-    removeListener: jest.fn(), // deprecated
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn(),
-    dispatchEvent: jest.fn(),
-  })),
-})
+// Mock window.matchMedia (only in jsdom environment)
+if (typeof window !== 'undefined') {
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    value: jest.fn().mockImplementation(query => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: jest.fn(), // deprecated
+      removeListener: jest.fn(), // deprecated
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+      dispatchEvent: jest.fn(),
+    })),
+  })
 
-// Mock window.location to prevent navigation errors in jsdom
-// Note: This is a workaround for jsdom's navigation limitations
-try {
-  delete window.location;
-  window.location = {
-    href: '',
-    pathname: '/',
-    search: '',
-    hash: '',
-    assign: jest.fn(),
-    replace: jest.fn(),
-    reload: jest.fn(),
-    toString: jest.fn(() => ''),
-  };
-} catch (e) {
-  // Location may not be deletable, that's ok
+  // Mock window.location to prevent navigation errors in jsdom
+  // Note: This is a workaround for jsdom's navigation limitations
+  try {
+    delete window.location;
+    window.location = {
+      href: '',
+      pathname: '/',
+      search: '',
+      hash: '',
+      assign: jest.fn(),
+      replace: jest.fn(),
+      reload: jest.fn(),
+      toString: jest.fn(() => ''),
+    };
+  } catch (e) {
+    // Location may not be deletable, that's ok
+  }
 }
 
 // Suppress console errors in tests (optional - comment out if you want to see them)
