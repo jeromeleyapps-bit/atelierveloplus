@@ -25,6 +25,7 @@
 import fs from 'fs-extra';
 import path from 'path';
 import { app } from 'electron';
+import { logger } from '@/lib/logger';
 
 // ============================================================================
 // TYPES
@@ -398,17 +399,17 @@ class NativeMonitoring {
 
     switch (entry.level) {
       case 'debug':
-        console.debug(message, entry.context || '');
+        logger.debug(message, entry.context || '');
         break;
       case 'info':
-        console.info(message, entry.context || '');
+        logger.info(message, entry.context || '');
         break;
       case 'warn':
-        console.warn(message, entry.context || '');
+        logger.warn(message, entry.context || '');
         break;
       case 'error':
       case 'critical':
-        console.error(message, entry.error || entry.context || '');
+        logger.error(message, entry.error || entry.context || '');
         break;
     }
   }
@@ -427,7 +428,7 @@ class NativeMonitoring {
       // Vider buffer
       this.logBuffer = [];
     } catch (error) {
-      console.error('[MONITORING] Erreur flush logs:', error);
+      logger.error('[MONITORING] Erreur flush logs:', error);
     }
   }
 

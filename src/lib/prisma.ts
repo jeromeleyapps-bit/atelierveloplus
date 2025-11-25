@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import path from "path";
 import { logger } from "./logger";
+import { logger } from '@/lib/logger';
 
 // Fix Prisma ASAR: En production Electron, pointer vers extraResources
 // SOLUTION FORUMS 2024: Basée sur GitHub discussions #10562, #21027
@@ -30,7 +31,7 @@ if (typeof process !== 'undefined' && process.env.NODE_ENV === 'production') {
     }
   } catch (e) {
     // Pas en Electron ou erreur, continuer normalement
-    console.warn('[Prisma] Could not setup extraResources path:', e);
+    logger.warn('[Prisma] Could not setup extraResources path:', e);
   }
 }
 

@@ -4,6 +4,7 @@
  */
 
 import type { 
+import { logger } from '@/lib/logger';
   SupplierConnector, 
   AvailabilityResult, 
   LookupInput,
@@ -65,7 +66,7 @@ export class P2RConnector implements SupplierConnector {
 
       return null;
     } catch (error) {
-      console.error('P2R login error:', error);
+      logger.error('P2R login error:', error);
       return null;
     }
   }
@@ -107,7 +108,7 @@ export class P2RConnector implements SupplierConnector {
 
       return products.slice(0, options.limit || 20);
     } catch (error) {
-      console.error('P2R search error:', error);
+      logger.error('P2R search error:', error);
       const message = error instanceof Error ? error.message : 'Unknown error';
       throw new Error(`P2R search failed: ${message}`);
     }

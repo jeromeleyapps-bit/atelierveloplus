@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  web:
+    name: apps/web CI
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
+
+      - name: Install dependencies (root)
+        run: pnpm install --frozen-lockfile
+
+      - name: Prisma generate (apps/web)
+        run: pnpm dlx prisma generate --schema "apps/web/prisma/schema.prisma"
+
+      - name: Typecheck (apps/web)
+        run: pnpm --filter web typecheck
+
+      - name: Lint (apps/web)
+        run: pnpm --filter web lint:ci
+
+      - name: Test (apps/web)
+        run: pnpm --filter web test:ci
+
+      - name: Build (apps/web)
+        run: pnpm --filter web build

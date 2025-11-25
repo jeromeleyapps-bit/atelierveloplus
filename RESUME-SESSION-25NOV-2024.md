@@ -284,3 +284,4 @@ Get-ChildItem dist-electron/win-unpacked -Recurse |
 **Dernière mise à jour** : 25 novembre 2024  
 **Commits** : Tous sauvegardés sur GitHub ✅
 
+

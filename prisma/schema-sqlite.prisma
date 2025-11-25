@@ -1,0 +1,181 @@
+// Test schema for SQLite compatibility
+// This is a copy of schema.prisma adapted for SQLite
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client-sqlite"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./test-sqlite.db"
+}
+
+enum CatalogCategory {
+  PIECES
+  EQUIPEMENTS
+  AUTRES
+}
+
+// Partial payments recorded against invoices
+model InvoicePayment {
+  id        String   @id @default(cuid())
+  invoiceId String
+  amount    Float
+  method    String?
+  paidAt    DateTime
+  note      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([invoiceId])
+}
+
+model CustomerBike {
+  id         String   @id @default(cuid())
+  customerId String
+  brand      String?
+  model      String?
+  serialNo   String?
+  color      String?
+  notes      String?
+  createdAt  DateTime @default(now())
+
+  customer   Customer    @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  workOrders WorkOrder[]
+
+  @@index([customerId])
+}
+
+model Customer {
+  id         String   @id @default(cuid())
+  email      String   @unique
+  firstName  String?
+  lastName   String?
+  phone      String?
+  address    String?
+  city       String?
+  postalCode String?
+  notes      String?
+  createdAt  DateTime @default(now())
+
+  bikes      CustomerBike[]
+  bookings   Booking[]
+  workOrders WorkOrder[]
+}
+
+model Booking {
+  id         String   @id @default(cuid())
+  customerId String?
+  name       String
+  email      String?
+  phone      String?
+  start      DateTime
+  end        DateTime
+  status     String   @default("pending")
+  notes      String?
+  createdAt  DateTime @default(now())
+
+  customer Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+
+  @@index([customerId])
+  @@index([start])
+}
+
+model CatalogItem {
+  id          String          @id @default(cuid())
+  name        String
+  description String?
+  category    CatalogCategory @default(PIECES)
+  reference   String?
+  priceHT     Float?
+  stockQty    Int?
+  minStock    Int?
+  supplier    String?
+  notes       String?
+  createdAt   DateTime        @default(now())
+
+  @@index([category])
+}
+
+model Invoice {
+  id           String   @id @default(cuid())
+  number       String?  @unique
+  customerId   String?
+  customerName String?
+  issueDate    DateTime @default(now())
+  dueDate      DateTime?
+  status       String   @default("draft")
+  subtotalHT   Float?
+  taxAmount    Float?
+  totalTTC     Float?
+  currency     String   @default("EUR")
+  notes        String?
+  paidAt       DateTime?
+  createdAt    DateTime @default(now())
+
+  payments InvoicePayment[]
+
+  @@index([customerId])
+  @@index([status])
+}
+
+// Minimal local WorkOrder for linking invoices
+model WorkOrder {
+  id         String    @id @default(cuid())
+  status     String    @default("created")
+  customerId String?
+  bikeId     String?
+  type       String?   @default("repair")
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  dueAt      DateTime?
+
+  customer Customer?     @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  bike     CustomerBike? @relation(fields: [bikeId], references: [id], onDelete: SetNull)
+  parts    WorkOrderPart[]
+  
+  @@index([customerId])
+  @@index([bikeId])
+}
+
+model WorkOrderPart {
+  id            String   @id @default(cuid())
+  workOrderId   String
+  catalogItemId String?
+  description   String
+  qty           Int      @default(1)
+  priceHT       Float
+  note          String?
+  createdAt     DateTime @default(now())
+
+  workOrder WorkOrder @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+
+  @@index([workOrderId])
+}
+
+model LaborEntry {
+  id          String   @id @default(cuid())
+  workOrderId String
+  description String
+  hours       Float
+  rateHT      Float
+  totalHT     Float
+  note        String?
+  createdAt   DateTime @default(now())
+
+  @@index([workOrderId])
+}
+
+model AppSetting {
+  userId         String  @id
+  shopName       String?
+  shopAddress    String?
+  shopCity       String?
+  shopPostalCode String?
+  shopPhone      String?
+  shopEmail      String?
+  legalMention   String?
+}

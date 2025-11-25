@@ -1,0 +1,21 @@
+# Configuration ULTRA MINIMALE - Fix ENAMETOOLONG définitif
+# Basée sur solutions Stack Overflow 2024
+
+appId: com.atelier-velo-plus
+productName: Atelier Velo+
+
+directories:
+  output: dist-electron
+
+# UNiquement les fichiers essentiels
+files:
+  - "electron/index.js"
+  - "package.json"
+
+win:
+  target: dir
+  forceCodeSigning: false
+  icon: resources/icon.ico  # Réactiver icône personnalisée
+
+# Compression store pour éviter chemins longs
+compression: store

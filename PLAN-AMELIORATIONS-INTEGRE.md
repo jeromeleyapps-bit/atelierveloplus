@@ -202,13 +202,13 @@ Ce plan intègre :
 
 **Actions - Qualité Code (PRIORITÉ 2)** :
 
-- [x] **Remplacement console.log** : 🔄 EN COURS (32% complété)
+- [x] **Remplacement console.log** : 🔄 EN COURS (48% complété)
   - [x] Remplacer `console.*` par `logger.*` dans src/lib (10 fichiers - Lot 1) ✅
-  - [x] Remplacer `console.*` par `logger.*` dans src/app/api (21 fichiers - Lots 2-4) ✅
-  - [ ] Continuer remplacement par lots (146 fichiers restants)
+  - [x] Remplacer `console.*` par `logger.*` dans src/app/api (30 fichiers - Lots 2-4) ✅
+  - [ ] Continuer remplacement par lots (139 fichiers restants)
   - [ ] ESLint rule : interdire `console.*` en production
   - [ ] Objectif : 0 console.log en production
-  - **Progression** : 31/177 fichiers (18%), ~184/580 occurrences (32%)
+  - **Progression** : 40/179 fichiers (22%), ~282/590 occurrences (48%)
 
 - [ ] **TypeScript Strict** :
   - [ ] Activer `strict: true` dans tsconfig

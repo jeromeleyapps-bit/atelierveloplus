@@ -8,16 +8,16 @@
  * Initialiser monitoring (stub pour compatibilité)
  */
 export function initSentry() {
-  console.log('[MONITORING] Monitoring natif actif (Sentry désactivé)');
+  logger.info('[MONITORING] Monitoring natif actif (Sentry désactivé)');
 }
 
 /**
  * Capturer erreur React
  */
 export function captureError(error: Error, context?: Record<string, unknown>) {
-  console.error('[MONITORING] Erreur capturée:', error);
+  logger.error('[MONITORING] Erreur capturée:', error);
   if (context) {
-    console.error('[MONITORING] Contexte:', context);
+    logger.error('[MONITORING] Contexte:', context);
   }
 }
 
@@ -27,6 +27,6 @@ export function captureError(error: Error, context?: Record<string, unknown>) {
 export const Sentry = {
   isInitialized: () => false,
   captureException: (error: Error, options?: unknown) => {
-    console.error('[MONITORING] Exception:', error, options);
+    logger.error('[MONITORING] Exception:', error, options);
   },
 };

@@ -1,4 +1,5 @@
 import type { SupplierConnector, AvailabilityResult, LookupInput } from "./base";
+import { logger } from '@/lib/logger';
 
 // RCZ Bike Shop connector (rczbikeshop.com)
 // Default endpoints may need adjustment; can be overridden via credentials.extraJson
@@ -67,7 +68,7 @@ export class RCZBikeShopConnector implements SupplierConnector {
         try {
           const start = Date.now();
           const res = await fetchWithTimeout(url, init, toMs);
-          if (debug) console.log(`[rcz] ${tag} status=${res.status} dur=${Date.now() - start}ms`);
+          if (debug) logger.info(`[rcz] ${tag} status=${res.status} dur=${Date.now() - start}ms`);
           if (!res.ok && res.status >= 500 && attempt < maxRetries) {
             await new Promise(r => setTimeout(r, 300 * (attempt + 1)));
             continue;
@@ -75,7 +76,7 @@ export class RCZBikeShopConnector implements SupplierConnector {
           return res;
         } catch (e) {
           lastErr = e;
-          if (debug) console.warn(`[rcz] ${tag} error attempt=${attempt}`, e);
+          if (debug) logger.warn(`[rcz] ${tag} error attempt=${attempt}`, e);
           if (attempt < maxRetries) {
             await new Promise(r => setTimeout(r, 300 * (attempt + 1)));
             continue;

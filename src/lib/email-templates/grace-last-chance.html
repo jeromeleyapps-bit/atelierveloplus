@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dernière chance - Blocage demain</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+    .header { background: linear-gradient(135deg, #ff6b6b 0%, #c92a2a 100%); color: white; padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0; }
+    .header h1 { margin: 0; font-size: 24px; }
+    .header .icon { font-size: 48px; margin-bottom: 10px; }
+    .content { background: #ffffff; padding: 30px; border: 1px solid #e0e0e0; border-top: none; }
+    .alert { background: #f8d7da; border: 3px solid #dc3545; padding: 25px; margin: 25px 0; text-align: center; border-radius: 8px; color: #721c24; }
+    .alert .countdown { font-size: 72px; font-weight: bold; color: #dc3545; margin: 10px 0; }
+    .alert .subtitle { font-size: 18px; margin: 10px 0; }
+    .what-happens { background: #fff3cd; padding: 20px; border-left: 4px solid #ffc107; margin: 20px 0; }
+    .what-happens h3 { margin-top: 0; color: #856404; }
+    .reassurance { background: #d1ecf1; padding: 20px; border-left: 4px solid #17a2b8; margin: 20px 0; }
+    .pricing { background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .pricing ul { margin: 10px 0; padding-left: 20px; }
+    .pricing li { margin: 8px 0; }
+    .cta { text-align: center; margin: 30px 0; }
+    .button { display: inline-block; background: #dc3545; color: white; padding: 18px 50px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    .button:hover { background: #c82333; }
+    .footer { text-align: center; color: #666; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; }
+    .discount { background: #d4edda; border: 2px solid #28a745; padding: 15px; text-align: center; border-radius: 6px; margin: 20px 0; color: #155724; }
+    .discount strong { font-size: 18px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="icon">⚠️</div>
+    <h1>ATTENTION: Dernière Chance</h1>
+  </div>
+  
+  <div class="content">
+    <p>Bonjour <strong>{{customerName}}</strong>,</p>
+    
+    <div class="alert">
+      <p class="subtitle">Votre application sera bloquée dans</p>
+      <p class="countdown">24H</p>
+      <p style="margin: 0; font-size: 16px;">
+        <strong>Demain à cette heure, vous ne pourrez plus accéder à Atelier Vélo+</strong>
+      </p>
+    </div>
+    
+    <p style="font-size: 16px; text-align: center; color: #721c24;">
+      <strong>⏰ Date limite:</strong> {{gracePeriodEndsAt}}
+    </p>
+    
+    <div class="what-happens">
+      <h3>🚫 Que se passera-t-il après le blocage?</h3>
+      <ul>
+        <li>L'application sera <strong>complètement bloquée</strong></li>
+        <li>Vous ne pourrez plus accéder à vos données</li>
+        <li>Aucun ticket, facture ou client accessible</li>
+        <li>L'offre -20% ne sera <strong>plus disponible</strong></li>
+      </ul>
+    </div>
+    
+    <div class="reassurance">
+      <h3>✅ Bonne nouvelle:</h3>
+      <ul>
+        <li>Vos données sont <strong>conservées en sécurité</strong></li>
+        <li>Tout redeviendra accessible <strong>immédiatement</strong> après activation</li>
+        <li>L'offre <strong>-20%</strong> est encore valable pour les prochaines 24h!</li>
+      </ul>
+    </div>
+    
+    <div class="discount">
+      <strong>🎁 DERNIÈRE CHANCE: -20% encore valable!</strong><br>
+      Code: <strong>GRACE20</strong>
+    </div>
+    
+    <div class="pricing">
+      <h3 style="text-align: center; margin-top: 0;">Nos offres avec -20%:</h3>
+      <ul>
+        <li>🥉 <strong>Basique:</strong> <span style="text-decoration: line-through; color: #999;">199€</span> → <strong style="color: #28a745;">159€/an</strong> (30 emails/mois)</li>
+        <li>🥈 <strong>Pro:</strong> <span style="text-decoration: line-through; color: #999;">359€</span> → <strong style="color: #28a745;">287€/an</strong> (illimité) ⭐ POPULAIRE</li>
+        <li>🥇 <strong>Pro Lifetime:</strong> <span style="text-decoration: line-through; color: #999;">599€</span> → <strong style="color: #28a745;">479€ à vie</strong> (économisez 1 196€ sur 5 ans!) 🔥</li>
+      </ul>
+    </div>
+    
+    <div class="cta">
+      <a href="{{upgradeUrl}}?promo=GRACE20" class="button">🔥 Débloquer maintenant avec -20%</a>
+    </div>
+    
+    <p style="background: #f8f9fa; padding: 20px; border-radius: 6px; text-align: center; margin: 30px 0;">
+      <strong style="font-size: 18px;">📞 Besoin d'aide ou d'un conseil?</strong><br>
+      <span style="font-size: 14px;">Appelez-nous: <strong>01 23 45 67 89</strong><br>
+      Ou répondez à cet email, nous sommes là pour vous!</span>
+    </p>
+    
+    <p style="text-align: center; color: #721c24; font-weight: bold; font-size: 16px;">
+      ⏰ Il ne reste que 24 heures. Agissez maintenant!
+    </p>
+    
+    <p>Cordialement,<br>
+    <strong>L'équipe Atelier Vélo+</strong></p>
+  </div>
+  
+  <div class="footer">
+    <p>© {{year}} Atelier Vélo+ | Upgraded Bikes</p>
+    <p style="color: #dc3545; font-weight: bold;">⚠️ Offre -20% expire dans 24h • Code: GRACE20</p>
+  </div>
+</body>
+</html>

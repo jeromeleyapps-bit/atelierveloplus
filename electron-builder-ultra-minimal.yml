@@ -1,0 +1,27 @@
+# Configuration ULTRA MINIMALE - ENAMETOOLONG FIX
+# SANS node_modules dans files principal
+
+appId: com.atelier-velo-plus
+productName: Atelier Velo+
+
+# Désactiver ASAR temporairement
+asar: false
+
+directories:
+  output: dist-electron
+
+# UNiquement les fichiers de l'application
+files:
+  - "electron/**/*"
+  - "app/**/*"
+  - "package.json"
+
+# Configuration Windows minimaliste
+win:
+  target:
+    - target: dir
+      arch:
+        - x64
+
+# Compression minimale
+compression: store

@@ -1,0 +1,351 @@
+﻿
+> atelier-velo-plus@1.0.3 lint:ci
+> eslint . --max-warnings=0
+
+
+C:\Users\j_ley\Atelier-velo+\src\app\account\components\SimpleBookingSection.tsx
+   28:3   error  'rdvHost' is defined but never used. Allowed unused args must match /^_/u          @typescript-eslint/no-unused-vars
+   29:3   error  'onRdvHostChange' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+   48:30  error  Unexpected any. Specify a different type                                           @typescript-eslint/no-explicit-any
+   84:30  error  Unexpected any. Specify a different type                                           @typescript-eslint/no-explicit-any
+  111:21  error  Unexpected any. Specify a different type                                           @typescript-eslint/no-explicit-any
+  123:30  error  Unexpected any. Specify a different type                                           @typescript-eslint/no-explicit-any
+  148:21  error  Unexpected any. Specify a different type                                           @typescript-eslint/no-explicit-any
+  289:27  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                    react/no-unescaped-entities
+
+C:\Users\j_ley\Atelier-velo+\src\app\account\page.tsx
+   53:42   error    Unexpected any. Specify a different type                                                                       @typescript-eslint/no-explicit-any
+  113:6    warning  React Hook useEffect has a missing dependency: 'vatPercent'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  261:108  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                react/no-unescaped-entities
+  309:33   error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                react/no-unescaped-entities
+  424:30   error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                react/no-unescaped-entities
+
+C:\Users\j_ley\Atelier-velo+\src\app\admin\calendar\page.tsx
+  99:35  warning  React Hook useEffect has a missing dependency: 'refresh'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\j_ley\Atelier-velo+\src\app\admin\catalog\page.tsx
+   84:6    warning  React Hook React.useEffect has a missing dependency: 'searchBarcode'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  162:128  error    Unexpected any. Specify a different type                                                                                @typescript-eslint/no-explicit-any
+  185:23   error    'header' is assigned a value but never used. Allowed unused vars must match /^_/u                                       @typescript-eslint/no-unused-vars
+  320:125  error    Unexpected any. Specify a different type                                                                                @typescript-eslint/no-explicit-any
+  321:143  error    Unexpected any. Specify a different type                                                                                @typescript-eslint/no-explicit-any
+  328:126  error    Unexpected any. Specify a different type                                                                                @typescript-eslint/no-explicit-any
+  330:83   error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                         react/no-unescaped-entities
+  347:32   error    Unexpected any. Specify a different type                                                                                @typescript-eslint/no-explicit-any
+  368:36   error    Unexpected any. Specify a different type                                                                                @typescript-eslint/no-explicit-any
+  385:53   error    Unexpected any. Specify a different type                                                                                @typescript-eslint/no-explicit-any
+  413:32   error    Unexpected any. Specify a different type                                                                                @typescript-eslint/no-explicit-any
+  445:143  error    Unexpected any. Specify a different type                                                                                @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\app\admin\guide\page.tsx
+    55:25   error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+    59:24   error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+    62:56   error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+    63:46   error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+   391:29   error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+   398:58   error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+   462:61   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+   462:74   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+   463:72   error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+   489:71   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+   489:89   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+   489:113  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+   489:129  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+   490:24   error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+   505:33   error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+   509:51   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+   509:68   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+   513:39   error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+   520:37   error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+   554:115  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+   572:30   error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+   647:66   error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+   862:30   error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+   956:39   error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  1079:47   error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  1249:26   error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  1252:69   error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  1356:24   error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\j_ley\Atelier-velo+\src\app\admin\license\blocked\page.tsx
+   52:28   error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+   66:91   error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+   66:104  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  100:21   error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\j_ley\Atelier-velo+\src\app\admin\license\upgrade\page.tsx
+  152:44  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  335:82  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  349:54  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  374:42  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  388:36  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  424:91  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\j_ley\Atelier-velo+\src\app\admin\online-booking\page.tsx
+   93:41   error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  112:23   error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  119:25   error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  124:52   error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  219:57   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  219:70   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  220:68   error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  246:67   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  246:85   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  246:109  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  246:125  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  247:20   error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  262:29   error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  266:47   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  266:64   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  270:35   error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  280:33   error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  327:24   error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  339:109  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\j_ley\Atelier-velo+\src\app\admin\page.tsx
+   65:9   error  'router' is assigned a value but never used. Allowed unused vars must match /^_/u               @typescript-eslint/no-unused-vars
+   74:87  error  Unexpected any. Specify a different type                                                        @typescript-eslint/no-explicit-any
+  115:9   error  'handleStravaConnect' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  152:21  error  Unexpected any. Specify a different type                                                        @typescript-eslint/no-explicit-any
+  212:29  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                 react/no-unescaped-entities
+  215:40  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                 react/no-unescaped-entities
+  215:60  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                 react/no-unescaped-entities
+  227:23  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                 react/no-unescaped-entities
+  244:45  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                 react/no-unescaped-entities
+  371:35  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                 react/no-unescaped-entities
+  475:52  error  Unexpected any. Specify a different type                                                        @typescript-eslint/no-explicit-any
+  479:46  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                 react/no-unescaped-entities
+  664:26  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                 react/no-unescaped-entities
+  938:25  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                 react/no-unescaped-entities
+  938:56  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                 react/no-unescaped-entities
+  961:66  error  Unexpected any. Specify a different type                                                        @typescript-eslint/no-explicit-any
+  966:49  error  Unexpected any. Specify a different type                                                        @typescript-eslint/no-explicit-any
+  973:27  error  Unexpected any. Specify a different type                                                        @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\app\admin\settings\SmtpConfigCard.tsx
+   64:48  error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+   74:17  error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  121:17  error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  182:49  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  182:61  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  183:63  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  183:76  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  204:23  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  386:26  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  386:41  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  386:53  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  386:67  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  386:73  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  387:27  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  387:41  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  387:48  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  387:56  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  389:45  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  389:58  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  393:23  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  407:27  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  407:38  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  407:55  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  410:41  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  414:27  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  414:65  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  418:34  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  418:54  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  421:27  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  421:35  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  421:51  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\j_ley\Atelier-velo+\src\app\admin\settings\TunnelConfigDialog.tsx
+   79:55  error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+   80:41  error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+   95:17  error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  161:73  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  231:34  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  308:62  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  317:23  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  317:54  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\j_ley\Atelier-velo+\src\app\admin\settings\page-complete.tsx
+   36:52   error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  107:17   error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  118:55   error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  119:41   error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  133:55   error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  134:41   error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  143:17   error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  156:55   error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  157:41   error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  166:17   error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  196:17   error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  229:17   error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  256:17   error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  280:17   error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  293:56   error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  299:39   error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  307:17   error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  398:32   error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  398:125  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  433:39   error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\j_ley\Atelier-velo+\src\app\admin\settings\page.tsx
+   54:6    warning  React Hook useEffect has a missing dependency: 'settingsUI'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  101:55   error    Unexpected any. Specify a different type                                                                       @typescript-eslint/no-explicit-any
+  102:41   error    Unexpected any. Specify a different type                                                                       @typescript-eslint/no-explicit-any
+  111:17   error    Unexpected any. Specify a different type                                                                       @typescript-eslint/no-explicit-any
+  124:55   error    Unexpected any. Specify a different type                                                                       @typescript-eslint/no-explicit-any
+  125:41   error    Unexpected any. Specify a different type                                                                       @typescript-eslint/no-explicit-any
+  134:17   error    Unexpected any. Specify a different type                                                                       @typescript-eslint/no-explicit-any
+  142:9    error    'handleSaveEmailSettings' is assigned a value but never used. Allowed unused vars must match /^_/u             @typescript-eslint/no-unused-vars
+  259:32   error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                react/no-unescaped-entities
+  259:125  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                react/no-unescaped-entities
+
+C:\Users\j_ley\Atelier-velo+\src\app\bikes\history\page.tsx
+   43:6   error  'BikeHistory' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+   63:6   error  'BikeDetails' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+   78:6   error  'Customer' is defined but never used. Allowed unused vars must match /^_/u     @typescript-eslint/no-unused-vars
+  251:54  error  Unexpected any. Specify a different type                                       @typescript-eslint/no-explicit-any
+  315:57  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                react/no-unescaped-entities
+  518:39  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                react/no-unescaped-entities
+  570:41  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                react/no-unescaped-entities
+
+C:\Users\j_ley\Atelier-velo+\src\app\catalog\items\[name]\page.tsx
+  57:14  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  57:23  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  57:34  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  57:37  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\j_ley\Atelier-velo+\src\app\clear-cache\page.tsx
+  84:30  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  86:36  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\j_ley\Atelier-velo+\src\app\components\GlobalTrialBanner.tsx
+  169:24  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  213:70  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\j_ley\Atelier-velo+\src\app\components\LicenseBanner.tsx
+  50:6  warning  React Hook useEffect has a missing dependency: 'fetchLicenseStatus'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\j_ley\Atelier-velo+\src\app\components\LineItemsTable.tsx
+  102:37  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  102:55  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\j_ley\Atelier-velo+\src\app\components\OnboardingWizard.tsx
+  208:21  error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  226:17  error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  351:26  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  399:31  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  469:30  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  540:30  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  567:29  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  686:23  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\j_ley\Atelier-velo+\src\app\customers\[id]\bikes\page.tsx
+   31:3   error  'getCustomerBike' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  148:38  error  Unexpected any. Specify a different type                                           @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\app\dashboard\page.tsx
+  102:32   error    Unexpected any. Specify a different type                                                                          @typescript-eslint/no-explicit-any
+  117:42   error    Unexpected any. Specify a different type                                                                          @typescript-eslint/no-explicit-any
+  151:40   error    Unexpected any. Specify a different type                                                                          @typescript-eslint/no-explicit-any
+  152:40   error    Unexpected any. Specify a different type                                                                          @typescript-eslint/no-explicit-any
+  157:120  error    Unexpected any. Specify a different type                                                                          @typescript-eslint/no-explicit-any
+  172:33   error    Unexpected any. Specify a different type                                                                          @typescript-eslint/no-explicit-any
+  317:6    warning  React Hook useEffect has a missing dependency: 'fetchBikeNews'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  392:26   error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                   react/no-unescaped-entities
+  522:24   error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                   react/no-unescaped-entities
+  608:25   error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                   react/no-unescaped-entities
+  668:94   error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                   react/no-unescaped-entities
+
+C:\Users\j_ley\Atelier-velo+\src\app\finance\components\CreditsTab.tsx
+   32:61  error  'onRefresh' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+   75:19  error  Unexpected any. Specify a different type                                     @typescript-eslint/no-explicit-any
+  220:56  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`              react/no-unescaped-entities
+  229:39  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`              react/no-unescaped-entities
+
+C:\Users\j_ley\Atelier-velo+\src\app\finance\components\QuotesTab.tsx
+   50:19  error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  252:40  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\j_ley\Atelier-velo+\src\app\finance\components\SelectTicketDialog.tsx
+   88:21  error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  137:24  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\j_ley\Atelier-velo+\src\app\finance\invoices\[id]\page.tsx
+   47:38  error  'Invoice' is defined but never used. Allowed unused vars must match /^_/u              @typescript-eslint/no-unused-vars
+   80:20  error  'setNewLine' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  125:21  error  Unexpected any. Specify a different type                                               @typescript-eslint/no-explicit-any
+  147:65  error  Unexpected any. Specify a different type                                               @typescript-eslint/no-explicit-any
+  149:21  error  Unexpected any. Specify a different type                                               @typescript-eslint/no-explicit-any
+  178:28  error  Unexpected any. Specify a different type                                               @typescript-eslint/no-explicit-any
+  179:24  error  Unexpected any. Specify a different type                                               @typescript-eslint/no-explicit-any
+  350:49  error  Unexpected any. Specify a different type                                               @typescript-eslint/no-explicit-any
+  477:39  error  Unexpected any. Specify a different type                                               @typescript-eslint/no-explicit-any
+  508:82  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                        react/no-unescaped-entities
+  514:82  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                        react/no-unescaped-entities
+  566:31  error  Unexpected any. Specify a different type                                               @typescript-eslint/no-explicit-any
+  604:27  error  Unexpected any. Specify a different type                                               @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\app\fix-auth\page.tsx
+  55:28  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  65:58  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  75:25  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\j_ley\Atelier-velo+\src\app\scan\page.tsx
+  48:9  error  Do not assign to the variable `module`. See: https://nextjs.org/docs/messages/no-assign-module-variable  @next/next/no-assign-module-variable
+
+C:\Users\j_ley\Atelier-velo+\src\app\settings\TunnelConfigDialog.tsx
+   76:55  error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+   77:41  error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+   92:17  error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  231:62  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\j_ley\Atelier-velo+\src\app\suppliers\page.tsx
+   86:25  error  'setSavingCreate' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  133:34  error  Unexpected any. Specify a different type                                                    @typescript-eslint/no-explicit-any
+  134:34  error  Unexpected any. Specify a different type                                                    @typescript-eslint/no-explicit-any
+  135:45  error  Unexpected any. Specify a different type                                                    @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\app\tickets\[id]\page.tsx
+   54:42  error    Unexpected any. Specify a different type                                                                    @typescript-eslint/no-explicit-any
+  135:39  error    Unexpected any. Specify a different type                                                                    @typescript-eslint/no-explicit-any
+  154:6   warning  React Hook useEffect has a missing dependency: 'refresh'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  469:68  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                             react/no-unescaped-entities
+  478:74  error    Unexpected any. Specify a different type                                                                    @typescript-eslint/no-explicit-any
+  499:81  error    Unexpected any. Specify a different type                                                                    @typescript-eslint/no-explicit-any
+  543:78  error    Unexpected any. Specify a different type                                                                    @typescript-eslint/no-explicit-any
+  564:85  error    Unexpected any. Specify a different type                                                                    @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\app\tickets\page.tsx
+    18:8   error    'Customer' is defined but never used. Allowed unused vars must match /^_/u                                                         @typescript-eslint/no-unused-vars
+   283:6   warning  React Hook useEffect has missing dependencies: 'setTablePage' and 'tablePage'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+   288:6   warning  React Hook useEffect has a missing dependency: 'setTablePage'. Either include it or remove the dependency array                    react-hooks/exhaustive-deps
+   295:30  error    Unexpected any. Specify a different type                                                                                           @typescript-eslint/no-explicit-any
+   664:83  error    Unexpected any. Specify a different type                                                                                           @typescript-eslint/no-explicit-any
+   671:98  error    Unexpected any. Specify a different type                                                                                           @typescript-eslint/no-explicit-any
+   676:94  error    Unexpected any. Specify a different type                                                                                           @typescript-eslint/no-explicit-any
+   681:95  error    Unexpected any. Specify a different type                                                                                           @typescript-eslint/no-explicit-any
+   686:94  error    Unexpected any. Specify a different type                                                                                           @typescript-eslint/no-explicit-any
+   696:96  error    Unexpected any. Specify a different type                                                                                           @typescript-eslint/no-explicit-any
+   701:97  error    Unexpected any. Specify a different type                                                                                           @typescript-eslint/no-explicit-any
+  1070:89  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                                    react/no-unescaped-entities
+
+C:\Users\j_ley\Atelier-velo+\src\components\AppointmentPicker.tsx
+   89:19  error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  105:19  error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  213:60  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\j_ley\Atelier-velo+\src\components\TestInfrastructure.tsx
+  108:23  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\j_ley\Atelier-velo+\src\components\catalog-v2\OrdersTab.tsx
+  38:19  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\j_ley\Atelier-velo+\src\components\catalog\AddToStockDialog.tsx
+  140:21  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  236:62  error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\lib\catalog-harmonizer.ts
+  494:1  warning  Assign object to a variable before exporting as module default  import/no-anonymous-default-export
+
+Ô£û 270 problems (260 errors, 10 warnings)
+

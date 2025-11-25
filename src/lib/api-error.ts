@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { logger } from '@/lib/logger';
 
 /**
  * Gestion sécurisée des erreurs API avec masquage automatique en production
@@ -25,7 +26,7 @@ export function handleApiError(error: unknown, context?: string): NextResponse {
   const isDev = process.env.NODE_ENV === 'development';
   
   // Log serveur (toujours visible dans les logs)
-  console.error(`[API Error${context ? ` - ${context}` : ''}]`, error);
+  logger.error(`[API Error${context ? ` - ${context}` : ''}]`, error);
   
   // Déterminer le message d'erreur
   let errorMessage = 'internal_error';

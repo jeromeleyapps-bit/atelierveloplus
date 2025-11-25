@@ -1,0 +1,11 @@
+﻿
+> atelier-velo-plus@1.0.3 lint
+> next lint
+
+npm : Invalid project directory provided, no such directory: C:\Users\j_ley\Atelier-velo+\lint
+Au caractère C:\Users\j_ley\AppData\Local\Temp\ps-script-1bda8dbd-baf5-4160-8406-c0c9b764fb4f.ps1:86 : 1
++ npm run lint 2>&1 | Out-File -FilePath "lint-errors-analysis.txt" -En ...
++ ~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Invalid project...lier-velo+\lint:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 

@@ -307,3 +307,4 @@ L'application dispose maintenant d'une base solide de tests automatisés couvran
 
 **Dernière mise à jour** : 25 novembre 2024
 
+

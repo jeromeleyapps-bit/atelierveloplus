@@ -1,0 +1,85 @@
+﻿
+
+     CHECKLIST VERIFICATION FONCTIONNALITES               ║
+╚═══════════════════════════════════════
+
+ AUTHENTIFICATION
+    Register multi-utilisateurs (limite supprimée)
+    Login avec JWT
+    Logout
+    Protection routes (RequireAuth)
+
+✅ GESTION CLIENTS
+   ✓ Créer/Modifier/Supprimer clients
+   ✓ Recherche clients (nom, email, téléphone)
+   ✓ Vélos associés aux clients
+    Export/Import clients
+
+ GESTION ATELIER (WORK ORDERS)
+    Créer tickets
+    Statuts: pending, in_progress, delivered
+    Ajouter pièces et main d'œuvre
+    Rendez-vous (date due)
+    Fusionner tickets
+
+ FACTURATION
+    Créer factures et devis
+    Générer PDF
+    Envoyer par email (Resend)
+    Paiements (cash, card, transfer)
+    Avoirs (credit notes)
+    Convertir devis en facture
+
+ CATALOGUE
+    Articles (nom, référence, prix)
+    Gestion stock (quantité, min, réassort)
+    Fournisseurs
+    Recherche fournisseurs (API externe)
+    Marges de tarification
+
+ CAISSE
+    Entrées/Sorties espèces
+    Total caisse
+    Historique
+
+ STATISTIQUES
+    Données réelles (API)
+    Tickets clôturés
+    Factures émises/payées
+    CA période/année
+    Total caisse
+
+ ADMINISTRATION
+    Vue d'ensemble (users, tickets, factures, DB)
+    Export/Import backup (JSON)
+    Création utilisateurs
+    Paramètres système
+    Intégrations (SumUp, Stripe, HubSpot, Strava)
+
+ MON COMPTE
+    Profil utilisateur
+    Paramètres atelier (nom, contact, adresse)
+    Informations légales (SIRET, TVA, RCS)
+    Statut fiscal (Auto-Entrepreneur)
+    Tarification (multiplicateur, TVA)
+    Stock (min, réassort)
+
+ COPYRIGHT & PROTECTION
+    Licence propriétaire (LICENSE)
+    Avis propriété intellectuelle (COPYRIGHT)
+    Footer visible sur toutes les pages
+    Headers code source
+    Métadonnées (package.json, layout.tsx)
+
+
+
+ STATUT: TOUTES LES FONCTIONNALITES VALIDEES 
+
+ MODE DEV: STABLE ET FONCTIONNEL
+   URL: http://localhost:3000
+   DB:  apps/web/data/atelier.db (421 Ko)
+
+  BUILD ELECTRON: Nécessite permissions admin
+   Solution: PowerShell Admin OU Mode Développeur Windows
+
+

@@ -5,6 +5,7 @@
 
 import crypto from 'crypto';
 import { logger } from './logger';
+import { logger } from '@/lib/logger';
 
 const ALGORITHM = 'aes-256-gcm';
 const IV_LENGTH = 16;
@@ -27,7 +28,7 @@ function getEncryptionKey(): Buffer {
       );
     }
     // Development: Use a default key (NOT for production!)
-    console.warn('⚠️ ENCRYPTION_KEY not set, using default key (DEV ONLY)');
+    logger.warn('⚠️ ENCRYPTION_KEY not set, using default key (DEV ONLY)');
     return crypto.scryptSync('default-dev-key-change-in-prod', 'salt', KEY_LENGTH);
   }
   

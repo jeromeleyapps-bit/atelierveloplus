@@ -1,4 +1,5 @@
 import { requestLocal } from './api';
+import { logger } from '@/lib/logger';
 
 export type CatalogCategory = 'PIECES' | 'EQUIPEMENTS' | 'AUTRES';
 export type CatalogItem = {
@@ -27,7 +28,7 @@ export async function searchCatalog(params: { q?: string; category?: CatalogCate
     const data = await requestLocal(`/catalog/search${qp}`);
     if (Array.isArray(data)) return data as CatalogItem[];
   } catch (e) {
-    console.error('[searchCatalog] Error:', e);
+    logger.error('[searchCatalog] Error:', e);
   }
 
   // 2) Fallback local filtering

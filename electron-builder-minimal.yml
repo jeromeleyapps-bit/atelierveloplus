@@ -1,0 +1,31 @@
+# Configuration MINIMALE pour contourner ENAMETOOLONG
+# Sans extraResources complexes, sans signing, sans icon
+
+appId: com.atelier-velo-plus
+productName: Atelier Velo+
+
+# Désactiver ASAR temporairement pour éviter chemins longs
+asar: false
+
+directories:
+  output: dist-electron
+
+files:
+  - "electron/**/*"
+  - "app/**/*"
+  - "node_modules/**/*"
+  - "package.json"
+
+# Configuration Windows minimaliste
+win:
+  target:
+    - target: dir
+      arch:
+        - x64
+
+# PAS d'extraResources (évite ENAMETOOLONG)
+# PAS d'icon (évite signing)
+# PAS de signing
+
+# Compression minimale
+compression: store

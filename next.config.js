@@ -16,9 +16,6 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
 
-  // Corriger métadonnées base
-  metadataBase: new URL('http://localhost:3000'),
-
   // Configuration Webpack minimale
   webpack: (config, { isServer }) => {
     // Désactiver cache pour éviter warnings

@@ -584,32 +584,18 @@ function killServer() {
  * Crée la fenêtre principale
  */
 function createWindow() {
-  // ✅ FIX ICÔNE: Définir icône personnalisée pour la fenêtre
-  // electron-builder copie l'icône dans buildResources (resources/) vers le build
-  // En mode packagé: l'icône est intégrée dans l'exe via electron-builder.config.yml
-  // On peut aussi la définir explicitement pour la fenêtre
-  let iconPath = null;
-  if (app.isPackaged) {
-    // Mode production: electron-builder intègre l'icône dans l'exe
-    // Mais on peut aussi chercher dans resources/ si besoin
-    const possiblePaths = [
-      path.join(process.resourcesPath, 'icon.ico'),  // Si copiée dans resources/
-      path.join(app.getAppPath(), 'resources', 'icon.ico'),  // Dans app.asar/resources/
-      path.join(path.dirname(process.execPath), 'resources', 'icon.ico'),  // À côté de l'exe
-    ];
-    
-    for (const p of possiblePaths) {
-      if (fs.existsSync(p)) {
-        iconPath = p;
-        break;
-      }
-    }
-  } else {
-    // Mode développement: icône dans resources/ à la racine
-    iconPath = path.join(__dirname, '..', 'resources', 'icon.ico');
-  }
-  
-  // Ne définir icon que si le fichier existe
+  // ✅ BEST PRACTICE ELECTRON: L'icône est configurée dans electron-builder.config.yml
+  // avec win.icon: resources/icon.ico
+  // electron-builder intègre automatiquement l'icône dans l'exe Windows
+  // Windows utilisera automatiquement cette icône pour:
+  // - L'exécutable dans l'explorateur
+  // - La barre des tâches
+  // - La fenêtre de l'application
+  //
+  // ❌ NE PAS définir icon dans BrowserWindow en mode packagé
+  // Cela peut causer des conflits et empêcher l'icône de s'afficher correctement
+  // 
+  // ✅ En mode dev, on peut définir l'icône pour voir le résultat immédiatement
   const windowOptions = {
     width: 1400,
     height: 900,
@@ -624,17 +610,20 @@ function createWindow() {
     show: false
   };
   
-  if (iconPath && fs.existsSync(iconPath)) {
-    windowOptions.icon = iconPath;
-    log.info('[WINDOW] ✅ Icône personnalisée chargée:', iconPath);
-  } else {
-    // En mode packagé, l'icône est déjà intégrée dans l'exe via electron-builder
-    // Pas besoin de la définir explicitement, elle sera utilisée automatiquement
-    if (app.isPackaged) {
-      log.info('[WINDOW] ℹ️  Icône intégrée dans l\'exe (electron-builder)');
+  // ✅ En mode développement uniquement: définir l'icône pour preview
+  // En mode packagé: electron-builder gère l'icône automatiquement
+  if (!app.isPackaged) {
+    const devIconPath = path.join(__dirname, '..', 'resources', 'icon.ico');
+    if (fs.existsSync(devIconPath)) {
+      windowOptions.icon = devIconPath;
+      log.info('[WINDOW] ✅ Icône dev chargée:', devIconPath);
     } else {
-      log.warn('[WINDOW] ⚠️  Icône introuvable en dev:', path.join(__dirname, '..', 'resources', 'icon.ico'));
+      log.warn('[WINDOW] ⚠️  Icône dev introuvable:', devIconPath);
     }
+  } else {
+    // Mode packagé: l'icône est intégrée dans l'exe par electron-builder
+    // Windows l'utilisera automatiquement - pas besoin de la définir ici
+    log.info('[WINDOW] ℹ️  Mode packagé: icône intégrée dans l\'exe (electron-builder.config.yml)');
   }
   
   mainWindow = new BrowserWindow(windowOptions);

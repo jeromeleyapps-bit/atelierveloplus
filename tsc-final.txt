@@ -1,0 +1,98 @@
+﻿src/app/admin/service-rates/page.tsx(66,45): error TS2352: Conversion of type 'FormData' to type 'Record<string, unknown>' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Index signature for type 'string' is missing in type 'FormData'.
+src/app/admin/service-rates/page.tsx(68,29): error TS2352: Conversion of type 'FormData' to type 'Record<string, unknown>' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Index signature for type 'string' is missing in type 'FormData'.
+src/app/api/bikes/[id]/history/route.ts(139,27): error TS2339: Property 'WorkOrderLine' does not exist on type 'unknown'.
+src/app/api/bikes/route.ts(44,49): error TS2353: Object literal may only specify known properties, and 'mode' does not exist in type 'StringFilter<"Bike">'.
+src/app/api/catalog/import/supplier-csv-stream/route.ts(157,42): error TS2345: Argument of type 'CSVRow' is not assignable to parameter of type 'SupplierCSVRow'.
+  Property 'reference' is optional in type 'CSVRow' but required in type 'SupplierCSVRow'.
+src/app/api/catalog/items/[id]/offers/refresh/route.ts(56,35): error TS2339: Property 'Supplier' does not exist on type 'unknown'.
+src/app/api/catalog/items/[id]/offers/route.ts(17,35): error TS2339: Property 'Supplier' does not exist on type 'unknown'.
+src/app/api/catalog/items/[id]/supplier-items/route.ts(66,29): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(arg: PrismaPromise<any>[], options?: { isolationLevel?: "Serializable"; }): Promise<any[]>', gave the following error.
+    Argument of type 'unknown[]' is not assignable to parameter of type 'PrismaPromise<any>[]'.
+      Type '{}' is missing the following properties from type 'PrismaPromise<any>': [Symbol.toStringTag], then, catch, finally
+  Overload 2 of 2, '(fn: (prisma: Omit<PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>, "$connect" | "$disconnect" | "$on" | "$transaction" | "$extends">) => Promise<...>, options?: { ...; }): Promise<...>', gave the following error.
+    Argument of type 'unknown[]' is not assignable to parameter of type '(prisma: Omit<PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>, "$connect" | "$disconnect" | "$on" | "$transaction" | "$extends">) => Promise<...>'.
+      Type 'unknown[]' provides no match for the signature '(prisma: Omit<PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>, "$connect" | "$disconnect" | "$on" | "$transaction" | "$extends">): Promise<...>'.
+src/app/api/catalog/scan-bulk/route.ts(126,45): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/catalog/search/route.ts(25,34): error TS2353: Object literal may only specify known properties, and 'mode' does not exist in type 'StringFilter<"CatalogItem">'.
+src/app/api/catalog/search/route.ts(26,33): error TS2353: Object literal may only specify known properties, and 'mode' does not exist in type 'StringNullableFilter<"CatalogItem">'.
+src/app/api/catalog/search/route.ts(27,32): error TS2353: Object literal may only specify known properties, and 'mode' does not exist in type 'StringFilter<"CatalogItem">'.
+src/app/api/catalog/seed/route.ts(32,72): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/customers/[id]/bikes/[bikeId]/route.ts(54,12): error TS2339: Property 'index' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/lines/route.ts(78,32): error TS2339: Property 'InvoiceLine' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/payments/route.ts(58,11): error TS2322: Type 'string' is not assignable to type '"issued" | "draft" | "part_paid" | "paid" | "cancelled"'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(401,9): error TS2322: Type '{ issueDate: string; dueDate: string; validUntil: string; logoBytes: Uint8Array; number: string; status: string; type: string; parentId: string | null; shopName: string; shopLogo: string | null; ... 25 more ...; payments?: Array<{ amount: number; method?: string | null; paidAt: string; note?: string | null; }>; }' is not assignable to type 'InvoiceData'.
+  Types of property 'pricingMode' are incompatible.
+    Type 'string' is not assignable to type '"AE_TTC" | "HT_TVA"'.
+src/app/api/finance/invoices/[id]/route.ts(113,38): error TS2345: Argument of type '{ InvoiceLine: { id: string; type: string; vatRate: number; totalTTC: number; invoiceId: string; description: string; qty: number; unitPriceHT: number; unitPriceTTC: number; totalHT: number; partId: string; purchasePriceHT: number; }[]; InvoicePayment: { ...; }[]; } & { ...; }' is not assignable to parameter of type 'InvoiceWithLines'.
+  Property 'lines' is missing in type '{ InvoiceLine: { id: string; type: string; vatRate: number; totalTTC: number; invoiceId: string; description: string; qty: number; unitPriceHT: number; unitPriceTTC: number; totalHT: number; partId: string; purchasePriceHT: number; }[]; InvoicePayment: { ...; }[]; } & { ...; }' but required in type 'InvoiceWithLines'.
+src/app/api/news/bike-feeds/route.ts(150,51): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/pos/workorders/[id]/quote-pdf/route.ts(171,36): error TS2339: Property 'logoBytes' does not exist on type 'unknown'.
+src/app/api/pos/workorders/[id]/quote-pdf/route.ts(189,36): error TS2339: Property 'logoBytes' does not exist on type 'unknown'.
+src/app/api/pos/workorders/[id]/sale/route.ts(51,13): error TS2339: Property '_billableHours' does not exist on type 'LaborCostResult'.
+src/app/api/pos/workorders/[id]/sale/route.ts(51,29): error TS2339: Property '_hourlyRate' does not exist on type 'LaborCostResult'.
+src/app/api/settings/route.ts(41,49): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/suppliers/offers/route.ts(50,27): error TS2339: Property 'supplierId' does not exist on type 'unknown'.
+src/app/api/support/diagnostics/route.ts(79,47): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/uploads/[...path]/route.ts(69,54): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/workorders/[id]/lines/route.ts(34,9): error TS2698: Spread types may only be created from object types.
+src/app/api/workorders/[id]/parts/[partId]/route.ts(29,79): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/workorders/[id]/parts/[partId]/route.ts(48,79): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/workshop/workorders/[id]/labor/route.ts(52,22): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/workshop/workorders/[id]/labor/route.ts(91,22): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/workshop/workorders/[id]/route.ts(43,21): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/workshop/workorders/[id]/route.ts(66,21): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/workshop/workorders/[id]/status/route.ts(26,16): error TS2339: Property 'completedAt' does not exist on type 'unknown'.
+src/app/api/workshop/workorders/[id]/status/route.ts(40,39): error TS2339: Property 'completedAt' does not exist on type 'unknown'.
+src/app/api/workshop/workorders/invoiceable/route.ts(113,45): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/booking-local/page.tsx(223,15): error TS2322: Type 'unknown[]' is not assignable to type 'readonly Customer[]'.
+  Type '{}' is missing the following properties from type 'Customer': id, firstName, lastName, email, phone
+src/app/booking-local/page.tsx(246,15): error TS2322: Type 'true' is not assignable to type 'false'.
+src/app/catalog/services/page.tsx(85,29): error TS2345: Argument of type 'FormData' is not assignable to parameter of type 'Record<string, unknown>'.
+  Index signature for type 'string' is missing in type 'FormData'.
+src/app/communications/page.tsx(208,56): error TS2345: Argument of type 'import("C:/Users/j_ley/Atelier-velo+/src/lib/api").Communication' is not assignable to parameter of type 'Communication'.
+  Property 'sentAt' is optional in type 'Communication' but required in type 'Communication'.
+src/app/components/BarcodeScanner.tsx(60,7): error TS2322: Type 'Html5Qrcode' is not assignable to type 'Html5QrcodeInstance'.
+  Types of property 'start' are incompatible.
+    Type '(cameraIdOrConfig: string | MediaTrackConstraints, configuration: Html5QrcodeCameraScanConfig, qrCodeSuccessCallback: QrcodeSuccessCallback, qrCodeErrorCallback: QrcodeErrorCallback) => Promise<...>' is not assignable to type '(cameraIdOrConfig: string | MediaStreamConstraints, config: unknown, qrCodeSuccessCallback: (decodedText: string) => void, qrCodeErrorCallback?: (errorMessage: string) => void) => Promise<...>'.
+      Types of parameters 'cameraIdOrConfig' and 'cameraIdOrConfig' are incompatible.
+        Type 'string | MediaStreamConstraints' is not assignable to type 'string | MediaTrackConstraints'.
+          Type 'MediaStreamConstraints' is not assignable to type 'string | MediaTrackConstraints'.
+src/app/components/SectionCard.tsx(23,62): error TS2698: Spread types may only be created from object types.
+src/app/customers/[id]/page.tsx(49,35): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/finance/components/CreateInvoiceDialog.tsx(357,39): error TS2339: Property 'description' does not exist on type 'WorkOrder'.
+src/app/stats/page.tsx(125,67): error TS2339: Property 'count' does not exist on type '{ paidAmount?: number; }'.
+src/components/catalog-v2/MyStockTab.tsx(36,28): error TS2339: Property 'detail' does not exist on type 'unknown'.
+src/components/catalog-v2/MyStockTab.tsx(190,41): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/components/catalog/SupplierCatalogTableView.tsx(240,102): error TS2339: Property 'supplierSku' does not exist on type 'unknown'.
+src/components/catalog/SupplierCatalogTableView.tsx(246,46): error TS2339: Property 'supplierSku' does not exist on type 'unknown'.
+src/components/NotificationCenter.tsx(59,62): error TS2339: Property 'status' does not exist on type 'unknown'.
+src/components/RequireAuth.tsx(17,49): error TS2339: Property '_role' does not exist on type 'RequireAuthProps'.
+src/hooks/useAccountData.ts(12,47): error TS2724: '"@/lib/api"' has no exported member named '_AccountSettings'. Did you mean 'AccountSettings'?
+src/hooks/useAdminCatalogData.ts(12,26): error TS2307: Cannot find module '@tanstack/query' or its corresponding type declarations.
+src/hooks/useAdminCatalogMutations.ts(26,70): error TS2345: Argument of type 'Record<string, unknown>' is not assignable to parameter of type 'Partial<CatalogItem> & { category: string; name: string; priceHT: number; priceTTC: number; vatRate: number; }'.
+  Type 'Record<string, unknown>' is missing the following properties from type '{ category: string; name: string; priceHT: number; priceTTC: number; vatRate: number; }': category, name, priceHT, priceTTC, vatRate
+src/hooks/useAdminDashboardData.ts(27,5): error TS2739: Type '{}' is missing the following properties from type 'AdminStats': totalUsers, activeTickets, pendingInvoices, dbSize, lastBackup
+src/hooks/useAdminDashboardMutations.ts(81,38): error TS2345: Argument of type '{ backup: unknown; wipeFirst: boolean; }' is not assignable to parameter of type '{ backup: Record<string, unknown>; wipeFirst: boolean; }'.
+  Types of property 'backup' are incompatible.
+    Type 'unknown' is not assignable to type 'Record<string, unknown>'.
+      Index signature for type 'string' is missing in type '{}'.
+src/hooks/useBikesMutations.ts(172,26): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/hooks/useCashRegisterMutations.ts(26,76): error TS2345: Argument of type 'Record<string, unknown>' is not assignable to parameter of type '{ type: string; amount: number; note?: string; reference?: string; }'.
+  Type 'Record<string, unknown>' is missing the following properties from type '{ type: string; amount: number; note?: string; reference?: string; }': type, amount
+src/hooks/useCashRegisterMutations.ts(39,94): error TS2345: Argument of type 'unknown' is not assignable to parameter of type '{ type: string; amount: number; note?: string; reference?: string; }'.
+  Type '{}' is missing the following properties from type '{ type: string; amount: number; note?: string; reference?: string; }': type, amount
+src/hooks/useCatalogMutations.ts(32,70): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Partial<CatalogItem> & { category: string; name: string; priceHT: number; priceTTC: number; vatRate: number; }'.
+  Type '{}' is missing the following properties from type '{ category: string; name: string; priceHT: number; priceTTC: number; vatRate: number; }': category, name, priceHT, priceTTC, vatRate
+src/hooks/useCustomersData.ts(16,30): error TS2724: '"@/lib/api"' has no exported member named '_Customer'. Did you mean 'Customer'?
+src/hooks/useTicketsMutations.ts(64,30): error TS2345: Argument of type 'unknown' is not assignable to parameter of type '"delivered" | "in_progress" | "created" | "ready"'.
+src/lib/__tests__/labor-pricing.test.ts(2,51): error TS2724: '"../labor-pricing"' has no exported member named '_LaborCostResult'. Did you mean 'LaborCostResult'?
+src/lib/catalog-harmonizer.ts(234,5): error TS2322: Type 'unknown' is not assignable to type '"PIECES" | "EQUIPEMENTS" | "AUTRES"'.
+src/lib/dbReset.ts(41,31): error TS2339: Property '$executeRawUnsafe' does not exist on type 'unknown'.
+src/lib/dbReset.ts(57,31): error TS2339: Property '$executeRawUnsafe' does not exist on type 'unknown'.
+src/lib/jwt.ts(43,28): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'JWTPayload'.
+  Index signature for type 'string' is missing in type '{}'.
+src/lib/logger.ts(22,74): error TS2339: Property 'electron' does not exist on type 'unknown'.
+src/lib/queryClient.ts(23,45): error TS2339: Property 'status' does not exist on type 'unknown'.

@@ -1,0 +1,364 @@
+================================================================================
+  GUIDE COMPLET - GÉNÉRATION CLÉS RSA POUR LICENCES ATELIER VÉLO+
+================================================================================
+
+📋 TABLE DES MATIÈRES
+---------------------
+1. Prérequis
+2. Génération des clés RSA
+3. Génération d'une licence
+4. Activation dans l'application
+5. Sécurité et bonnes pratiques
+6. Dépannage
+
+================================================================================
+1. PRÉREQUIS
+================================================================================
+
+✅ Node.js installé (version 14 ou supérieure)
+✅ Accès au dossier license-generator/
+✅ Droits d'écriture dans le dossier
+
+Vérification Node.js :
+  node --version
+
+================================================================================
+2. GÉNÉRATION DES CLÉS RSA (À FAIRE UNE SEULE FOIS)
+================================================================================
+
+📍 Emplacement : Dossier racine du projet
+
+COMMANDE :
+----------
+cd license-generator
+node generate-rsa-keys.js
+
+
+RÉSULTAT :
+----------
+✅ Fichiers créés :
+   - private-key.pem       (Clé privée - À PROTÉGER !)
+   - public-key.pem        (Clé publique)
+   - public-key-base64.txt (Clé publique en base64)
+
+⚠️  IMPORTANT :
+   - La clé privée (private-key.pem) doit rester SECRÈTE
+   - NE JAMAIS commiter private-key.pem dans Git
+   - Sauvegarder private-key.pem dans un endroit sûr (coffre-fort, gestionnaire de mots de passe)
+
+
+COPIE DE LA CLÉ PUBLIQUE DANS L'APPLICATION :
+----------------------------------------------
+La clé publique doit être copiée dans l'application pour valider les licences.
+
+COMMANDE (depuis license-generator/) :
+  Copy-Item "public-key.pem" -Destination "..\src\lib\license-rsa-public.pem" -Force
+
+OU manuellement :
+  Copier : license-generator/public-key.pem
+  Vers   : src/lib/license-rsa-public.pem
+
+================================================================================
+3. GÉNÉRATION D'UNE LICENCE
+================================================================================
+
+📍 Emplacement : license-generator/
+
+TYPES DE LICENCES DISPONIBLES :
+--------------------------------
+1. Trial      - 14 jours gratuit (AVTR-XXXX-XXXX-512CHARS)
+2. Basique    - 199€/an, 30 emails/mois (AVBS-XXXX-XXXX-512CHARS)
+3. Pro        - 359€/an, illimité (AVPR-XXXX-XXXX-512CHARS)
+4. Pro Lifetime - 599€ à vie (AVPL-XXXX-XXXX-512CHARS)
+
+
+COMMANDES :
+-----------
+
+A) LICENCE TRIAL (14 jours) :
+   node generate-license.js trial --atelier "Nom de l'Atelier"
+
+   Exemple :
+   node generate-license.js trial --atelier "Vélo Passion Paris"
+
+
+B) LICENCE BASIQUE (Date automatique +365 jours) :
+   node generate-license.js basique auto --atelier "Nom de l'Atelier"
+
+   Exemple :
+   node generate-license.js basique auto --atelier "Bike Shop Lyon"
+
+
+C) LICENCE BASIQUE (Date personnalisée) :
+   node generate-license.js basique [JOUR] [MOIS] [ANNÉE] --atelier "Nom de l'Atelier"
+
+   Exemple (expire le 31 décembre 2025) :
+   node generate-license.js basique 31 12 2025 --atelier "Cycle Service"
+
+
+D) LICENCE PRO (Date automatique +365 jours) :
+   node generate-license.js pro auto --atelier "Nom de l'Atelier"
+
+   Exemple :
+   node generate-license.js pro auto --atelier "Atelier Pro Vélo"
+
+
+E) LICENCE PRO (Date personnalisée) :
+   node generate-license.js pro [JOUR] [MOIS] [ANNÉE] --atelier "Nom de l'Atelier"
+
+   Exemple (expire le 15 juin 2026) :
+   node generate-license.js pro 15 06 2026 --atelier "Bike Center"
+
+
+F) LICENCE PRO LIFETIME (À vie) :
+   node generate-license.js pro_lifetime --atelier "Nom de l'Atelier"
+
+   Exemple :
+   node generate-license.js pro_lifetime --atelier "Premium Cycles"
+
+
+RÉSULTAT :
+----------
+✅ Affichage dans le terminal :
+   - Clé de licence complète
+   - Type et prix
+   - Date d'expiration
+   - Features incluses
+
+✅ Fichier créé automatiquement :
+   license-[tier]-[nom-atelier]-[timestamp].txt
+
+   Exemple :
+   license-pro-Bike-Shop-Lyon-2025-11-21T12-30-00.txt
+
+
+AIDE :
+------
+Pour voir toutes les options :
+  node generate-license.js --help
+
+================================================================================
+4. ACTIVATION DANS L'APPLICATION
+================================================================================
+
+ÉTAPES :
+--------
+1. Copier la clé de licence générée (depuis le terminal ou le fichier .txt)
+
+2. Lancer l'application Atelier Vélo+
+
+3. Aller dans : Admin → Licences
+
+4. Coller la clé dans le champ "Clé de licence"
+
+5. Renseigner :
+   - Email de l'atelier
+   - Nom de l'atelier
+
+6. Cliquer sur "Activer"
+
+7. Vérification :
+   ✅ Status : Active
+   ✅ Tier affiché correctement
+   ✅ Features débloquées
+
+
+FORMAT DE CLÉ :
+---------------
+AVXX-YYYY-MMYY-[512 caractères hexadécimaux de signature RSA]
+
+Exemple :
+AVTR-8C8B-1225-3e34ae131c3afb23a539b52f00884ddf67917addb59656d1556ed932...
+
+Longueur totale : ~530 caractères
+
+================================================================================
+5. SÉCURITÉ ET BONNES PRATIQUES
+================================================================================
+
+🔒 CLÉ PRIVÉE (private-key.pem) :
+----------------------------------
+✅ À FAIRE :
+   - Sauvegarder dans un coffre-fort numérique
+   - Conserver une copie de secours hors ligne
+   - Ajouter à .gitignore (déjà fait)
+   - Limiter l'accès (vous seul)
+
+❌ À NE JAMAIS FAIRE :
+   - Commiter dans Git
+   - Partager par email
+   - Stocker en clair sur un serveur
+   - Laisser accessible à d'autres personnes
+
+
+🔓 CLÉ PUBLIQUE (public-key.pem) :
+-----------------------------------
+✅ Peut être partagée
+✅ Embarquée dans l'application
+✅ Utilisée pour valider les licences
+
+
+🎯 LICENCES GÉNÉRÉES :
+----------------------
+✅ Chaque licence est unique
+✅ Liée au Hardware ID de la machine
+✅ Signature RSA impossible à falsifier
+✅ Validation automatique à chaque démarrage
+
+
+ROTATION DES CLÉS :
+-------------------
+Si vous devez regénérer les clés (compromission, perte) :
+
+1. Générer nouvelle paire de clés :
+   node generate-rsa-keys.js
+
+2. Copier nouvelle clé publique dans l'app :
+   Copy-Item "public-key.pem" -Destination "..\src\lib\license-rsa-public.pem" -Force
+
+3. Rebuilder l'application
+
+4. ⚠️ IMPORTANT : Toutes les anciennes licences seront INVALIDES
+   Vous devrez regénérer toutes les licences actives
+
+================================================================================
+6. DÉPANNAGE
+================================================================================
+
+ERREUR : "Clé privée RSA non trouvée"
+--------------------------------------
+CAUSE : Le fichier private-key.pem n'existe pas
+SOLUTION :
+  cd license-generator
+  node generate-rsa-keys.js
+
+
+ERREUR : "Cannot find module 'crypto'"
+---------------------------------------
+CAUSE : Node.js trop ancien
+SOLUTION : Mettre à jour Node.js (version 14+)
+  node --version
+
+
+ERREUR : "Tier invalide"
+-------------------------
+CAUSE : Type de licence incorrect
+SOLUTION : Utiliser un des tiers valides :
+  - trial
+  - basique
+  - pro
+  - pro_lifetime
+
+
+ERREUR : "Date requise"
+------------------------
+CAUSE : Date manquante pour licence Basique ou Pro
+SOLUTION : Ajouter la date ou utiliser "auto"
+  node generate-license.js basique auto --atelier "Nom"
+  OU
+  node generate-license.js basique 31 12 2025 --atelier "Nom"
+
+
+CLÉ NON ACCEPTÉE DANS L'APP
+----------------------------
+CAUSE : Clé publique dans l'app ne correspond pas à la clé privée
+SOLUTION :
+  1. Vérifier que public-key.pem a été copié dans src/lib/license-rsa-public.pem
+  2. Rebuilder l'application
+  3. Regénérer la licence
+
+
+LICENCE EXPIRÉE IMMÉDIATEMENT
+------------------------------
+CAUSE : Date d'expiration dans le passé
+SOLUTION : Vérifier la date fournie ou utiliser "auto"
+
+
+================================================================================
+📞 SUPPORT
+================================================================================
+
+Email : jeromeley.apps@gmail.com
+Documentation : README.md dans license-generator/
+Code source : license-generator/generate-license.js
+
+================================================================================
+📝 EXEMPLES COMPLETS
+================================================================================
+
+SCÉNARIO 1 : Première installation
+-----------------------------------
+# Étape 1 : Générer les clés RSA
+cd license-generator
+node generate-rsa-keys.js
+
+# Étape 2 : Copier la clé publique dans l'app
+Copy-Item "public-key.pem" -Destination "..\src\lib\license-rsa-public.pem" -Force
+
+# Étape 3 : Générer une licence trial pour test
+node generate-license.js trial --atelier "Mon Atelier Test"
+
+# Étape 4 : Copier la clé affichée et l'activer dans l'app
+
+
+SCÉNARIO 2 : Vente licence Basique
+-----------------------------------
+# Client : "Vélo Shop Paris"
+# Durée : 1 an à partir d'aujourd'hui
+
+cd license-generator
+node generate-license.js basique auto --atelier "Vélo Shop Paris"
+
+# Envoyer le fichier .txt généré au client par email
+
+
+SCÉNARIO 3 : Vente licence Pro Lifetime
+----------------------------------------
+# Client : "Premium Cycles Pro"
+# Durée : À vie
+
+cd license-generator
+node generate-license.js pro_lifetime --atelier "Premium Cycles Pro"
+
+# Envoyer la clé au client
+
+
+SCÉNARIO 4 : Renouvellement licence Pro
+----------------------------------------
+# Client : "Bike Center"
+# Expire le : 31 décembre 2026
+
+cd license-generator
+node generate-license.js pro 31 12 2026 --atelier "Bike Center"
+
+================================================================================
+✅ CHECKLIST AVANT GÉNÉRATION
+================================================================================
+
+□ Node.js installé et à jour
+□ Clés RSA générées (private-key.pem et public-key.pem existent)
+□ Clé publique copiée dans src/lib/license-rsa-public.pem
+□ Nom de l'atelier client confirmé
+□ Type de licence déterminé (trial/basique/pro/pro_lifetime)
+□ Date d'expiration définie (si applicable)
+□ Prêt à envoyer la licence au client
+
+================================================================================
+📊 TABLEAU RÉCAPITULATIF DES TIERS
+================================================================================
+
++-------------+----------+-------------+------------+----------+----------+
+| Tier        | Prix     | Emails/Mois | PDF Direct | Durée    | Préfixe  |
++-------------+----------+-------------+------------+----------+----------+
+| Trial       | Gratuit  | Illimité    | ✅         | 14 jours | AVTR     |
+| Basique     | 199€/an  | 30          | ❌         | 1 an     | AVBS     |
+| Pro         | 359€/an  | Illimité    | ✅         | 1 an     | AVPR     |
+| Pro Lifetime| 599€     | Illimité    | ✅         | À vie    | AVPL     |
++-------------+----------+-------------+------------+----------+----------+
+
+================================================================================
+📅 DATE DE CRÉATION : 21 novembre 2025
+📝 VERSION : 1.0.0
+👤 AUTEUR : Jérôme Leyssard - Upgraded Bikes
+================================================================================
+

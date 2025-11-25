@@ -1,0 +1,20 @@
+# Configuration finale sans icône pour éviter ENAMETOOLONG
+# L'icône sera ajoutée manuellement après build
+
+appId: com.atelier-velo-plus
+productName: Atelier Velo+
+
+directories:
+  output: dist-electron
+
+# Fichiers essentiels uniquement
+files:
+  - "electron/**/*"
+  - "package.json"
+
+# PAS d'icône dans la config pour éviter ENAMETOOLONG
+win:
+  target: dir
+  forceCodeSigning: false
+
+compression: store

@@ -154,3 +154,4 @@ describe('GET /api/calendar/availability', () => {
   });
 });
 
+

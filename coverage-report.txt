@@ -1,0 +1,1972 @@
+﻿
+> atelier-velo-plus@1.0.17 test:coverage
+> npx jest --coverage
+
+npm : FAIL src/__tests__/lib/security.test.ts
+Au caractère Ligne:1 : 16
++ cd c:\atelier; npm run test:coverage 2>&1 | Out-File -FilePath covera ...
++                ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (FAIL src/__tests__/lib/security.t 
+   est.ts:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  ÔùÅ Security Utilities ÔÇ║ isPasswordBreached ÔÇ║ should handle network 
+errors gracefully
+
+    Network error
+
+    [0m [90m 114 |[39m
+     [90m 115 |[39m     it([32m'should handle network errors 
+gracefully'[39m[33m,[39m [36masync[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 116 |[39m       (global[33m.[39mfetch 
+[36mas[39m 
+jest[33m.[39m[33mMock[39m)[33m.[39mmockRejectedValue([36mnew[39m 
+[33mError[39m([32m'Network error'[39m))[33m;[39m
+     [90m     |[39m                                                     
+[31m[1m^[22m[39m
+     [90m 117 |[39m
+     [90m 118 |[39m       [90m// The function should catch the error and 
+return false (fail-closed)[39m
+     [90m 119 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m 
+isPasswordBreached([32m'testpassword'[39m)[33m;[39m[0m
+
+      at Object.<anonymous> (src/__tests__/lib/security.test.ts:116:53)
+
+FAIL src/__tests__/lib/jwt.test.ts
+  ÔùÅ JWT Utils ÔÇ║ generateToken ÔÇ║ should generate different tokens for 
+different payloads
+
+    expect(received).not.toBe(expected) // Object.is equality
+
+    Expected: not "mock.jwt.token"
+
+    [0m [90m 63 |[39m       [36mconst[39m token2 [33m=[39m 
+[36mawait[39m generateToken(payload2)[33m;[39m
+     [90m 64 |[39m
+    [31m[1m>[22m[39m[90m 65 |[39m       
+expect(token1)[33m.[39mnot[33m.[39mtoBe(token2)[33m;[39m
+     [90m    |[39m                          [31m[1m^[22m[39m
+     [90m 66 |[39m     })[33m;[39m
+     [90m 67 |[39m   })[33m;[39m
+     [90m 68 |[39m[0m
+
+      at Object.toBe (src/__tests__/lib/jwt.test.ts:65:26)
+
+  ÔùÅ JWT Utils ÔÇ║ verifyToken ÔÇ║ should return null for invalid token
+
+    expect(received).toBeNull()
+
+    Received: {"email": "test@example.com", "role": "admin", "userId": 
+"user-123"}
+
+    [0m [90m 87 |[39m       [36mconst[39m invalidToken [33m=[39m 
+[32m'invalid.token.here'[39m[33m;[39m
+     [90m 88 |[39m       [36mconst[39m verified [33m=[39m 
+[36mawait[39m verifyToken(invalidToken)[33m;[39m
+    [31m[1m>[22m[39m[90m 89 |[39m       
+expect(verified)[33m.[39mtoBeNull()[33m;[39m
+     [90m    |[39m                        [31m[1m^[22m[39m
+     [90m 90 |[39m     })[33m;[39m
+     [90m 91 |[39m
+     [90m 92 |[39m     it([32m'should return null for expired 
+token'[39m[33m,[39m [36masync[39m () [33m=>[39m {[0m
+
+      at Object.toBeNull (src/__tests__/lib/jwt.test.ts:89:24)
+
+  ÔùÅ JWT Utils ÔÇ║ verifyToken ÔÇ║ should return null for expired token
+
+    expect(received).toBeNull()
+
+    Received: {"email": "test@example.com", "role": "admin", "userId": 
+"user-123"}
+
+    [0m [90m  95 |[39m       [36mconst[39m invalidToken [33m=[39m [32m'
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ1c2VyLTEyMyIsImVtYWlsIjoidG
+VzdEBleGFtcGxlLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTYwOTQ1NjgwMCwiZXhwIjoxNjA5N
+DU2ODAwfQ.invalid'[39m[33m;[39m
+     [90m  96 |[39m       [36mconst[39m verified [33m=[39m 
+[36mawait[39m verifyToken(invalidToken)[33m;[39m
+    [31m[1m>[22m[39m[90m  97 |[39m       
+expect(verified)[33m.[39mtoBeNull()[33m;[39m
+     [90m     |[39m                        [31m[1m^[22m[39m
+     [90m  98 |[39m     })[33m;[39m
+     [90m  99 |[39m   })[33m;[39m
+     [90m 100 |[39m[0m
+
+      at Object.toBeNull (src/__tests__/lib/jwt.test.ts:97:24)
+
+  ÔùÅ JWT Utils ÔÇ║ getUserFromToken ÔÇ║ should extract user from request with 
+valid token
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "user-123"
+    Received: undefined
+
+    [0m [90m 116 |[39m       [36mconst[39m user [33m=[39m 
+[36mawait[39m getUserFromToken(req)[33m;[39m
+     [90m 117 |[39m       expect(user)[33m.[39mtoBeDefined()[33m;[39m
+    [31m[1m>[22m[39m[90m 118 |[39m       expect(user[33m?[39m[33m.[39
+mid)[33m.[39mtoBe([32m'user-123'[39m)[33m;[39m
+     [90m     |[39m                        [31m[1m^[22m[39m
+     [90m 119 |[39m       expect(user[33m?[39m[33m.[39memail)[33m.[39mt
+oBe([32m'test@example.com'[39m)[33m;[39m
+     [90m 120 |[39m     })[33m;[39m
+     [90m 121 |[39m[0m
+
+      at Object.toBe (src/__tests__/lib/jwt.test.ts:118:24)
+
+  ÔùÅ JWT Utils ÔÇ║ getUserFromToken ÔÇ║ should return null for request with 
+invalid token
+
+    expect(received).toBeNull()
+
+    Received: {"email": "test@example.com", "role": "admin", "userId": 
+"user-123"}
+
+    [0m [90m 137 |[39m
+     [90m 138 |[39m       [36mconst[39m user [33m=[39m [36mawait[39m 
+getUserFromToken(req)[33m;[39m
+    [31m[1m>[22m[39m[90m 139 |[39m       
+expect(user)[33m.[39mtoBeNull()[33m;[39m
+     [90m     |[39m                    [31m[1m^[22m[39m
+     [90m 140 |[39m     })[33m;[39m
+     [90m 141 |[39m   })[33m;[39m
+     [90m 142 |[39m })[33m;[39m[0m
+
+      at Object.toBeNull (src/__tests__/lib/jwt.test.ts:139:20)
+
+FAIL src/__tests__/api/catalog-items.test.ts
+  ÔùÅ POST /api/catalog/items ÔÇ║ should handle database errors
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 500
+    Received: 400
+
+    [0m [90m 236 |[39m     [36mconst[39m data [33m=[39m [36mawait[39m 
+res[33m.[39mjson()[33m;[39m
+     [90m 237 |[39m
+    [31m[1m>[22m[39m[90m 238 |[39m     
+expect(res[33m.[39mstatus)[33m.[39mtoBe([35m500[39m)[33m;[39m
+     [90m     |[39m                        [31m[1m^[22m[39m
+     [90m 239 |[39m     
+expect(data)[33m.[39mtoHaveProperty([32m'error'[39m)[33m;[39m
+     [90m 240 |[39m   })[33m;[39m
+     [90m 241 |[39m })[33m;[39m[0m
+
+      at Object.toBe (src/__tests__/api/catalog-items.test.ts:238:24)
+
+FAIL src/__tests__/api/admin-system-settings.test.ts
+  ÔùÅ PUT /api/admin/system-settings ÔÇ║ should update settings with format 1 
+(setting + value)
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 500
+
+    [0m [90m 163 |[39m     [36mconst[39m data [33m=[39m [36mawait[39m 
+res[33m.[39mjson()[33m;[39m
+     [90m 164 |[39m
+    [31m[1m>[22m[39m[90m 165 |[39m     
+expect(res[33m.[39mstatus)[33m.[39mtoBe([35m200[39m)[33m;[39m
+     [90m     |[39m                        [31m[1m^[22m[39m
+     [90m 166 |[39m     
+expect(mockPrismaSystemSettingsUpsert)[33m.[39mtoHaveBeenCalled()[33m;[39m
+     [90m 167 |[39m   })[33m;[39m
+     [90m 168 |[39m[0m
+
+      at Object.toBe (src/__tests__/api/admin-system-settings.test.ts:165:24)
+
+  ÔùÅ PUT /api/admin/system-settings ÔÇ║ should update settings with format 2 
+(object)
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 500
+
+    [0m [90m 188 |[39m     [36mconst[39m data [33m=[39m [36mawait[39m 
+res[33m.[39mjson()[33m;[39m
+     [90m 189 |[39m
+    [31m[1m>[22m[39m[90m 190 |[39m     
+expect(res[33m.[39mstatus)[33m.[39mtoBe([35m200[39m)[33m;[39m
+     [90m     |[39m                        [31m[1m^[22m[39m
+     [90m 191 |[39m     
+expect(mockPrismaSystemSettingsUpsert)[33m.[39mtoHaveBeenCalled()[33m;[39m
+     [90m 192 |[39m   })[33m;[39m
+     [90m 193 |[39m[0m
+
+      at Object.toBe (src/__tests__/api/admin-system-settings.test.ts:190:24)
+
+FAIL src/__tests__/api/finance-quotes.test.ts
+  ÔùÅ POST /api/finance/quotes ÔÇ║ should create quote from work order
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 500
+
+    [0m [90m 213 |[39m     [36mconst[39m data [33m=[39m [36mawait[39m 
+res[33m.[39mjson()[33m;[39m
+     [90m 214 |[39m
+    [31m[1m>[22m[39m[90m 215 |[39m     
+expect(res[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                        [31m[1m^[22m[39m
+     [90m 216 |[39m     expect(data)[33m.[39mtoMatchObject({ id[33m:[39m 
+[32m'quote-1'[39m[33m,[39m type[33m:[39m [32m'quote'[39m })[33m;[39m
+     [90m 217 |[39m     
+expect(mockPrismaInvoiceCreate)[33m.[39mtoHaveBeenCalled()[33m;[39m
+     [90m 218 |[39m   })[33m;[39m[0m
+
+      at Object.toBe (src/__tests__/api/finance-quotes.test.ts:215:24)
+
+  ÔùÅ POST /api/finance/quotes ÔÇ║ should set vatRate to 0 for 
+auto-entrepreneur
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 500
+
+    [0m [90m 246 |[39m     [36mconst[39m res [33m=[39m [36mawait[39m 
+[33mPOST[39m(req)[33m;[39m
+     [90m 247 |[39m
+    [31m[1m>[22m[39m[90m 248 |[39m     
+expect(res[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                        [31m[1m^[22m[39m
+     [90m 249 |[39m     
+expect(mockPrismaInvoiceCreate)[33m.[39mtoHaveBeenCalledWith(
+     [90m 250 |[39m       expect[33m.[39mobjectContaining({
+     [90m 251 |[39m         data[33m:[39m 
+expect[33m.[39mobjectContaining({[0m
+
+      at Object.toBe (src/__tests__/api/finance-quotes.test.ts:248:24)
+
+FAIL src/__tests__/api/admin-stats.test.ts
+  ÔùÅ GET /api/admin/stats ÔÇ║ should handle database errors gracefully
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 500
+    Received: 200
+
+    [0m [90m  95 |[39m     [36mconst[39m data [33m=[39m [36mawait[39m 
+res[33m.[39mjson()[33m;[39m
+     [90m  96 |[39m
+    [31m[1m>[22m[39m[90m  97 |[39m     
+expect(res[33m.[39mstatus)[33m.[39mtoBe([35m500[39m)[33m;[39m
+     [90m     |[39m                        [31m[1m^[22m[39m
+     [90m  98 |[39m     
+expect(data)[33m.[39mtoHaveProperty([32m'error'[39m[33m,[39m 
+[32m'Failed to fetch stats'[39m)[33m;[39m
+     [90m  99 |[39m   })[33m;[39m
+     [90m 100 |[39m })[33m;[39m[0m
+
+      at Object.toBe (src/__tests__/api/admin-stats.test.ts:97:24)
+
+PASS src/__tests__/auth/AuthContext.test.tsx
+  ÔùÅ Console
+
+    console.log
+      [AUTH] AuthContext initializing
+
+      at log (src/app/auth/AuthContext.tsx:40:13)
+
+    console.log
+      [AUTH] Token exists: false
+
+      at log (src/app/auth/AuthContext.tsx:44:13)
+
+    console.log
+      [AUTH] User data exists: false
+
+      at log (src/app/auth/AuthContext.tsx:45:13)
+
+    console.log
+      [AUTH] No token or user data - user is null
+
+      at log (src/app/auth/AuthContext.tsx:59:15)
+
+    console.log
+      [AUTH] AuthContext ready
+
+      at log (src/app/auth/AuthContext.tsx:62:13)
+
+    console.log
+      [AUTH] AuthContext initializing
+
+      at log (src/app/auth/AuthContext.tsx:40:13)
+
+    console.log
+      [AUTH] Token exists: true
+
+      at log (src/app/auth/AuthContext.tsx:44:13)
+
+    console.log
+      [AUTH] User data exists: true
+
+      at log (src/app/auth/AuthContext.tsx:45:13)
+
+    console.log
+      [AUTH] Setting user: test@example.com
+
+      at log (src/app/auth/AuthContext.tsx:50:17)
+
+    console.log
+      [AUTH] AuthContext ready
+
+      at log (src/app/auth/AuthContext.tsx:62:13)
+
+    console.log
+      [AUTH] AuthContext initializing
+
+      at log (src/app/auth/AuthContext.tsx:40:13)
+
+    console.log
+      [AUTH] Token exists: true
+
+      at log (src/app/auth/AuthContext.tsx:44:13)
+
+    console.log
+      [AUTH] User data exists: true
+
+      at log (src/app/auth/AuthContext.tsx:45:13)
+
+    console.log
+      [AUTH] Invalid user data - clearing
+
+      at log (src/app/auth/AuthContext.tsx:53:17)
+
+    console.log
+      [AUTH] AuthContext ready
+
+      at log (src/app/auth/AuthContext.tsx:62:13)
+
+    console.log
+      [AUTH] AuthContext initializing
+
+      at log (src/app/auth/AuthContext.tsx:40:13)
+
+    console.log
+      [AUTH] Token exists: false
+
+      at log (src/app/auth/AuthContext.tsx:44:13)
+
+    console.log
+      [AUTH] User data exists: false
+
+      at log (src/app/auth/AuthContext.tsx:45:13)
+
+    console.log
+      [AUTH] No token or user data - user is null
+
+      at log (src/app/auth/AuthContext.tsx:59:15)
+
+    console.log
+      [AUTH] AuthContext ready
+
+      at log (src/app/auth/AuthContext.tsx:62:13)
+
+    console.log
+      [AUTH] AuthContext initializing
+
+      at log (src/app/auth/AuthContext.tsx:40:13)
+
+    console.log
+      [AUTH] Token exists: false
+
+      at log (src/app/auth/AuthContext.tsx:44:13)
+
+    console.log
+      [AUTH] User data exists: false
+
+      at log (src/app/auth/AuthContext.tsx:45:13)
+
+    console.log
+      [AUTH] No token or user data - user is null
+
+      at log (src/app/auth/AuthContext.tsx:59:15)
+
+    console.log
+      [AUTH] AuthContext ready
+
+      at log (src/app/auth/AuthContext.tsx:62:13)
+
+    console.log
+      [AuthContext] Register response: {
+        token: 'register-token',
+        user: { id: '3', email: 'new@example.com', shopName: 'New Shop' }
+      }
+
+      at log (src/app/auth/AuthContext.tsx:100:13)
+
+    console.log
+      [AuthContext] Has token? true
+
+      at log (src/app/auth/AuthContext.tsx:101:13)
+
+    console.log
+      [AuthContext] Has user? true
+
+      at log (src/app/auth/AuthContext.tsx:102:13)
+
+    console.log
+      [AuthContext] Storing token in localStorage
+
+      at log (src/app/auth/AuthContext.tsx:106:15)
+
+    console.log
+      [AuthContext] Token stored, user set
+
+      at log (src/app/auth/AuthContext.tsx:110:15)
+
+    console.log
+      [AUTH] AuthContext initializing
+
+      at log (src/app/auth/AuthContext.tsx:40:13)
+
+    console.log
+      [AUTH] Token exists: true
+
+      at log (src/app/auth/AuthContext.tsx:44:13)
+
+    console.log
+      [AUTH] User data exists: true
+
+      at log (src/app/auth/AuthContext.tsx:45:13)
+
+    console.log
+      [AUTH] Setting user: test@example.com
+
+      at log (src/app/auth/AuthContext.tsx:50:17)
+
+    console.log
+      [AUTH] AuthContext ready
+
+      at log (src/app/auth/AuthContext.tsx:62:13)
+
+PASS src/__tests__/api/customers-id.test.ts
+PASS src/__tests__/api/communications.test.ts
+PASS src/__tests__/api/calendar-bookings.test.ts
+PASS src/__tests__/lib/cache.test.ts
+PASS src/__tests__/hooks/useLocalStorage.test.ts
+PASS src/__tests__/hooks/useTableState.test.ts
+FAIL src/__tests__/lib/format.test.ts
+  ÔùÅ Format Utilities ÔÇ║ formatDate ÔÇ║ should format a valid date
+
+    expect(received).not.toBe(expected) // Object.is equality
+
+    Expected: not "-"
+
+    [0m [90m 14 |[39m       [36mconst[39m result [33m=[39m 
+formatDate(date)[33m;[39m
+     [90m 15 |[39m       [90m// Should return a formatted date string (not 
+"-")[39m
+    [31m[1m>[22m[39m[90m 16 |[39m       
+expect(result)[33m.[39mnot[33m.[39mtoBe([32m'-'[39m)[33m;[39m
+     [90m    |[39m                          [31m[1m^[22m[39m
+     [90m 17 |[39m       expect([36mtypeof[39m 
+result)[33m.[39mtoBe([32m'string'[39m)[33m;[39m
+     [90m 18 |[39m       expect(result[33m.[39mlength)[33m.[39mtoBeGreate
+rThan([35m0[39m)[33m;[39m
+     [90m 19 |[39m     })[33m;[39m[0m
+
+      at Object.toBe (src/__tests__/lib/format.test.ts:16:26)
+
+  ÔùÅ Format Utilities ÔÇ║ formatDate ÔÇ║ should format a date string
+
+    expect(received).not.toBe(expected) // Object.is equality
+
+    Expected: not "-"
+
+    [0m [90m 23 |[39m       [36mconst[39m result [33m=[39m 
+formatDate(dateString)[33m;[39m
+     [90m 24 |[39m       [90m// Should return a formatted date string (not 
+"-")[39m
+    [31m[1m>[22m[39m[90m 25 |[39m       
+expect(result)[33m.[39mnot[33m.[39mtoBe([32m'-'[39m)[33m;[39m
+     [90m    |[39m                          [31m[1m^[22m[39m
+     [90m 26 |[39m       expect([36mtypeof[39m 
+result)[33m.[39mtoBe([32m'string'[39m)[33m;[39m
+     [90m 27 |[39m       expect(result[33m.[39mlength)[33m.[39mtoBeGreate
+rThan([35m0[39m)[33m;[39m
+     [90m 28 |[39m     })[33m;[39m[0m
+
+      at Object.toBe (src/__tests__/lib/format.test.ts:25:26)
+
+  ÔùÅ Format Utilities ÔÇ║ formatDateTime ÔÇ║ should format a valid date with 
+time
+
+    expect(received).not.toBe(expected) // Object.is equality
+
+    Expected: not "-"
+
+    [0m [90m 46 |[39m       [36mconst[39m result [33m=[39m 
+formatDateTime(date)[33m;[39m
+     [90m 47 |[39m       [90m// Should return a formatted date-time string 
+(not "-")[39m
+    [31m[1m>[22m[39m[90m 48 |[39m       
+expect(result)[33m.[39mnot[33m.[39mtoBe([32m'-'[39m)[33m;[39m
+     [90m    |[39m                          [31m[1m^[22m[39m
+     [90m 49 |[39m       expect([36mtypeof[39m 
+result)[33m.[39mtoBe([32m'string'[39m)[33m;[39m
+     [90m 50 |[39m       expect(result[33m.[39mlength)[33m.[39mtoBeGreate
+rThan([35m0[39m)[33m;[39m
+     [90m 51 |[39m     })[33m;[39m[0m
+
+      at Object.toBe (src/__tests__/lib/format.test.ts:48:26)
+
+  ÔùÅ Format Utilities ÔÇ║ formatDateLong ÔÇ║ should format a date in long 
+format
+
+    expect(received).not.toBe(expected) // Object.is equality
+
+    Expected: not "-"
+
+    [0m [90m 64 |[39m       [36mconst[39m date [33m=[39m [36mnew[39m 
+[33mDate[39m([32m'2024-01-15'[39m)[33m;[39m
+     [90m 65 |[39m       [36mconst[39m result [33m=[39m 
+formatDateLong(date)[33m;[39m
+    [31m[1m>[22m[39m[90m 66 |[39m       
+expect(result)[33m.[39mnot[33m.[39mtoBe([32m'-'[39m)[33m;[39m
+     [90m    |[39m                          [31m[1m^[22m[39m
+     [90m 67 |[39m       expect([36mtypeof[39m 
+result)[33m.[39mtoBe([32m'string'[39m)[33m;[39m
+     [90m 68 |[39m     })[33m;[39m
+     [90m 69 |[39m[0m
+
+      at Object.toBe (src/__tests__/lib/format.test.ts:66:26)
+
+  ÔùÅ Format Utilities ÔÇ║ formatTime ÔÇ║ should format time from date
+
+    expect(received).not.toBe(expected) // Object.is equality
+
+    Expected: not "-"
+
+    [0m [90m 78 |[39m       [36mconst[39m result [33m=[39m 
+formatTime(date)[33m;[39m
+     [90m 79 |[39m       [90m// Should return a formatted time string (not 
+"-")[39m
+    [31m[1m>[22m[39m[90m 80 |[39m       
+expect(result)[33m.[39mnot[33m.[39mtoBe([32m'-'[39m)[33m;[39m
+     [90m    |[39m                          [31m[1m^[22m[39m
+     [90m 81 |[39m       expect([36mtypeof[39m 
+result)[33m.[39mtoBe([32m'string'[39m)[33m;[39m
+     [90m 82 |[39m       expect(result[33m.[39mlength)[33m.[39mtoBeGreate
+rThan([35m0[39m)[33m;[39m
+     [90m 83 |[39m     })[33m;[39m[0m
+
+      at Object.toBe (src/__tests__/lib/format.test.ts:80:26)
+
+  ÔùÅ Format Utilities ÔÇ║ formatPhone ÔÇ║ should return "-" for invalid phone
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "-"
+    Received: "invalid"
+
+    [0m [90m 142 |[39m
+     [90m 143 |[39m     it([32m'should return "-" for invalid 
+phone'[39m[33m,[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 144 |[39m       expect(formatPhone([32m'invalid
+'[39m))[33m.[39mtoBe([32m'-'[39m)[33m;[39m
+     [90m     |[39m                                      [31m[1m^[22m[39m
+     [90m 145 |[39m     })[33m;[39m
+     [90m 146 |[39m   })[33m;[39m
+     [90m 147 |[39m })[33m;[39m[0m
+
+      at Object.toBe (src/__tests__/lib/format.test.ts:144:38)
+
+PASS src/__tests__/components/RequireAuth.test.tsx
+  ÔùÅ Console
+
+    console.error
+      Error: Not implemented: navigation (except hash changes)
+          at module.exports 
+(C:\atelier\node_modules\jsdom\lib\jsdom\browser\not-implemented.js:9:17)
+          at navigateFetch 
+(C:\atelier\node_modules\jsdom\lib\jsdom\living\window\navigation.js:77:3)
+          at exports.navigate 
+(C:\atelier\node_modules\jsdom\lib\jsdom\living\window\navigation.js:55:3)
+          at LocationImpl._locationObjectNavigate 
+(C:\atelier\node_modules\jsdom\lib\jsdom\living\window\Location-impl.js:30:5)
+          at LocationImpl._locationObjectSetterNavigate 
+(C:\atelier\node_modules\jsdom\lib\jsdom\living\window\Location-impl.js:24:17)
+          at LocationImpl.set pathname [as pathname] 
+(C:\atelier\node_modules\jsdom\lib\jsdom\living\window\Location-impl.js:146:10)
+          at Location.set pathname [as pathname] 
+(C:\atelier\node_modules\jsdom\lib\jsdom\living\generated\Location.js:271:41)
+          at Object.<anonymous> 
+(C:\atelier\src\__tests__\components\RequireAuth.test.tsx:25:38)
+          at Promise.finally.completed 
+(C:\atelier\node_modules\jest-circus\build\jestAdapterInit.js:1557:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn 
+(C:\atelier\node_modules\jest-circus\build\jestAdapterInit.js:1497:10)
+          at _callCircusHook 
+(C:\atelier\node_modules\jest-circus\build\jestAdapterInit.js:976:40)
+          at processTicksAndRejections (node:internal/process/task_queues:95:5)
+          at _runTest 
+(C:\atelier\node_modules\jest-circus\build\jestAdapterInit.js:941:5)
+          at C:\atelier\node_modules\jest-circus\build\jestAdapterInit.js:849:7
+          at _runTestsForDescribeBlock 
+(C:\atelier\node_modules\jest-circus\build\jestAdapterInit.js:862:11)
+          at _runTestsForDescribeBlock 
+(C:\atelier\node_modules\jest-circus\build\jestAdapterInit.js:857:11)
+          at run 
+(C:\atelier\node_modules\jest-circus\build\jestAdapterInit.js:761:3)
+          at runAndTransformResultsToJestFormat 
+(C:\atelier\node_modules\jest-circus\build\jestAdapterInit.js:1918:21)
+          at jestAdapter 
+(C:\atelier\node_modules\jest-circus\build\runner.js:101:19)
+          at runTestInternal 
+(C:\atelier\node_modules\jest-runner\build\testWorker.js:275:16)
+          at runTest 
+(C:\atelier\node_modules\jest-runner\build\testWorker.js:343:7)
+          at Object.worker 
+(C:\atelier\node_modules\jest-runner\build\testWorker.js:497:12) {
+        type: 'not implemented'
+      }
+
+    [0m [90m 23 |[39m     localStorage[33m.[39mclear()[33m;[39m
+     [90m 24 |[39m     (window[33m.[39mlocation [36mas[39m 
+any)[33m.[39mhref [33m=[39m [32m''[39m[33m;[39m
+    [31m[1m>[22m[39m[90m 25 |[39m     (window[33m.[39mlocation 
+[36mas[39m any)[33m.[39mpathname [33m=[39m [32m'/test'[39m[33m;[39m
+     [90m    |[39m                                      [31m[1m^[22m[39m
+     [90m 26 |[39m     (window[33m.[39mlocation [36mas[39m 
+any)[33m.[39msearch [33m=[39m [32m''[39m[33m;[39m
+     [90m 27 |[39m   })[33m;[39m
+     [90m 28 |[39m[0m
+
+      at VirtualConsole.<anonymous> 
+(node_modules/@jest/environment-jsdom-abstract/build/index.js:87:23)
+      at module.exports 
+(node_modules/jsdom/lib/jsdom/browser/not-implemented.js:12:26)
+      at navigateFetch 
+(node_modules/jsdom/lib/jsdom/living/window/navigation.js:77:3)
+      at exports.navigate 
+(node_modules/jsdom/lib/jsdom/living/window/navigation.js:55:3)
+      at LocationImpl._locationObjectNavigate 
+(node_modules/jsdom/lib/jsdom/living/window/Location-impl.js:30:5)
+      at LocationImpl._locationObjectSetterNavigate 
+(node_modules/jsdom/lib/jsdom/living/window/Location-impl.js:24:17)
+      at LocationImpl.set pathname [as pathname] 
+(node_modules/jsdom/lib/jsdom/living/window/Location-impl.js:146:10)
+      at Location.set pathname [as pathname] 
+(node_modules/jsdom/lib/jsdom/living/generated/Location.js:271:41)
+      at Object.<anonymous> 
+(src/__tests__/components/RequireAuth.test.tsx:25:38)
+
+    console.log
+      [AUTH] AuthContext initializing
+
+      at log (src/app/auth/AuthContext.tsx:40:13)
+
+    console.log
+      [AUTH] Token exists: false
+
+      at log (src/app/auth/AuthContext.tsx:44:13)
+
+    console.log
+      [AUTH] User data exists: false
+
+      at log (src/app/auth/AuthContext.tsx:45:13)
+
+    console.log
+      [AUTH] No token or user data - user is null
+
+      at log (src/app/auth/AuthContext.tsx:59:15)
+
+    console.log
+      [AUTH] AuthContext ready
+
+      at log (src/app/auth/AuthContext.tsx:62:13)
+
+    console.error
+      Error: Not implemented: navigation (except hash changes)
+          at module.exports 
+(C:\atelier\node_modules\jsdom\lib\jsdom\browser\not-implemented.js:9:17)
+          at navigateFetch 
+(C:\atelier\node_modules\jsdom\lib\jsdom\living\window\navigation.js:77:3)
+          at exports.navigate 
+(C:\atelier\node_modules\jsdom\lib\jsdom\living\window\navigation.js:55:3)
+          at LocationImpl._locationObjectNavigate 
+(C:\atelier\node_modules\jsdom\lib\jsdom\living\window\Location-impl.js:30:5)
+          at LocationImpl._locationObjectSetterNavigate 
+(C:\atelier\node_modules\jsdom\lib\jsdom\living\window\Location-impl.js:24:17)
+          at LocationImpl.set href [as href] 
+(C:\atelier\node_modules\jsdom\lib\jsdom\living\window\Location-impl.js:46:10)
+          at Location.set href [as href] 
+(C:\atelier\node_modules\jsdom\lib\jsdom\living\generated\Location.js:125:37)
+          at RequireAuth (C:\atelier\src\components\RequireAuth.tsx:49:27)
+          at renderWithHooks 
+(C:\atelier\node_modules\react-dom\cjs\react-dom.development.js:16305:18)
+          at updateFunctionComponent 
+(C:\atelier\node_modules\react-dom\cjs\react-dom.development.js:19588:20)
+          at beginWork 
+(C:\atelier\node_modules\react-dom\cjs\react-dom.development.js:21601:16)
+          at beginWork$1 
+(C:\atelier\node_modules\react-dom\cjs\react-dom.development.js:27426:14)
+          at performUnitOfWork 
+(C:\atelier\node_modules\react-dom\cjs\react-dom.development.js:26560:12)
+          at workLoopSync 
+(C:\atelier\node_modules\react-dom\cjs\react-dom.development.js:26466:5)
+          at renderRootSync 
+(C:\atelier\node_modules\react-dom\cjs\react-dom.development.js:26434:7)
+          at performConcurrentWorkOnRoot 
+(C:\atelier\node_modules\react-dom\cjs\react-dom.development.js:25738:74)
+          at flushActQueue 
+(C:\atelier\node_modules\react\cjs\react.development.js:2667:24)
+          at act 
+(C:\atelier\node_modules\react\cjs\react.development.js:2582:11)
+          at 
+C:\atelier\node_modules\@testing-library\react\dist\act-compat.js:47:25
+          at renderRoot 
+(C:\atelier\node_modules\@testing-library\react\dist\pure.js:190:26)
+          at render 
+(C:\atelier\node_modules\@testing-library\react\dist\pure.js:292:10)
+          at Object.<anonymous> 
+(C:\atelier\src\__tests__\components\RequireAuth.test.tsx:32:33)
+          at Promise.finally.completed 
+(C:\atelier\node_modules\jest-circus\build\jestAdapterInit.js:1557:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn 
+(C:\atelier\node_modules\jest-circus\build\jestAdapterInit.js:1497:10)
+          at _callCircusTest 
+(C:\atelier\node_modules\jest-circus\build\jestAdapterInit.js:1007:40)
+          at processTicksAndRejections (node:internal/process/task_queues:95:5)
+          at _runTest 
+(C:\atelier\node_modules\jest-circus\build\jestAdapterInit.js:947:3)
+          at C:\atelier\node_modules\jest-circus\build\jestAdapterInit.js:849:7
+          at _runTestsForDescribeBlock 
+(C:\atelier\node_modules\jest-circus\build\jestAdapterInit.js:862:11)
+          at _runTestsForDescribeBlock 
+(C:\atelier\node_modules\jest-circus\build\jestAdapterInit.js:857:11)
+          at run 
+(C:\atelier\node_modules\jest-circus\build\jestAdapterInit.js:761:3)
+          at runAndTransformResultsToJestFormat 
+(C:\atelier\node_modules\jest-circus\build\jestAdapterInit.js:1918:21)
+          at jestAdapter 
+(C:\atelier\node_modules\jest-circus\build\runner.js:101:19)
+          at runTestInternal 
+(C:\atelier\node_modules\jest-runner\build\testWorker.js:275:16)
+          at runTest 
+(C:\atelier\node_modules\jest-runner\build\testWorker.js:343:7)
+          at Object.worker 
+(C:\atelier\node_modules\jest-runner\build\testWorker.js:497:12) {
+        type: 'not implemented'
+      }
+
+    [0m [90m 47 |[39m     [36mif[39m ([36mtypeof[39m window 
+[33m!==[39m [32m"undefined"[39m) {
+     [90m 48 |[39m       [36mconst[39m cb [33m=[39m 
+encodeURIComponent(window[33m.[39mlocation[33m.[39mpathname [33m+[39m 
+window[33m.[39mlocation[33m.[39msearch)[33m;[39m
+    [31m[1m>[22m[39m[90m 49 |[39m       
+window[33m.[39mlocation[33m.[39mhref [33m=[39m 
+[32m`/auth/login?callbackUrl=${cb}`[39m[33m;[39m
+     [90m    |[39m                           [31m[1m^[22m[39m
+     [90m 50 |[39m     }
+     [90m 51 |[39m     [36mif[39m (fallback) [36mreturn[39m 
+[33m<[39m[33m>[39m{fallback}[33m<[39m[33m/[39m[33m>[39m[33m;[39m
+     [90m 52 |[39m[0m
+
+      at VirtualConsole.<anonymous> 
+(node_modules/@jest/environment-jsdom-abstract/build/index.js:87:23)
+      at module.exports 
+(node_modules/jsdom/lib/jsdom/browser/not-implemented.js:12:26)
+      at navigateFetch 
+(node_modules/jsdom/lib/jsdom/living/window/navigation.js:77:3)
+      at exports.navigate 
+(node_modules/jsdom/lib/jsdom/living/window/navigation.js:55:3)
+      at LocationImpl._locationObjectNavigate 
+(node_modules/jsdom/lib/jsdom/living/window/Location-impl.js:30:5)
+      at LocationImpl._locationObjectSetterNavigate 
+(node_modules/jsdom/lib/jsdom/living/window/Location-impl.js:24:17)
+      at LocationImpl.set href [as href] 
+(node_modules/jsdom/lib/jsdom/living/window/Location-impl.js:46:10)
+      at Location.set href [as href] 
+(node_modules/jsdom/lib/jsdom/living/generated/Location.js:125:37)
+      at RequireAuth (src/components/RequireAuth.tsx:49:27)
+      at renderWithHooks 
+(node_modules/react-dom/cjs/react-dom.development.js:16305:18)
+      at updateFunctionComponent 
+(node_modules/react-dom/cjs/react-dom.development.js:19588:20)
+      at beginWork 
+(node_modules/react-dom/cjs/react-dom.development.js:21601:16)
+      at beginWork$1 
+(node_modules/react-dom/cjs/react-dom.development.js:27426:14)
+      at performUnitOfWork 
+(node_modules/react-dom/cjs/react-dom.development.js:26560:12)
+      at workLoopSync 
+(node_modules/react-dom/cjs/react-dom.development.js:26466:5)
+      at renderRootSync 
+(node_modules/react-dom/cjs/react-dom.development.js:26434:7)
+      at performConcurrentWorkOnRoot 
+(node_modules/react-dom/cjs/react-dom.development.js:25738:74)
+      at flushActQueue (node_modules/react/cjs/react.development.js:2667:24)
+      at act (node_modules/react/cjs/react.development.js:2582:11)
+      at node_modules/@testing-library/react/dist/act-compat.js:47:25
+      at renderRoot (node_modules/@testing-library/react/dist/pure.js:190:26)
+      at render (node_modules/@testing-library/react/dist/pure.js:292:10)
+      at Object.<anonymous> 
+(src/__tests__/components/RequireAuth.test.tsx:32:33)
+
+    console.error
+      Error: Not implemented: navigation (except hash changes)
+          at module.exports 
+(C:\atelier\node_modules\jsdom\lib\jsdom\browser\not-implemented.js:9:17)
+          at navigateFetch 
+(C:\atelier\node_modules\jsdom\lib\jsdom\living\window\navigation.js:77:3)
+          at exports.navigate 
+(C:\atelier\node_modules\jsdom\lib\jsdom\living\window\navigation.js:55:3)
+          at LocationImpl._locationObjectNavigate 
+(C:\atelier\node_modules\jsdom\lib\jsdom\living\window\Location-impl.js:30:5)
+          at LocationImpl._locationObjectSetterNavigate 
+(C:\atelier\node_modules\jsdom\lib\jsdom\living\window\Location-impl.js:24:17)
+          at LocationImpl.set pathname [as pathname] 
+(C:\atelier\node_modules\jsdom\lib\jsdom\living\window\Location-impl.js:146:10)
+          at Location.set pathname [as pathname] 
+(C:\atelier\node_modules\jsdom\lib\jsdom\living\generated\Location.js:271:41)
+          at Object.<anonymous> 
+(C:\atelier\src\__tests__\components\RequireAuth.test.tsx:25:38)
+          at Promise.finally.completed 
+(C:\atelier\node_modules\jest-circus\build\jestAdapterInit.js:1557:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn 
+(C:\atelier\node_modules\jest-circus\build\jestAdapterInit.js:1497:10)
+          at _callCircusHook 
+(C:\atelier\node_modules\jest-circus\build\jestAdapterInit.js:976:40)
+          at _runTest 
+(C:\atelier\node_modules\jest-circus\build\jestAdapterInit.js:941:5)
+          at C:\atelier\node_modules\jest-circus\build\jestAdapterInit.js:849:7
+          at _runTestsForDescribeBlock 
+(C:\atelier\node_modules\jest-circus\build\jestAdapterInit.js:862:11)
+          at _runTestsForDescribeBlock 
+(C:\atelier\node_modules\jest-circus\build\jestAdapterInit.js:857:11)
+          at run 
+(C:\atelier\node_modules\jest-circus\build\jestAdapterInit.js:761:3)
+          at runAndTransformResultsToJestFormat 
+(C:\atelier\node_modules\jest-circus\build\jestAdapterInit.js:1918:21)
+          at jestAdapter 
+(C:\atelier\node_modules\jest-circus\build\runner.js:101:19)
+          at runTestInternal 
+(C:\atelier\node_modules\jest-runner\build\testWorker.js:275:16)
+          at runTest 
+(C:\atelier\node_modules\jest-runner\build\testWorker.js:343:7)
+          at Object.worker 
+(C:\atelier\node_modules\jest-runner\build\testWorker.js:497:12) {
+        type: 'not implemented'
+      }
+
+    [0m [90m 23 |[39m     localStorage[33m.[39mclear()[33m;[39m
+     [90m 24 |[39m     (window[33m.[39mlocation [36mas[39m 
+any)[33m.[39mhref [33m=[39m [32m''[39m[33m;[39m
+    [31m[1m>[22m[39m[90m 25 |[39m     (window[33m.[39mlocation 
+[36mas[39m any)[33m.[39mpathname [33m=[39m [32m'/test'[39m[33m;[39m
+     [90m    |[39m                                      [31m[1m^[22m[39m
+     [90m 26 |[39m     (window[33m.[39mlocation [36mas[39m 
+any)[33m.[39msearch [33m=[39m [32m''[39m[33m;[39m
+     [90m 27 |[39m   })[33m;[39m
+     [90m 28 |[39m[0m
+
+      at VirtualConsole.<anonymous> 
+(node_modules/@jest/environment-jsdom-abstract/build/index.js:87:23)
+      at module.exports 
+(node_modules/jsdom/lib/jsdom/browser/not-implemented.js:12:26)
+      at navigateFetch 
+(node_modules/jsdom/lib/jsdom/living/window/navigation.js:77:3)
+      at exports.navigate 
+(node_modules/jsdom/lib/jsdom/living/window/navigation.js:55:3)
+      at LocationImpl._locationObjectNavigate 
+(node_modules/jsdom/lib/jsdom/living/window/Location-impl.js:30:5)
+      at LocationImpl._locationObjectSetterNavigate 
+(node_modules/jsdom/lib/jsdom/living/window/Location-impl.js:24:17)
+      at LocationImpl.set pathname [as pathname] 
+(node_modules/jsdom/lib/jsdom/living/window/Location-impl.js:146:10)
+      at Location.set pathname [as pathname] 
+(node_modules/jsdom/lib/jsdom/living/generated/Location.js:271:41)
+      at Object.<anonymous> 
+(src/__tests__/components/RequireAuth.test.tsx:25:38)
+
+    console.log
+      [AUTH] AuthContext initializing
+
+      at log (src/app/auth/AuthContext.tsx:40:13)
+
+    console.log
+      [AUTH] Token exists: true
+
+      at log (src/app/auth/AuthContext.tsx:44:13)
+
+    console.log
+      [AUTH] User data exists: true
+
+      at log (src/app/auth/AuthContext.tsx:45:13)
+
+    console.log
+      [AUTH] Setting user: test@example.com
+
+      at log (src/app/auth/AuthContext.tsx:50:17)
+
+    console.log
+      [AUTH] AuthContext ready
+
+      at log (src/app/auth/AuthContext.tsx:62:13)
+
+PASS src/__tests__/api/auth-login.test.ts
+PASS src/__tests__/api/stats-summary.test.ts
+PASS src/__tests__/api/auth-register.test.ts
+PASS src/__tests__/api/invoices-id.test.ts
+PASS src/__tests__/api/suppliers.test.ts
+PASS src/__tests__/api/bikes.test.ts
+PASS src/__tests__/api/catalog-items-id.test.ts
+PASS src/__tests__/api/invoices.test.ts
+  ÔùÅ Console
+
+    console.log
+      [POST Invoice] Statut Auto-Entrepreneur: false
+
+      at log (src/app/api/finance/invoices/route.ts:115:13)
+
+    console.log
+      [POST Invoice] workOrderId: undefined, customerId: customer-1
+
+      at log (src/app/api/finance/invoices/route.ts:130:13)
+
+    console.log
+      [POST Invoice] Statut Auto-Entrepreneur: true
+
+      at log (src/app/api/finance/invoices/route.ts:115:13)
+
+    console.log
+      [POST Invoice] workOrderId: undefined, customerId: customer-1
+
+      at log (src/app/api/finance/invoices/route.ts:130:13)
+
+    console.log
+      [POST Invoice] Statut Auto-Entrepreneur: false
+
+      at log (src/app/api/finance/invoices/route.ts:115:13)
+
+    console.log
+      [POST Invoice] workOrderId: wo-1, customerId: customer-1
+
+      at log (src/app/api/finance/invoices/route.ts:130:13)
+
+    console.log
+      [POST Invoice] Copie de 1 lignes depuis WorkOrder wo-1
+
+      at log (src/app/api/finance/invoices/route.ts:155:15)
+
+    console.log
+      [POST Invoice] Totaux calcul├®s (AE=false): HT=60Ôé¼, TVA=12Ôé¼, 
+TTC=72Ôé¼
+
+      at log (src/app/api/finance/invoices/route.ts:194:17)
+
+    console.log
+      [POST Invoice] Statut Auto-Entrepreneur: false
+
+      at log (src/app/api/finance/invoices/route.ts:115:13)
+
+    console.log
+      [POST Invoice] workOrderId: wo-1, customerId: customer-1
+
+      at log (src/app/api/finance/invoices/route.ts:130:13)
+
+    console.log
+      [POST Invoice] Copie de 0 lignes depuis WorkOrder wo-1
+
+      at log (src/app/api/finance/invoices/route.ts:155:15)
+
+    console.log
+      [POST Invoice] Statut Auto-Entrepreneur: false
+
+      at log (src/app/api/finance/invoices/route.ts:115:13)
+
+    console.log
+      [POST Invoice] workOrderId: undefined, customerId: customer-1
+
+      at log (src/app/api/finance/invoices/route.ts:130:13)
+
+PASS src/__tests__/api/customers.test.ts
+PASS src/__tests__/api/settings.test.ts
+PASS src/__tests__/api/customers-bikes.test.ts
+PASS src/__tests__/api/bikes-search.test.ts
+PASS src/__tests__/api/service-rates.test.ts
+PASS src/__tests__/api/users-first.test.ts
+PASS src/__tests__/api/cash-register.test.ts
+PASS src/__tests__/api/workorders-id.test.ts
+PASS src/__tests__/api/catalog-search.test.ts
+PASS src/__tests__/api/workorders.test.ts
+  ÔùÅ Console
+
+    console.log
+      [WorkOrder Create] Creating with data: {"status":"created","customerId":"
+customer-1","bikeId":null,"type":null,"dueAt":null,"userId":"user-123"}
+
+      at log (src/app/api/workshop/workorders/route.ts:103:13)
+
+    console.log
+      [WorkOrder Create] Created ticket: {
+        id: '1',
+        customerId: 'customer-1',
+        hasCustomer: false,
+        customerName: 'N/A',
+        bikeId: null,
+        hasBike: false
+      }
+
+      at log (src/app/api/workshop/workorders/route.ts:114:13)
+
+    console.log
+      [WorkOrder Create] Creating with data: {"status":"created","customerId":"
+customer-1","bikeId":null,"type":null,"dueAt":null,"userId":"user-123"}
+
+      at log (src/app/api/workshop/workorders/route.ts:103:13)
+
+PASS src/__tests__/lib/api-helpers.test.ts
+PASS src/__tests__/lib/ticket-number.test.ts
+PASS src/__tests__/lib/validation.test.ts
+PASS src/__tests__/lib/short-id.test.ts
+PASS src/__tests__/lib/invoice-totals.test.ts
+--------------------------------------------------------|---------|----------|---------|---------|------------------------------------------
+File                                                    | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                        
+--------------------------------------------------------|---------|----------|---------|---------|------------------------------------------
+All files                                               |     6.9 |     6.77 |    5.04 |    6.96 |                                          
+ src                                                    |       0 |        0 |       0 |       0 |                                          
+  instrumentation.ts                                    |       0 |        0 |       0 |       0 | 7-19                                     
+  middleware.ts                                         |       0 |        0 |       0 |       0 | 3-192                                    
+  proxy.ts                                              |       0 |        0 |       0 |       0 | 3-182                                    
+ src/app                                                |       0 |        0 |       0 |       0 |                                          
+  EmotionCache.tsx                                      |       0 |        0 |       0 |       0 | 3-41                                     
+  fonts.ts                                              |       0 |      100 |     100 |       0 | 1-3                                      
+  layout.tsx                                            |       0 |      100 |       0 |       0 | 16-63                                    
+  minimal-layout.tsx                                    |       0 |      100 |       0 |       0 | 2                                        
+  mui-provider.tsx                                      |       0 |      100 |       0 |       0 | 3-27                                     
+  page.tsx                                              |       0 |      100 |       0 |       0 | 3-14                                     
+  providers.tsx                                         |       0 |        0 |       0 |       0 | 3-80                                     
+ src/app/account                                        |       0 |        0 |       0 |       0 |                                          
+  page.tsx                                              |       0 |        0 |       0 |       0 | 3-699                                    
+ src/app/account/components                             |       0 |        0 |       0 |       0 |                                          
+  SimpleBookingSection.tsx                              |       0 |        0 |       0 |       0 | 3-259                                    
+ src/app/admin                                          |       0 |        0 |       0 |       0 |                                          
+  page.tsx                                              |       0 |        0 |       0 |       0 | 4-910                                    
+ src/app/admin/booking                                  |       0 |      100 |       0 |       0 |                                          
+  page.tsx                                              |       0 |      100 |       0 |       0 | 3-13                                     
+ src/app/admin/calendar                                 |       0 |        0 |       0 |       0 |                                          
+  page.tsx                                              |       0 |        0 |       0 |       0 | 4-362                                    
+ src/app/admin/catalog                                  |       0 |        0 |       0 |       0 |                                          
+  layout.tsx                                            |       0 |      100 |       0 |       0 | 1-3                                      
+  page.tsx                                              |       0 |        0 |       0 |       0 | 5-453                                    
+ src/app/admin/guide                                    |       0 |      100 |       0 |       0 |                                          
+  page.tsx                                              |       0 |      100 |       0 |       0 | 3-43                                     
+ src/app/admin/license                                  |       0 |        0 |       0 |       0 |                                          
+  page.tsx                                              |       0 |        0 |       0 |       0 | 8-948                                    
+ src/app/admin/license/blocked                          |       0 |      100 |       0 |       0 |                                          
+  page.tsx                                              |       0 |      100 |       0 |       0 | 10-21                                    
+ src/app/admin/license/upgrade                          |       0 |        0 |       0 |       0 |                                          
+  page.tsx                                              |       0 |        0 |       0 |       0 | 10-434                                   
+ src/app/admin/metrics                                  |       0 |      100 |       0 |       0 |                                          
+  page.tsx                                              |       0 |      100 |       0 |       0 | 4-12                                     
+ src/app/admin/online-booking                           |       0 |        0 |       0 |       0 |                                          
+  page.tsx                                              |       0 |        0 |       0 |       0 | 3-349                                    
+ src/app/admin/service-rates                            |       0 |        0 |       0 |       0 |                                          
+  page.tsx                                              |       0 |        0 |       0 |       0 | 4-374                                    
+ src/app/admin/settings                                 |       0 |        0 |       0 |       0 |                                          
+  SmtpConfigCard.tsx                                    |       0 |        0 |       0 |       0 | 3-330                                    
+  TunnelConfigDialog.tsx                                |       0 |        0 |       0 |       0 | 3-249                                    
+  page-complete.tsx                                     |       0 |        0 |       0 |       0 | 3-709                                    
+  page.tsx                                              |       0 |        0 |       0 |       0 | 4-519                                    
+ src/app/api/account/settings                           |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-249                                    
+ src/app/api/account/upload-logo                        |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-115                                    
+ src/app/api/admin/backup                               |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-514                                    
+ src/app/api/admin/jobs/daily                           |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 8-28                                     
+ src/app/api/admin/license/activate                     |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 10-57                                    
+ src/app/api/admin/license/check-booking                |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-47                                     
+ src/app/api/admin/license/check-toggle                 |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 9-67                                     
+ src/app/api/admin/license/start-trial                  |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 9-52                                     
+ src/app/api/admin/license/status                       |       0 |      100 |       0 |       0 |                                          
+  route.ts                                              |       0 |      100 |       0 |       0 | 9-27                                     
+ src/app/api/admin/license/verify                       |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 9-33                                     
+ src/app/api/admin/pricing-margins                      |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-90                                     
+ src/app/api/admin/recent-emails                        |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-68                                     
+ src/app/api/admin/service-rates                        |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-74                                     
+ src/app/api/admin/service-rates/[id]                   |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-69                                     
+ src/app/api/admin/service-rates/import                 |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-145                                    
+ src/app/api/admin/stats                                |   85.71 |      100 |     100 |      90 |                                          
+  route.ts                                              |   85.71 |      100 |     100 |      90 | 69-70                                    
+ src/app/api/admin/system-settings                      |   84.41 |       75 |     100 |   85.52 |                                          
+  route.ts                                              |   84.41 |       75 |     100 |   85.52 | 172-184,241,250,290-292,299-300          
+ src/app/api/admin/test-email                           |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-146                                    
+ src/app/api/admin/test-email-db                        |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-76                                     
+ src/app/api/admin/users                                |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-90                                     
+ src/app/api/auth/[...nextauth]                         |       0 |      100 |       0 |       0 |                                          
+  route.ts                                              |       0 |      100 |       0 |       0 | 6-14                                     
+ src/app/api/auth/login                                 |   88.88 |    79.31 |   83.33 |   95.12 |                                          
+  route.ts                                              |   88.88 |    79.31 |   83.33 |   95.12 | 73-74                                    
+ src/app/api/auth/register                              |   86.56 |    71.18 |   83.33 |   90.47 |                                          
+  route.ts                                              |   86.56 |    71.18 |   83.33 |   90.47 | 78-79,126-127,155-156                    
+ src/app/api/bikes                                      |   80.32 |       77 |     100 |   83.63 |                                          
+  route.ts                                              |   80.32 |       77 |     100 |   83.63 | 61-63,147-160                            
+ src/app/api/bikes/[id]                                 |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-149                                    
+ src/app/api/bikes/[id]/history                         |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-155                                    
+ src/app/api/bikes/[id]/sell                            |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-201                                    
+ src/app/api/bikes/search                               |   89.47 |      100 |   66.66 |   88.88 |                                          
+  route.ts                                              |   89.47 |      100 |   66.66 |   88.88 | 60-71                                    
+ src/app/api/calendar/availability                      |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-70                                     
+ src/app/api/calendar/blocks                            |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-49                                     
+ src/app/api/calendar/bookings                          |   58.01 |    29.85 |     100 |   59.66 |                                          
+  route.ts                                              |   58.01 |    29.85 |     100 |   59.66 | 34-53,95,123,128,160-189,228-281,293-294 
+ src/app/api/calendar/bookings/[id]                     |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-30                                     
+ src/app/api/calendar/events                            |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-65                                     
+ src/app/api/cash-register                              |   93.75 |      100 |     100 |     100 |                                          
+  route.ts                                              |   93.75 |      100 |     100 |     100 |                                          
+ src/app/api/cash-register/[id]                         |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-46                                     
+ src/app/api/cash-register/send-receipt                 |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-209                                    
+ src/app/api/catalog/barcode                            |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 22-222                                   
+ src/app/api/catalog/import                             |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-157                                    
+ src/app/api/catalog/import-catalogsnap                 |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-143                                    
+ src/app/api/catalog/import-csv-streaming               |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 3-229                                    
+ src/app/api/catalog/import/supplier-csv                |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-319                                    
+ src/app/api/catalog/import/supplier-csv-stream         |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-259                                    
+ src/app/api/catalog/items                              |   54.79 |    59.37 |    37.5 |   58.46 |                                          
+  route.ts                                              |   54.79 |    59.37 |    37.5 |   58.46 | 28,113-163                               
+ src/app/api/catalog/items/[id]                         |   96.15 |      100 |     100 |     100 |                                          
+  route.ts                                              |   96.15 |      100 |     100 |     100 |                                          
+ src/app/api/catalog/items/[id]/offers                  |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-25                                     
+ src/app/api/catalog/items/[id]/offers/refresh          |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-64                                     
+ src/app/api/catalog/items/[id]/stock-movements         |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-37                                     
+ src/app/api/catalog/items/[id]/supplier-items          |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-65                                     
+ src/app/api/catalog/items/from-supplier                |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-94                                     
+ src/app/api/catalog/low-stock                          |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-33                                     
+ src/app/api/catalog/migrate-suppliers                  |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-79                                     
+ src/app/api/catalog/scan                               |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-157                                    
+ src/app/api/catalog/scan-bulk                          |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-144                                    
+ src/app/api/catalog/search                             |   81.81 |    62.96 |     100 |   83.33 |                                          
+  route.ts                                              |   81.81 |    62.96 |     100 |   83.33 | 54-63                                    
+ src/app/api/catalog/search-all                         |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-172                                    
+ src/app/api/catalog/seed                               |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-33                                     
+ src/app/api/catalog/seed-test                          |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-142                                    
+ src/app/api/catalog/stats                              |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-131                                    
+ src/app/api/communications                             |   96.15 |    91.66 |     100 |     100 |                                          
+  route.ts                                              |   96.15 |    91.66 |     100 |     100 | 62                                       
+ src/app/api/communications/send                        |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 7-263                                    
+ src/app/api/customers                                  |   95.23 |     86.3 |     100 |     100 |                                          
+  route.ts                                              |   95.23 |     86.3 |     100 |     100 | 23,25-28,62-63,69-70,77                  
+ src/app/api/customers/[id]                             |   76.47 |    68.42 |      60 |      75 |                                          
+  route.ts                                              |   76.47 |    68.42 |      60 |      75 | 65-73                                    
+ src/app/api/customers/[id]/bikes                       |   95.45 |       85 |     100 |     100 |                                          
+  route.ts                                              |   95.45 |       85 |     100 |     100 | 54-63                                    
+ src/app/api/customers/[id]/bikes/[bikeId]              |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-90                                     
+ src/app/api/customers/export                           |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-23                                     
+ src/app/api/customers/import                           |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-138                                    
+ src/app/api/debug/env                                  |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-69                                     
+ src/app/api/finance/invoices                           |   92.39 |    69.62 |     100 |   93.82 |                                          
+  route.ts                                              |   92.39 |    69.62 |     100 |   93.82 | 76-77,90-92                              
+ src/app/api/finance/invoices/[id]                      |   50.87 |    38.23 |      60 |   51.92 |                                          
+  route.ts                                              |   50.87 |    38.23 |      60 |   51.92 | 88-152                                   
+ src/app/api/finance/invoices/[id]/cancel               |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-49                                     
+ src/app/api/finance/invoices/[id]/convert-to-invoice   |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-108                                    
+ src/app/api/finance/invoices/[id]/credit               |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-79                                     
+ src/app/api/finance/invoices/[id]/email                |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-210                                    
+ src/app/api/finance/invoices/[id]/import-labor         |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-123                                    
+ src/app/api/finance/invoices/[id]/issue                |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-88                                     
+ src/app/api/finance/invoices/[id]/lines                |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-83                                     
+ src/app/api/finance/invoices/[id]/lines/[lineId]       |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-134                                    
+ src/app/api/finance/invoices/[id]/pay                  |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-13                                     
+ src/app/api/finance/invoices/[id]/payments             |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-69                                     
+ src/app/api/finance/invoices/[id]/payments/[paymentId] |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-110                                    
+ src/app/api/finance/invoices/[id]/pdf                  |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-427                                    
+ src/app/api/finance/invoices/[id]/remind               |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-144                                    
+ src/app/api/finance/invoices/[id]/send-email           |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-331                                    
+ src/app/api/finance/quotes                             |   89.47 |    75.67 |      75 |   90.56 |                                          
+  route.ts                                              |   89.47 |    75.67 |      75 |   90.56 | 119,143,185-187                          
+ src/app/api/news/bike-feeds                            |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 3-189                                    
+ src/app/api/pos/workorders/[id]/quote                  |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-116                                    
+ src/app/api/pos/workorders/[id]/quote-pdf              |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-219                                    
+ src/app/api/pos/workorders/[id]/sale                   |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-165                                    
+ src/app/api/service-rates                              |   95.65 |      100 |     100 |     100 |                                          
+  route.ts                                              |   95.65 |      100 |     100 |     100 |                                          
+ src/app/api/settings                                   |   94.11 |    91.66 |     100 |     100 |                                          
+  route.ts                                              |   94.11 |    91.66 |     100 |     100 | 39                                       
+ src/app/api/settings/[key]                             |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-23                                     
+ src/app/api/simplybook/rest/[...path]                  |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 9-57                                     
+ src/app/api/simplybook/rpc                             |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 11-29                                    
+ src/app/api/stats/summary                              |   85.36 |    66.66 |     100 |     100 |                                          
+  route.ts                                              |   85.36 |    66.66 |     100 |     100 | 21-38                                    
+ src/app/api/suppliers                                  |   96.42 |    77.27 |     100 |     100 |                                          
+  route.ts                                              |   96.42 |    77.27 |     100 |     100 | 17-18,21,26                              
+ src/app/api/suppliers/[id]                             |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-16                                     
+ src/app/api/suppliers/[id]/credentials                 |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-31                                     
+ src/app/api/suppliers/offers                           |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-56                                     
+ src/app/api/suppliers/offers/[id]                      |       0 |      100 |       0 |       0 |                                          
+  route.ts                                              |       0 |      100 |       0 |       0 | 2-14                                     
+ src/app/api/suppliers/search                           |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-198                                    
+ src/app/api/support/diagnostics                        |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-79                                     
+ src/app/api/test-invoice                               |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-36                                     
+ src/app/api/tunnel/activate                            |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-56                                     
+ src/app/api/tunnel/deactivate                          |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-43                                     
+ src/app/api/tunnel/status                              |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-39                                     
+ src/app/api/uploads/[...path]                          |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-71                                     
+ src/app/api/user/profile                               |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-34                                     
+ src/app/api/users/first                                |    87.5 |      100 |     100 |     100 |                                          
+  route.ts                                              |    87.5 |      100 |     100 |     100 |                                          
+ src/app/api/workorders/[id]/appointment                |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-165                                    
+ src/app/api/workorders/[id]/lines                      |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-111                                    
+ src/app/api/workorders/[id]/lines/[lineId]             |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-72                                     
+ src/app/api/workorders/[id]/parts                      |       0 |      100 |       0 |       0 |                                          
+  route.ts                                              |       0 |      100 |       0 |       0 | 4-16                                     
+ src/app/api/workorders/[id]/parts/[partId]             |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-50                                     
+ src/app/api/workorders/[id]/type                       |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-26                                     
+ src/app/api/workshop/workorders                        |   97.72 |     92.3 |     100 |     100 |                                          
+  route.ts                                              |   97.72 |     92.3 |     100 |     100 | 97,100-118                               
+ src/app/api/workshop/workorders/[id]                   |   96.42 |       80 |     100 |     100 |                                          
+  route.ts                                              |   96.42 |       80 |     100 |     100 | 40,64                                    
+ src/app/api/workshop/workorders/[id]/estimate          |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-43                                     
+ src/app/api/workshop/workorders/[id]/labor             |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-92                                     
+ src/app/api/workshop/workorders/[id]/ready             |       0 |      100 |       0 |       0 |                                          
+  route.ts                                              |       0 |      100 |       0 |       0 | 2-10                                     
+ src/app/api/workshop/workorders/[id]/start             |       0 |      100 |       0 |       0 |                                          
+  route.ts                                              |       0 |      100 |       0 |       0 | 2-10                                     
+ src/app/api/workshop/workorders/[id]/status            |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-55                                     
+ src/app/api/workshop/workorders/invoiceable            |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-114                                    
+ src/app/api/workshop/workorders/merge                  |       0 |        0 |       0 |       0 |                                          
+  route.ts                                              |       0 |        0 |       0 |       0 | 2-100                                    
+ src/app/auth                                           |    88.7 |    66.66 |   88.88 |   90.16 |                                          
+  AuthContext.tsx                                       |    88.7 |    66.66 |   88.88 |   90.16 | 66-69,112-115                            
+ src/app/auth/login                                     |       0 |        0 |       0 |       0 |                                          
+  page.tsx                                              |       0 |        0 |       0 |       0 | 3-85                                     
+ src/app/auth/register                                  |       0 |        0 |       0 |       0 |                                          
+  page.tsx                                              |       0 |        0 |       0 |       0 | 3-101                                    
+ src/app/bikes/history                                  |       0 |        0 |       0 |       0 |                                          
+  page.tsx                                              |       0 |        0 |       0 |       0 | 4-502                                    
+ src/app/booking                                        |       0 |      100 |       0 |       0 |                                          
+  page.tsx                                              |       0 |      100 |       0 |       0 | 1-5                                      
+ src/app/booking-local                                  |       0 |        0 |       0 |       0 |                                          
+  page.tsx                                              |       0 |        0 |       0 |       0 | 4-286                                    
+ src/app/booking-simplybook                             |       0 |        0 |       0 |       0 |                                          
+  page.tsx                                              |       0 |        0 |       0 |       0 | 3-96                                     
+ src/app/campaigns                                      |       0 |        0 |       0 |       0 |                                          
+  page.tsx                                              |       0 |        0 |       0 |       0 | 3-533                                    
+ src/app/cash-register                                  |       0 |        0 |       0 |       0 |                                          
+  page.tsx                                              |       0 |        0 |       0 |       0 | 4-416                                    
+ src/app/catalog                                        |       0 |        0 |       0 |       0 |                                          
+  page.tsx                                              |       0 |        0 |       0 |       0 | 9-283                                    
+ src/app/catalog/bikes                                  |       0 |      100 |       0 |       0 |                                          
+  page.tsx                                              |       0 |      100 |       0 |       0 | 9-63                                     
+ src/app/catalog/items/[name]                           |       0 |        0 |       0 |       0 |                                          
+  page.tsx                                              |       0 |        0 |       0 |       0 | 3-75                                     
+ src/app/catalog/pieces                                 |       0 |        0 |       0 |       0 |                                          
+  page.tsx                                              |       0 |        0 |       0 |       0 | 10-1015                                  
+ src/app/catalog/services                               |       0 |        0 |       0 |       0 |                                          
+  page.tsx                                              |       0 |        0 |       0 |       0 | 4-433                                    
+ src/app/clear-cache                                    |       0 |        0 |       0 |       0 |                                          
+  page.tsx                                              |       0 |        0 |       0 |       0 | 3-97                                     
+ src/app/communications                                 |       0 |        0 |       0 |       0 |                                          
+  page.tsx                                              |       0 |        0 |       0 |       0 | 4-279                                    
+ src/app/components                                     |       0 |        0 |       0 |       0 |                                          
+  BarcodeScanner.tsx                                    |       0 |        0 |       0 |       0 | 3-290                                    
+  BikeCard.tsx                                          |       0 |        0 |       0 |       0 | 3-40                                     
+  CustomerCard.tsx                                      |       0 |        0 |       0 |       0 | 3-49                                     
+  EditInvoiceLineDialog.tsx                             |       0 |        0 |       0 |       0 | 3-116                                    
+  FinancialSummaryCard.tsx                              |       0 |        0 |       0 |       0 | 3-26                                     
+  GlobalTrialBanner.tsx                                 |       0 |        0 |       0 |       0 | 12-223                                   
+  LicenseBanner.tsx                                     |       0 |        0 |       0 |       0 | 13-154                                   
+  LicenseStatusBadge.tsx                                |       0 |        0 |       0 |       0 | 8-61                                     
+  LineItemSelector.tsx                                  |       0 |        0 |       0 |       0 | 3-585                                    
+  LineItemsTable.tsx                                    |       0 |        0 |       0 |       0 | 3-201                                    
+  LoadingSpinner.tsx                                    |       0 |      100 |       0 |       0 | 3-6                                      
+  NavBanner.tsx                                         |       0 |        0 |       0 |       0 | 3-241                                    
+  OnboardingWizard.tsx                                  |       0 |        0 |       0 |       0 | 3-653                                    
+  PageShell.tsx                                         |       0 |        0 |       0 |       0 | 3-8                                      
+  RequireAuth.tsx                                       |       0 |        0 |       0 |       0 | 3-53                                     
+  SectionCard.tsx                                       |       0 |        0 |       0 |       0 | 3-10                                     
+  UpgradeModal.tsx                                      |       0 |      100 |       0 |       0 | 9-99                                     
+  VatRateSelector.tsx                                   |       0 |        0 |       0 |       0 | 1-29                                     
+ src/app/customers                                      |       0 |        0 |       0 |       0 |                                          
+  page.tsx                                              |       0 |        0 |       0 |       0 | 3-609                                    
+ src/app/customers/[id]                                 |       0 |        0 |       0 |       0 |                                          
+  page.tsx                                              |       0 |        0 |       0 |       0 | 3-270                                    
+ src/app/customers/[id]/bikes                           |       0 |        0 |       0 |       0 |                                          
+  page.tsx                                              |       0 |        0 |       0 |       0 | 3-327                                    
+ src/app/dashboard                                      |       0 |        0 |       0 |       0 |                                          
+  page.tsx                                              |       0 |        0 |       0 |       0 | 3-1224                                   
+ src/app/finance                                        |       0 |        0 |       0 |       0 |                                          
+  page.tsx                                              |       0 |        0 |       0 |       0 | 3-878                                    
+ src/app/finance/components                             |       0 |        0 |       0 |       0 |                                          
+  CreateInvoiceDialog.tsx                               |       0 |        0 |       0 |       0 | 3-496                                    
+  CreateQuoteDialog.tsx                                 |       0 |        0 |       0 |       0 | 3-320                                    
+  CreditsTab.tsx                                        |       0 |        0 |       0 |       0 | 3-239                                    
+  QuotesTab.tsx                                         |       0 |        0 |       0 |       0 | 3-358                                    
+  SelectTicketDialog.tsx                                |       0 |        0 |       0 |       0 | 3-150                                    
+ src/app/finance/credits/[id]                           |       0 |      100 |     100 |       0 |                                          
+  page.tsx                                              |       0 |      100 |     100 |       0 | 2-5                                      
+ src/app/finance/invoices                               |       0 |      100 |       0 |       0 |                                          
+  page.tsx                                              |       0 |      100 |       0 |       0 | 1-5                                      
+ src/app/finance/invoices/[id]                          |       0 |        0 |       0 |       0 |                                          
+  error.tsx                                             |       0 |        0 |       0 |       0 | 2-14                                     
+  page.tsx                                              |       0 |        0 |       0 |       0 | 4-625                                    
+ src/app/finance/quotes/[id]                            |       0 |      100 |     100 |       0 |                                          
+  page.tsx                                              |       0 |      100 |     100 |       0 | 2-5                                      
+ src/app/fix-auth                                       |       0 |        0 |       0 |       0 |                                          
+  page.tsx                                              |       0 |        0 |       0 |       0 | 3-46                                     
+ src/app/login                                          |       0 |      100 |       0 |       0 |                                          
+  page.tsx                                              |       0 |      100 |       0 |       0 | 1-4                                      
+ src/app/rdv                                            |       0 |        0 |       0 |       0 |                                          
+  layout.tsx                                            |       0 |      100 |       0 |       0 | 1                                        
+  page.tsx                                              |       0 |        0 |       0 |       0 | 4-301                                    
+ src/app/scan                                           |       0 |        0 |       0 |       0 |                                          
+  layout.tsx                                            |       0 |      100 |       0 |       0 | 3-8                                      
+  page.tsx                                              |       0 |        0 |       0 |       0 | 3-271                                    
+ src/app/settings                                       |       0 |        0 |       0 |       0 |                                          
+  TunnelConfigDialog.tsx                                |       0 |        0 |       0 |       0 | 3-181                                    
+  page.tsx                                              |       0 |      100 |       0 |       0 | 3-14                                     
+ src/app/stats                                          |       0 |        0 |       0 |       0 |                                          
+  page.tsx                                              |       0 |        0 |       0 |       0 | 4-215                                    
+ src/app/suppliers                                      |       0 |        0 |       0 |       0 |                                          
+  page.tsx                                              |       0 |        0 |       0 |       0 | 3-365                                    
+ src/app/tickets                                        |       0 |        0 |       0 |       0 |                                          
+  page.tsx                                              |       0 |        0 |       0 |       0 | 3-1137                                   
+ src/app/tickets/[id]                                   |       0 |        0 |       0 |       0 |                                          
+  page.tsx                                              |       0 |        0 |       0 |       0 | 3-623                                    
+ src/app/wizard                                         |       0 |      100 |       0 |       0 |                                          
+  page.tsx                                              |       0 |      100 |       0 |       0 | 3-30                                     
+ src/components                                         |    2.56 |     2.21 |    1.31 |    2.66 |                                          
+  AppointmentPicker.tsx                                 |       0 |        0 |       0 |       0 | 3-220                                    
+  B2BSearchDialog.tsx                                   |       0 |        0 |       0 |       0 | 8-233                                    
+  CatalogGrid.tsx                                       |       0 |        0 |       0 |       0 | 7-107                                    
+  CatalogItemCard.tsx                                   |       0 |        0 |       0 |       0 | 7-301                                    
+  ClearableTextField.tsx                                |       0 |        0 |       0 |       0 | 8-43                                     
+  GlobalTextFieldEnhancer.tsx                           |       0 |        0 |       0 |       0 | 8-66                                     
+  ModernStatCard.tsx                                    |       0 |        0 |       0 |       0 | 7-129                                    
+  NotificationCenter.tsx                                |       0 |        0 |       0 |       0 | 8-192                                    
+  NumericTextField.tsx                                  |       0 |      100 |       0 |       0 | 1-24                                     
+  RepairTimerBar.tsx                                    |       0 |        0 |       0 |       0 | 18-137                                   
+  RequireAuth.tsx                                       |     100 |       75 |     100 |     100 | 21,47                                    
+  ResponsiveContainer.tsx                               |       0 |        0 |       0 |       0 | 8-34                                     
+  SupplierCatalogCard.tsx                               |       0 |        0 |       0 |       0 | 7-80                                     
+  SupplierCatalogGrid.tsx                               |       0 |        0 |       0 |       0 | 7-138                                    
+  TestInfrastructure.tsx                                |       0 |        0 |       0 |       0 | 12-32                                    
+ src/components/catalog                                 |       0 |        0 |       0 |       0 |                                          
+  AddBikeDialog.tsx                                     |       0 |        0 |       0 |       0 | 3-614                                    
+  AddToStockDialog.tsx                                  |       0 |        0 |       0 |       0 | 7-249                                    
+  BikeCard.tsx                                          |       0 |        0 |       0 |       0 | 3-87                                     
+  BikesTab.tsx                                          |       0 |        0 |       0 |       0 | 3-257                                    
+  GlobalSearchTab.tsx                                   |       0 |        0 |       0 |       0 | 6-247                                    
+  MyStockTab.tsx                                        |       0 |        0 |       0 |       0 | 6-158                                    
+  SellBikeDialog.tsx                                    |       0 |        0 |       0 |       0 | 3-190                                    
+  SupplierCatalogTableView.tsx                          |       0 |        0 |       0 |       0 | 3-331                                    
+  SuppliersTab.tsx                                      |       0 |        0 |       0 |       0 | 6-302                                    
+ src/components/catalog-v2                              |       0 |        0 |       0 |       0 |                                          
+  ImportProgressDialog.tsx                              |       0 |        0 |       0 |       0 | 3-38                                     
+  MyStockTab.tsx                                        |       0 |        0 |       0 |       0 | 3-228                                    
+  OrdersTab.tsx                                         |       0 |      100 |       0 |       0 | 3-36                                     
+  SupplierCatalogTab.tsx                                |       0 |        0 |       0 |       0 | 3-350                                    
+  SuppliersManagementTab.tsx                            |       0 |        0 |       0 |       0 | 3-246                                    
+ src/components/providers                               |       0 |        0 |       0 |       0 |                                          
+  SentryProvider.tsx                                    |       0 |        0 |       0 |       0 | 8-14                                     
+ src/contexts                                           |       0 |        0 |       0 |       0 |                                          
+  RepairTimerContext.tsx                                |       0 |        0 |       0 |       0 | 17-188                                   
+  StockUpdateContext.tsx                                |       0 |        0 |       0 |       0 | 3-82                                     
+ src/hooks                                              |    3.11 |     2.37 |    2.92 |    3.22 |                                          
+  useAccountData.ts                                     |       0 |        0 |       0 |       0 | 11-49                                    
+  useAdminCatalogData.ts                                |       0 |        0 |       0 |       0 | 12-97                                    
+  useAdminCatalogMutations.ts                           |       0 |        0 |       0 |       0 | 12-67                                    
+  useAdminCatalogUI.ts                                  |       0 |        0 |       0 |       0 | 13-90                                    
+  useAdminDashboardData.ts                              |       0 |        0 |       0 |       0 | 13-100                                   
+  useAdminDashboardMutations.ts                         |       0 |        0 |       0 |       0 | 13-110                                   
+  useAdminDashboardUI.ts                                |       0 |        0 |       0 |       0 | 13-71                                    
+  useAppointmentsData.ts                                |       0 |        0 |       0 |       0 | 13-65                                    
+  useAppointmentsMutations.ts                           |       0 |        0 |       0 |       0 | 13-60                                    
+  useAppointmentsUI.ts                                  |       0 |      100 |       0 |       0 | 14-73                                    
+  useBikeHistoryData.ts                                 |       0 |        0 |       0 |       0 | 8-30                                     
+  useBikeHistoryUI.ts                                   |       0 |        0 |       0 |       0 | 10-29                                    
+  useBikeSearch.ts                                      |       0 |        0 |       0 |       0 | 8-78                                     
+  useBikes.ts                                           |       0 |        0 |       0 |       0 | 6-79                                     
+  useBikesMutations.ts                                  |       0 |        0 |       0 |       0 | 6-200                                    
+  useBikesUI.ts                                         |       0 |        0 |       0 |       0 | 6-103                                    
+  useBookingLocalData.ts                                |       0 |        0 |       0 |       0 | 12-89                                    
+  useCachedData.ts                                      |       0 |        0 |       0 |       0 | 1-80                                     
+  useCalendarData.ts                                    |       0 |        0 |       0 |       0 | 8-77                                     
+  useCalendarUI.ts                                      |       0 |        0 |       0 |       0 | 7-47                                     
+  useCashRegisterData.ts                                |       0 |        0 |       0 |       0 | 12-77                                    
+  useCashRegisterMutations.ts                           |       0 |        0 |       0 |       0 | 12-73                                    
+  useCashRegisterUI.ts                                  |       0 |        0 |       0 |       0 | 13-111                                   
+  useCatalogData.ts                                     |       0 |        0 |       0 |       0 | 12-63                                    
+  useCatalogMutations.ts                                |       0 |        0 |       0 |       0 | 13-145                                   
+  useCatalogStats.ts                                    |       0 |        0 |       0 |       0 | 8-45                                     
+  useCatalogUI.ts                                       |       0 |        0 |       0 |       0 | 14-116                                   
+  useCommunicationsData.ts                              |       0 |        0 |       0 |       0 | 14-41                                    
+  useCommunicationsUI.ts                                |       0 |      100 |       0 |       0 | 12-43                                    
+  useCreateTicketForm.ts                                |       0 |        0 |       0 |       0 | 1-155                                    
+  useCustomersData.ts                                   |       0 |        0 |       0 |       0 | 14-54                                    
+  useCustomersMutations.ts                              |       0 |        0 |       0 |       0 | 14-152                                   
+  useCustomersUI.ts                                     |       0 |        0 |       0 |       0 | 12-37                                    
+  useDashboardRevenue.ts                                |       0 |        0 |       0 |       0 | 12-87                                    
+  useFinanceDocumentData.ts                             |       0 |        0 |       0 |       0 | 11-28                                    
+  useLocalStorage.ts                                    |   88.88 |       75 |     100 |   88.88 | 18,45                                    
+  useLogoUpload.ts                                      |       0 |        0 |       0 |       0 | 10-58                                    
+  usePageTheme.ts                                       |       0 |        0 |       0 |       0 | 3-19                                     
+  useScannerUI.ts                                       |       0 |      100 |       0 |       0 | 13-49                                    
+  useServiceRatesData.ts                                |       0 |        0 |       0 |       0 | 12-54                                    
+  useServiceRatesMutations.ts                           |       0 |        0 |       0 |       0 | 12-116                                   
+  useServiceRatesUI.ts                                  |       0 |        0 |       0 |       0 | 13-89                                    
+  useStatsData.ts                                       |       0 |        0 |       0 |       0 | 15-217                                   
+  useStatsUI.ts                                         |       0 |      100 |       0 |       0 | 12-26                                    
+  useSystemSettings.ts                                  |       0 |        0 |       0 |       0 | 12-114                                   
+  useSystemSettingsMutations.ts                         |       0 |        0 |       0 |       0 | 12-84                                    
+  useSystemSettingsUI.ts                                |       0 |        0 |       0 |       0 | 13-88                                    
+  useTableState.ts                                      |     100 |      100 |     100 |     100 |                                          
+  useTicketsData.ts                                     |       0 |        0 |       0 |       0 | 1-94                                     
+  useTicketsMutations.ts                                |       0 |      100 |       0 |       0 | 1-105                                    
+  useTicketsUI.ts                                       |       0 |        0 |       0 |       0 | 1-71                                     
+ src/lib                                                |    7.92 |     5.87 |   10.42 |    7.84 |                                          
+  api-error.ts                                          |       0 |        0 |       0 |       0 | 24-97                                    
+  api-helpers.ts                                        |   37.73 |       50 |      50 |   39.21 | 24-29,66-68,74-134                       
+  api.ts                                                |    0.29 |      1.7 |       0 |     0.3 | 6-1270                                   
+  apiClient.ts                                          |       0 |        0 |       0 |       0 | 10-99                                    
+  cache.ts                                              |     100 |    93.75 |     100 |     100 | 77                                       
+  calendar.ts                                           |       0 |        0 |       0 |       0 | 1-109                                    
+  catalog-harmonizer.ts                                 |       0 |        0 |       0 |       0 | 101-504                                  
+  catalog.ts                                            |       0 |        0 |       0 |       0 | 1-47                                     
+  cron-license-expiration.ts                            |       0 |        0 |       0 |       0 | 20-532                                   
+  cron-trial-grace.ts                                   |       0 |        0 |       0 |       0 | 18-351                                   
+  crypto.ts                                             |       0 |        0 |       0 |       0 | 6-150                                    
+  db.ts                                                 |       0 |        0 |       0 |       0 | 12-187                                   
+  dbReset.ts                                            |       0 |        0 |       0 |       0 | 1-57                                     
+  email-logger.ts                                       |       0 |        0 |       0 |       0 | 10-216                                   
+  email-template-loader.ts                              |       0 |        0 |       0 |       0 | 8-93                                     
+  email-templates.ts                                    |       0 |        0 |       0 |       0 | 22-96                                    
+  email-with-db-config.ts                               |       0 |        0 |       0 |       0 | 6-329                                    
+  error-handler.ts                                      |       0 |        0 |       0 |       0 | 2-140                                    
+  form-helpers.ts                                       |       0 |      100 |       0 |       0 | 4-21                                     
+  format.ts                                             |   58.33 |    46.15 |   54.54 |   64.28 | 18,30,42,54,73-76,102-127                
+  invoice-number.ts                                     |       0 |        0 |       0 |       0 | 1-112                                    
+  invoice-totals.ts                                     |     100 |    85.71 |     100 |     100 | 24-27                                    
+  jwt.ts                                                |    77.5 |    60.86 |     100 |   76.31 | 19-28,63,68-76,102                       
+  labor-pricing.ts                                      |       0 |        0 |       0 |       0 | 18-132                                   
+  license-guards.ts                                     |       0 |        0 |       0 |       0 | 9-448                                    
+  license-manager.ts                                    |       0 |        0 |       0 |       0 | 12-1141                                  
+  logger.ts                                             |       0 |        0 |       0 |       0 | 10-189                                   
+  mailer.ts                                             |       0 |        0 |       0 |       0 | 1-141                                    
+  monitoring-native.ts                                  |       0 |        0 |       0 |       0 | 25-505                                   
+  monitoring.ts                                         |       0 |        0 |       0 |       0 | 10-30                                    
+  pdf-invoice.ts                                        |       0 |        0 |       0 |       0 | 1-833                                    
+  pricing-margins.ts                                    |       0 |        0 |       0 |       0 | 1-89                                     
+  prisma.ts                                             |       0 |        0 |       0 |       0 | 1-87                                     
+  queryClient.ts                                        |       0 |        0 |       0 |       0 | 8-34                                     
+  scheduler.ts                                          |       0 |        0 |       0 |       0 | 6-347                                    
+  security.ts                                           |   96.77 |    85.71 |     100 |     100 | 40                                       
+  short-id.ts                                           |     100 |      100 |     100 |     100 |                                          
+  template-engine.ts                                    |       0 |        0 |       0 |       0 | 59-132                                   
+  theme-colors.ts                                       |       0 |        0 |       0 |       0 | 18-79                                    
+  ticket-number.ts                                      |     100 |      100 |     100 |     100 |                                          
+  validation.ts                                         |   51.28 |        0 |      50 |   70.83 | 120-136                                  
+  validations.ts                                        |       0 |        0 |       0 |       0 | 1-149                                    
+ src/lib/errors                                         |       0 |        0 |       0 |       0 |                                          
+  AppError.ts                                           |       0 |        0 |       0 |       0 | 12-114                                   
+ src/lib/metrics                                        |       0 |      100 |       0 |       0 |                                          
+  init.ts                                               |       0 |      100 |       0 |       0 | 1-9                                      
+  metrics.service.ts                                    |       0 |      100 |       0 |       0 | 2-14                                     
+ src/lib/suppliers                                      |       0 |        0 |       0 |       0 |                                          
+  fourmybike.ts                                         |       0 |        0 |       0 |       0 | 14-157                                   
+  mock.ts                                               |       0 |        0 |       0 |       0 | 10-84                                    
+  p2r.ts                                                |       0 |        0 |       0 |       0 | 15-232                                   
+  rcz.ts                                                |       0 |        0 |       0 |       0 | 17-158                                   
+ src/theme                                              |       0 |      100 |     100 |       0 |                                          
+  index.ts                                              |       0 |      100 |     100 |       0 | 1-3                                      
+  theme.ts                                              |       0 |      100 |     100 |       0 | 6-211                                    
+ src/utils                                              |       0 |      100 |       0 |       0 |                                          
+  createEmotionCache.ts                                 |       0 |      100 |       0 |       0 | 1-4                                      
+--------------------------------------------------------|---------|----------|---------|---------|------------------------------------------
+Jest: "global" coverage threshold for statements (10%) not met: 6.9%
+Jest: "global" coverage threshold for branches (10%) not met: 6.77%
+Jest: "global" coverage threshold for lines (10%) not met: 6.96%
+Jest: "global" coverage threshold for functions (10%) not met: 5.04%
+
+Summary of all failing tests
+FAIL src/__tests__/lib/security.test.ts
+  ÔùÅ Security Utilities ÔÇ║ isPasswordBreached ÔÇ║ should handle network 
+errors gracefully
+
+    Network error
+
+    [0m [90m 114 |[39m
+     [90m 115 |[39m     it([32m'should handle network errors 
+gracefully'[39m[33m,[39m [36masync[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 116 |[39m       (global[33m.[39mfetch 
+[36mas[39m 
+jest[33m.[39m[33mMock[39m)[33m.[39mmockRejectedValue([36mnew[39m 
+[33mError[39m([32m'Network error'[39m))[33m;[39m
+     [90m     |[39m                                                     
+[31m[1m^[22m[39m
+     [90m 117 |[39m
+     [90m 118 |[39m       [90m// The function should catch the error and 
+return false (fail-closed)[39m
+     [90m 119 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m 
+isPasswordBreached([32m'testpassword'[39m)[33m;[39m[0m
+
+      at Object.<anonymous> (src/__tests__/lib/security.test.ts:116:53)
+
+FAIL src/__tests__/lib/jwt.test.ts
+  ÔùÅ JWT Utils ÔÇ║ generateToken ÔÇ║ should generate different tokens for 
+different payloads
+
+    expect(received).not.toBe(expected) // Object.is equality
+
+    Expected: not "mock.jwt.token"
+
+    [0m [90m 63 |[39m       [36mconst[39m token2 [33m=[39m 
+[36mawait[39m generateToken(payload2)[33m;[39m
+     [90m 64 |[39m
+    [31m[1m>[22m[39m[90m 65 |[39m       
+expect(token1)[33m.[39mnot[33m.[39mtoBe(token2)[33m;[39m
+     [90m    |[39m                          [31m[1m^[22m[39m
+     [90m 66 |[39m     })[33m;[39m
+     [90m 67 |[39m   })[33m;[39m
+     [90m 68 |[39m[0m
+
+      at Object.toBe (src/__tests__/lib/jwt.test.ts:65:26)
+
+  ÔùÅ JWT Utils ÔÇ║ verifyToken ÔÇ║ should return null for invalid token
+
+    expect(received).toBeNull()
+
+    Received: {"email": "test@example.com", "role": "admin", "userId": 
+"user-123"}
+
+    [0m [90m 87 |[39m       [36mconst[39m invalidToken [33m=[39m 
+[32m'invalid.token.here'[39m[33m;[39m
+     [90m 88 |[39m       [36mconst[39m verified [33m=[39m 
+[36mawait[39m verifyToken(invalidToken)[33m;[39m
+    [31m[1m>[22m[39m[90m 89 |[39m       
+expect(verified)[33m.[39mtoBeNull()[33m;[39m
+     [90m    |[39m                        [31m[1m^[22m[39m
+     [90m 90 |[39m     })[33m;[39m
+     [90m 91 |[39m
+     [90m 92 |[39m     it([32m'should return null for expired 
+token'[39m[33m,[39m [36masync[39m () [33m=>[39m {[0m
+
+      at Object.toBeNull (src/__tests__/lib/jwt.test.ts:89:24)
+
+  ÔùÅ JWT Utils ÔÇ║ verifyToken ÔÇ║ should return null for expired token
+
+    expect(received).toBeNull()
+
+    Received: {"email": "test@example.com", "role": "admin", "userId": 
+"user-123"}
+
+    [0m [90m  95 |[39m       [36mconst[39m invalidToken [33m=[39m [32m'
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ1c2VyLTEyMyIsImVtYWlsIjoidG
+VzdEBleGFtcGxlLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTYwOTQ1NjgwMCwiZXhwIjoxNjA5N
+DU2ODAwfQ.invalid'[39m[33m;[39m
+     [90m  96 |[39m       [36mconst[39m verified [33m=[39m 
+[36mawait[39m verifyToken(invalidToken)[33m;[39m
+    [31m[1m>[22m[39m[90m  97 |[39m       
+expect(verified)[33m.[39mtoBeNull()[33m;[39m
+     [90m     |[39m                        [31m[1m^[22m[39m
+     [90m  98 |[39m     })[33m;[39m
+     [90m  99 |[39m   })[33m;[39m
+     [90m 100 |[39m[0m
+
+      at Object.toBeNull (src/__tests__/lib/jwt.test.ts:97:24)
+
+  ÔùÅ JWT Utils ÔÇ║ getUserFromToken ÔÇ║ should extract user from request with 
+valid token
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "user-123"
+    Received: undefined
+
+    [0m [90m 116 |[39m       [36mconst[39m user [33m=[39m 
+[36mawait[39m getUserFromToken(req)[33m;[39m
+     [90m 117 |[39m       expect(user)[33m.[39mtoBeDefined()[33m;[39m
+    [31m[1m>[22m[39m[90m 118 |[39m       expect(user[33m?[39m[33m.[39
+mid)[33m.[39mtoBe([32m'user-123'[39m)[33m;[39m
+     [90m     |[39m                        [31m[1m^[22m[39m
+     [90m 119 |[39m       expect(user[33m?[39m[33m.[39memail)[33m.[39mt
+oBe([32m'test@example.com'[39m)[33m;[39m
+     [90m 120 |[39m     })[33m;[39m
+     [90m 121 |[39m[0m
+
+      at Object.toBe (src/__tests__/lib/jwt.test.ts:118:24)
+
+  ÔùÅ JWT Utils ÔÇ║ getUserFromToken ÔÇ║ should return null for request with 
+invalid token
+
+    expect(received).toBeNull()
+
+    Received: {"email": "test@example.com", "role": "admin", "userId": 
+"user-123"}
+
+    [0m [90m 137 |[39m
+     [90m 138 |[39m       [36mconst[39m user [33m=[39m [36mawait[39m 
+getUserFromToken(req)[33m;[39m
+    [31m[1m>[22m[39m[90m 139 |[39m       
+expect(user)[33m.[39mtoBeNull()[33m;[39m
+     [90m     |[39m                    [31m[1m^[22m[39m
+     [90m 140 |[39m     })[33m;[39m
+     [90m 141 |[39m   })[33m;[39m
+     [90m 142 |[39m })[33m;[39m[0m
+
+      at Object.toBeNull (src/__tests__/lib/jwt.test.ts:139:20)
+
+FAIL src/__tests__/api/catalog-items.test.ts
+  ÔùÅ POST /api/catalog/items ÔÇ║ should handle database errors
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 500
+    Received: 400
+
+    [0m [90m 236 |[39m     [36mconst[39m data [33m=[39m [36mawait[39m 
+res[33m.[39mjson()[33m;[39m
+     [90m 237 |[39m
+    [31m[1m>[22m[39m[90m 238 |[39m     
+expect(res[33m.[39mstatus)[33m.[39mtoBe([35m500[39m)[33m;[39m
+     [90m     |[39m                        [31m[1m^[22m[39m
+     [90m 239 |[39m     
+expect(data)[33m.[39mtoHaveProperty([32m'error'[39m)[33m;[39m
+     [90m 240 |[39m   })[33m;[39m
+     [90m 241 |[39m })[33m;[39m[0m
+
+      at Object.toBe (src/__tests__/api/catalog-items.test.ts:238:24)
+
+FAIL src/__tests__/api/admin-system-settings.test.ts
+  ÔùÅ PUT /api/admin/system-settings ÔÇ║ should update settings with format 1 
+(setting + value)
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 500
+
+    [0m [90m 163 |[39m     [36mconst[39m data [33m=[39m [36mawait[39m 
+res[33m.[39mjson()[33m;[39m
+     [90m 164 |[39m
+    [31m[1m>[22m[39m[90m 165 |[39m     
+expect(res[33m.[39mstatus)[33m.[39mtoBe([35m200[39m)[33m;[39m
+     [90m     |[39m                        [31m[1m^[22m[39m
+     [90m 166 |[39m     
+expect(mockPrismaSystemSettingsUpsert)[33m.[39mtoHaveBeenCalled()[33m;[39m
+     [90m 167 |[39m   })[33m;[39m
+     [90m 168 |[39m[0m
+
+      at Object.toBe (src/__tests__/api/admin-system-settings.test.ts:165:24)
+
+  ÔùÅ PUT /api/admin/system-settings ÔÇ║ should update settings with format 2 
+(object)
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 500
+
+    [0m [90m 188 |[39m     [36mconst[39m data [33m=[39m [36mawait[39m 
+res[33m.[39mjson()[33m;[39m
+     [90m 189 |[39m
+    [31m[1m>[22m[39m[90m 190 |[39m     
+expect(res[33m.[39mstatus)[33m.[39mtoBe([35m200[39m)[33m;[39m
+     [90m     |[39m                        [31m[1m^[22m[39m
+     [90m 191 |[39m     
+expect(mockPrismaSystemSettingsUpsert)[33m.[39mtoHaveBeenCalled()[33m;[39m
+     [90m 192 |[39m   })[33m;[39m
+     [90m 193 |[39m[0m
+
+      at Object.toBe (src/__tests__/api/admin-system-settings.test.ts:190:24)
+
+FAIL src/__tests__/api/finance-quotes.test.ts
+  ÔùÅ POST /api/finance/quotes ÔÇ║ should create quote from work order
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 500
+
+    [0m [90m 213 |[39m     [36mconst[39m data [33m=[39m [36mawait[39m 
+res[33m.[39mjson()[33m;[39m
+     [90m 214 |[39m
+    [31m[1m>[22m[39m[90m 215 |[39m     
+expect(res[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                        [31m[1m^[22m[39m
+     [90m 216 |[39m     expect(data)[33m.[39mtoMatchObject({ id[33m:[39m 
+[32m'quote-1'[39m[33m,[39m type[33m:[39m [32m'quote'[39m })[33m;[39m
+     [90m 217 |[39m     
+expect(mockPrismaInvoiceCreate)[33m.[39mtoHaveBeenCalled()[33m;[39m
+     [90m 218 |[39m   })[33m;[39m[0m
+
+      at Object.toBe (src/__tests__/api/finance-quotes.test.ts:215:24)
+
+  ÔùÅ POST /api/finance/quotes ÔÇ║ should set vatRate to 0 for 
+auto-entrepreneur
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 500
+
+    [0m [90m 246 |[39m     [36mconst[39m res [33m=[39m [36mawait[39m 
+[33mPOST[39m(req)[33m;[39m
+     [90m 247 |[39m
+    [31m[1m>[22m[39m[90m 248 |[39m     
+expect(res[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                        [31m[1m^[22m[39m
+     [90m 249 |[39m     
+expect(mockPrismaInvoiceCreate)[33m.[39mtoHaveBeenCalledWith(
+     [90m 250 |[39m       expect[33m.[39mobjectContaining({
+     [90m 251 |[39m         data[33m:[39m 
+expect[33m.[39mobjectContaining({[0m
+
+      at Object.toBe (src/__tests__/api/finance-quotes.test.ts:248:24)
+
+FAIL src/__tests__/api/admin-stats.test.ts
+  ÔùÅ GET /api/admin/stats ÔÇ║ should handle database errors gracefully
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 500
+    Received: 200
+
+    [0m [90m  95 |[39m     [36mconst[39m data [33m=[39m [36mawait[39m 
+res[33m.[39mjson()[33m;[39m
+     [90m  96 |[39m
+    [31m[1m>[22m[39m[90m  97 |[39m     
+expect(res[33m.[39mstatus)[33m.[39mtoBe([35m500[39m)[33m;[39m
+     [90m     |[39m                        [31m[1m^[22m[39m
+     [90m  98 |[39m     
+expect(data)[33m.[39mtoHaveProperty([32m'error'[39m[33m,[39m 
+[32m'Failed to fetch stats'[39m)[33m;[39m
+     [90m  99 |[39m   })[33m;[39m
+     [90m 100 |[39m })[33m;[39m[0m
+
+      at Object.toBe (src/__tests__/api/admin-stats.test.ts:97:24)
+
+FAIL src/__tests__/lib/format.test.ts
+  ÔùÅ Format Utilities ÔÇ║ formatDate ÔÇ║ should format a valid date
+
+    expect(received).not.toBe(expected) // Object.is equality
+
+    Expected: not "-"
+
+    [0m [90m 14 |[39m       [36mconst[39m result [33m=[39m 
+formatDate(date)[33m;[39m
+     [90m 15 |[39m       [90m// Should return a formatted date string (not 
+"-")[39m
+    [31m[1m>[22m[39m[90m 16 |[39m       
+expect(result)[33m.[39mnot[33m.[39mtoBe([32m'-'[39m)[33m;[39m
+     [90m    |[39m                          [31m[1m^[22m[39m
+     [90m 17 |[39m       expect([36mtypeof[39m 
+result)[33m.[39mtoBe([32m'string'[39m)[33m;[39m
+     [90m 18 |[39m       expect(result[33m.[39mlength)[33m.[39mtoBeGreate
+rThan([35m0[39m)[33m;[39m
+     [90m 19 |[39m     })[33m;[39m[0m
+
+      at Object.toBe (src/__tests__/lib/format.test.ts:16:26)
+
+  ÔùÅ Format Utilities ÔÇ║ formatDate ÔÇ║ should format a date string
+
+    expect(received).not.toBe(expected) // Object.is equality
+
+    Expected: not "-"
+
+    [0m [90m 23 |[39m       [36mconst[39m result [33m=[39m 
+formatDate(dateString)[33m;[39m
+     [90m 24 |[39m       [90m// Should return a formatted date string (not 
+"-")[39m
+    [31m[1m>[22m[39m[90m 25 |[39m       
+expect(result)[33m.[39mnot[33m.[39mtoBe([32m'-'[39m)[33m;[39m
+     [90m    |[39m                          [31m[1m^[22m[39m
+     [90m 26 |[39m       expect([36mtypeof[39m 
+result)[33m.[39mtoBe([32m'string'[39m)[33m;[39m
+     [90m 27 |[39m       expect(result[33m.[39mlength)[33m.[39mtoBeGreate
+rThan([35m0[39m)[33m;[39m
+     [90m 28 |[39m     })[33m;[39m[0m
+
+      at Object.toBe (src/__tests__/lib/format.test.ts:25:26)
+
+  ÔùÅ Format Utilities ÔÇ║ formatDateTime ÔÇ║ should format a valid date with 
+time
+
+    expect(received).not.toBe(expected) // Object.is equality
+
+    Expected: not "-"
+
+    [0m [90m 46 |[39m       [36mconst[39m result [33m=[39m 
+formatDateTime(date)[33m;[39m
+     [90m 47 |[39m       [90m// Should return a formatted date-time string 
+(not "-")[39m
+    [31m[1m>[22m[39m[90m 48 |[39m       
+expect(result)[33m.[39mnot[33m.[39mtoBe([32m'-'[39m)[33m;[39m
+     [90m    |[39m                          [31m[1m^[22m[39m
+     [90m 49 |[39m       expect([36mtypeof[39m 
+result)[33m.[39mtoBe([32m'string'[39m)[33m;[39m
+     [90m 50 |[39m       expect(result[33m.[39mlength)[33m.[39mtoBeGreate
+rThan([35m0[39m)[33m;[39m
+     [90m 51 |[39m     })[33m;[39m[0m
+
+      at Object.toBe (src/__tests__/lib/format.test.ts:48:26)
+
+  ÔùÅ Format Utilities ÔÇ║ formatDateLong ÔÇ║ should format a date in long 
+format
+
+    expect(received).not.toBe(expected) // Object.is equality
+
+    Expected: not "-"
+
+    [0m [90m 64 |[39m       [36mconst[39m date [33m=[39m [36mnew[39m 
+[33mDate[39m([32m'2024-01-15'[39m)[33m;[39m
+     [90m 65 |[39m       [36mconst[39m result [33m=[39m 
+formatDateLong(date)[33m;[39m
+    [31m[1m>[22m[39m[90m 66 |[39m       
+expect(result)[33m.[39mnot[33m.[39mtoBe([32m'-'[39m)[33m;[39m
+     [90m    |[39m                          [31m[1m^[22m[39m
+     [90m 67 |[39m       expect([36mtypeof[39m 
+result)[33m.[39mtoBe([32m'string'[39m)[33m;[39m
+     [90m 68 |[39m     })[33m;[39m
+     [90m 69 |[39m[0m
+
+      at Object.toBe (src/__tests__/lib/format.test.ts:66:26)
+
+  ÔùÅ Format Utilities ÔÇ║ formatTime ÔÇ║ should format time from date
+
+    expect(received).not.toBe(expected) // Object.is equality
+
+    Expected: not "-"
+
+    [0m [90m 78 |[39m       [36mconst[39m result [33m=[39m 
+formatTime(date)[33m;[39m
+     [90m 79 |[39m       [90m// Should return a formatted time string (not 
+"-")[39m
+    [31m[1m>[22m[39m[90m 80 |[39m       
+expect(result)[33m.[39mnot[33m.[39mtoBe([32m'-'[39m)[33m;[39m
+     [90m    |[39m                          [31m[1m^[22m[39m
+     [90m 81 |[39m       expect([36mtypeof[39m 
+result)[33m.[39mtoBe([32m'string'[39m)[33m;[39m
+     [90m 82 |[39m       expect(result[33m.[39mlength)[33m.[39mtoBeGreate
+rThan([35m0[39m)[33m;[39m
+     [90m 83 |[39m     })[33m;[39m[0m
+
+      at Object.toBe (src/__tests__/lib/format.test.ts:80:26)
+
+  ÔùÅ Format Utilities ÔÇ║ formatPhone ÔÇ║ should return "-" for invalid phone
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "-"
+    Received: "invalid"
+
+    [0m [90m 142 |[39m
+     [90m 143 |[39m     it([32m'should return "-" for invalid 
+phone'[39m[33m,[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 144 |[39m       expect(formatPhone([32m'invalid
+'[39m))[33m.[39mtoBe([32m'-'[39m)[33m;[39m
+     [90m     |[39m                                      [31m[1m^[22m[39m
+     [90m 145 |[39m     })[33m;[39m
+     [90m 146 |[39m   })[33m;[39m
+     [90m 147 |[39m })[33m;[39m[0m
+
+      at Object.toBe (src/__tests__/lib/format.test.ts:144:38)
+
+
+Test Suites: 7 failed, 31 passed, 38 total
+Tests:       18 failed, 3 skipped, 292 passed, 313 total
+Snapshots:   0 total
+Time:        17.033 s
+Ran all test suites.

@@ -1,0 +1,64 @@
+# Fichiers MD Obsolètes à Supprimer
+
+## Doublons / Obsolètes (À supprimer)
+
+ADMIN_SECURITY_SECTION.md - Fusionné dans GUIDE_TECHNIQUE
+ANALYSE_CONFIGURATION.md - Obsolète
+ASSISTANT_CONFIGURATION_TECHNIQUE.md - Obsolète
+AUDIT_COMPLET.md - Obsolète
+BONNE_NUIT.md - Temporaire
+BUILD_PROCEDURE.md - Fusionné dans GUIDE_TECHNIQUE
+BUILD_PROCEDURE_COMPLETE.md - Fusionné dans GUIDE_TECHNIQUE
+COMMANDES_TESTS_EXE.md - Fusionné dans GUIDE_TECHNIQUE
+CORRECTIONS_BUILD_V1_V2.md - Obsolète (corrections appliquées)
+CORRECTIONS_FINALES.md - Obsolète (corrections appliquées)
+CORRECTION_FINALE_SECTION.md - Obsolète
+CORRECTION_PARTS_FINALE.md - Obsolète
+DEPLOIEMENT_CLOUD.md - Fonctionnalité non implémentée
+DISTRIBUTION_APP.md - Fusionné dans GUIDE_COMPLET
+ELECTRON_BUILD_TROUBLESHOOTING.md - Fusionné dans GUIDE_COMPLET
+ETAT_INTEGRATION_LIGNES.md - Obsolète (intégration terminée)
+FIX_PDF_DEVIS.md - Obsolète (fix appliqué)
+FIX_QUOTE_TYPES.md - Obsolète (fix appliqué)
+FIX_WORKORDER_QUOTE.md - Obsolète (fix appliqué)
+GARANTIE_BUILD_SANS_ERREURS.md - Obsolète
+GUIDE_BUILD_V1_V2.md - Fusionné dans GUIDE_TECHNIQUE
+INTEGRATION_COMPLETE_PLAN.md - Obsolète (intégration terminée)
+INTEGRATION_FINALE_INSTRUCTIONS.md - Obsolète (intégration terminée)
+INTEGRATION_PRESTATIONS_PLAN.md - Obsolète (intégration terminée)
+INTEGRATION_TERMINEE.md - Obsolète
+MIGRATION_COMPLETE.md - Obsolète
+NETTOYER_CACHE.md - Fusionné dans GUIDE_COMPLET
+PLAN_AUJOURDHUI.md - Temporaire
+REDESIGN_FINAL_SUMMARY.md - Fusionné dans HARMONISATION_COMPLETE
+REDESIGN_INTERFACES_PLAN.md - Obsolète (redesign terminé)
+REDESIGN_PROGRESS.md - Fusionné dans HARMONISATION_COMPLETE
+REDESIGN_PROGRESSION.md - Doublon REDESIGN_PROGRESS
+REDESIGN_TEST_PLAN.md - Fusionné dans HARMONISATION_COMPLETE
+RESUME_FINAL_SESSION.md - Fusionné dans SESSION_COMPLETE_15OCT2025
+SESSION_14OCT2025_RECAP.md - Fusionné dans CHANGELOG
+SESSION_COMPLETE_RECAP.md - Doublon SESSION_COMPLETE_15OCT2025
+SOLUTION_RDV_CLIENTS.md - Fusionné dans CHANGELOG
+TODOLIST.md - Obsolète
+TODO_ASSISTANT_CONFIGURATION.md - Obsolète
+TUNNEL_AUTO_START_DONE.md - Fusionné dans GUIDE_COMPLET
+
+## À Conserver
+
+README.md - Fichier principal du projet
+DEMARRAGE_RAPIDE.md - Guide démarrage rapide (à garder)
+DEMARRAGE_AUTO_WINDOWS.md - Guide démarrage auto (à garder)
+BUILD_FINAL_READY.md - Guide build final (à garder)
+GUIDE_INSTALLATION_UTILISATEUR.md - Guide installation (à garder)
+GUIDE_UTILISATION.md - Guide utilisation (à garder)
+HISTORIQUE_VELOS_GUIDE.md - Guide fonctionnalité (à garder)
+TARIFS_PRESTATIONS_GUIDE.md - Guide fonctionnalité (à garder)
+THEME_COLORS_GUIDE.md - Guide système couleurs (à garder)
+HARMONISATION_COMPLETE.md - Résumé harmonisation (à garder)
+SESSION_COMPLETE_15OCT2025.md - Résumé session (à garder)
+
+## Nouveaux Fichiers (docs/)
+
+GUIDE_COMPLET.md - Guide utilisateur complet
+GUIDE_TECHNIQUE.md - Guide développeur
+CHANGELOG.md - Historique versions

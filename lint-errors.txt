@@ -1,0 +1,254 @@
+﻿
+> atelier-velo-plus@1.0.3 lint:ci
+> eslint . --max-warnings=0
+
+
+C:\Users\j_ley\Atelier-velo+\src\app\account\components\SimpleBookingSection.tsx
+   48:30  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   84:30  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  124:30  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\app\account\page.tsx
+  53:42  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\app\admin\catalog\page.tsx
+  163:128  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  321:125  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  322:143  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  329:126  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  348:32   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  369:36   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  386:53   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  414:32   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  446:143  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\app\admin\page.tsx
+   72:87  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  474:52  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  960:66  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  965:49  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\app\admin\settings\SmtpConfigCard.tsx
+  64:48  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\app\admin\settings\TunnelConfigDialog.tsx
+  79:55  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  80:41  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\app\admin\settings\page-complete.tsx
+   36:52  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  119:55  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  120:41  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  134:55  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  135:41  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  158:55  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  159:41  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  300:56  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  306:39  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\app\admin\settings\page.tsx
+  101:55  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  102:41  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  125:55  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  126:41  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\app\api\admin\backup\route.ts
+  200:14  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\app\api\bikes\[id]\history\route.ts
+  139:31  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\app\api\catalog\import\supplier-csv-stream\route.ts
+  157:49  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\app\api\catalog\items\[id]\offers\refresh\route.ts
+  56:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\app\api\catalog\items\[id]\offers\route.ts
+  17:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\app\api\catalog\items\[id]\supplier-items\route.ts
+  66:36  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\app\api\finance\invoices\[id]\cancel\route.ts
+  29:35  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\app\api\finance\invoices\[id]\credit\route.ts
+  69:41  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\app\api\finance\invoices\[id]\lines\route.ts
+  78:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  78:55  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\app\api\finance\invoices\[id]\pdf\route.ts
+  411:28  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\app\api\finance\invoices\[id]\route.ts
+  113:49  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\app\api\pos\workorders\[id]\quote-pdf\route.ts
+  171:27  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  189:27  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\app\api\suppliers\search\route.ts
+  40:11  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  42:43  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\app\api\workorders\[id]\lines\route.ts
+  33:32  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\app\api\workshop\workorders\route.ts
+  103:72  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\app\bikes\history\page.tsx
+  208:54  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\app\booking-local\page.tsx
+  223:37  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  224:40  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  229:37  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  229:50  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  246:34  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  248:29  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  248:41  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\app\catalog\services\page.tsx
+  83:57  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  85:41  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\app\communications\page.tsx
+  186:39  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  186:75  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  208:64  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\app\components\BarcodeScanner.tsx
+  60:39  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\app\components\SectionCard.tsx
+  20:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\app\customers\[id]\bikes\page.tsx
+  148:38  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\app\customers\page.tsx
+  119:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  120:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  121:30  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\app\dashboard\page.tsx
+  102:32   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  117:42   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  151:40   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  152:40   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  157:120  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  172:33   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\app\finance\components\CreateInvoiceDialog.tsx
+  357:43  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\app\finance\invoices\[id]\page.tsx
+  148:65  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  180:28  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  181:24  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\app\settings\TunnelConfigDialog.tsx
+  76:55  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  77:41  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\app\stats\page.tsx
+  125:65  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\app\suppliers\page.tsx
+  133:34  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  134:34  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  135:45  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\app\tickets\[id]\page.tsx
+   54:42  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  135:39  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  479:74  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  500:81  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  544:78  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  565:85  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\app\tickets\page.tsx
+  308:30  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  694:83  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  701:94  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  706:94  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  716:98  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  721:95  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  726:96  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  731:97  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\components\NotificationCenter.tsx
+  59:48  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\components\catalog-v2\MyStockTab.tsx
+  35:39  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\components\catalog\AddToStockDialog.tsx
+  236:62  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\components\catalog\MyStockTab.tsx
+  58:20  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\components\catalog\SupplierCatalogTableView.tsx
+  240:93  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  246:37  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\hooks\useAdminCatalogData.ts
+  33:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  34:18  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\hooks\useAdminCatalogMutations.ts
+  26:24  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  65:20  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\hooks\useAdminDashboardMutations.ts
+   80:40  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  109:28  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\hooks\useBikesMutations.ts
+  172:30  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\hooks\useCashRegisterMutations.ts
+  26:84   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  39:102  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\hooks\useCatalogMutations.ts
+  32:81  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\hooks\useCommunicationsData.ts
+  31:22  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\lib\api.ts
+  1089:48  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\lib\catalog-harmonizer.ts
+  234:34  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\lib\dbReset.ts
+  41:22  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  57:22  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\lib\jwt.ts
+  43:39  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\lib\license-manager.ts
+  542:59  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  694:59  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\lib\logger.ts
+  22:65  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\lib\prisma.ts
+   8:39  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  14:52  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  15:20  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\j_ley\Atelier-velo+\src\lib\queryClient.ts
+  23:36  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+Ô£û 129 problems (129 errors, 0 warnings)
+

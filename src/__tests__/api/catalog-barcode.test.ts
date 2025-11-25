@@ -175,3 +175,4 @@ describe('GET /api/catalog/barcode', () => {
   });
 });
 
+

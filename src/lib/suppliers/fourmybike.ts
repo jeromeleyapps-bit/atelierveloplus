@@ -1,4 +1,5 @@
 import type { SupplierConnector, AvailabilityResult, LookupInput } from "./base";
+import { logger } from '@/lib/logger';
 
 // 4mybike.de connector — real HTTP flow with configurable endpoints via credentials.extra
 // extra supports:
@@ -64,7 +65,7 @@ export class FourMyBikeConnector implements SupplierConnector {
         try {
           const start = Date.now();
           const res = await fetchWithTimeout(url, init, toMs);
-          if (debug) console.log(`[fourmybike] ${tag} status=${res.status} dur=${Date.now() - start}ms`);
+          if (debug) logger.info(`[fourmybike] ${tag} status=${res.status} dur=${Date.now() - start}ms`);
           if (!res.ok && res.status >= 500 && attempt < maxRetries) {
             await new Promise(r => setTimeout(r, 300 * (attempt + 1)));
             continue;
@@ -72,7 +73,7 @@ export class FourMyBikeConnector implements SupplierConnector {
           return res;
         } catch (e) {
           lastErr = e;
-          if (debug) console.warn(`[fourmybike] ${tag} error attempt=${attempt}`, e);
+          if (debug) logger.warn(`[fourmybike] ${tag} error attempt=${attempt}`, e);
           if (attempt < maxRetries) {
             await new Promise(r => setTimeout(r, 300 * (attempt + 1)));
             continue;

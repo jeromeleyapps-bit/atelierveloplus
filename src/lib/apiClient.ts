@@ -8,6 +8,7 @@
  */
 
 import axios, { AxiosError } from 'axios'
+import { logger } from '@/lib/logger';
 
 const BASE_URL = '/api'
 
@@ -30,7 +31,7 @@ apiClient.interceptors.request.use(
     }
     
     if (process.env.NODE_ENV === 'development') {
-      console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`)
+      logger.info(`[API Request] ${config.method?.toUpperCase()} ${config.url}`)
     }
     
     return config
@@ -44,7 +45,7 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => {
     if (process.env.NODE_ENV === 'development') {
-      console.log(`[API Success] ${response.config.method?.toUpperCase()} ${response.config.url}`)
+      logger.info(`[API Success] ${response.config.method?.toUpperCase()} ${response.config.url}`)
     }
     return response
   },
@@ -62,11 +63,11 @@ apiClient.interceptors.response.use(
     }
     
     if (error.response?.status === 403) {
-      console.error('[API] Accès refusé:', error.response.data)
+      logger.error('[API] Accès refusé:', error.response.data)
     }
     
     if (process.env.NODE_ENV === 'development') {
-      console.error(`[API Error] ${error.config?.method?.toUpperCase()} ${error.config?.url}`, error)
+      logger.error(`[API Error] ${error.config?.method?.toUpperCase()} ${error.config?.url}`, error)
     }
     
     return Promise.reject(error)

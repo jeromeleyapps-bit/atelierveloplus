@@ -30,7 +30,7 @@ export async function requestLocal<T>(path: string, options?: RequestInit): Prom
         json = JSON.parse(text);
         // Si c'est une erreur user_not_found, déconnecter
         if (json.error === "user_not_found" || json.error === "no_user_found") {
-          console.log('[API] User from JWT not found in DB - logging out');
+          logger.info('[API] User from JWT not found in DB - logging out');
           window.localStorage.removeItem("jwt_token");
           window.localStorage.removeItem("user");
           window.location.href = "/auth/login";
@@ -54,7 +54,7 @@ export async function requestLocal<T>(path: string, options?: RequestInit): Prom
           const hasToken = window.localStorage.getItem("jwt_token");
           if (hasToken) {
             // Token existe mais invalide/expiré - déconnecter
-            console.log('[API] Token invalid or expired - logging out');
+            logger.info('[API] Token invalid or expired - logging out');
             window.localStorage.removeItem("jwt_token");
             window.localStorage.removeItem("user");
             // Émettre événement pour synchroniser AuthContext
@@ -63,7 +63,7 @@ export async function requestLocal<T>(path: string, options?: RequestInit): Prom
             throw new Error('Unauthorized - redirecting to login');
           } else {
             // Pas de token - juste rediriger sans message
-            console.log('[API] No token found - redirecting to login');
+            logger.info('[API] No token found - redirecting to login');
             window.location.href = "/auth/login";
             throw new Error('No token - redirecting to login');
           }

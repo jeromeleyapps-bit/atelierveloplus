@@ -1,0 +1,26 @@
+# Configuration progressive - Ajouter ressources web
+# Basée sur build minimaliste fonctionnel
+
+appId: com.atelier-velo-plus
+productName: Atelier Velo+
+
+directories:
+  output: dist-electron
+
+# Fichiers de base + application web
+files:
+  - "electron/**/*"
+  - "package.json"
+
+# Ajouter ressources web (sans node_modules)
+extraResources:
+  - from: electron-resources/web
+    to: web
+    filter:
+      - "!node_modules/**/*"  # Exclure node_modules pour éviter ENAMETOOLONG
+
+win:
+  target: dir
+  forceCodeSigning: false
+
+compression: store

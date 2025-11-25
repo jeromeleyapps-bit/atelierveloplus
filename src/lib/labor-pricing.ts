@@ -16,6 +16,7 @@
  */
 
 import { getPrisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
 
 /**
  * Résultat du calcul du coût de la main d'œuvre
@@ -83,7 +84,7 @@ export async function calculateLaborCost(
           }
         }
       } catch (error) {
-        console.error('[labor-pricing] Error reading hourlyRate setting:', error);
+        logger.error('[labor-pricing] Error reading hourlyRate setting:', error);
         // Continuer avec valeur par défaut
       }
     }

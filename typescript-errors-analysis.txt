@@ -1,0 +1,1055 @@
+﻿src/app/admin/calendar/page.tsx(43,32): error TS2698: Spread types may only be created from object types.
+src/app/admin/calendar/page.tsx(43,52): error TS2322: Type '{ ref: unknown; }' is not assignable to type 'IntrinsicAttributes & RawOptionsFromRefiners<Required<BaseOptionRefiners>> & RefinedOptionsFromRefiners<Required<CalendarListenerRefiners>> & RawOptionsFromRefiners<...>'.
+  Property 'ref' does not exist on type 'IntrinsicAttributes & RawOptionsFromRefiners<Required<BaseOptionRefiners>> & RefinedOptionsFromRefiners<Required<CalendarListenerRefiners>> & RawOptionsFromRefiners<...>'.
+src/app/admin/calendar/page.tsx(45,14): error TS2339: Property 'displayName' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(103,53): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(103,68): error TS2339: Property 'title' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(103,99): error TS2339: Property 'start' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(103,113): error TS2339: Property 'end' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(103,127): error TS2339: Property 'blocksAvail' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(104,53): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(104,68): error TS2339: Property 'reason' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(104,103): error TS2339: Property 'start' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(104,117): error TS2339: Property 'end' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(106,25): error TS2339: Property 'status' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(108,31): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(108,54): error TS2339: Property 'name' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(108,71): error TS2339: Property 'start' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(108,85): error TS2339: Property 'end' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(114,28): error TS2339: Property 'event' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(117,38): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(127,48): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(127,52): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/app/admin/calendar/page.tsx(210,10): error TS2604: JSX element type 'FullCalendar' does not have any construct or call signatures.
+src/app/admin/calendar/page.tsx(210,10): error TS2786: 'FullCalendar' cannot be used as a JSX component.
+  Its type 'unknown' is not a valid JSX element type.
+src/app/admin/calendar/page.tsx(254,29): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(255,51): error TS2339: Property 'title' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(256,61): error TS2339: Property 'start' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(256,100): error TS2339: Property 'end' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(269,29): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(270,34): error TS2339: Property 'reason' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(271,61): error TS2339: Property 'start' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(271,100): error TS2339: Property 'end' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(284,29): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(285,51): error TS2339: Property 'name' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(285,60): error TS2339: Property 'phone' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(285,75): error TS2339: Property 'phone' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(286,61): error TS2339: Property 'start' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(286,100): error TS2339: Property 'end' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(287,22): error TS2339: Property 'bike' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(287,69): error TS2339: Property 'bike' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(288,22): error TS2339: Property 'description' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(288,78): error TS2339: Property 'description' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(300,53): error TS2339: Property 'name' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(305,70): error TS2339: Property 'name' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(306,33): error TS2339: Property 'phone' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(306,98): error TS2339: Property 'phone' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(307,33): error TS2339: Property 'email' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(307,94): error TS2339: Property 'email' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(308,78): error TS2339: Property 'start' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(309,76): error TS2339: Property 'end' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(310,33): error TS2339: Property 'bike' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(310,92): error TS2339: Property 'bike' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(311,33): error TS2339: Property 'description' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(311,106): error TS2339: Property 'description' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(332,56): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/admin/calendar/page.tsx(334,43): error TS2339: Property 'getApi' does not exist on type 'unknown'.
+src/app/admin/license/page.tsx(172,32): error TS2339: Property 'tier' does not exist on type 'unknown'.
+src/app/admin/license/page.tsx(173,28): error TS2339: Property 'isTrial' does not exist on type 'unknown'.
+src/app/admin/license/page.tsx(248,32): error TS2339: Property 'tier' does not exist on type 'unknown'.
+src/app/admin/license/page.tsx(248,48): error TS2339: Property 'isTrial' does not exist on type 'unknown'.
+src/app/admin/license/page.tsx(259,27): error TS2339: Property 'isTrial' does not exist on type 'unknown'.
+src/app/admin/license/page.tsx(259,46): error TS2339: Property 'trial' does not exist on type 'unknown'.
+src/app/admin/license/page.tsx(260,41): error TS2339: Property 'trial' does not exist on type 'unknown'.
+src/app/admin/license/page.tsx(283,32): error TS2339: Property 'status' does not exist on type 'unknown'.
+src/app/admin/license/page.tsx(283,62): error TS2339: Property 'gracePeriod' does not exist on type 'unknown'.
+src/app/admin/license/page.tsx(284,41): error TS2339: Property 'gracePeriod' does not exist on type 'unknown'.
+src/app/admin/license/page.tsx(286,43): error TS2339: Property 'tier' does not exist on type 'unknown'.
+src/app/admin/license/page.tsx(286,76): error TS2339: Property 'tier' does not exist on type 'unknown'.
+src/app/admin/license/page.tsx(308,33): error TS2339: Property 'tier' does not exist on type 'unknown'.
+src/app/admin/license/page.tsx(308,59): error TS2339: Property 'tier' does not exist on type 'unknown'.
+src/app/admin/license/page.tsx(308,90): error TS2339: Property 'status' does not exist on type 'unknown'.
+src/app/admin/license/page.tsx(308,122): error TS2339: Property 'daysUntilExpiry' does not exist on type 'unknown'.
+src/app/admin/license/page.tsx(309,41): error TS2339: Property 'daysUntilExpiry' does not exist on type 'unknown'.
+src/app/admin/license/page.tsx(311,42): error TS2339: Property 'tier' does not exist on type 'unknown'.
+src/app/admin/license/page.tsx(315,29): error TS2339: Property 'expiresAt' does not exist on type 'unknown'.
+src/app/admin/license/page.tsx(316,50): error TS2339: Property 'expiresAt' does not exist on type 'unknown'.
+src/app/admin/license/page.tsx(316,92): error TS2339: Property 'expiresAt' does not exist on type 'unknown'.
+src/app/admin/license/page.tsx(316,113): error TS2339: Property 'expiresAt' does not exist on type 'unknown'.
+src/app/admin/license/page.tsx(346,33): error TS2339: Property 'tier' does not exist on type 'unknown'.
+src/app/admin/license/page.tsx(346,68): error TS2339: Property 'isLifetime' does not exist on type 'unknown'.
+src/app/admin/license/page.tsx(346,91): error TS2339: Property 'status' does not exist on type 'unknown'.
+src/app/admin/license/page.tsx(347,29): error TS2339: Property 'maintenanceExpiresAt' does not exist on type 'unknown'.
+src/app/admin/license/page.tsx(349,58): error TS2339: Property 'maintenanceExpiresAt' does not exist on type 'unknown'.
+src/app/admin/license/page.tsx(350,40): error TS2339: Property 'maintenanceExpiresAt' does not exist on type 'unknown'.
+src/app/admin/license/page.tsx(351,40): error TS2339: Property 'maintenanceExpiresAt' does not exist on type 'unknown'.
+src/app/admin/license/page.tsx(424,81): error TS2339: Property 'status' does not exist on type 'unknown'.
+src/app/admin/license/page.tsx(424,111): error TS2339: Property 'tier' does not exist on type 'unknown'.
+src/app/admin/license/page.tsx(424,137): error TS2339: Property 'tier' does not exist on type 'unknown'.
+src/app/admin/license/page.tsx(432,36): error TS2339: Property 'status' does not exist on type 'unknown'.
+src/app/admin/service-rates/page.tsx(68,29): error TS2345: Argument of type 'FormData' is not assignable to parameter of type 'Record<string, unknown>'.
+  Index signature for type 'string' is missing in type 'FormData'.
+src/app/admin/settings/page.tsx(51,35): error TS2345: Argument of type 'SystemSettings' is not assignable to parameter of type 'Record<string, unknown>'.
+  Index signature for type 'string' is missing in type 'SystemSettings'.
+src/app/admin/settings/page.tsx(213,36): error TS2339: Property 'running' does not exist on type 'unknown'.
+src/app/admin/settings/page.tsx(225,34): error TS2339: Property 'running' does not exist on type 'unknown'.
+src/app/api/account/settings/route.ts(159,73): error TS2339: Property 'shopName' does not exist on type 'unknown'.
+src/app/api/account/settings/route.ts(160,48): error TS2339: Property 'shopEmail' does not exist on type 'unknown'.
+src/app/api/account/settings/route.ts(161,48): error TS2339: Property 'shopPhone' does not exist on type 'unknown'.
+src/app/api/account/settings/route.ts(162,47): error TS2339: Property 'address1' does not exist on type 'unknown'.
+src/app/api/account/settings/route.ts(163,47): error TS2339: Property 'address2' does not exist on type 'unknown'.
+src/app/api/account/settings/route.ts(164,42): error TS2339: Property 'zip' does not exist on type 'unknown'.
+src/app/api/account/settings/route.ts(165,43): error TS2339: Property 'city' does not exist on type 'unknown'.
+src/app/api/account/settings/route.ts(166,46): error TS2339: Property 'country' does not exist on type 'unknown'.
+src/app/api/account/settings/route.ts(168,10): error TS2339: Property 'shopLogo' does not exist on type 'unknown'.
+src/app/api/account/settings/route.ts(169,78): error TS2339: Property 'shopLogo' does not exist on type 'unknown'.
+src/app/api/account/settings/route.ts(173,50): error TS2339: Property 'legalFooter' does not exist on type 'unknown'.
+src/app/api/account/settings/route.ts(174,44): error TS2339: Property 'siret' does not exist on type 'unknown'.
+src/app/api/account/settings/route.ts(175,42): error TS2339: Property 'tva' does not exist on type 'unknown'.
+src/app/api/account/settings/route.ts(176,42): error TS2339: Property 'rcs' does not exist on type 'unknown'.
+src/app/api/account/settings/route.ts(177,46): error TS2339: Property 'capital' does not exist on type 'unknown'.
+src/app/api/account/settings/route.ts(178,48): error TS2339: Property 'insurance' does not exist on type 'unknown'.
+src/app/api/account/settings/route.ts(179,58): error TS2339: Property 'isAutoEntrepreneur' does not exist on type 'unknown'.
+src/app/api/account/settings/route.ts(197,25): error TS2698: Spread types may only be created from object types.
+src/app/api/account/upload-logo/route.ts(61,69): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/account/upload-logo/route.ts(96,75): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/admin/backup/route.ts(208,67): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/api/admin/backup/route.ts(208,80): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/admin/backup/route.ts(219,27): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/api/admin/backup/route.ts(221,9): error TS2322: Type 'unknown' is not assignable to type '(Without<UserCreateInput, UserUncheckedCreateInput> & UserUncheckedCreateInput) | (Without<...> & UserCreateInput)'.
+src/app/api/admin/backup/route.ts(227,31): error TS2339: Property 'key' does not exist on type 'unknown'.
+src/app/api/admin/backup/route.ts(228,34): error TS2339: Property 'value' does not exist on type 'unknown'.
+src/app/api/admin/backup/route.ts(229,9): error TS2322: Type 'unknown' is not assignable to type '(Without<GlobalSettingCreateInput, GlobalSettingUncheckedCreateInput> & GlobalSettingUncheckedCreateInput) | (Without<...> & GlobalSettingCreateInput)'.
+src/app/api/admin/backup/route.ts(235,29): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/api/admin/backup/route.ts(243,27): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/api/admin/backup/route.ts(245,9): error TS2322: Type 'unknown' is not assignable to type '(Without<ServiceRateCreateInput, ServiceRateUncheckedCreateInput> & ServiceRateUncheckedCreateInput) | (Without<...> & ServiceRateCreateInput)'.
+src/app/api/admin/backup/route.ts(251,29): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/api/admin/backup/route.ts(253,9): error TS2322: Type 'unknown' is not assignable to type '(Without<PricingMarginCreateInput, PricingMarginUncheckedCreateInput> & PricingMarginUncheckedCreateInput) | (Without<...> & PricingMarginCreateInput)'.
+src/app/api/admin/backup/route.ts(259,31): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/api/admin/backup/route.ts(261,9): error TS2322: Type 'unknown' is not assignable to type '(Without<SupplierCreateInput, SupplierUncheckedCreateInput> & SupplierUncheckedCreateInput) | (Without<...> & SupplierCreateInput)'.
+src/app/api/admin/backup/route.ts(267,27): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/api/admin/backup/route.ts(269,9): error TS2322: Type 'unknown' is not assignable to type '(Without<CatalogItemCreateInput, CatalogItemUncheckedCreateInput> & CatalogItemUncheckedCreateInput) | (Without<...> & CatalogItemCreateInput)'.
+src/app/api/admin/backup/route.ts(276,34): error TS2339: Property 'userId' does not exist on type 'unknown'.
+src/app/api/admin/backup/route.ts(278,9): error TS2322: Type 'unknown' is not assignable to type '(Without<AppSettingCreateInput, AppSettingUncheckedCreateInput> & AppSettingUncheckedCreateInput) | (Without<...> & AppSettingCreateInput)'.
+src/app/api/admin/backup/route.ts(284,34): error TS2339: Property 'userId' does not exist on type 'unknown'.
+src/app/api/admin/backup/route.ts(286,9): error TS2322: Type 'unknown' is not assignable to type '(Without<SystemSettingsCreateInput, SystemSettingsUncheckedCreateInput> & SystemSettingsUncheckedCreateInput) | (Without<...> & SystemSettingsCreateInput)'.
+src/app/api/admin/backup/route.ts(292,27): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/api/admin/backup/route.ts(294,9): error TS2322: Type 'unknown' is not assignable to type '(Without<BikeCreateInput, BikeUncheckedCreateInput> & BikeUncheckedCreateInput) | (Without<...> & BikeCreateInput)'.
+src/app/api/admin/backup/route.ts(301,54): error TS2339: Property 'userId' does not exist on type 'unknown'.
+src/app/api/admin/backup/route.ts(301,81): error TS2339: Property 'reference' does not exist on type 'unknown'.
+src/app/api/admin/backup/route.ts(309,47): error TS2322: Type 'unknown' is not assignable to type '(Without<SupplierProductCreateInput, SupplierProductUncheckedCreateInput> & SupplierProductUncheckedCreateInput) | (Without<...> & SupplierProductCreateInput)'.
+src/app/api/admin/backup/route.ts(316,31): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/api/admin/backup/route.ts(324,55): error TS2339: Property 'customerId' does not exist on type 'unknown'.
+src/app/api/admin/backup/route.ts(324,79): error TS2339: Property 'index' does not exist on type 'unknown'.
+src/app/api/admin/backup/route.ts(326,9): error TS2322: Type 'unknown' is not assignable to type '(Without<CustomerBikeCreateInput, CustomerBikeUncheckedCreateInput> & CustomerBikeUncheckedCreateInput) | (Without<...> & CustomerBikeCreateInput)'.
+src/app/api/admin/backup/route.ts(332,30): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/api/admin/backup/route.ts(334,9): error TS2322: Type 'unknown' is not assignable to type '(Without<BookingCreateInput, BookingUncheckedCreateInput> & BookingUncheckedCreateInput) | (Without<...> & BookingCreateInput)'.
+src/app/api/admin/backup/route.ts(341,27): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/api/admin/backup/route.ts(343,9): error TS2322: Type 'unknown' is not assignable to type '(Without<SupplierItemCreateInput, SupplierItemUncheckedCreateInput> & SupplierItemUncheckedCreateInput) | (Without<...> & SupplierItemCreateInput)'.
+src/app/api/admin/backup/route.ts(349,28): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/api/admin/backup/route.ts(351,9): error TS2322: Type 'unknown' is not assignable to type '(Without<SupplierOfferCreateInput, SupplierOfferUncheckedCreateInput> & SupplierOfferUncheckedCreateInput) | (Without<...> & SupplierOfferCreateInput)'.
+src/app/api/admin/backup/route.ts(357,27): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/api/admin/backup/route.ts(359,9): error TS2322: Type 'unknown' is not assignable to type '(Without<SupplierCredentialCreateInput, SupplierCredentialUncheckedCreateInput> & SupplierCredentialUncheckedCreateInput) | (Without<...> & SupplierCredentialCreateInput)'.
+src/app/api/admin/backup/route.ts(365,31): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/api/admin/backup/route.ts(367,9): error TS2322: Type 'unknown' is not assignable to type '(Without<StockMovementCreateInput, StockMovementUncheckedCreateInput> & StockMovementUncheckedCreateInput) | (Without<...> & StockMovementCreateInput)'.
+src/app/api/admin/backup/route.ts(374,25): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/api/admin/backup/route.ts(382,27): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/api/admin/backup/route.ts(384,9): error TS2322: Type 'unknown' is not assignable to type '(Without<WorkOrderLineCreateInput, WorkOrderLineUncheckedCreateInput> & WorkOrderLineUncheckedCreateInput) | (Without<...> & WorkOrderLineCreateInput)'.
+src/app/api/admin/backup/route.ts(391,30): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/api/admin/backup/route.ts(399,27): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/api/admin/backup/route.ts(401,9): error TS2322: Type 'unknown' is not assignable to type '(Without<CommunicationCreateInput, CommunicationUncheckedCreateInput> & CommunicationUncheckedCreateInput) | (Without<...> & CommunicationCreateInput)'.
+src/app/api/admin/backup/route.ts(408,27): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/api/admin/backup/route.ts(410,9): error TS2322: Type 'unknown' is not assignable to type '(Without<InvoiceLineCreateInput, InvoiceLineUncheckedCreateInput> & InvoiceLineUncheckedCreateInput) | (Without<...> & InvoiceLineCreateInput)'.
+src/app/api/admin/backup/route.ts(416,30): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/api/admin/backup/route.ts(418,9): error TS2322: Type 'unknown' is not assignable to type '(Without<InvoicePaymentCreateInput, InvoicePaymentUncheckedCreateInput> & InvoicePaymentUncheckedCreateInput) | (Without<...> & InvoicePaymentCreateInput)'.
+src/app/api/admin/backup/route.ts(424,31): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/api/admin/backup/route.ts(426,9): error TS2322: Type 'unknown' is not assignable to type '(Without<CashRegisterCreateInput, CashRegisterUncheckedCreateInput> & CashRegisterUncheckedCreateInput) | (Without<...> & CashRegisterCreateInput)'.
+src/app/api/admin/backup/route.ts(433,28): error TS2339: Property 'year' does not exist on type 'unknown'.
+src/app/api/admin/backup/route.ts(435,9): error TS2322: Type 'unknown' is not assignable to type '(Without<InvoiceSequenceCreateInput, InvoiceSequenceUncheckedCreateInput> & InvoiceSequenceUncheckedCreateInput) | (Without<...> & InvoiceSequenceCreateInput)'.
+src/app/api/admin/backup/route.ts(442,28): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/api/admin/backup/route.ts(444,9): error TS2322: Type 'unknown' is not assignable to type '(Without<CalendarEventCreateInput, CalendarEventUncheckedCreateInput> & CalendarEventUncheckedCreateInput) | (Without<...> & CalendarEventCreateInput)'.
+src/app/api/admin/backup/route.ts(450,28): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/api/admin/backup/route.ts(452,9): error TS2322: Type 'unknown' is not assignable to type '(Without<CalendarBlockCreateInput, CalendarBlockUncheckedCreateInput> & CalendarBlockUncheckedCreateInput) | (Without<...> & CalendarBlockCreateInput)'.
+src/app/api/admin/backup/route.ts(459,33): error TS2339: Property 'name' does not exist on type 'unknown'.
+src/app/api/admin/backup/route.ts(461,9): error TS2322: Type 'unknown' is not assignable to type '(Without<EmailTemplateCreateInput, EmailTemplateUncheckedCreateInput> & EmailTemplateUncheckedCreateInput) | (Without<...> & EmailTemplateCreateInput)'.
+src/app/api/admin/backup/route.ts(467,33): error TS2339: Property 'name' does not exist on type 'unknown'.
+src/app/api/admin/backup/route.ts(469,9): error TS2322: Type 'unknown' is not assignable to type '(Without<SMSTemplateCreateInput, SMSTemplateUncheckedCreateInput> & SMSTemplateUncheckedCreateInput) | (Without<...> & SMSTemplateCreateInput)'.
+src/app/api/admin/backup/route.ts(476,31): error TS2339: Property 'key' does not exist on type 'unknown'.
+src/app/api/admin/backup/route.ts(478,9): error TS2322: Type 'unknown' is not assignable to type '(Without<LicenseCreateInput, LicenseUncheckedCreateInput> & LicenseUncheckedCreateInput) | (Without<...> & LicenseCreateInput)'.
+src/app/api/admin/backup/route.ts(484,28): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/api/admin/backup/route.ts(486,9): error TS2322: Type 'unknown' is not assignable to type '(Without<LicenseVerificationCreateInput, LicenseVerificationUncheckedCreateInput> & LicenseVerificationUncheckedCreateInput) | (Without<...> & LicenseVerificationCreateInput)'.
+src/app/api/admin/backup/route.ts(510,58): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/admin/jobs/daily/route.ts(29,22): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/admin/license/activate/route.ts(45,83): error TS2339: Property 'tier' does not exist on type 'unknown'.
+src/app/api/admin/license/activate/route.ts(51,30): error TS2339: Property 'tier' does not exist on type 'unknown'.
+src/app/api/admin/license/activate/route.ts(52,35): error TS2339: Property 'expiresAt' does not exist on type 'unknown'.
+src/app/api/admin/license/activate/route.ts(53,32): error TS2339: Property 'status' does not exist on type 'unknown'.
+src/app/api/admin/license/start-trial/route.ts(45,30): error TS2339: Property 'tier' does not exist on type 'unknown'.
+src/app/api/admin/license/start-trial/route.ts(46,37): error TS2339: Property 'trialEndsAt' does not exist on type 'unknown'.
+src/app/api/admin/license/start-trial/route.ts(47,32): error TS2339: Property 'status' does not exist on type 'unknown'.
+src/app/api/admin/pricing-margins/route.ts(22,22): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/admin/pricing-margins/route.ts(50,22): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/admin/pricing-margins/route.ts(72,28): error TS2339: Property 'minPrice' does not exist on type 'unknown'.
+src/app/api/admin/pricing-margins/route.ts(73,21): error TS2339: Property 'maxPrice' does not exist on type 'unknown'.
+src/app/api/admin/pricing-margins/route.ts(73,41): error TS2339: Property 'maxPrice' does not exist on type 'unknown'.
+src/app/api/admin/pricing-margins/route.ts(74,31): error TS2339: Property 'coefficient' does not exist on type 'unknown'.
+src/app/api/admin/pricing-margins/route.ts(82,22): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/admin/recent-emails/route.ts(68,22): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/admin/service-rates/[id]/route.ts(24,39): error TS2339: Property 'name' does not exist on type 'unknown'.
+src/app/api/admin/service-rates/[id]/route.ts(25,46): error TS2339: Property 'description' does not exist on type 'unknown'.
+src/app/api/admin/service-rates/[id]/route.ts(26,42): error TS2339: Property 'priceHT' does not exist on type 'unknown'.
+src/app/api/admin/service-rates/[id]/route.ts(27,43): error TS2339: Property 'bikeType' does not exist on type 'unknown'.
+src/app/api/admin/service-rates/[id]/route.ts(28,43): error TS2339: Property 'category' does not exist on type 'unknown'.
+src/app/api/admin/service-rates/[id]/route.ts(29,43): error TS2339: Property 'duration' does not exist on type 'unknown'.
+src/app/api/admin/service-rates/[id]/route.ts(30,41): error TS2339: Property 'active' does not exist on type 'unknown'.
+src/app/api/admin/service-rates/route.ts(19,27): error TS2339: Property 'active' does not exist on type 'unknown'.
+src/app/api/admin/service-rates/route.ts(20,25): error TS2339: Property 'bikeType' does not exist on type 'unknown'.
+src/app/api/admin/service-rates/route.ts(21,25): error TS2339: Property 'category' does not exist on type 'unknown'.
+src/app/api/admin/system-settings/route.ts(66,16): error TS2322: Type 'unknown' is not assignable to type 'object'.
+src/app/api/admin/system-settings/route.ts(233,96): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/app/api/admin/system-settings/route.ts(240,91): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/app/api/admin/system-settings/route.ts(279,9): error TS2698: Spread types may only be created from object types.
+src/app/api/admin/system-settings/route.ts(307,57): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/admin/test-email-db/route.ts(77,22): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/admin/test-email-db/route.ts(78,24): error TS2339: Property 'stack' does not exist on type 'unknown'.
+src/app/api/admin/test-email/route.ts(110,30): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/admin/test-email/route.ts(113,15): error TS2339: Property 'code' does not exist on type 'unknown'.
+src/app/api/admin/test-email/route.ts(116,22): error TS2339: Property 'code' does not exist on type 'unknown'.
+src/app/api/admin/test-email/route.ts(119,22): error TS2339: Property 'code' does not exist on type 'unknown'.
+src/app/api/admin/test-email/route.ts(122,22): error TS2339: Property 'responseCode' does not exist on type 'unknown'.
+src/app/api/admin/test-email/route.ts(131,21): error TS2339: Property 'code' does not exist on type 'unknown'.
+src/app/api/admin/test-email/route.ts(132,29): error TS2339: Property 'responseCode' does not exist on type 'unknown'.
+src/app/api/admin/test-email/route.ts(133,24): error TS2339: Property 'command' does not exist on type 'unknown'.
+src/app/api/bikes/[id]/history/route.ts(139,27): error TS2339: Property 'WorkOrderLine' does not exist on type 'unknown'.
+src/app/api/bikes/[id]/route.ts(28,22): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/bikes/[id]/route.ts(55,45): error TS2339: Property 'type' does not exist on type 'unknown'.
+src/app/api/bikes/[id]/route.ts(56,50): error TS2339: Property 'condition' does not exist on type 'unknown'.
+src/app/api/bikes/[id]/route.ts(57,46): error TS2339: Property 'brand' does not exist on type 'unknown'.
+src/app/api/bikes/[id]/route.ts(58,46): error TS2339: Property 'model' does not exist on type 'unknown'.
+src/app/api/bikes/[id]/route.ts(59,45): error TS2339: Property 'year' does not exist on type 'unknown'.
+src/app/api/bikes/[id]/route.ts(60,45): error TS2339: Property 'size' does not exist on type 'unknown'.
+src/app/api/bikes/[id]/route.ts(61,46): error TS2339: Property 'color' does not exist on type 'unknown'.
+src/app/api/bikes/[id]/route.ts(62,53): error TS2339: Property 'serialNumber' does not exist on type 'unknown'.
+src/app/api/bikes/[id]/route.ts(63,50): error TS2339: Property 'frameSize' does not exist on type 'unknown'.
+src/app/api/bikes/[id]/route.ts(64,54): error TS2339: Property 'frameMaterial' does not exist on type 'unknown'.
+src/app/api/bikes/[id]/route.ts(65,50): error TS2339: Property 'wheelSize' does not exist on type 'unknown'.
+src/app/api/bikes/[id]/route.ts(66,47): error TS2339: Property 'weight' does not exist on type 'unknown'.
+src/app/api/bikes/[id]/route.ts(67,49): error TS2339: Property 'groupset' does not exist on type 'unknown'.
+src/app/api/bikes/[id]/route.ts(68,50): error TS2339: Property 'brakeType' does not exist on type 'unknown'.
+src/app/api/bikes/[id]/route.ts(69,51): error TS2339: Property 'drivetrain' does not exist on type 'unknown'.
+src/app/api/bikes/[id]/route.ts(70,45): error TS2339: Property 'fork' does not exist on type 'unknown'.
+src/app/api/bikes/[id]/route.ts(71,47): error TS2339: Property 'wheels' does not exist on type 'unknown'.
+src/app/api/bikes/[id]/route.ts(72,51): error TS2339: Property 'isElectric' does not exist on type 'unknown'.
+src/app/api/bikes/[id]/route.ts(73,46): error TS2339: Property 'motor' does not exist on type 'unknown'.
+src/app/api/bikes/[id]/route.ts(74,48): error TS2339: Property 'battery' does not exist on type 'unknown'.
+src/app/api/bikes/[id]/route.ts(75,46): error TS2339: Property 'range' does not exist on type 'unknown'.
+src/app/api/bikes/[id]/route.ts(76,55): error TS2339: Property 'conditionNotes' does not exist on type 'unknown'.
+src/app/api/bikes/[id]/route.ts(77,59): error TS2339: Property 'maintenanceHistory' does not exist on type 'unknown'.
+src/app/api/bikes/[id]/route.ts(78,56): error TS2339: Property 'purchasePriceHT' does not exist on type 'unknown'.
+src/app/api/bikes/[id]/route.ts(79,55): error TS2339: Property 'sellingPriceHT' does not exist on type 'unknown'.
+src/app/api/bikes/[id]/route.ts(80,48): error TS2339: Property 'vatRate' does not exist on type 'unknown'.
+src/app/api/bikes/[id]/route.ts(81,46): error TS2339: Property 'stock' does not exist on type 'unknown'.
+src/app/api/bikes/[id]/route.ts(82,49): error TS2339: Property 'location' does not exist on type 'unknown'.
+src/app/api/bikes/[id]/route.ts(83,47): error TS2339: Property 'photos' does not exist on type 'unknown'.
+src/app/api/bikes/[id]/route.ts(84,54): error TS2339: Property 'internalNotes' does not exist on type 'unknown'.
+src/app/api/bikes/[id]/route.ts(85,47): error TS2339: Property 'active' does not exist on type 'unknown'.
+src/app/api/bikes/[id]/route.ts(98,15): error TS2339: Property 'code' does not exist on type 'unknown'.
+src/app/api/bikes/[id]/route.ts(98,41): error TS2339: Property 'meta' does not exist on type 'unknown'.
+src/app/api/bikes/[id]/route.ts(106,22): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/bikes/[id]/route.ts(140,15): error TS2339: Property 'code' does not exist on type 'unknown'.
+src/app/api/bikes/[id]/route.ts(145,22): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/bikes/[id]/sell/route.ts(116,29): error TS2339: Property 'quantity' does not exist on type 'unknown'.
+src/app/api/bikes/[id]/sell/route.ts(116,45): error TS2339: Property 'unitPriceHT' does not exist on type 'unknown'.
+src/app/api/bikes/[id]/sell/route.ts(125,29): error TS2339: Property 'description' does not exist on type 'unknown'.
+src/app/api/bikes/[id]/sell/route.ts(126,26): error TS2339: Property 'quantity' does not exist on type 'unknown'.
+src/app/api/bikes/[id]/sell/route.ts(127,29): error TS2339: Property 'unitPriceHT' does not exist on type 'unknown'.
+src/app/api/bikes/[id]/sell/route.ts(195,22): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/bikes/route.ts(41,21): error TS2339: Property 'type' does not exist on type 'unknown'.
+src/app/api/bikes/route.ts(42,26): error TS2339: Property 'condition' does not exist on type 'unknown'.
+src/app/api/bikes/route.ts(43,22): error TS2339: Property 'brand' does not exist on type 'unknown'.
+src/app/api/bikes/route.ts(45,13): error TS2339: Property 'sellingPriceHT' does not exist on type 'unknown'.
+src/app/api/bikes/route.ts(46,27): error TS2339: Property 'sellingPriceHT' does not exist on type 'unknown'.
+src/app/api/bikes/route.ts(47,27): error TS2339: Property 'sellingPriceHT' does not exist on type 'unknown'.
+src/app/api/bikes/route.ts(62,22): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/bikes/route.ts(148,15): error TS2339: Property 'code' does not exist on type 'unknown'.
+src/app/api/bikes/route.ts(148,41): error TS2339: Property 'meta' does not exist on type 'unknown'.
+src/app/api/bikes/route.ts(156,22): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/calendar/blocks/route.ts(21,13): error TS2339: Property 'start' does not exist on type 'unknown'.
+src/app/api/calendar/blocks/route.ts(22,13): error TS2339: Property 'end' does not exist on type 'unknown'.
+src/app/api/calendar/bookings/[id]/route.ts(21,32): error TS2339: Property 'status' does not exist on type 'unknown'.
+src/app/api/calendar/bookings/route.ts(68,13): error TS2339: Property 'start' does not exist on type 'unknown'.
+src/app/api/calendar/bookings/route.ts(69,13): error TS2339: Property 'end' does not exist on type 'unknown'.
+src/app/api/calendar/bookings/route.ts(284,33): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/calendar/bookings/route.ts(285,33): error TS2339: Property 'response' does not exist on type 'unknown'.
+src/app/api/calendar/bookings/route.ts(285,53): error TS2339: Property 'stack' does not exist on type 'unknown'.
+src/app/api/calendar/events/route.ts(25,13): error TS2339: Property 'start' does not exist on type 'unknown'.
+src/app/api/calendar/events/route.ts(26,13): error TS2339: Property 'end' does not exist on type 'unknown'.
+src/app/api/cash-register/[id]/route.ts(30,41): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/cash-register/[id]/route.ts(44,41): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/cash-register/send-receipt/route.ts(209,22): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/catalog/import-catalogsnap/route.ts(60,23): error TS2339: Property 'EAN' does not exist on type 'unknown'.
+src/app/api/catalog/import-catalogsnap/route.ts(60,34): error TS2339: Property 'ean' does not exist on type 'unknown'.
+src/app/api/catalog/import-catalogsnap/route.ts(60,45): error TS2339: Property 'code_barre' does not exist on type 'unknown'.
+src/app/api/catalog/import-catalogsnap/route.ts(60,63): error TS2339: Property 'barcode' does not exist on type 'unknown'.
+src/app/api/catalog/import-catalogsnap/route.ts(61,24): error TS2339: Property 'Nom' does not exist on type 'unknown'.
+src/app/api/catalog/import-catalogsnap/route.ts(61,35): error TS2339: Property 'nom' does not exist on type 'unknown'.
+src/app/api/catalog/import-catalogsnap/route.ts(61,46): error TS2339: Property 'name' does not exist on type 'unknown'.
+src/app/api/catalog/import-catalogsnap/route.ts(61,58): error TS2339: Property 'designation' does not exist on type 'unknown'.
+src/app/api/catalog/import-catalogsnap/route.ts(62,37): error TS2339: Property 'Quantit├®' does not exist on type 'unknown'.
+src/app/api/catalog/import-catalogsnap/route.ts(62,53): error TS2339: Property 'quantite' does not exist on type 'unknown'.
+src/app/api/catalog/import-catalogsnap/route.ts(62,69): error TS2339: Property 'quantity' does not exist on type 'unknown'.
+src/app/api/catalog/import-catalogsnap/route.ts(62,85): error TS2339: Property 'qty' does not exist on type 'unknown'.
+src/app/api/catalog/import-catalogsnap/route.ts(126,22): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/catalog/import-csv-streaming/route.ts(81,28): error TS2339: Property 'reference' does not exist on type 'unknown'.
+src/app/api/catalog/import-csv-streaming/route.ts(81,43): error TS2339: Property 'name' does not exist on type 'unknown'.
+src/app/api/catalog/import-csv-streaming/route.ts(89,44): error TS2339: Property 'reference' does not exist on type 'unknown'.
+src/app/api/catalog/import-csv-streaming/route.ts(111,48): error TS2339: Property 'reference' does not exist on type 'unknown'.
+src/app/api/catalog/import-csv-streaming/route.ts(112,48): error TS2339: Property 'prix_ht' does not exist on type 'unknown'.
+src/app/api/catalog/import-csv-streaming/route.ts(112,67): error TS2339: Property 'price' does not exist on type 'unknown'.
+src/app/api/catalog/import-csv-streaming/route.ts(112,84): error TS2339: Property 'priceHT' does not exist on type 'unknown'.
+src/app/api/catalog/import-csv-streaming/route.ts(113,44): error TS2339: Property 'stock' does not exist on type 'unknown'.
+src/app/api/catalog/import-csv-streaming/route.ts(113,61): error TS2339: Property 'quantity' does not exist on type 'unknown'.
+src/app/api/catalog/import-csv-streaming/route.ts(119,36): error TS2339: Property 'reference' does not exist on type 'unknown'.
+src/app/api/catalog/import-csv-streaming/route.ts(120,31): error TS2339: Property 'name' does not exist on type 'unknown'.
+src/app/api/catalog/import-csv-streaming/route.ts(120,47): error TS2339: Property 'nom' does not exist on type 'unknown'.
+src/app/api/catalog/import-csv-streaming/route.ts(120,62): error TS2339: Property 'designation' does not exist on type 'unknown'.
+src/app/api/catalog/import-csv-streaming/route.ts(121,35): error TS2339: Property 'category' does not exist on type 'unknown'.
+src/app/api/catalog/import-csv-streaming/route.ts(121,55): error TS2339: Property 'categorie' does not exist on type 'unknown'.
+src/app/api/catalog/import-csv-streaming/route.ts(125,39): error TS2339: Property 'supplier' does not exist on type 'unknown'.
+src/app/api/catalog/import-csv-streaming/route.ts(125,59): error TS2339: Property 'fournisseur' does not exist on type 'unknown'.
+src/app/api/catalog/import-csv-streaming/route.ts(131,36): error TS2339: Property 'reference' does not exist on type 'unknown'.
+src/app/api/catalog/import-csv-streaming/route.ts(146,15): error TS2322: Type 'unknown[]' is not assignable to type 'SupplierProductCreateManyInput | SupplierProductCreateManyInput[]'.
+  Type 'unknown[]' is not assignable to type 'SupplierProductCreateManyInput[]'.
+    Type '{}' is missing the following properties from type 'SupplierProductCreateManyInput': userId, reference, name, priceHT
+src/app/api/catalog/import-csv-streaming/route.ts(157,34): error TS2339: Property 'reference' does not exist on type 'unknown'.
+src/app/api/catalog/import-csv-streaming/route.ts(160,32): error TS2339: Property 'priceHT' does not exist on type 'unknown'.
+src/app/api/catalog/import-csv-streaming/route.ts(161,30): error TS2339: Property 'stock' does not exist on type 'unknown'.
+src/app/api/catalog/import-csv-streaming/route.ts(162,34): error TS2339: Property 'available' does not exist on type 'unknown'.
+src/app/api/catalog/import-csv-streaming/route.ts(163,35): error TS2339: Property 'lastImport' does not exist on type 'unknown'.
+src/app/api/catalog/import-csv-streaming/route.ts(200,24): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/catalog/import/route.ts(137,13): error TS2322: Type '{ sku: string; name: string; category: unknown; priceHT: number; priceTTC: number; vatRate: number; stockQty: number; minStock: number; barcode: string; }' is not assignable to type '(Without<CatalogItemCreateInput, CatalogItemUncheckedCreateInput> & CatalogItemUncheckedCreateInput) | (Without<...> & CatalogItemCreateInput)'.
+  Type '{ sku: string; name: string; category: unknown; priceHT: number; priceTTC: number; vatRate: number; stockQty: number; minStock: number; barcode: string; }' is not assignable to type 'Without<CatalogItemUncheckedCreateInput, CatalogItemCreateInput> & CatalogItemCreateInput'.
+    Type '{ sku: string; name: string; category: unknown; priceHT: number; priceTTC: number; vatRate: number; stockQty: number; minStock: number; barcode: string; }' is not assignable to type 'CatalogItemCreateInput'.
+      Types of property 'category' are incompatible.
+        Type 'unknown' is not assignable to type 'string'.
+src/app/api/catalog/import/route.ts(142,52): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/catalog/import/route.ts(157,22): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/catalog/import/supplier-csv-stream/route.ts(86,15): error TS2339: Property 'name' does not exist on type 'unknown'.
+src/app/api/catalog/import/supplier-csv-stream/route.ts(86,27): error TS2339: Property 'reference' does not exist on type 'unknown'.
+src/app/api/catalog/import/supplier-csv-stream/route.ts(148,42): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'SupplierCSVRow'.
+  Type '{}' is missing the following properties from type 'SupplierCSVRow': reference, name
+src/app/api/catalog/import/supplier-csv-stream/route.ts(164,37): error TS2339: Property 'catalogItem' does not exist on type 'unknown'.
+src/app/api/catalog/import/supplier-csv-stream/route.ts(203,20): error TS2339: Property 'catalogItem' does not exist on type 'unknown'.
+src/app/api/catalog/import/supplier-csv-stream/route.ts(213,24): error TS2339: Property 'catalogItem' does not exist on type 'unknown'.
+src/app/api/catalog/import/supplier-csv-stream/route.ts(216,19): error TS2339: Property 'code' does not exist on type 'unknown'.
+src/app/api/catalog/import/supplier-csv-stream/route.ts(217,78): error TS2339: Property 'sku' does not exist on type 'unknown'.
+src/app/api/catalog/import/supplier-csv-stream/route.ts(229,20): error TS2339: Property 'catalogItem' does not exist on type 'unknown'.
+src/app/api/catalog/import/supplier-csv/route.ts(142,15): error TS2339: Property 'name' does not exist on type 'unknown'.
+src/app/api/catalog/import/supplier-csv/route.ts(142,27): error TS2339: Property 'reference' does not exist on type 'unknown'.
+src/app/api/catalog/import/supplier-csv/route.ts(285,79): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/catalog/import/supplier-csv/route.ts(285,97): error TS2339: Property 'stack' does not exist on type 'unknown'.
+src/app/api/catalog/import/supplier-csv/route.ts(287,45): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/catalog/items/[id]/offers/refresh/route.ts(56,35): error TS2339: Property 'Supplier' does not exist on type 'unknown'.
+src/app/api/catalog/items/[id]/offers/route.ts(17,35): error TS2339: Property 'Supplier' does not exist on type 'unknown'.
+src/app/api/catalog/items/[id]/supplier-items/route.ts(66,29): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(arg: PrismaPromise<any>[], options?: { isolationLevel?: "Serializable"; }): Promise<any[]>', gave the following error.
+    Argument of type 'unknown[]' is not assignable to parameter of type 'PrismaPromise<any>[]'.
+      Type '{}' is missing the following properties from type 'PrismaPromise<any>': [Symbol.toStringTag], then, catch, finally
+  Overload 2 of 2, '(fn: (prisma: Omit<PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>, "$connect" | "$disconnect" | "$on" | "$transaction" | "$extends">) => Promise<...>, options?: { ...; }): Promise<...>', gave the following error.
+    Argument of type 'unknown[]' is not assignable to parameter of type '(prisma: Omit<PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>, "$connect" | "$disconnect" | "$on" | "$transaction" | "$extends">) => Promise<...>'.
+      Type 'unknown[]' provides no match for the signature '(prisma: Omit<PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>, "$connect" | "$disconnect" | "$on" | "$transaction" | "$extends">): Promise<...>'.
+src/app/api/catalog/items/route.ts(23,38): error TS2339: Property '$executeRawUnsafe' does not exist on type 'unknown'.
+src/app/api/catalog/items/route.ts(35,23): error TS2339: Property 'category' does not exist on type 'unknown'.
+src/app/api/catalog/items/route.ts(37,11): error TS2339: Property 'OR' does not exist on type 'unknown'.
+src/app/api/catalog/items/route.ts(55,22): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/catalog/items/route.ts(127,34): error TS2339: Property 'supplierName' does not exist on type 'unknown'.
+src/app/api/catalog/items/route.ts(128,37): error TS2339: Property 'supplierName' does not exist on type 'unknown'.
+src/app/api/catalog/items/route.ts(160,50): error TS2339: Property 'count' does not exist on type 'unknown'.
+src/app/api/catalog/low-stock/route.ts(24,41): error TS2339: Property 'minStock' does not exist on type 'unknown'.
+src/app/api/catalog/low-stock/route.ts(24,80): error TS2339: Property 'minStock' does not exist on type 'unknown'.
+src/app/api/catalog/low-stock/route.ts(32,77): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/catalog/migrate-suppliers/route.ts(80,22): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/catalog/scan-bulk/route.ts(126,45): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/catalog/scan-bulk/route.ts(144,22): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/catalog/scan/route.ts(128,22): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/catalog/search-all/route.ts(173,22): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/catalog/search/route.ts(21,27): error TS2339: Property 'category' does not exist on type 'unknown'.
+src/app/api/catalog/search/route.ts(23,15): error TS2339: Property 'OR' does not exist on type 'unknown'.
+src/app/api/catalog/seed-test/route.ts(143,22): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/catalog/seed/route.ts(32,72): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/catalog/stats/route.ts(131,22): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/communications/route.ts(28,27): error TS2339: Property 'customerId' does not exist on type 'unknown'.
+src/app/api/communications/route.ts(29,21): error TS2339: Property 'type' does not exist on type 'unknown'.
+src/app/api/communications/route.ts(30,23): error TS2339: Property 'status' does not exist on type 'unknown'.
+src/app/api/communications/route.ts(63,21): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/communications/send/route.ts(245,29): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/communications/send/route.ts(246,67): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/communications/send/route.ts(252,29): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/communications/send/route.ts(261,21): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/customers/[id]/bikes/[bikeId]/route.ts(54,12): error TS2339: Property 'index' does not exist on type 'unknown'.
+src/app/api/customers/[id]/bikes/[bikeId]/route.ts(70,68): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/customers/[id]/bikes/route.ts(57,19): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/customers/[id]/bikes/route.ts(58,18): error TS2339: Property 'issues' does not exist on type 'unknown'.
+src/app/api/customers/[id]/bikes/route.ts(62,19): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/customers/[id]/bikes/route.ts(63,19): error TS2339: Property 'issues' does not exist on type 'unknown'.
+src/app/api/customers/[id]/route.ts(52,19): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/customers/[id]/route.ts(53,16): error TS2339: Property 'code' does not exist on type 'unknown'.
+src/app/api/customers/[id]/route.ts(54,16): error TS2339: Property 'meta' does not exist on type 'unknown'.
+src/app/api/customers/[id]/route.ts(59,25): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/customers/[id]/route.ts(60,16): error TS2339: Property 'code' does not exist on type 'unknown'.
+src/app/api/customers/[id]/route.ts(72,83): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/customers/import/route.ts(42,46): error TS2345: Argument of type 'unknown' is not assignable to parameter of type '"," | ";"'.
+src/app/api/customers/import/route.ts(107,39): error TS2345: Argument of type 'unknown' is not assignable to parameter of type '"," | ";"'.
+src/app/api/customers/import/route.ts(132,216): error TS2322: Type 'unknown' is not assignable to type 'string'.
+src/app/api/customers/route.ts(18,45): error TS2698: Spread types may only be created from object types.
+src/app/api/customers/route.ts(18,65): error TS2339: Property '_count' does not exist on type 'unknown'.
+src/app/api/customers/route.ts(72,83): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/cancel/route.ts(11,47): error TS2345: Argument of type 'unknown' is not assignable to parameter of type '{ select?: InvoiceSelect<DefaultArgs>; omit?: InvoiceOmit<DefaultArgs>; include?: InvoiceInclude<DefaultArgs>; where: InvoiceWhereUniqueInput; }'.
+  Property 'where' is missing in type '{}' but required in type '{ select?: InvoiceSelect<DefaultArgs>; omit?: InvoiceOmit<DefaultArgs>; include?: InvoiceInclude<DefaultArgs>; where: InvoiceWhereUniqueInput; }'.
+src/app/api/finance/invoices/[id]/cancel/route.ts(19,37): error TS2339: Property 'lines' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/cancel/route.ts(20,25): error TS2339: Property 'type' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/cancel/route.ts(20,60): error TS2339: Property 'partId' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/cancel/route.ts(20,86): error TS2339: Property 'qty' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/cancel/route.ts(20,109): error TS2339: Property 'qty' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/cancel/route.ts(21,55): error TS2339: Property 'qty' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/cancel/route.ts(22,78): error TS2339: Property 'partId' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/cancel/route.ts(23,73): error TS2339: Property 'partId' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/cancel/route.ts(26,47): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(arg: PrismaPromise<any>[], options?: { isolationLevel?: "Serializable"; }): Promise<any[]>', gave the following error.
+    Argument of type 'unknown[]' is not assignable to parameter of type 'PrismaPromise<any>[]'.
+      Type '{}' is missing the following properties from type 'PrismaPromise<any>': [Symbol.toStringTag], then, catch, finally
+  Overload 2 of 2, '(fn: (prisma: Omit<PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>, "$connect" | "$disconnect" | "$on" | "$transaction" | "$extends">) => Promise<...>, options?: { ...; }): Promise<...>', gave the following error.
+    Argument of type 'unknown[]' is not assignable to parameter of type '(prisma: Omit<PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>, "$connect" | "$disconnect" | "$on" | "$transaction" | "$extends">) => Promise<...>'.
+      Type 'unknown[]' provides no match for the signature '(prisma: Omit<PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>, "$connect" | "$disconnect" | "$on" | "$transaction" | "$extends">): Promise<...>'.
+src/app/api/finance/invoices/[id]/convert-to-invoice/route.ts(67,52): error TS2339: Property 'InvoiceLine' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/convert-to-invoice/route.ts(68,24): error TS2339: Property 'type' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/convert-to-invoice/route.ts(69,31): error TS2339: Property 'description' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/convert-to-invoice/route.ts(70,23): error TS2339: Property 'qty' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/convert-to-invoice/route.ts(71,31): error TS2339: Property 'unitPriceHT' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/convert-to-invoice/route.ts(72,32): error TS2339: Property 'unitPriceTTC' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/convert-to-invoice/route.ts(73,27): error TS2339: Property 'vatRate' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/convert-to-invoice/route.ts(74,27): error TS2339: Property 'totalHT' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/convert-to-invoice/route.ts(75,28): error TS2339: Property 'totalTTC' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/convert-to-invoice/route.ts(76,26): error TS2339: Property 'partId' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/convert-to-invoice/route.ts(77,35): error TS2339: Property 'purchasePriceHT' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/convert-to-invoice/route.ts(102,58): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/credit/route.ts(45,47): error TS2339: Property 'InvoiceLine' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/credit/route.ts(46,19): error TS2339: Property 'type' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/credit/route.ts(47,37): error TS2339: Property 'description' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/credit/route.ts(48,28): error TS2339: Property 'qty' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/credit/route.ts(49,26): error TS2339: Property 'unitPriceHT' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/credit/route.ts(49,59): error TS2339: Property 'unitPriceHT' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/credit/route.ts(50,27): error TS2339: Property 'unitPriceTTC' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/credit/route.ts(50,61): error TS2339: Property 'unitPriceTTC' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/credit/route.ts(51,22): error TS2339: Property 'vatRate' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/credit/route.ts(51,42): error TS2339: Property 'vatRate' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/credit/route.ts(52,24): error TS2339: Property 'totalHT' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/credit/route.ts(53,25): error TS2339: Property 'totalTTC' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/credit/route.ts(54,21): error TS2339: Property 'partId' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/credit/route.ts(55,30): error TS2339: Property 'purchasePriceHT' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/credit/route.ts(64,41): error TS2339: Property 'InvoiceLine' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/credit/route.ts(65,25): error TS2339: Property 'type' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/credit/route.ts(65,60): error TS2339: Property 'partId' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/credit/route.ts(65,86): error TS2339: Property 'qty' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/credit/route.ts(65,109): error TS2339: Property 'qty' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/credit/route.ts(66,55): error TS2339: Property 'qty' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/credit/route.ts(67,78): error TS2339: Property 'partId' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/credit/route.ts(68,73): error TS2339: Property 'partId' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/credit/route.ts(71,45): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(arg: PrismaPromise<any>[], options?: { isolationLevel?: "Serializable"; }): Promise<any[]>', gave the following error.
+    Argument of type 'unknown[]' is not assignable to parameter of type 'PrismaPromise<any>[]'.
+      Type '{}' is missing the following properties from type 'PrismaPromise<any>': [Symbol.toStringTag], then, catch, finally
+  Overload 2 of 2, '(fn: (prisma: Omit<PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>, "$connect" | "$disconnect" | "$on" | "$transaction" | "$extends">) => Promise<...>, options?: { ...; }): Promise<...>', gave the following error.
+    Argument of type 'unknown[]' is not assignable to parameter of type '(prisma: Omit<PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>, "$connect" | "$disconnect" | "$on" | "$transaction" | "$extends">) => Promise<...>'.
+      Type 'unknown[]' provides no match for the signature '(prisma: Omit<PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>, "$connect" | "$disconnect" | "$on" | "$transaction" | "$extends">): Promise<...>'.
+src/app/api/finance/invoices/[id]/email/route.ts(17,32): error TS2339: Property 'number' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/email/route.ts(17,46): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/email/route.ts(19,22): error TS2339: Property 'issueDate' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/email/route.ts(19,47): error TS2339: Property 'issueDate' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/email/route.ts(19,94): error TS2339: Property 'createdAt' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/email/route.ts(25,11): error TS2339: Property 'customer' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/email/route.ts(26,23): error TS2339: Property 'customer' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/email/route.ts(26,47): error TS2339: Property 'customer' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/email/route.ts(26,99): error TS2339: Property 'customer' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/email/route.ts(26,121): error TS2339: Property 'customer' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/email/route.ts(38,115): error TS2339: Property 'currency' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/email/route.ts(40,24): error TS2339: Property 'lines' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/email/route.ts(44,23): error TS2339: Property 'pricingMode' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/email/route.ts(53,39): error TS2339: Property 'totalTTC' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/email/route.ts(54,11): error TS2339: Property 'pricingMode' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/email/route.ts(55,40): error TS2339: Property 'subtotalHT' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/email/route.ts(55,69): error TS2339: Property 'vatAmount' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/email/route.ts(74,49): error TS2345: Argument of type 'unknown' is not assignable to parameter of type '{ select?: InvoiceSelect<DefaultArgs>; omit?: InvoiceOmit<DefaultArgs>; include?: InvoiceInclude<DefaultArgs>; where: InvoiceWhereUniqueInput; }'.
+  Property 'where' is missing in type '{}' but required in type '{ select?: InvoiceSelect<DefaultArgs>; omit?: InvoiceOmit<DefaultArgs>; include?: InvoiceInclude<DefaultArgs>; where: InvoiceWhereUniqueInput; }'.
+src/app/api/finance/invoices/[id]/email/route.ts(90,39): error TS2339: Property 'WorkOrder' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/email/route.ts(151,78): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/import-labor/route.ts(123,22): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/issue/route.ts(53,46): error TS2339: Property 'InvoiceLine' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/issue/route.ts(82,56): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(arg: PrismaPromise<any>[], options?: { isolationLevel?: "Serializable"; }): Promise<any[]>', gave the following error.
+    Argument of type 'unknown[]' is not assignable to parameter of type 'PrismaPromise<any>[]'.
+      Type '{}' is missing the following properties from type 'PrismaPromise<any>': [Symbol.toStringTag], then, catch, finally
+  Overload 2 of 2, '(fn: (prisma: Omit<PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>, "$connect" | "$disconnect" | "$on" | "$transaction" | "$extends">) => Promise<...>, options?: { ...; }): Promise<...>', gave the following error.
+    Argument of type 'unknown[]' is not assignable to parameter of type '(prisma: Omit<PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>, "$connect" | "$disconnect" | "$on" | "$transaction" | "$extends">) => Promise<...>'.
+      Type 'unknown[]' provides no match for the signature '(prisma: Omit<PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>, "$connect" | "$disconnect" | "$on" | "$transaction" | "$extends">): Promise<...>'.
+src/app/api/finance/invoices/[id]/issue/route.ts(89,21): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/lines/[lineId]/route.ts(13,31): error TS2339: Property 'type' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/lines/[lineId]/route.ts(14,38): error TS2339: Property 'description' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/lines/[lineId]/route.ts(15,30): error TS2339: Property 'qty' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/lines/[lineId]/route.ts(16,44): error TS2339: Property 'unitPriceHT' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/lines/[lineId]/route.ts(17,45): error TS2339: Property 'unitPriceTTC' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/lines/[lineId]/route.ts(18,40): error TS2339: Property 'vatRate' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/lines/[lineId]/route.ts(19,39): error TS2339: Property 'partId' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/lines/[lineId]/route.ts(20,48): error TS2339: Property 'purchasePriceHT' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/lines/[lineId]/route.ts(35,40): error TS2698: Spread types may only be created from object types.
+src/app/api/finance/invoices/[id]/lines/[lineId]/route.ts(48,12): error TS2339: Property 'unitPriceTTC' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/lines/[lineId]/route.ts(53,16): error TS2339: Property 'unitPriceTTC' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/lines/[lineId]/route.ts(53,43): error TS2339: Property 'unitPriceTTC' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/lines/[lineId]/route.ts(54,12): error TS2339: Property 'totalTTC' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/lines/[lineId]/route.ts(55,12): error TS2339: Property 'totalHT' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/lines/[lineId]/route.ts(57,12): error TS2339: Property 'unitPriceHT' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/lines/[lineId]/route.ts(65,12): error TS2339: Property 'unitPriceHT' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/lines/[lineId]/route.ts(71,16): error TS2339: Property 'unitPriceHT' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/lines/[lineId]/route.ts(71,42): error TS2339: Property 'unitPriceHT' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/lines/[lineId]/route.ts(72,12): error TS2339: Property 'unitPriceTTC' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/lines/[lineId]/route.ts(73,12): error TS2339: Property 'totalHT' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/lines/[lineId]/route.ts(74,12): error TS2339: Property 'totalTTC' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/lines/[lineId]/route.ts(88,34): error TS2339: Property 'InvoiceLine' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/lines/[lineId]/route.ts(88,82): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/lines/[lineId]/route.ts(88,94): error TS2339: Property 'type' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/lines/[lineId]/route.ts(88,107): error TS2339: Property 'qty' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/lines/[lineId]/route.ts(88,127): error TS2339: Property 'unitPriceHT' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/lines/[lineId]/route.ts(88,156): error TS2339: Property 'unitPriceTTC' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/lines/[lineId]/route.ts(88,181): error TS2339: Property 'vatRate' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/lines/[lineId]/route.ts(109,34): error TS2339: Property 'InvoiceLine' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/lines/[lineId]/route.ts(109,82): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/lines/[lineId]/route.ts(109,94): error TS2339: Property 'type' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/lines/[lineId]/route.ts(109,107): error TS2339: Property 'qty' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/lines/[lineId]/route.ts(109,127): error TS2339: Property 'unitPriceHT' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/lines/[lineId]/route.ts(109,156): error TS2339: Property 'unitPriceTTC' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/lines/[lineId]/route.ts(109,181): error TS2339: Property 'vatRate' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/lines/route.ts(78,32): error TS2339: Property 'InvoiceLine' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/payments/[paymentId]/route.ts(50,82): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/payments/[paymentId]/route.ts(62,10): error TS2339: Property 'amount' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/payments/[paymentId]/route.ts(64,39): error TS2339: Property 'method' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/payments/[paymentId]/route.ts(65,39): error TS2339: Property 'paidAt' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/payments/[paymentId]/route.ts(66,37): error TS2339: Property 'note' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/payments/[paymentId]/route.ts(99,52): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(value: string | number | Date): Date', gave the following error.
+    Argument of type 'unknown' is not assignable to parameter of type 'string | number | Date'.
+  Overload 2 of 4, '(value: string | number): Date', gave the following error.
+    Argument of type 'unknown' is not assignable to parameter of type 'string | number'.
+src/app/api/finance/invoices/[id]/payments/[paymentId]/route.ts(99,94): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(value: string | number | Date): Date', gave the following error.
+    Argument of type 'unknown' is not assignable to parameter of type 'string | number | Date'.
+  Overload 2 of 4, '(value: string | number): Date', gave the following error.
+    Argument of type 'unknown' is not assignable to parameter of type 'string | number'.
+src/app/api/finance/invoices/[id]/payments/[paymentId]/route.ts(107,82): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/payments/route.ts(18,81): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/payments/route.ts(58,11): error TS2322: Type 'unknown' is not assignable to type '"issued" | "paid" | "draft" | "cancelled" | "part_paid"'.
+src/app/api/finance/invoices/[id]/payments/route.ts(67,82): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(15,17): error TS2339: Property 'number' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(15,31): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(16,20): error TS2339: Property 'issueDate' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(16,37): error TS2339: Property 'createdAt' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(17,18): error TS2339: Property 'dueDate' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(18,17): error TS2339: Property 'status' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(19,15): error TS2339: Property 'type' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(20,21): error TS2339: Property 'validUntil' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(21,19): error TS2339: Property 'parentId' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(24,17): error TS2339: Property 'shopName' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(25,17): error TS2339: Property 'shopLogo' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(26,20): error TS2339: Property 'address1' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(27,16): error TS2339: Property 'zip' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(28,17): error TS2339: Property 'city' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(29,18): error TS2339: Property 'shopPhone' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(30,18): error TS2339: Property 'shopEmail' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(33,31): error TS2339: Property 'siret' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(34,29): error TS2339: Property 'tva' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(35,29): error TS2339: Property 'rcs' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(36,33): error TS2339: Property 'capital' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(37,35): error TS2339: Property 'insurance' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(41,19): error TS2339: Property 'firstName' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(41,39): error TS2339: Property 'lastName' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(41,87): error TS2339: Property 'email' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(41,105): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(43,32): error TS2339: Property 'address1' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(44,28): error TS2339: Property 'zip' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(45,29): error TS2339: Property 'city' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(48,30): error TS2339: Property 'InvoiceLine' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(49,22): error TS2339: Property 'qty' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(50,22): error TS2339: Property 'vatRate' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(50,37): error TS2339: Property 'vatRate' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(51,24): error TS2339: Property 'totalHT' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(52,25): error TS2339: Property 'totalTTC' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(54,17): error TS2339: Property 'pricingMode' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(55,26): error TS2339: Property 'unitPriceHT' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(59,27): error TS2339: Property 'unitPriceTTC' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(66,25): error TS2339: Property 'description' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(68,25): error TS2339: Property 'unitPriceHT' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(69,26): error TS2339: Property 'unitPriceTTC' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(70,21): error TS2339: Property 'vatRate' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(77,21): error TS2339: Property 'subtotalHT' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(78,20): error TS2339: Property 'vatAmount' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(79,19): error TS2339: Property 'totalTTC' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(80,22): error TS2339: Property 'pricingMode' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(83,24): error TS2339: Property 'paymentMethod' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(84,17): error TS2339: Property 'paidAt' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(87,20): error TS2339: Property 'legalFooter' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(148,54): error TS2339: Property 'amount' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(148,77): error TS2339: Property 'method' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(148,103): error TS2339: Property 'paidAt' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(148,132): error TS2339: Property 'paidAt' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(148,148): error TS2339: Property 'note' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(152,15): error TS2339: Property 'discountAmount' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(153,15): error TS2339: Property 'paidAmount' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(154,15): error TS2339: Property 'remainingAmount' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(155,15): error TS2339: Property 'payments' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(167,34): error TS2339: Property 'logoBytes' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(177,19): error TS2339: Property 'shopLogo' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(177,50): error TS2339: Property 'shopLogo' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(183,40): error TS2339: Property 'shopLogo' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(184,23): error TS2339: Property 'shopLogo' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(185,23): error TS2339: Property 'shopLogo' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(196,34): error TS2339: Property 'logoBytes' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(228,36): error TS2339: Property 'logoBytes' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(239,36): error TS2339: Property 'logoBytes' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/pdf/route.ts(254,45): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'InvoiceData'.
+  Type '{}' is missing the following properties from type 'InvoiceData': number, issueDate, status, shopName, and 9 more.
+src/app/api/finance/invoices/[id]/remind/route.ts(63,49): error TS2345: Argument of type 'unknown' is not assignable to parameter of type '{ select?: InvoiceSelect<DefaultArgs>; omit?: InvoiceOmit<DefaultArgs>; include?: InvoiceInclude<DefaultArgs>; where: InvoiceWhereUniqueInput; }'.
+  Property 'where' is missing in type '{}' but required in type '{ select?: InvoiceSelect<DefaultArgs>; omit?: InvoiceOmit<DefaultArgs>; include?: InvoiceInclude<DefaultArgs>; where: InvoiceWhereUniqueInput; }'.
+src/app/api/finance/invoices/[id]/remind/route.ts(79,39): error TS2339: Property 'WorkOrder' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/remind/route.ts(136,74): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/route.ts(29,24): error TS2339: Property 'InvoiceLine' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/route.ts(30,22): error TS2339: Property 'InvoiceLine' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/route.ts(30,49): error TS2339: Property 'InvoiceLine' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/route.ts(31,11): error TS2698: Spread types may only be created from object types.
+src/app/api/finance/invoices/[id]/route.ts(37,24): error TS2339: Property 'vatAmount' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/route.ts(38,24): error TS2339: Property 'totalTTC' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/route.ts(53,13): error TS2339: Property 'InvoiceLine' does not exist on type '{}'.
+src/app/api/finance/invoices/[id]/route.ts(53,26): error TS2339: Property 'InvoicePayment' does not exist on type '{}'.
+src/app/api/finance/invoices/[id]/route.ts(53,45): error TS2700: Rest types may only be created from object types.
+src/app/api/finance/invoices/[id]/route.ts(57,18): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/route.ts(58,25): error TS2339: Property 'invoiceId' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/route.ts(59,20): error TS2339: Property 'type' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/route.ts(60,27): error TS2339: Property 'description' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/route.ts(61,19): error TS2339: Property 'qty' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/route.ts(62,27): error TS2339: Property 'unitPriceHT' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/route.ts(63,28): error TS2339: Property 'unitPriceTTC' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/route.ts(64,23): error TS2339: Property 'vatRate' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/route.ts(65,23): error TS2339: Property 'totalHT' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/route.ts(66,24): error TS2339: Property 'totalTTC' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/route.ts(67,24): error TS2339: Property 'sourceId' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/route.ts(68,24): error TS2339: Property 'duration' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/route.ts(78,41): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/route.ts(107,38): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'InvoiceWithLines'.
+  Type '{}' is missing the following properties from type 'InvoiceWithLines': id, pricingMode, vatRate, lines
+src/app/api/finance/invoices/[id]/route.ts(141,41): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/send-email/route.ts(62,50): error TS2339: Property 'WorkOrder' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/send-email/route.ts(65,43): error TS2339: Property 'customerId' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/send-email/route.ts(67,43): error TS2339: Property 'customerId' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/send-email/route.ts(71,37): error TS2339: Property 'email' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/send-email/route.ts(110,21): error TS2339: Property 'firstName' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/send-email/route.ts(110,41): error TS2339: Property 'lastName' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/send-email/route.ts(110,89): error TS2339: Property 'email' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/send-email/route.ts(112,34): error TS2339: Property 'address1' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/send-email/route.ts(113,30): error TS2339: Property 'zip' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/send-email/route.ts(114,31): error TS2339: Property 'city' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/send-email/route.ts(116,36): error TS2339: Property 'InvoiceLine' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/send-email/route.ts(117,24): error TS2339: Property 'qty' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/send-email/route.ts(118,32): error TS2339: Property 'unitPriceHT' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/send-email/route.ts(120,54): error TS2339: Property 'vatRate' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/send-email/route.ts(121,28): error TS2339: Property 'totalHT' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/send-email/route.ts(122,61): error TS2339: Property 'totalTTC' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/send-email/route.ts(125,27): error TS2339: Property 'description' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/send-email/route.ts(194,31): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/api/finance/invoices/[id]/send-email/route.ts(220,21): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/finance/invoices/route.ts(26,23): error TS2339: Property 'status' does not exist on type 'unknown'.
+src/app/api/finance/invoices/route.ts(27,27): error TS2339: Property 'issueDate' does not exist on type 'unknown'.
+src/app/api/finance/invoices/route.ts(29,18): error TS2339: Property 'OR' does not exist on type 'unknown'.
+src/app/api/finance/invoices/route.ts(64,22): error TS2339: Property 'customerId' does not exist on type 'unknown'.
+src/app/api/finance/invoices/route.ts(68,37): error TS2339: Property 'firstName' does not exist on type 'unknown'.
+src/app/api/finance/invoices/route.ts(68,58): error TS2339: Property 'lastName' does not exist on type 'unknown'.
+src/app/api/finance/invoices/route.ts(68,88): error TS2339: Property 'email' does not exist on type 'unknown'.
+src/app/api/finance/invoices/route.ts(76,69): error TS2339: Property 'code' does not exist on type 'unknown'.
+src/app/api/finance/invoices/route.ts(77,69): error TS2339: Property 'meta' does not exist on type 'unknown'.
+src/app/api/finance/invoices/route.ts(78,72): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/finance/invoices/route.ts(80,45): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/finance/invoices/route.ts(80,67): error TS2339: Property 'code' does not exist on type 'unknown'.
+src/app/api/finance/invoices/route.ts(80,86): error TS2339: Property 'meta' does not exist on type 'unknown'.
+src/app/api/finance/invoices/route.ts(182,45): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/finance/quotes/route.ts(62,13): error TS2339: Property '_billableHours' does not exist on type 'LaborCostResult'.
+src/app/api/finance/quotes/route.ts(106,24): error TS2322: Type 'unknown[]' is not assignable to type '(Without<InvoiceLineCreateWithoutInvoiceInput, InvoiceLineUncheckedCreateWithoutInvoiceInput> & InvoiceLineUncheckedCreateWithoutInvoiceInput) | (Without<...> & InvoiceLineCreateWithoutInvoiceInput) | InvoiceLineCreateWithoutInvoiceInput[] | InvoiceLineUncheckedCreateWithoutInvoiceInput[]'.
+  Type 'unknown[]' is not assignable to type 'InvoiceLineCreateWithoutInvoiceInput[]'.
+    Property 'description' is missing in type '{}' but required in type 'InvoiceLineCreateWithoutInvoiceInput'.
+src/app/api/finance/quotes/route.ts(119,22): error TS2339: Property 'InvoiceLine' does not exist on type '{ number: string; id: string; createdAt: Date; updatedAt: Date; type: string; vatRate: number; status: string; customerId: string; workOrderId: string; issueDate: Date; parentId: string; ... 16 more ...; convertedToId: string; }'.
+src/app/api/finance/quotes/route.ts(147,57): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/finance/quotes/route.ts(172,23): error TS2339: Property 'status' does not exist on type 'unknown'.
+src/app/api/finance/quotes/route.ts(173,28): error TS2339: Property 'workOrderId' does not exist on type 'unknown'.
+src/app/api/finance/quotes/route.ts(186,57): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/news/bike-feeds/route.ts(150,51): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/pos/workorders/[id]/quote-pdf/route.ts(171,36): error TS2339: Property 'logoBytes' does not exist on type 'unknown'.
+src/app/api/pos/workorders/[id]/quote-pdf/route.ts(189,36): error TS2339: Property 'logoBytes' does not exist on type 'unknown'.
+src/app/api/pos/workorders/[id]/sale/route.ts(51,13): error TS2339: Property '_billableHours' does not exist on type 'LaborCostResult'.
+src/app/api/pos/workorders/[id]/sale/route.ts(51,29): error TS2339: Property '_hourlyRate' does not exist on type 'LaborCostResult'.
+src/app/api/service-rates/route.ts(22,27): error TS2339: Property 'active' does not exist on type 'unknown'.
+src/app/api/service-rates/route.ts(23,25): error TS2339: Property 'bikeType' does not exist on type 'unknown'.
+src/app/api/service-rates/route.ts(24,25): error TS2339: Property 'category' does not exist on type 'unknown'.
+src/app/api/settings/route.ts(41,49): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/suppliers/offers/route.ts(50,27): error TS2339: Property 'supplierId' does not exist on type 'unknown'.
+src/app/api/suppliers/search/route.ts(42,22): error TS2339: Property 'supplierId' does not exist on type 'unknown'.
+src/app/api/suppliers/search/route.ts(43,24): error TS2339: Property 'supplier' does not exist on type 'unknown'.
+src/app/api/suppliers/search/route.ts(44,23): error TS2339: Property 'supplierSku' does not exist on type 'unknown'.
+src/app/api/suppliers/search/route.ts(45,15): error TS2339: Property 'ean' does not exist on type 'unknown'.
+src/app/api/suppliers/search/route.ts(46,23): error TS2339: Property 'lastPriceHT' does not exist on type 'unknown'.
+src/app/api/suppliers/search/route.ts(47,28): error TS2339: Property 'lastAvailability' does not exist on type 'unknown'.
+src/app/api/suppliers/search/route.ts(48,25): error TS2339: Property 'lastCheckedAt' does not exist on type 'unknown'.
+src/app/api/suppliers/search/route.ts(48,53): error TS2339: Property 'lastCheckedAt' does not exist on type 'unknown'.
+src/app/api/suppliers/search/route.ts(53,83): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/suppliers/search/route.ts(169,24): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/suppliers/search/route.ts(196,21): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/support/diagnostics/route.ts(79,47): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/test-invoice/route.ts(19,23): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/test-invoice/route.ts(20,20): error TS2339: Property 'code' does not exist on type 'unknown'.
+src/app/api/test-invoice/route.ts(21,20): error TS2339: Property 'meta' does not exist on type 'unknown'.
+src/app/api/test-invoice/route.ts(22,21): error TS2339: Property 'stack' does not exist on type 'unknown'.
+src/app/api/test-invoice/route.ts(30,20): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/test-invoice/route.ts(31,20): error TS2339: Property 'code' does not exist on type 'unknown'.
+src/app/api/test-invoice/route.ts(32,20): error TS2339: Property 'meta' does not exist on type 'unknown'.
+src/app/api/tunnel/activate/route.ts(56,22): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/tunnel/deactivate/route.ts(43,22): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/uploads/[...path]/route.ts(69,54): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/workorders/[id]/appointment/route.ts(61,22): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/workorders/[id]/appointment/route.ts(108,22): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/workorders/[id]/appointment/route.ts(163,22): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/workorders/[id]/lines/[lineId]/route.ts(28,46): error TS2339: Property 'description' does not exist on type 'unknown'.
+src/app/api/workorders/[id]/lines/[lineId]/route.ts(29,43): error TS2339: Property 'quantity' does not exist on type 'unknown'.
+src/app/api/workorders/[id]/lines/[lineId]/route.ts(30,42): error TS2339: Property 'priceHT' does not exist on type 'unknown'.
+src/app/api/workorders/[id]/lines/[lineId]/route.ts(31,42): error TS2339: Property 'vatRate' does not exist on type 'unknown'.
+src/app/api/workorders/[id]/lines/[lineId]/route.ts(32,43): error TS2339: Property 'duration' does not exist on type 'unknown'.
+src/app/api/workorders/[id]/lines/[lineId]/route.ts(33,40): error TS2339: Property 'notes' does not exist on type 'unknown'.
+src/app/api/workorders/[id]/lines/route.ts(34,9): error TS2698: Spread types may only be created from object types.
+src/app/api/workorders/[id]/parts/[partId]/route.ts(29,79): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/workorders/[id]/parts/[partId]/route.ts(48,79): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/workshop/workorders/[id]/labor/route.ts(52,22): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/workshop/workorders/[id]/labor/route.ts(91,22): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/workshop/workorders/[id]/route.ts(43,21): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/workshop/workorders/[id]/route.ts(66,21): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/workshop/workorders/[id]/status/route.ts(26,16): error TS2339: Property 'completedAt' does not exist on type 'unknown'.
+src/app/api/workshop/workorders/[id]/status/route.ts(40,39): error TS2339: Property 'completedAt' does not exist on type 'unknown'.
+src/app/api/workshop/workorders/invoiceable/route.ts(113,45): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/api/workshop/workorders/route.ts(45,11): error TS2339: Property 'status' does not exist on type 'unknown'.
+src/app/api/workshop/workorders/route.ts(50,11): error TS2339: Property 'OR' does not exist on type 'unknown'.
+src/app/api/workshop/workorders/route.ts(106,15): error TS2339: Property 'name' does not exist on type 'unknown'.
+src/app/api/workshop/workorders/route.ts(109,33): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'ZodError<any>'.
+  Type '{}' is missing the following properties from type 'ZodError<any>': issues, errors, format, message, and 6 more.
+src/app/bikes/history/page.tsx(175,45): error TS2339: Property 'value' does not exist on type 'object'.
+src/app/bikes/history/page.tsx(218,39): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/bikes/history/page.tsx(224,39): error TS2339: Property 'firstName' does not exist on type 'unknown'.
+src/app/bikes/history/page.tsx(224,60): error TS2339: Property 'lastName' does not exist on type 'unknown'.
+src/app/bikes/history/page.tsx(227,39): error TS2339: Property 'email' does not exist on type 'unknown'.
+src/app/bikes/history/page.tsx(231,45): error TS2339: Property 'email' does not exist on type 'unknown'.
+src/app/bikes/history/page.tsx(235,39): error TS2339: Property 'phone' does not exist on type 'unknown'.
+src/app/bikes/history/page.tsx(239,45): error TS2339: Property 'phone' does not exist on type 'unknown'.
+src/app/bikes/history/page.tsx(247,33): error TS2339: Property 'bikes' does not exist on type 'unknown'.
+src/app/bikes/history/page.tsx(251,37): error TS2339: Property 'bikes' does not exist on type 'unknown'.
+src/app/booking-local/page.tsx(57,25): error TS2339: Property 'firstName' does not exist on type 'unknown'.
+src/app/booking-local/page.tsx(57,53): error TS2339: Property 'lastName' does not exist on type 'unknown'.
+src/app/booking-local/page.tsx(57,89): error TS2339: Property 'email' does not exist on type 'unknown'.
+src/app/booking-local/page.tsx(58,23): error TS2339: Property 'email' does not exist on type 'unknown'.
+src/app/booking-local/page.tsx(59,23): error TS2339: Property 'phone' does not exist on type 'unknown'.
+src/app/booking-local/page.tsx(218,40): error TS2339: Property 'firstName' does not exist on type 'unknown'.
+src/app/booking-local/page.tsx(218,66): error TS2339: Property 'lastName' does not exist on type 'unknown'.
+src/app/booking-local/page.tsx(219,39): error TS2339: Property 'email' does not exist on type 'unknown'.
+src/app/booking-local/page.tsx(227,36): error TS2339: Property 'firstName' does not exist on type 'unknown'.
+src/app/booking-local/page.tsx(227,62): error TS2339: Property 'lastName' does not exist on type 'unknown'.
+src/app/booking-local/page.tsx(227,96): error TS2339: Property 'email' does not exist on type 'unknown'.
+src/app/booking-local/page.tsx(229,31): error TS2339: Property 'phone' does not exist on type 'unknown'.
+src/app/booking-local/page.tsx(231,35): error TS2339: Property 'phone' does not exist on type 'unknown'.
+src/app/cash-register/page.tsx(180,24): error TS2365: Operator '<' cannot be applied to types 'unknown' and 'number'.
+src/app/cash-register/page.tsx(181,22): error TS2365: Operator '<' cannot be applied to types 'unknown' and 'number'.
+src/app/cash-register/page.tsx(184,28): error TS2339: Property 'toFixed' does not exist on type 'unknown'.
+src/app/cash-register/page.tsx(186,60): error TS2365: Operator '<' cannot be applied to types 'unknown' and 'number'.
+src/app/cash-register/page.tsx(219,40): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/cash-register/page.tsx(221,39): error TS2339: Property 'createdAt' does not exist on type 'unknown'.
+src/app/cash-register/page.tsx(226,33): error TS2339: Property 'type' does not exist on type 'unknown'.
+src/app/cash-register/page.tsx(227,33): error TS2339: Property 'type' does not exist on type 'unknown'.
+src/app/cash-register/page.tsx(228,33): error TS2339: Property 'type' does not exist on type 'unknown'.
+src/app/cash-register/page.tsx(229,33): error TS2339: Property 'type' does not exist on type 'unknown'.
+src/app/cash-register/page.tsx(229,87): error TS2339: Property 'type' does not exist on type 'unknown'.
+src/app/cash-register/page.tsx(233,33): error TS2339: Property 'type' does not exist on type 'unknown'.
+src/app/cash-register/page.tsx(234,33): error TS2339: Property 'type' does not exist on type 'unknown'.
+src/app/cash-register/page.tsx(235,33): error TS2339: Property 'type' does not exist on type 'unknown'.
+src/app/cash-register/page.tsx(236,33): error TS2339: Property 'type' does not exist on type 'unknown'.
+src/app/cash-register/page.tsx(240,39): error TS2339: Property 'description' does not exist on type 'unknown'.
+src/app/cash-register/page.tsx(241,39): error TS2339: Property 'invoice' does not exist on type 'unknown'.
+src/app/cash-register/page.tsx(242,86): error TS2339: Property 'type' does not exist on type 'unknown'.
+src/app/cash-register/page.tsx(242,127): error TS2339: Property 'type' does not exist on type 'unknown'.
+src/app/cash-register/page.tsx(243,31): error TS2339: Property 'type' does not exist on type 'unknown'.
+src/app/cash-register/page.tsx(243,72): error TS2339: Property 'type' does not exist on type 'unknown'.
+src/app/cash-register/page.tsx(243,120): error TS2339: Property 'amount' does not exist on type 'unknown'.
+src/app/cash-register/page.tsx(245,39): error TS2339: Property 'user' does not exist on type 'unknown'.
+src/app/cash-register/page.tsx(245,59): error TS2339: Property 'user' does not exist on type 'unknown'.
+src/app/cash-register/page.tsx(251,98): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/cash-register/page.tsx(264,44): error TS2365: Operator '>=' cannot be applied to types 'unknown' and 'number'.
+src/app/cash-register/page.tsx(264,106): error TS2365: Operator '>=' cannot be applied to types 'unknown' and 'number'.
+src/app/cash-register/page.tsx(268,64): error TS2365: Operator '>=' cannot be applied to types 'unknown' and 'number'.
+src/app/cash-register/page.tsx(269,26): error TS2339: Property 'toFixed' does not exist on type 'unknown'.
+src/app/cash-register/page.tsx(272,57): error TS2365: Operator '>=' cannot be applied to types 'unknown' and 'number'.
+src/app/catalog/pieces/page.tsx(115,41): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/catalog/pieces/page.tsx(172,48): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Partial<CatalogItem> & { category: string; name: string; priceHT: number; priceTTC: number; vatRate: number; }'.
+  Type '{}' is missing the following properties from type '{ category: string; name: string; priceHT: number; priceTTC: number; vatRate: number; }': category, name, priceHT, priceTTC, vatRate
+src/app/catalog/pieces/page.tsx(199,52): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/catalog/pieces/page.tsx(225,52): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/catalog/pieces/page.tsx(282,31): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/catalog/pieces/page.tsx(348,31): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/catalog/pieces/page.tsx(418,31): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/catalog/pieces/page.tsx(450,48): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Partial<CatalogItem> & { category: string; name: string; priceHT: number; priceTTC: number; vatRate: number; }'.
+  Type '{}' is missing the following properties from type '{ category: string; name: string; priceHT: number; priceTTC: number; vatRate: number; }': category, name, priceHT, priceTTC, vatRate
+src/app/catalog/pieces/page.tsx(468,52): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/catalog/pieces/page.tsx(815,61): error TS2322: Type 'unknown' is not assignable to type 'string'.
+src/app/catalog/pieces/page.tsx(1013,43): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/catalog/services/page.tsx(85,29): error TS2345: Argument of type 'FormData' is not assignable to parameter of type 'Record<string, unknown>'.
+  Index signature for type 'string' is missing in type 'FormData'.
+src/app/communications/page.tsx(33,15): error TS2724: '"@/lib/api"' has no exported member named '_Communication'. Did you mean 'Communication'?
+src/app/communications/page.tsx(186,48): error TS2339: Property 'customer' does not exist on type 'unknown'.
+src/app/communications/page.tsx(186,88): error TS2339: Property 'customer' does not exist on type 'unknown'.
+src/app/communications/page.tsx(232,76): error TS2339: Property 'event' does not exist on type 'unknown'.
+src/app/communications/page.tsx(235,65): error TS2339: Property 'recipient' does not exist on type 'unknown'.
+src/app/communications/page.tsx(240,41): error TS2339: Property 'status' does not exist on type 'unknown'.
+src/app/communications/page.tsx(242,56): error TS2339: Property 'status' does not exist on type 'unknown'.
+src/app/communications/page.tsx(246,73): error TS2339: Property 'sentAt' does not exist on type 'unknown'.
+src/app/communications/page.tsx(248,31): error TS2339: Property 'subject' does not exist on type 'unknown'.
+src/app/communications/page.tsx(250,60): error TS2339: Property 'subject' does not exist on type 'unknown'.
+src/app/communications/page.tsx(253,31): error TS2339: Property 'error' does not exist on type 'unknown'.
+src/app/communications/page.tsx(256,63): error TS2339: Property 'error' does not exist on type 'unknown'.
+src/app/communications/page.tsx(272,35): error TS2339: Property 'content' does not exist on type 'unknown'.
+src/app/components/BarcodeScanner.tsx(107,15): error TS2339: Property 'name' does not exist on type 'unknown'.
+src/app/components/BarcodeScanner.tsx(107,49): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/components/BarcodeScanner.tsx(107,88): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/components/BarcodeScanner.tsx(109,22): error TS2339: Property 'name' does not exist on type 'unknown'.
+src/app/components/BarcodeScanner.tsx(109,54): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/components/BarcodeScanner.tsx(111,22): error TS2339: Property 'name' does not exist on type 'unknown'.
+src/app/components/BarcodeScanner.tsx(113,22): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/components/BarcodeScanner.tsx(114,39): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/components/BarcodeScanner.tsx(127,34): error TS2339: Property 'stop' does not exist on type 'unknown'.
+src/app/components/EditInvoiceLineDialog.tsx(71,20): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/components/LineItemSelector.tsx(109,60): error TS2339: Property 'active' does not exist on type 'unknown'.
+src/app/components/LineItemSelector.tsx(141,21): error TS2339: Property 'name' does not exist on type 'unknown'.
+src/app/components/LineItemSelector.tsx(142,28): error TS2339: Property 'name' does not exist on type 'unknown'.
+src/app/components/LineItemSelector.tsx(143,24): error TS2339: Property 'priceHT' does not exist on type 'unknown'.
+src/app/components/LineItemSelector.tsx(145,25): error TS2339: Property 'duration' does not exist on type 'unknown'.
+src/app/components/LineItemSelector.tsx(153,25): error TS2339: Property 'name' does not exist on type 'unknown'.
+src/app/components/LineItemSelector.tsx(154,21): error TS2339: Property 'priceHT' does not exist on type 'unknown'.
+src/app/components/LineItemSelector.tsx(167,34): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/components/LineItemSelector.tsx(167,54): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/components/LineItemSelector.tsx(175,75): error TS2339: Property 'name' does not exist on type 'unknown'.
+src/app/components/LineItemSelector.tsx(178,32): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/components/LineItemSelector.tsx(179,29): error TS2339: Property 'sku' does not exist on type 'unknown'.
+src/app/components/LineItemSelector.tsx(180,30): error TS2339: Property 'name' does not exist on type 'unknown'.
+src/app/components/LineItemSelector.tsx(193,21): error TS2339: Property 'bikeType' does not exist on type 'unknown'.
+src/app/components/LineItemSelector.tsx(193,41): error TS2339: Property 'bikeType' does not exist on type 'unknown'.
+src/app/components/LineItemSelector.tsx(260,52): error TS2339: Property 'name' does not exist on type 'unknown'.
+src/app/components/LineItemSelector.tsx(261,50): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/components/LineItemSelector.tsx(263,65): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/components/LineItemSelector.tsx(263,78): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/components/LineItemSelector.tsx(268,53): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/components/LineItemSelector.tsx(270,61): error TS2339: Property 'name' does not exist on type 'unknown'.
+src/app/components/LineItemSelector.tsx(272,35): error TS2339: Property 'priceHT' does not exist on type 'unknown'.
+src/app/components/LineItemSelector.tsx(273,35): error TS2339: Property 'duration' does not exist on type 'unknown'.
+src/app/components/LineItemSelector.tsx(273,60): error TS2339: Property 'duration' does not exist on type 'unknown'.
+src/app/components/LineItemSelector.tsx(274,35): error TS2339: Property 'bikeType' does not exist on type 'unknown'.
+src/app/components/LineItemSelector.tsx(274,60): error TS2339: Property 'bikeType' does not exist on type 'unknown'.
+src/app/components/LineItemSelector.tsx(381,52): error TS2339: Property 'name' does not exist on type 'unknown'.
+src/app/components/LineItemSelector.tsx(382,50): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/components/LineItemSelector.tsx(384,65): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/components/LineItemSelector.tsx(384,78): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/components/LineItemSelector.tsx(389,53): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/components/LineItemSelector.tsx(391,61): error TS2339: Property 'name' does not exist on type 'unknown'.
+src/app/components/LineItemSelector.tsx(393,35): error TS2339: Property 'priceHT' does not exist on type 'unknown'.
+src/app/components/LineItemSelector.tsx(393,76): error TS2339: Property 'stockQty' does not exist on type 'unknown'.
+src/app/components/NavBanner.tsx(62,68): error TS2339: Property 'detail' does not exist on type 'unknown'.
+src/app/components/NavBanner.tsx(63,17): error TS2339: Property 'detail' does not exist on type 'unknown'.
+src/app/components/NavBanner.tsx(64,27): error TS2339: Property 'detail' does not exist on type 'unknown'.
+src/app/components/NavBanner.tsx(66,17): error TS2339: Property 'detail' does not exist on type 'unknown'.
+src/app/components/NavBanner.tsx(67,27): error TS2339: Property 'detail' does not exist on type 'unknown'.
+src/app/components/NavBanner.tsx(68,59): error TS2339: Property 'detail' does not exist on type 'unknown'.
+src/app/components/SectionCard.tsx(23,62): error TS2698: Spread types may only be created from object types.
+src/app/customers/[id]/bikes/page.tsx(87,19): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/customers/[id]/bikes/page.tsx(159,21): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/customers/[id]/bikes/page.tsx(166,27): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/customers/[id]/bikes/page.tsx(166,41): error TS2339: Property 'error' does not exist on type 'unknown'.
+src/app/customers/[id]/bikes/page.tsx(170,14): error TS2339: Property 'issues' does not exist on type 'unknown'.
+src/app/customers/[id]/bikes/page.tsx(172,11): error TS2339: Property 'issues' does not exist on type 'unknown'.
+src/app/customers/[id]/bikes/page.tsx(186,16): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/customers/[id]/bikes/page.tsx(198,16): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/customers/[id]/page.tsx(49,35): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/customers/[id]/page.tsx(76,28): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/customers/page.tsx(119,34): error TS2339: Property 'bikeBrand' does not exist on type 'unknown'.
+src/app/customers/page.tsx(120,34): error TS2339: Property 'bikeModel' does not exist on type 'unknown'.
+src/app/customers/page.tsx(121,39): error TS2339: Property 'nationalFileId' does not exist on type 'unknown'.
+src/app/customers/page.tsx(138,22): error TS2345: Argument of type '{ brand: unknown; model: unknown; nationalFileId: unknown; serialNumber: unknown; color: unknown; notes: unknown; exists: boolean; }[]' is not assignable to parameter of type 'SetStateAction<{ brand: string; model: string; nationalFileId: string; serialNumber: string; color: string; notes: string; exists: boolean; }[]>'.
+  Type '{ brand: unknown; model: unknown; nationalFileId: unknown; serialNumber: unknown; color: unknown; notes: unknown; exists: boolean; }[]' is not assignable to type '{ brand: string; model: string; nationalFileId: string; serialNumber: string; color: string; notes: string; exists: boolean; }[]'.
+    Type '{ brand: unknown; model: unknown; nationalFileId: unknown; serialNumber: unknown; color: unknown; notes: unknown; exists: boolean; }' is not assignable to type '{ brand: string; model: string; nationalFileId: string; serialNumber: string; color: string; notes: string; exists: boolean; }'.
+      Types of property 'brand' are incompatible.
+        Type 'unknown' is not assignable to type 'string'.
+src/app/finance/components/CreateInvoiceDialog.tsx(19,109): error TS2724: '"@/lib/api"' has no exported member named '_WorkOrder'. Did you mean 'WorkOrder'?
+src/app/finance/components/CreateInvoiceDialog.tsx(187,43): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/finance/components/CreateInvoiceDialog.tsx(236,18): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/finance/components/CreateInvoiceDialog.tsx(340,83): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'SetStateAction<"bike" | "service" | "product" | "equipment">'.
+src/app/finance/components/CreateInvoiceDialog.tsx(356,39): error TS2339: Property 'description' does not exist on type 'unknown'.
+src/app/finance/components/CreateInvoiceDialog.tsx(357,41): error TS2339: Property 'status' does not exist on type 'unknown'.
+src/app/finance/components/CreateInvoiceDialog.tsx(358,37): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/finance/components/CreateInvoiceDialog.tsx(360,69): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/finance/components/CreateInvoiceDialog.tsx(360,82): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/app/finance/components/CreateInvoiceDialog.tsx(458,28): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/finance/components/CreateQuoteDialog.tsx(173,20): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/finance/page.tsx(52,70): error TS2724: '"@/lib/api"' has no exported member named '_PricingMode'. Did you mean 'PricingMode'?
+src/app/finance/page.tsx(52,89): error TS2724: '"@/lib/api"' has no exported member named '_Customer'. Did you mean 'Customer'?
+src/app/finance/page.tsx(173,19): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'SetStateAction<"" | "issued" | "paid" | "draft" | "cancelled">'.
+src/app/finance/page.tsx(407,42): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'SetStateAction<"" | "issued" | "paid" | "draft" | "cancelled">'.
+src/app/finance/page.tsx(561,68): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/finance/page.tsx(641,30): error TS2322: Type 'unknown' is not assignable to type 'SortDirection'.
+src/app/finance/page.tsx(644,30): error TS2322: Type 'unknown' is not assignable to type 'SortDirection'.
+src/app/finance/page.tsx(651,30): error TS2322: Type 'unknown' is not assignable to type 'SortDirection'.
+src/app/finance/page.tsx(654,30): error TS2322: Type 'unknown' is not assignable to type 'SortDirection'.
+src/app/scan/page.tsx(109,15): error TS2339: Property 'name' does not exist on type 'unknown'.
+src/app/scan/page.tsx(109,49): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/scan/page.tsx(111,22): error TS2339: Property 'name' does not exist on type 'unknown'.
+src/app/scan/page.tsx(113,22): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/scan/page.tsx(114,39): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/app/scan/page.tsx(127,34): error TS2339: Property 'stop' does not exist on type 'unknown'.
+src/app/scan/page.tsx(146,28): error TS2339: Property 'stop' does not exist on type 'unknown'.
+src/app/stats/page.tsx(125,52): error TS2339: Property 'invoices' does not exist on type 'unknown'.
+src/app/stats/page.tsx(147,53): error TS2339: Property 'toFixed' does not exist on type 'unknown'.
+src/components/B2BSearchDialog.tsx(67,20): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/components/catalog-v2/MyStockTab.tsx(36,28): error TS2339: Property 'detail' does not exist on type 'unknown'.
+src/components/catalog-v2/MyStockTab.tsx(190,41): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/components/catalog-v2/SupplierCatalogTab.tsx(136,22): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/components/catalog-v2/SupplierCatalogTab.tsx(138,21): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/components/catalog-v2/SupplierCatalogTab.tsx(170,21): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/components/catalog/MyStockTab.tsx(58,29): error TS2339: Property 'barcode' does not exist on type 'unknown'.
+src/components/catalog/MyStockTab.tsx(64,58): error TS2339: Property 'category' does not exist on type 'unknown'.
+src/components/catalog/MyStockTab.tsx(105,40): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'SetStateAction<"name" | "stock" | "price">'.
+src/components/catalog/SellBikeDialog.tsx(83,36): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/components/catalog/SellBikeDialog.tsx(131,25): error TS2339: Property 'firstName' does not exist on type 'unknown'.
+src/components/catalog/SellBikeDialog.tsx(131,51): error TS2339: Property 'lastName' does not exist on type 'unknown'.
+src/components/catalog/SellBikeDialog.tsx(131,75): error TS2339: Property 'email' does not exist on type 'unknown'.
+src/components/catalog/SellBikeDialog.tsx(131,95): error TS2339: Property 'email' does not exist on type 'unknown'.
+src/components/catalog/SupplierCatalogTableView.tsx(66,25): error TS2339: Property 'supplierSku' does not exist on type 'unknown'.
+src/components/catalog/SupplierCatalogTableView.tsx(68,25): error TS2339: Property 'description' does not exist on type 'unknown'.
+src/components/catalog/SupplierCatalogTableView.tsx(88,32): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(that: string, locales?: LocalesArgument, options?: CollatorOptions): number', gave the following error.
+    Argument of type 'unknown' is not assignable to parameter of type 'string'.
+  Overload 2 of 3, '(that: string, locales?: string | string[], options?: CollatorOptions): number', gave the following error.
+    Argument of type 'unknown' is not assignable to parameter of type 'string'.
+  Overload 3 of 3, '(that: string): number', gave the following error.
+    Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/components/catalog/SupplierCatalogTableView.tsx(89,18): error TS2339: Property 'localeCompare' does not exist on type 'unknown'.
+src/components/catalog/SupplierCatalogTableView.tsx(91,32): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/components/catalog/SupplierCatalogTableView.tsx(91,41): error TS2363: The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/components/catalog/SupplierCatalogTableView.tsx(91,50): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/components/catalog/SupplierCatalogTableView.tsx(91,59): error TS2363: The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/components/catalog/SupplierCatalogTableView.tsx(234,102): error TS2339: Property 'supplierSku' does not exist on type 'unknown'.
+src/components/catalog/SupplierCatalogTableView.tsx(240,46): error TS2339: Property 'supplierSku' does not exist on type 'unknown'.
+src/components/NotificationCenter.tsx(59,62): error TS2339: Property 'status' does not exist on type 'unknown'.
+src/components/RequireAuth.tsx(17,49): error TS2339: Property '_role' does not exist on type 'RequireAuthProps'.
+src/hooks/useAccountData.ts(12,47): error TS2724: '"@/lib/api"' has no exported member named '_AccountSettings'. Did you mean 'AccountSettings'?
+src/hooks/useAdminCatalogData.ts(13,49): error TS2724: '"@/lib/api"' has no exported member named '_CatalogItem'. Did you mean 'CatalogItem'?
+src/hooks/useAdminCatalogData.ts(33,30): error TS2339: Property '__catalogSeedAttempted__' does not exist on type 'unknown'.
+src/hooks/useAdminCatalogData.ts(34,27): error TS2339: Property '__catalogSeedAttempted__' does not exist on type 'unknown'.
+src/hooks/useAdminCatalogMutations.ts(26,70): error TS2345: Argument of type 'Record<string, unknown>' is not assignable to parameter of type 'Partial<CatalogItem> & { category: string; name: string; priceHT: number; priceTTC: number; vatRate: number; }'.
+  Type 'Record<string, unknown>' is missing the following properties from type '{ category: string; name: string; priceHT: number; priceTTC: number; vatRate: number; }': category, name, priceHT, priceTTC, vatRate
+src/hooks/useAdminCatalogUI.ts(63,30): error TS2339: Property 'category' does not exist on type 'unknown'.
+src/hooks/useAdminCatalogUI.ts(64,26): error TS2339: Property 'name' does not exist on type 'unknown'.
+src/hooks/useAdminCatalogUI.ts(76,22): error TS2339: Property 'brand' does not exist on type 'unknown'.
+src/hooks/useAdminCatalogUI.ts(76,44): error TS2339: Property 'name' does not exist on type 'unknown'.
+src/hooks/useAdminCatalogUI.ts(77,37): error TS2339: Property 'brand' does not exist on type 'unknown'.
+src/hooks/useAdminCatalogUI.ts(77,60): error TS2339: Property 'name' does not exist on type 'unknown'.
+src/hooks/useAdminDashboardData.ts(27,5): error TS2739: Type '{}' is missing the following properties from type 'AdminStats': totalUsers, activeTickets, pendingInvoices, dbSize, lastBackup
+src/hooks/useAdminDashboardMutations.ts(81,38): error TS2345: Argument of type '{ backup: unknown; wipeFirst: boolean; }' is not assignable to parameter of type '{ backup: Record<string, unknown>; wipeFirst: boolean; }'.
+  Types of property 'backup' are incompatible.
+    Type 'unknown' is not assignable to type 'Record<string, unknown>'.
+      Index signature for type 'string' is missing in type '{}'.
+src/hooks/useBikeSearch.ts(45,21): error TS2339: Property 'firstName' does not exist on type 'unknown'.
+src/hooks/useBikeSearch.ts(45,36): error TS2339: Property 'lastName' does not exist on type 'unknown'.
+src/hooks/useBikeSearch.ts(45,49): error TS2339: Property 'email' does not exist on type 'unknown'.
+src/hooks/useBikeSearch.ts(45,64): error TS2339: Property 'email' does not exist on type 'unknown'.
+src/hooks/useBikesMutations.ts(172,26): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/hooks/useCalendarData.ts(31,17): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/hooks/useCalendarUI.ts(37,27): error TS2339: Property 'status' does not exist on type 'unknown'.
+src/hooks/useCashRegisterData.ts(42,13): error TS2339: Property 'type' does not exist on type 'unknown'.
+src/hooks/useCashRegisterData.ts(42,50): error TS2339: Property 'type' does not exist on type 'unknown'.
+src/hooks/useCashRegisterData.ts(43,24): error TS2339: Property 'amount' does not exist on type 'unknown'.
+src/hooks/useCashRegisterData.ts(45,22): error TS2339: Property 'amount' does not exist on type 'unknown'.
+src/hooks/useCashRegisterData.ts(52,35): error TS2339: Property 'amount' does not exist on type 'unknown'.
+src/hooks/useCashRegisterData.ts(53,16): error TS2339: Property 'type' does not exist on type 'unknown'.
+src/hooks/useCashRegisterData.ts(53,40): error TS2339: Property 'type' does not exist on type 'unknown'.
+src/hooks/useCashRegisterData.ts(60,18): error TS2339: Property 'createdAt' does not exist on type 'unknown'.
+src/hooks/useCashRegisterData.ts(60,52): error TS2339: Property 'createdAt' does not exist on type 'unknown'.
+src/hooks/useCashRegisterData.ts(65,39): error TS2339: Property 'amount' does not exist on type 'unknown'.
+src/hooks/useCashRegisterData.ts(66,31): error TS2339: Property 'type' does not exist on type 'unknown'.
+src/hooks/useCashRegisterData.ts(66,59): error TS2339: Property 'type' does not exist on type 'unknown'.
+src/hooks/useCashRegisterData.ts(69,30): error TS2339: Property 'createdAt' does not exist on type 'unknown'.
+src/hooks/useCashRegisterMutations.ts(26,76): error TS2345: Argument of type 'Record<string, unknown>' is not assignable to parameter of type '{ type: string; amount: number; note?: string; reference?: string; }'.
+  Type 'Record<string, unknown>' is missing the following properties from type '{ type: string; amount: number; note?: string; reference?: string; }': type, amount
+src/hooks/useCashRegisterMutations.ts(39,94): error TS2345: Argument of type 'unknown' is not assignable to parameter of type '{ type: string; amount: number; note?: string; reference?: string; }'.
+  Type '{}' is missing the following properties from type '{ type: string; amount: number; note?: string; reference?: string; }': type, amount
+src/hooks/useCashRegisterUI.ts(74,24): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/hooks/useCashRegisterUI.ts(76,19): error TS2339: Property 'type' does not exist on type 'unknown'.
+src/hooks/useCashRegisterUI.ts(77,21): error TS2339: Property 'amount' does not exist on type 'unknown'.
+src/hooks/useCashRegisterUI.ts(78,26): error TS2339: Property 'description' does not exist on type 'unknown'.
+src/hooks/useCashRegisterUI.ts(79,24): error TS2339: Property 'invoiceId' does not exist on type 'unknown'.
+src/hooks/useCashRegisterUI.ts(80,23): error TS2339: Property 'discount' does not exist on type 'unknown'.
+src/hooks/useCashRegisterUI.ts(81,28): error TS2339: Property 'paymentMethod' does not exist on type 'unknown'.
+src/hooks/useCashRegisterUI.ts(82,28): error TS2339: Property 'customerEmail' does not exist on type 'unknown'.
+src/hooks/useCatalogMutations.ts(32,70): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Partial<CatalogItem> & { category: string; name: string; priceHT: number; priceTTC: number; vatRate: number; }'.
+  Type '{}' is missing the following properties from type '{ category: string; name: string; priceHT: number; priceTTC: number; vatRate: number; }': category, name, priceHT, priceTTC, vatRate
+src/hooks/useCommunicationsData.ts(16,35): error TS2724: '"@/lib/api"' has no exported member named '_Communication'. Did you mean 'Communication'?
+src/hooks/useCommunicationsData.ts(32,31): error TS2339: Property 'type' does not exist on type 'unknown'.
+src/hooks/useCommunicationsData.ts(33,33): error TS2339: Property 'status' does not exist on type 'unknown'.
+src/hooks/useCustomersData.ts(16,30): error TS2724: '"@/lib/api"' has no exported member named '_Customer'. Did you mean 'Customer'?
+src/hooks/useStatsData.ts(37,30): error TS2339: Property 'amount' does not exist on type 'unknown'.
+src/hooks/useStatsData.ts(38,15): error TS2339: Property 'type' does not exist on type 'unknown'.
+src/hooks/useStatsData.ts(38,47): error TS2339: Property 'type' does not exist on type 'unknown'.
+src/hooks/useStatsData.ts(39,15): error TS2339: Property 'type' does not exist on type 'unknown'.
+src/hooks/useStatsData.ts(39,56): error TS2339: Property 'type' does not exist on type 'unknown'.
+src/hooks/useStatsData.ts(54,15): error TS2339: Property 'invoices' does not exist on type 'unknown'.
+src/hooks/useStatsData.ts(88,25): error TS2339: Property 'status' does not exist on type 'unknown'.
+src/hooks/useStatsData.ts(88,56): error TS2339: Property 'status' does not exist on type 'unknown'.
+src/hooks/useStatsData.ts(179,32): error TS2339: Property 'invoices' does not exist on type 'unknown'.
+src/hooks/useStatsData.ts(180,34): error TS2339: Property 'workOrders' does not exist on type 'unknown'.
+src/hooks/useStatsData.ts(181,28): error TS2339: Property 'invoices' does not exist on type 'unknown'.
+src/hooks/useSystemSettingsUI.ts(70,26): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'SetStateAction<boolean>'.
+src/hooks/useSystemSettingsUI.ts(71,24): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'SetStateAction<string>'.
+src/hooks/useSystemSettingsUI.ts(74,7): error TS2322: Type 'unknown' is not assignable to type 'string'.
+src/hooks/useSystemSettingsUI.ts(75,7): error TS2322: Type 'unknown' is not assignable to type 'string'.
+src/hooks/useSystemSettingsUI.ts(76,7): error TS2322: Type 'unknown' is not assignable to type 'string'.
+src/hooks/useSystemSettingsUI.ts(77,7): error TS2322: Type 'unknown' is not assignable to type 'string'.
+src/hooks/useSystemSettingsUI.ts(80,24): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'SetStateAction<boolean>'.
+src/hooks/useSystemSettingsUI.ts(81,24): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'SetStateAction<boolean>'.
+src/hooks/useSystemSettingsUI.ts(84,26): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'SetStateAction<boolean>'.
+src/hooks/useTicketsData.ts(3,83): error TS2724: '"@/lib/api"' has no exported member named '_Customer'. Did you mean 'Customer'?
+src/hooks/useTicketsData.ts(3,99): error TS2724: '"@/lib/api"' has no exported member named '_CustomerBike'. Did you mean 'CustomerBike'?
+src/hooks/useTicketsData.ts(41,32): error TS2339: Property 'readyAt' does not exist on type 'unknown'.
+src/hooks/useTicketsData.ts(42,36): error TS2339: Property 'readyAt' does not exist on type 'unknown'.
+src/hooks/useTicketsData.ts(44,31): error TS2339: Property 'readyAt' does not exist on type 'unknown'.
+src/hooks/useTicketsData.ts(45,39): error TS2339: Property 'readyAt' does not exist on type 'unknown'.
+src/hooks/useTicketsMutations.ts(64,30): error TS2345: Argument of type 'unknown' is not assignable to parameter of type '"delivered" | "in_progress" | "created" | "ready"'.
+src/lib/__tests__/labor-pricing.test.ts(2,51): error TS2724: '"../labor-pricing"' has no exported member named '_LaborCostResult'. Did you mean 'LaborCostResult'?
+src/lib/catalog-harmonizer.ts(234,5): error TS2322: Type 'unknown' is not assignable to type '"PIECES" | "EQUIPEMENTS" | "AUTRES"'.
+src/lib/dbReset.ts(41,31): error TS2339: Property '$executeRawUnsafe' does not exist on type 'unknown'.
+src/lib/dbReset.ts(57,31): error TS2339: Property '$executeRawUnsafe' does not exist on type 'unknown'.
+src/lib/jwt.ts(43,28): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'JWTPayload'.
+  Index signature for type 'string' is missing in type '{}'.
+src/lib/license-manager.ts(552,54): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/lib/license-manager.ts(622,60): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/lib/license-manager.ts(700,38): error TS2339: Property 'emailResetDate' does not exist on type 'unknown'.
+src/lib/license-manager.ts(709,28): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/lib/license-manager.ts(921,73): error TS2339: Property 'message' does not exist on type 'unknown'.
+src/lib/logger.ts(22,74): error TS2339: Property 'electron' does not exist on type 'unknown'.
+src/lib/prisma.ts(8,48): error TS2339: Property 'resourcesPath' does not exist on type 'unknown'.
+src/lib/prisma.ts(14,61): error TS2339: Property 'default' does not exist on type 'unknown'.
+src/lib/prisma.ts(15,29): error TS2339: Property 'default' does not exist on type 'unknown'.
+src/lib/queryClient.ts(23,45): error TS2339: Property 'status' does not exist on type 'unknown'.

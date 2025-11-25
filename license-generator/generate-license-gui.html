@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur de Licences - Atelier Vélo+</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+        }
+        
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        select, input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        select:focus, input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .tier-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 13px;
+            color: #555;
+        }
+        
+        .tier-info strong {
+            color: #667eea;
+        }
+        
+        .expiry-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f0f7ff;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .result.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .license-key {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            text-align: center;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            margin: 15px 0;
+            letter-spacing: 2px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .result-info {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.8;
+        }
+        
+        .result-info div {
+            margin-bottom: 8px;
+        }
+        
+        .copy-btn {
+            background: #28a745;
+            padding: 10px 20px;
+            font-size: 14px;
+            margin-top: 15px;
+        }
+        
+        .copy-btn:hover {
+            background: #218838;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔑 Générateur de Licences</h1>
+        <p class="subtitle">Atelier Vélo+ - Système de Licences (RSA)</p>
+        <div style="background: #fff3cd; border: 2px solid #ffc107; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+            <strong>⚠️ Important:</strong> La génération de clés avec signature RSA nécessite la clé privée RSA qui n'est pas disponible dans cette interface web pour des raisons de sécurité.<br>
+            <strong>Recommandation:</strong> Utilisez <code>node generate-license.js</code> (ligne de commande) pour générer des clés sécurisées avec signature RSA.
+        </div>
+        
+        <form id="licenseForm">
+            <div class="form-group">
+                <label for="tier">Type de Licence</label>
+                <select id="tier" required>
+                    <option value="">-- Sélectionner --</option>
+                    <option value="trial">Trial (14 jours gratuit)</option>
+                    <option value="basique">Basique (199€/an)</option>
+                    <option value="pro">Pro (359€/an)</option>
+                    <option value="pro_lifetime">Pro Lifetime (599€ à vie)</option>
+                </select>
+                <div id="tierInfo" class="tier-info hidden"></div>
+            </div>
+            
+            <div id="expiryFields" class="form-group hidden">
+                <label>Date d'Expiration</label>
+                
+                <div style="margin-bottom: 15px;">
+                    <label style="display: flex; align-items: center; margin-bottom: 10px; cursor: pointer;">
+                        <input type="radio" name="dateMode" value="auto" checked style="margin-right: 10px; width: auto;">
+                        <span>📅 Automatique (+365 jours depuis aujourd'hui)</span>
+                    </label>
+                    <label style="display: flex; align-items: center; cursor: pointer;">
+                        <input type="radio" name="dateMode" value="custom" style="margin-right: 10px; width: auto;">
+                        <span>🗓️ Date personnalisée (jour/mois/année)</span>
+                    </label>
+                </div>
+                
+                <div id="customDateFields" class="hidden">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+                        <input type="number" id="expiryDay" placeholder="Jour (1-31)" min="1" max="31">
+                        <input type="number" id="expiryMonth" placeholder="Mois (1-12)" min="1" max="12">
+                        <input type="number" id="expiryYear" placeholder="Année" min="2025" max="2035">
+                    </div>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn">✨ Générer la Clé</button>
+        </form>
+        
+        <div id="result" class="result">
+            <div class="license-key" id="licenseKey"></div>
+            <div class="result-info" id="resultInfo"></div>
+            <button class="btn copy-btn" onclick="copyToClipboard(event)">📋 Copier la Clé</button>
+        </div>
+    </div>
+    
+    <script>
+        const TIERS = {
+            trial: {
+                prefix: 'AVTR',
+                name: 'Trial (14 jours)',
+                price: 'Gratuit',
+                duration: 14,
+                info: '✅ Version PRO complète pendant 14 jours<br>✅ Emails illimités<br>✅ Toutes les fonctionnalités'
+            },
+            basique: {
+                prefix: 'AVBS',
+                name: 'Basique',
+                price: '199€/an',
+                info: '✅ 30 emails/mois<br>✅ Création PDF<br>❌ Envoi PDF direct<br>❌ Campagnes marketing'
+            },
+            pro: {
+                prefix: 'AVPR',
+                name: 'Pro',
+                price: '359€/an',
+                info: '✅ Emails illimités<br>✅ Envoi PDF direct<br>✅ Campagnes marketing<br>✅ Statistiques avancées'
+            },
+            pro_lifetime: {
+                prefix: 'AVPL',
+                name: 'Pro Lifetime',
+                price: '599€ (à vie)',
+                info: '✅ Licence à vie<br>✅ Toutes fonctionnalités PRO<br>✅ Maintenance 3 ans incluse<br>✅ Mises à jour gratuites'
+            }
+        };
+        
+        // Afficher info tier
+        document.getElementById('tier').addEventListener('change', function() {
+            const tier = this.value;
+            const tierInfo = document.getElementById('tierInfo');
+            const expiryFields = document.getElementById('expiryFields');
+            
+            if (tier) {
+                tierInfo.innerHTML = `<strong>${TIERS[tier].name}</strong> - ${TIERS[tier].price}<br>${TIERS[tier].info}`;
+                tierInfo.classList.remove('hidden');
+                
+                // Afficher champs expiration sauf pour trial et lifetime
+                if (tier !== 'trial' && tier !== 'pro_lifetime') {
+                    expiryFields.classList.remove('hidden');
+                } else {
+                    expiryFields.classList.add('hidden');
+                }
+            } else {
+                tierInfo.classList.add('hidden');
+                expiryFields.classList.add('hidden');
+            }
+        });
+        
+        // Gestion radio buttons date
+        document.querySelectorAll('input[name="dateMode"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const customDateFields = document.getElementById('customDateFields');
+                const day = document.getElementById('expiryDay');
+                const month = document.getElementById('expiryMonth');
+                const year = document.getElementById('expiryYear');
+                
+                if (this.value === 'custom') {
+                    customDateFields.classList.remove('hidden');
+                    day.required = true;
+                    month.required = true;
+                    year.required = true;
+                } else {
+                    customDateFields.classList.add('hidden');
+                    day.required = false;
+                    month.required = false;
+                    year.required = false;
+                }
+            });
+        });
+        
+        // CRC8 Checksum
+        function calculateCRC8(str) {
+            let crc = 0;
+            for (let i = 0; i < str.length; i++) {
+                crc ^= str.charCodeAt(i);
+                for (let j = 0; j < 8; j++) {
+                    if (crc & 1) {
+                        crc = (crc >> 1) ^ 0x8C;
+                    } else {
+                        crc >>= 1;
+                    }
+                }
+            }
+            return crc & 0xFF;
+        }
+        
+        // Générer random hex
+        function randomHex(bytes) {
+            const array = new Uint8Array(bytes);
+            crypto.getRandomValues(array);
+            return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('').toUpperCase();
+        }
+        
+        // Générer clé
+        function generateLicenseKey(tier, dateMode, day, month, year) {
+            const prefix = TIERS[tier].prefix;
+            const randomSegment = randomHex(2);
+            
+            let expirySegment = '0000';
+            let expiryDate = null;
+            
+            if (tier === 'pro_lifetime') {
+                // Pro Lifetime: pas d'expiration
+                expirySegment = '0000';
+            } else if (tier === 'trial') {
+                // Trial: expiration automatique dans 14 jours
+                expiryDate = new Date();
+                expiryDate.setDate(expiryDate.getDate() + TIERS[tier].duration);
+                const monthStr = String(expiryDate.getMonth() + 1).padStart(2, '0');
+                const yearStr = String(expiryDate.getFullYear()).slice(-2);
+                expirySegment = `${monthStr}${yearStr}`;
+            } else {
+                // Basique ou Pro
+                if (dateMode === 'auto') {
+                    // Option 1: Date automatique (+365 jours)
+                    expiryDate = new Date();
+                    expiryDate.setDate(expiryDate.getDate() + 365);
+                    const monthStr = String(expiryDate.getMonth() + 1).padStart(2, '0');
+                    const yearStr = String(expiryDate.getFullYear()).slice(-2);
+                    expirySegment = `${monthStr}${yearStr}`;
+                } else {
+                    // Option 2: Date personnalisée complète
+                    expiryDate = new Date(year, month - 1, day);
+                    const monthStr = String(expiryDate.getMonth() + 1).padStart(2, '0');
+                    const yearStr = String(expiryDate.getFullYear()).slice(-2);
+                    expirySegment = `${monthStr}${yearStr}`;
+                }
+            }
+            
+            const dataForChecksum = `${prefix}-${randomSegment}-${expirySegment}`;
+            const crc = calculateCRC8(dataForChecksum);
+            const crcHex = crc.toString(16).toUpperCase().padStart(2, '0');
+            const randomSuffix = randomHex(1);
+            const checksumSegment = `${crcHex}${randomSuffix}`;
+            
+            return {
+                key: `${prefix}-${randomSegment}-${expirySegment}-${checksumSegment}`,
+                expiryDate: expiryDate
+            };
+        }
+        
+        // Submit form
+        document.getElementById('licenseForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const tier = document.getElementById('tier').value;
+            const dateMode = document.querySelector('input[name="dateMode"]:checked')?.value || 'auto';
+            const day = parseInt(document.getElementById('expiryDay').value) || null;
+            const month = parseInt(document.getElementById('expiryMonth').value) || null;
+            const year = parseInt(document.getElementById('expiryYear').value) || null;
+            
+            const result = generateLicenseKey(tier, dateMode, day, month, year);
+            
+            document.getElementById('licenseKey').textContent = result.key;
+            
+            let info = `<div><strong>Type:</strong> ${TIERS[tier].name}</div>`;
+            info += `<div><strong>Prix:</strong> ${TIERS[tier].price}</div>`;
+            
+            if (tier === 'pro_lifetime') {
+                info += `<div><strong>Expire:</strong> Jamais (Lifetime)</div>`;
+                info += `<div><strong>Maintenance:</strong> 3 ans inclus</div>`;
+            } else if (result.expiryDate) {
+                const daysUntilExpiry = Math.ceil((result.expiryDate - new Date()) / (1000 * 60 * 60 * 24));
+                info += `<div><strong>Expire:</strong> ${result.expiryDate.toLocaleDateString('fr-FR')} (dans ${daysUntilExpiry} jours)</div>`;
+                if (dateMode === 'auto') {
+                    info += `<div><strong>Mode:</strong> Date automatique (+365 jours)</div>`;
+                } else {
+                    info += `<div><strong>Mode:</strong> Date personnalisée</div>`;
+                }
+            }
+            
+            info += `<div><strong>Généré:</strong> ${new Date().toLocaleString('fr-FR')}</div>`;
+            
+            document.getElementById('resultInfo').innerHTML = info;
+            document.getElementById('result').classList.add('show');
+        });
+        
+        // Copier clé
+        function copyToClipboard(event) {
+            const key = document.getElementById('licenseKey').textContent;
+            navigator.clipboard.writeText(key).then(() => {
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = '✅ Copié !';
+                btn.style.background = '#28a745';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = '';
+                }, 2000);
+            }).catch((err) => {
+                console.error('Erreur copie:', err);
+                alert('❌ Erreur lors de la copie. Clé: ' + key);
+            });
+        }
+    </script>
+</body>
+</html>
