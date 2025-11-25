@@ -222,12 +222,13 @@ Ce plan intègre :
   - [ ] Objectif : 0 erreur TypeScript
   - 📊 État : `strict: false` actuellement
 
-- [ ] **Traitement TODOs** : 🔄 EN COURS
-  - [ ] Analyser TODOs/FIXMEs (11 occurrences dans 8 fichiers)
-  - [ ] Prioriser et traiter critiques
-  - [ ] Créer tickets pour non-critiques
-  - [ ] Objectif : 0 TODO critique
-  - 📊 État : 11 TODOs identifiés (beaucoup moins que prévu !)
+- [x] **Traitement TODOs** : ✅ COMPLÉTÉ (25 nov 2024)
+  - [x] Analyser TODOs/FIXMEs (11 occurrences dans 8 fichiers) ✅
+  - [x] Prioriser et traiter critiques ✅
+  - [x] Créer tickets pour non-critiques ✅
+  - [x] Objectif : 0 TODO critique ✅
+  - 📊 État : 11 TODOs analysés, 0 critique, 2 quick wins traités
+  - 📋 Documentation : ANALYSE-TODOS-25NOV2024.md créée
 
 **Actions - Tests E2E (PRIORITÉ 3)** :
 - [ ] **Setup Playwright** :
