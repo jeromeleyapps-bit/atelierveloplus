@@ -23,23 +23,29 @@ export function validatePasswordComplexity(pw: string): boolean {
 // HIBP k-anonymity breach check for passwords (no full password sent).
 export async function isPasswordBreached(pw: string): Promise<boolean> {
   if (!pw) return false;
-  const sha1 = await sha1Hex(pw);
-  const prefix = sha1.slice(0, 5);
-  const suffix = sha1.slice(5).toUpperCase();
-  const res = await fetch(`https://api.pwnedpasswords.com/range/${prefix}`, {
-    method: "GET",
-    headers: { "Add-Padding": "true" },
-    // Next fetch to external is fine; can be disabled in dev if needed
-    cache: "no-store",
-  });
-  if (!res.ok) return false; // fail-closed to not block users on network errors
-  const text = await res.text();
-  const lines = text.split("\n");
-  for (const line of lines) {
-    const [suf, count] = line.trim().split(":");
-    if (suf === suffix && Number(count) > 0) return true;
+  
+  try {
+    const sha1 = await sha1Hex(pw);
+    const prefix = sha1.slice(0, 5);
+    const suffix = sha1.slice(5).toUpperCase();
+    const res = await fetch(`https://api.pwnedpasswords.com/range/${prefix}`, {
+      method: "GET",
+      headers: { "Add-Padding": "true" },
+      // Next fetch to external is fine; can be disabled in dev if needed
+      cache: "no-store",
+    });
+    if (!res.ok) return false; // fail-closed to not block users on network errors
+    const text = await res.text();
+    const lines = text.split("\n");
+    for (const line of lines) {
+      const [suf, count] = line.trim().split(":");
+      if (suf === suffix && Number(count) > 0) return true;
+    }
+    return false;
+  } catch (error) {
+    // Fail-closed: return false on any error (network, crypto, etc.)
+    return false;
   }
-  return false;
 }
 
 async function sha1Hex(input: string): Promise<string> {

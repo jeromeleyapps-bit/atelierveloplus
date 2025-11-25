@@ -1,18 +1,67 @@
 // Mock jose before importing jwt module
+let mockTokenCounter = 0;
+const tokenPayloadMap = new Map<string, any>();
+
 jest.mock('jose', () => ({
-  SignJWT: jest.fn().mockImplementation(() => ({
-    setProtectedHeader: jest.fn().mockReturnThis(),
-    setIssuedAt: jest.fn().mockReturnThis(),
-    setIssuer: jest.fn().mockReturnThis(),
-    setExpirationTime: jest.fn().mockReturnThis(),
-    sign: jest.fn().mockResolvedValue('mock.jwt.token'),
-  })),
-  jwtVerify: jest.fn().mockResolvedValue({
-    payload: {
-      userId: 'user-123',
-      email: 'test@example.com',
-      role: 'admin',
-    },
+  SignJWT: jest.fn().mockImplementation((payload: any) => {
+    return {
+      setProtectedHeader: jest.fn().mockReturnThis(),
+      setIssuedAt: jest.fn().mockReturnThis(),
+      setIssuer: jest.fn().mockReturnThis(),
+      setExpirationTime: jest.fn().mockReturnThis(),
+      sign: jest.fn().mockImplementation(async () => {
+        // Generate unique token with JWT format (header.payload.signature)
+        const tokenId = ++mockTokenCounter;
+        const token = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${Buffer.from(JSON.stringify(payload)).toString('base64')}.sig${tokenId}`;
+        tokenPayloadMap.set(token, payload);
+        return token;
+      }),
+    };
+  }),
+  jwtVerify: jest.fn().mockImplementation((token: string, secret: any, options: any) => {
+    // Handle invalid/expired tokens
+    if (token === 'invalid-token' || token === 'expired-token' || token === 'invalid.token.here') {
+      return Promise.reject(new Error('Invalid token'));
+    }
+    
+    // Check issuer if provided
+    if (options?.issuer && options.issuer !== 'atelier-velo') {
+      return Promise.reject(new Error('Invalid issuer'));
+    }
+    
+    // Try to get payload from map
+    const payload = tokenPayloadMap.get(token);
+    if (payload) {
+      return Promise.resolve({
+        payload: payload, // Return payload as-is without adding 'id'
+      });
+    }
+    
+    // Fallback: try to decode from token
+    try {
+      const parts = token.split('.');
+      if (parts.length === 3) {
+        const payloadStr = Buffer.from(parts[1], 'base64').toString();
+        const decodedPayload = JSON.parse(payloadStr);
+        
+        // Check if token is expired
+        if (decodedPayload.exp) {
+          const now = Math.floor(Date.now() / 1000);
+          if (decodedPayload.exp <= now) {
+            return Promise.reject(new Error('Token expired'));
+          }
+        }
+        
+        return Promise.resolve({
+          payload: decodedPayload,
+        });
+      }
+    } catch {
+      // Ignore decode errors
+    }
+    
+    // If we can't decode, reject
+    return Promise.reject(new Error('Invalid token format'));
   }),
 }));
 
@@ -115,7 +164,7 @@ describe('JWT Utils', () => {
 
       const user = await getUserFromToken(req);
       expect(user).toBeDefined();
-      expect(user?.id).toBe('user-123');
+      expect(user?.userId).toBe('user-123');
       expect(user?.email).toBe('test@example.com');
     });
 

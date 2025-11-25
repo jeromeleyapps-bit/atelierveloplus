@@ -23,6 +23,7 @@ jest.mock('@/lib/api-helpers', () => ({
 jest.mock('@/lib/cache', () => ({
   getCache: jest.fn(),
   setCache: jest.fn(),
+  invalidateCache: jest.fn(),
 }));
 
 jest.mock('@/lib/logger', () => ({

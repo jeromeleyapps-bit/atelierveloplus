@@ -4,9 +4,9 @@
  * Centralise tout le formatage de dates, prix, téléphones, etc.
  */
 
-// Use require for better Jest compatibility
-const dateFns = require('date-fns');
-const { fr } = require('date-fns/locale');
+// Use dynamic import for better Jest compatibility
+import * as dateFns from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 const { format, parseISO, isValid } = dateFns;
 

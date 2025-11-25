@@ -202,7 +202,12 @@ describe('POST /api/finance/quotes', () => {
 
     mockPrismaWorkOrderFindUnique.mockResolvedValue(mockWorkOrder);
     mockPrismaWorkOrderLineFindMany.mockResolvedValue([]);
+    mockGetIsAutoEntrepreneur.mockResolvedValue(false);
+    mockCalculateLaborCost.mockResolvedValue({ hourlyRate: 60, laborCostHT: 60 });
+    mockRecomputeTotals.mockReturnValue({ subtotalHT: 60, vatAmount: 6, totalTTC: 66 });
     mockPrismaInvoiceCreate.mockResolvedValue(mockQuote);
+    mockPrismaInvoiceUpdate.mockResolvedValue(mockQuote);
+    mockPrismaInvoiceFindUnique.mockResolvedValue(mockQuote);
 
     const req = createMockRequest('http://localhost:3000/api/finance/quotes', {
       method: 'POST',
@@ -218,8 +223,6 @@ describe('POST /api/finance/quotes', () => {
   });
 
   it('should set vatRate to 0 for auto-entrepreneur', async () => {
-    mockGetIsAutoEntrepreneur.mockResolvedValue(true);
-
     const mockWorkOrder = {
       id: 'wo-1',
       estimatedMinutes: 60,
@@ -236,7 +239,12 @@ describe('POST /api/finance/quotes', () => {
 
     mockPrismaWorkOrderFindUnique.mockResolvedValue(mockWorkOrder);
     mockPrismaWorkOrderLineFindMany.mockResolvedValue([]);
+    mockGetIsAutoEntrepreneur.mockResolvedValue(true);
+    mockCalculateLaborCost.mockResolvedValue({ hourlyRate: 60, laborCostHT: 60 });
+    mockRecomputeTotals.mockReturnValue({ subtotalHT: 60, vatAmount: 0, totalTTC: 60 });
     mockPrismaInvoiceCreate.mockResolvedValue(mockQuote);
+    mockPrismaInvoiceUpdate.mockResolvedValue(mockQuote);
+    mockPrismaInvoiceFindUnique.mockResolvedValue(mockQuote);
 
     const req = createMockRequest('http://localhost:3000/api/finance/quotes', {
       method: 'POST',
