@@ -9,6 +9,7 @@ import { sendEmail, determineEmailProvider } from "@/lib/email-with-db-config";
 import { getUserIdOrFirst } from "@/lib/api-helpers";
 import { replaceVariables, type TemplateVariables } from "@/lib/template-engine";
 import { canSendEmail, incrementEmailCount } from "@/lib/license-manager";
+import { logger } from "@/lib/logger";
 
 export const dynamic = "force-dynamic";
 
@@ -74,7 +75,7 @@ export async function POST(req: Request) {
 
     // Fallback: si pas de settings pour ce userId, prendre le premier user actif
     if (!shopSettings) {
-      console.log('[COMMS] No AppSetting for userId:', userId, '- using first active user');
+      logger.info('[COMMS] No AppSetting for userId:', userId, '- using first active user');
       const firstUser = await prisma.user.findFirst({
         where: { active: true },
         orderBy: { createdAt: 'asc' }
@@ -103,7 +104,7 @@ export async function POST(req: Request) {
     }
 
     // Prepare variables
-    console.log('[COMMS] Shop Settings:', {
+    logger.info('[COMMS] Shop Settings:', {
       name: shopSettings?.shopName,
       address1: shopSettings?.address1,
       city: shopSettings?.city,
@@ -259,7 +260,7 @@ export async function POST(req: Request) {
 
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Erreur lors de l\'envoi';
-    console.error('Communication send error:', message);
+    logger.error('Communication send error:', message);
     return NextResponse.json({ 
       error: "send_failed", 
       detail: error?.message || String(error)

@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { getUserIdOrFirst } from "@/lib/api-helpers";
+import { logger } from "@/lib/logger";
 
 export const dynamic = "force-dynamic";
 
@@ -60,7 +61,7 @@ export async function GET(req: NextRequest) {
 
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    console.error('List communications error:', message);
+    logger.error('List communications error:', message);
     return NextResponse.json({ 
       error: "list_failed", 
       detail: message
