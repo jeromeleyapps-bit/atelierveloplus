@@ -44,9 +44,22 @@ export async function GET() {
       }),
     ]);
 
-    // Calculer la taille approximative de la base de données
-    // Note: Ceci est une approximation, la vraie taille nécessite une requête SQL brute
-    const dbSize = "45.2 MB"; // TODO: Implémenter calcul réel avec raw SQL
+    // Calculer la taille réelle de la base de données SQLite
+    let dbSize = "N/A";
+    try {
+      // Requête SQL brute pour obtenir la taille de la DB SQLite
+      const pageCount: any = await prisma.$queryRaw`PRAGMA page_count`;
+      const pageSize: any = await prisma.$queryRaw`PRAGMA page_size`;
+      
+      if (pageCount && pageCount[0] && pageSize && pageSize[0]) {
+        const sizeInBytes = pageCount[0].page_count * pageSize[0].page_size;
+        const sizeInMB = (sizeInBytes / (1024 * 1024)).toFixed(2);
+        dbSize = `${sizeInMB} MB`;
+      }
+    } catch (error) {
+      logger.warn('[AdminStats] Failed to calculate DB size:', error);
+      dbSize = "N/A";
+    }
 
     // Récupérer la date de la dernière sauvegarde (si système de backup existe)
     const lastBackup = new Date().toLocaleDateString("fr-FR");

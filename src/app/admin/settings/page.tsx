@@ -145,7 +145,9 @@ export default function AdminSettingsPage() {
     }
   };
 
-  // Email: Sauvegarder (TODO: ajouter bouton dans UI)
+  // Email: Sauvegarder
+  // Note: Fonction disponible mais non utilisée - les paramètres email sont sauvegardés
+  // automatiquement via le formulaire principal ou peuvent être ajoutés à l'UI si nécessaire
   const _handleSaveEmailSettings = () => {
     settingsMutations.update({
       emailProvider: emailSettings.provider,
