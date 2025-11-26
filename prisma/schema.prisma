@@ -563,6 +563,22 @@ model SystemSettings {
   User                      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+model AppointmentConfig {
+  id                        String   @id @default(cuid())
+  userId                    String   @unique
+  // Jours d'ouverture (JSON: { "monday": true, "tuesday": true, ... })
+  openingDays               String   @default("{\"monday\":true,\"tuesday\":true,\"wednesday\":true,\"thursday\":true,\"friday\":true,\"saturday\":false,\"sunday\":false}")
+  // Horaires par jour (JSON: { "monday": { "start": "09:00", "end": "18:00" }, ... })
+  openingHours              String   @default("{\"monday\":{\"start\":\"09:00\",\"end\":\"18:00\"},\"tuesday\":{\"start\":\"09:00\",\"end\":\"18:00\"},\"wednesday\":{\"start\":\"09:00\",\"end\":\"18:00\"},\"thursday\":{\"start\":\"09:00\",\"end\":\"18:00\"},\"friday\":{\"start\":\"09:00\",\"end\":\"18:00\"},\"saturday\":{\"start\":\"10:00\",\"end\":\"17:00\"},\"sunday\":{\"start\":\"09:00\",\"end\":\"18:00\"}}")
+  // Option PRO: Un jour sur RDV uniquement avec numéro de téléphone
+  appointmentOnlyDayEnabled Boolean  @default(false)  // PRO uniquement
+  appointmentOnlyDay        String?  // "saturday" par exemple
+  appointmentOnlyDayPhone    String?  // Numéro de téléphone (récupéré depuis AppSetting.shopPhone si null)
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime          @updatedAt
+  User                      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
 model User {
   id              String            @id @default(cuid())
   name            String?
@@ -581,6 +597,7 @@ model User {
   Session         Session[]
   SupplierProduct SupplierProduct[]
   SystemSettings  SystemSettings?
+  AppointmentConfig AppointmentConfig?
 }
 
 model VerificationToken {

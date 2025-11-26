@@ -35,6 +35,8 @@ import SaveIcon from '@mui/icons-material/Save';
 import EmailIcon from '@mui/icons-material/Email';
 import TunnelConfigDialog from './TunnelConfigDialog';
 import SmtpConfigCard from './SmtpConfigCard';
+import Link from 'next/link';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 
 export default function AdminSettingsPage() {
   // ✅ Hooks personnalisés
@@ -304,12 +306,47 @@ export default function AdminSettingsPage() {
                 <Button
                   variant="contained"
                   startIcon={<EmailIcon />}
+                  component={Link}
                   href="/campaigns"
                   fullWidth
                 >
                   Campagnes & Automatisations
                 </Button>
+                <Button
+                  variant="outlined"
+                  startIcon={<EmailIcon />}
+                  component={Link}
+                  href="/communications"
+                  fullWidth
+                >
+                  Historique Communications
+                </Button>
               </Stack>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* Configuration RDV Clients */}
+        <Grid item xs={12} md={6}>
+          <Card>
+            <CardHeader
+              avatar={<CalendarTodayIcon color="primary" />}
+              title="Configuration RDV Clients"
+              subheader="Jours d'ouverture et horaires"
+            />
+            <CardContent>
+              <Typography variant="body2" sx={{ mb: 2 }}>
+                Configurez les jours d'ouverture, les horaires et l'option PRO "un jour sur rendez-vous uniquement".
+              </Typography>
+              <Button
+                variant="contained"
+                startIcon={<CalendarTodayIcon />}
+                component={Link}
+                href="/admin/appointment-config"
+                fullWidth
+              >
+                Configurer les RDV
+              </Button>
             </CardContent>
           </Card>
         </Grid>

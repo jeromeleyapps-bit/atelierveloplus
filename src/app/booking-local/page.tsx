@@ -4,6 +4,7 @@
 import { useBookingLocalData } from '@/hooks/useBookingLocalData';
 import { useAppointmentsUI } from '@/hooks/useAppointmentsUI';
 import { useAppointmentsMutations } from '@/hooks/useAppointmentsMutations';
+import { useAppointmentConfig } from '@/hooks/useAppointmentConfig';
 import Autocomplete from '@mui/material/Autocomplete';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -36,6 +37,7 @@ export default function PublicBookingPage() {
     onSuccess: (msg) => bookingUI.setSubmitMsg({ ok: true, msg }),
     onError: (msg) => bookingUI.setSubmitMsg({ ok: false, msg }),
   });
+  const appointmentConfig = useAppointmentConfig();
 
   // Alias locaux
   const rangeStart = bookingData.rangeStart;
@@ -85,14 +87,15 @@ export default function PublicBookingPage() {
   }
 
   function renderSlotsByDay() {
-    // Grouper les créneaux par jour (exclure les dimanches)
+    // Grouper les créneaux par jour (filtrer selon config)
     const slotsByDay: { [key: string]: typeof slots } = {};
+    const { isDayOpen, isAppointmentOnlyDay, getAppointmentOnlyPhone, getDayHours } = appointmentConfig;
     
     slots.forEach(slot => {
       const date = new Date(slot.start);
       const dayOfWeek = date.getDay();
-      // Exclure les dimanches (0)
-      if (dayOfWeek === 0) return;
+      // Filtrer selon les jours d'ouverture configurés
+      if (!isDayOpen(dayOfWeek)) return;
       
       const dayKey = date.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
       if (!slotsByDay[dayKey]) slotsByDay[dayKey] = [];
@@ -111,7 +114,9 @@ export default function PublicBookingPage() {
           const daySlots = slotsByDay[day];
           const firstSlot = new Date(daySlots[0].start);
           const dayOfWeek = firstSlot.getDay();
-          const isSaturday = dayOfWeek === 6;
+          const isAppointmentOnly = isAppointmentOnlyDay(dayOfWeek);
+          const appointmentPhone = getAppointmentOnlyPhone();
+          const dayHours = getDayHours(dayOfWeek);
           
           return (
             <Paper 
@@ -119,24 +124,31 @@ export default function PublicBookingPage() {
               sx={{ 
                 minWidth: 200, 
                 p: 2, 
-                bgcolor: isSaturday ? 'action.hover' : 'background.paper',
-                border: isSaturday ? '2px dashed' : '1px solid',
-                borderColor: isSaturday ? '#ff9800' : 'rgba(0, 0, 0, 0.12)'
+                bgcolor: isAppointmentOnly ? 'action.hover' : 'background.paper',
+                border: isAppointmentOnly ? '2px dashed' : '1px solid',
+                borderColor: isAppointmentOnly ? '#ff9800' : 'rgba(0, 0, 0, 0.12)'
               }}
             >
               <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'bold', textAlign: 'center' }}>
                 {day}
               </Typography>
-              {isSaturday && (
+              {isAppointmentOnly && (
                 <Alert severity="info" sx={{ mb: 1, py: 0 }}>
-                  RDV à confirmer au 0768184875
+                  {appointmentPhone 
+                    ? `RDV à confirmer au ${appointmentPhone}`
+                    : 'RDV à confirmer par téléphone'}
+                </Alert>
+              )}
+              {dayHours && !isAppointmentOnly && (
+                <Alert severity="info" sx={{ mb: 1, py: 0 }}>
+                  Horaires : {dayHours.start} - {dayHours.end}
                 </Alert>
               )}
               <Stack spacing={1}>
                 {daySlots.map(slot => (
                   <Button
                     key={slot.start}
-                    variant={slot.available ? (isSaturday ? "outlined" : "contained") : "outlined"}
+                    variant={slot.available ? (isAppointmentOnly ? "outlined" : "contained") : "outlined"}
                     size="small"
                     fullWidth
                     onClick={() => { if (slot.available) { bookingUI.openDialog(slot); } }}
