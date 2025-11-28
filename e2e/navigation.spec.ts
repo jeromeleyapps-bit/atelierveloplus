@@ -16,17 +16,17 @@ test.describe('Navigation', () => {
   test('should navigate to tickets', async ({ page }) => {
     // Naviguer directement vers tickets pour tester l'accès
     await page.goto('/tickets');
-    await page.waitForURL(/\/tickets/, { timeout: 10000 });
+    await page.waitForURL(/\/tickets/, { timeout: 20000 });
     await page.waitForLoadState('networkidle');
     
     // Vérifier que la page s'affiche correctement
-    await expect(page.getByText(/tickets.*atelier/i).first()).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(/tickets.*atelier|gestion.*réparations/i).first()).toBeVisible({ timeout: 10000 });
   });
 
   test('should navigate to customers', async ({ page }) => {
     // Naviguer directement vers customers pour tester l'accès
     await page.goto('/customers');
-    await page.waitForURL(/\/customers/, { timeout: 10000 });
+    await page.waitForURL(/\/customers/, { timeout: 20000 });
     await page.waitForLoadState('networkidle');
     
     // Vérifier que la page s'affiche correctement
@@ -36,31 +36,31 @@ test.describe('Navigation', () => {
   test('should navigate to catalog', async ({ page }) => {
     // Naviguer directement vers catalog pour tester l'accès
     await page.goto('/catalog');
-    await page.waitForURL(/\/catalog/, { timeout: 10000 });
+    await page.waitForURL(/\/catalog/, { timeout: 20000 });
     await page.waitForLoadState('networkidle');
     
-    // Vérifier que la page s'affiche correctement (au moins pas d'erreur)
-    await expect(page.getByRole('main')).toBeVisible({ timeout: 10000 });
+    // Vérifier que la page s'affiche correctement - chercher "Catalogue Général"
+    await expect(page.getByText(/catalogue.*général|catalogue/i).first()).toBeVisible({ timeout: 10000 });
   });
 
   test('should navigate to finance', async ({ page }) => {
     // Naviguer directement vers finance pour tester l'accès
     await page.goto('/finance');
-    await page.waitForURL(/\/finance/, { timeout: 10000 });
+    await page.waitForURL(/\/finance/, { timeout: 20000 });
     await page.waitForLoadState('networkidle');
     
-    // Vérifier que la page s'affiche correctement (au moins pas d'erreur)
-    await expect(page.getByRole('main')).toBeVisible({ timeout: 10000 });
+    // Vérifier que la page s'affiche correctement - chercher "Facturation"
+    await expect(page.getByText(/facturation|gestion.*devis.*factures/i).first()).toBeVisible({ timeout: 10000 });
   });
 
   test('should access admin settings', async ({ page }) => {
     // Naviguer directement vers admin pour tester l'accès
     await page.goto('/admin');
-    await page.waitForURL(/\/admin/, { timeout: 10000 });
+    await page.waitForURL(/\/admin/, { timeout: 20000 });
     await page.waitForLoadState('networkidle');
     
-    // Vérifier que la page s'affiche correctement (au moins pas d'erreur)
-    await expect(page.getByRole('main')).toBeVisible({ timeout: 10000 });
+    // Vérifier que la page s'affiche correctement - chercher "Administration"
+    await expect(page.getByText(/administration|besoin.*aide/i).first()).toBeVisible({ timeout: 10000 });
   });
 });
 

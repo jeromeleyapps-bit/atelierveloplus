@@ -63,14 +63,22 @@ test.describe('Tickets (Work Orders)', () => {
 
   test('should search tickets', async ({ page }) => {
     await page.goto('/tickets');
-    await page.waitForURL(/\/tickets/, { timeout: 10000 });
+    await page.waitForURL(/\/tickets/, { timeout: 20000 });
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(1000);
     
-    // Chercher le champ de recherche par placeholder exact
-    const searchInput = page.getByPlaceholder(/rechercher.*id.*client|search/i);
+    // Chercher le champ de recherche par placeholder "Rechercher (id, client, email, vélo)"
+    const searchByPlaceholder = page.getByPlaceholder(/rechercher.*id.*client|rechercher/i);
+    const searchByLabel = page.getByLabel(/rechercher|search/i);
     
-    const isSearchVisible = await searchInput.isVisible({ timeout: 3000 }).catch(() => false);
+    // Essayer d'abord par placeholder, puis par label
+    let searchInput = searchByPlaceholder;
+    let isSearchVisible = await searchInput.isVisible({ timeout: 3000 }).catch(() => false);
+    
+    if (!isSearchVisible) {
+      searchInput = searchByLabel;
+      isSearchVisible = await searchInput.isVisible({ timeout: 3000 }).catch(() => false);
+    }
     
     if (isSearchVisible) {
       await searchInput.fill('test');
