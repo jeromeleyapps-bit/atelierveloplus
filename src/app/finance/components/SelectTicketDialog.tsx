@@ -88,7 +88,7 @@ export default function SelectTicketDialog({
         }
       } catch (err) {
         const message = err instanceof Error ? err.message : "Erreur de chargement";
-        logger.error("[SelectTicketDialog] Error:", message);
+        logger.error("[SelectTicketDialog] Error", { error: message });
         setError(message);
       } finally {
         setLoading(false);

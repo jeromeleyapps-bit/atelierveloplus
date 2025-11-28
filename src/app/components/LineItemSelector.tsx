@@ -120,7 +120,7 @@ export default function LineItemSelector({
       });
       
       if (!response.ok) {
-        logger.error("Catalog API error:", response.status);
+        logger.error("Catalog API error", { status: response.status });
         setCatalogItems([]);
         return;
       }

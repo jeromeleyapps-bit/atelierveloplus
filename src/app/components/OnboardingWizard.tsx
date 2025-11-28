@@ -208,7 +208,7 @@ export default function OnboardingWizard({ open, onComplete }: OnboardingWizardP
         }
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Erreur inconnue';
-        logger.error("[Wizard] ❌ Erreur démarrage trial:", message);
+        logger.error("[Wizard] ❌ Erreur démarrage trial", { error: message });
       }
 
       // Vérifier que le token est toujours valide avant redirection

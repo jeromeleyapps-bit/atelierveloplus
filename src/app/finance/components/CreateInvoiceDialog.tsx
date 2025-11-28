@@ -116,7 +116,7 @@ export default function CreateInvoiceDialog({ open, onClose, onSuccess }: Create
       });
       
       if (!response.ok) {
-        logger.error("Settings API error:", response.status);
+        logger.error("Settings API error", { status: response.status });
         return;
       }
       

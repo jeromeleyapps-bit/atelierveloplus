@@ -74,7 +74,7 @@ export default function NavBanner() {
       }
       if (customEvent.detail?.shopLogo !== undefined) {
         setShopLogo(customEvent.detail.shopLogo);
-        logger.info('[NavBanner] Logo mis à jour:', customEvent.detail.shopLogo);
+        logger.info('[NavBanner] Logo mis à jour', { shopLogo: customEvent.detail.shopLogo });
       }
     };
     
@@ -150,7 +150,7 @@ export default function NavBanner() {
                 style={{ borderRadius: 4 }}
                 onError={(e) => {
                   // Fallback si logo ne charge pas
-                  logger.error('[NavBanner] Logo load error:', shopLogo);
+                  logger.error('[NavBanner] Logo load error', { shopLogo });
                   e.currentTarget.style.display = 'none';
                   setShopLogo(null);
                 }}

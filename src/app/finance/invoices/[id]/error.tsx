@@ -7,7 +7,10 @@ import Typography from '@mui/material/Typography';
 import { logger } from '@/lib/logger';
 
 export default function InvoiceRouteError({ error, reset }: { error: Error & { digest?: string }; reset: () => void; }) {
-  useEffect(() => { logger.error("[InvoiceRouteError]", error); }, [error]);
+  useEffect(() => { 
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logger.error("[InvoiceRouteError]", { error: errorMessage, digest: error.digest }); 
+  }, [error]);
   return (
     <Stack spacing={2} sx={{ p: 3 }}>
       <Alert severity="error">Une erreur est survenue lors de l’affichage de la facture.</Alert>

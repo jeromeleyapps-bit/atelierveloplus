@@ -65,7 +65,7 @@ export default function B2BSearchDialog({ open, onClose, onAddToCatalog }: B2BSe
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : "Erreur lors de la recherche";
-      logger.error("B2B search error:", message);
+      logger.error("B2B search error", { error: message });
       setError(message);
     } finally {
       setLoading(false);

@@ -72,7 +72,8 @@ function RegisterContent() {
           } catch {}
         }
       }
-      logger.error(e);
+      const errorMessage = e instanceof Error ? e.message : String(e);
+      logger.error('Register error', { error: errorMessage });
       setError(msg);
     } finally {
       setSubmitting(false);

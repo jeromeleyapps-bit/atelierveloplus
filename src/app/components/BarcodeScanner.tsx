@@ -63,7 +63,7 @@ export default function BarcodeScanner({ open, onClose, onScan }: BarcodeScanner
       // Try to get camera permissions first
       try {
         const devices = await Html5Qrcode.getCameras();
-        logger.info('Available cameras:', devices.length);
+        logger.info('Available cameras', { count: devices.length });
         
         if (devices.length === 0) {
           throw new Error('Aucune caméra détectée');
@@ -77,7 +77,7 @@ export default function BarcodeScanner({ open, onClose, onScan }: BarcodeScanner
         );
         
         const cameraId = backCamera ? backCamera.id : devices[0].id;
-        logger.info('Using camera:', cameraId);
+        logger.info('Using camera', { cameraId });
 
         await scanner.start(
           cameraId,
@@ -88,7 +88,7 @@ export default function BarcodeScanner({ open, onClose, onScan }: BarcodeScanner
           },
           async (decodedText: string) => {
             // Barcode detected
-            logger.info('Barcode detected:', decodedText);
+            logger.info('Barcode detected', { decodedText });
             
             // Stop scanning
             await scanner.stop();

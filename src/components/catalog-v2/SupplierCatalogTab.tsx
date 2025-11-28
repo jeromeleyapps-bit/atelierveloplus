@@ -131,7 +131,7 @@ export default function SupplierCatalogTab({
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : "Erreur import";
-      logger.error("Import error:", message);
+      logger.error("Import error", { error: message });
       setImportProgress((prev) => ({
         ...prev,
         status: "error",
@@ -169,7 +169,7 @@ export default function SupplierCatalogTab({
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : "Erreur lors de l'ajout";
-      logger.error("Error adding to stock:", message);
+      logger.error("Error adding to stock", { error: message });
       onToast(message, "error");
     } finally {
       setAddingToStock(null);

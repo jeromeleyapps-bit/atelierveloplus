@@ -42,8 +42,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Load from localStorage after mount to avoid SSR/CSR mismatch
     const token = window.localStorage.getItem("jwt_token");
     const userStr = window.localStorage.getItem("user");
-    logger.info('[AUTH] Token exists:', !!token);
-    logger.info('[AUTH] User data exists:', !!userStr);
+    logger.info('[AUTH] Token exists', { exists: !!token });
+    logger.info('[AUTH] User data exists', { exists: !!userStr });
     
     if (token && userStr) {
       try {
@@ -99,8 +99,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }) => {
     const response = await authRegister(input);
     logger.info('[AuthContext] Register response:', response);
-    logger.info('[AuthContext] Has token?', 'token' in response);
-    logger.info('[AuthContext] Has user?', 'user' in response);
+    logger.info('[AuthContext] Has token?', { hasToken: 'token' in response });
+    logger.info('[AuthContext] Has user?', { hasUser: 'user' in response });
     
     // Register now returns token - auto-login
     if ('token' in response && 'user' in response) {

@@ -168,7 +168,7 @@ export default function MyStockTab({ items, loading, onRefresh, onToast }: MySto
                           const formData = new FormData();
                           formData.append("file", file);
                           const token = localStorage.getItem("jwt_token");
-                          logger.info('[CATALOGSNAP] Token:', token ? 'present' : 'missing');
+                          logger.info('[CATALOGSNAP] Token', { present: token ? 'present' : 'missing' });
                           
                           const response = await fetch("/api/catalog/import-catalogsnap", {
                             method: "POST",
@@ -176,9 +176,9 @@ export default function MyStockTab({ items, loading, onRefresh, onToast }: MySto
                             body: formData,
                           });
                           
-                          logger.info('[CATALOGSNAP] Response status:', response.status);
+                          logger.info('[CATALOGSNAP] Response status', { status: response.status });
                           const result = await response.json();
-                          logger.info('[CATALOGSNAP] Result:', result);
+                          logger.info('[CATALOGSNAP] Result', { result });
                           
                           if (response.ok) {
                             onToast(result.message, "success");
@@ -188,7 +188,7 @@ export default function MyStockTab({ items, loading, onRefresh, onToast }: MySto
                           }
                         } catch (error) {
                           const message = error instanceof Error ? error.message : "Erreur import";
-                          logger.error('[CATALOGSNAP] Error:', message);
+                          logger.error('[CATALOGSNAP] Error', { error: message });
                           onToast(message, "error");
                         }
                       })();

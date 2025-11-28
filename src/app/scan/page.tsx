@@ -95,7 +95,7 @@ export default function ScanPage() {
           aspectRatio: 1.0,
         },
         async (decodedText: string) => {
-          logger.info('Barcode detected:', decodedText);
+          logger.info('Barcode detected', { decodedText });
           await scanner.stop();
           setScanning(false);
           setResult(decodedText);

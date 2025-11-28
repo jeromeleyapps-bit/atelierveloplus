@@ -41,7 +41,8 @@ function LoginContent() {
       router.push(next as Route);
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Échec de connexion";
-      logger.error(e);
+      const errorMessage = e instanceof Error ? e.message : String(e);
+      logger.error('Login error', { error: errorMessage });
       setError(msg);
     } finally {
       setSubmitting(false);

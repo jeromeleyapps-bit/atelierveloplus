@@ -374,9 +374,10 @@ export default function TicketsPage() {
       if (ticketType) {
         try { 
           await setWorkOrderType(created.id, ticketType as WorkOrderType); 
-          logger.info('[Ticket Creation] Type set:', ticketType);
+          logger.info('[Ticket Creation] Type set', { ticketType });
         } catch (err) {
-          logger.error('[Ticket Creation] Error setting type:', err);
+          const errorMessage = err instanceof Error ? err.message : String(err);
+          logger.error('[Ticket Creation] Error setting type', { error: errorMessage });
         }
       }
       

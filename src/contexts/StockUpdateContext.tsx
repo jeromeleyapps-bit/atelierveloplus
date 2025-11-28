@@ -31,24 +31,25 @@ export function StockUpdateProvider({ children }: { children: React.ReactNode })
   const listeners = React.useRef<Set<(update: StockUpdate) => void>>(new Set());
 
   const notifyStockUpdate = useCallback((update: StockUpdate) => {
-    logger.info('[STOCK-EVENT] Broadcasting update:', update);
+    logger.info('[STOCK-EVENT] Broadcasting update', { update });
     listeners.current.forEach(callback => {
       try {
         callback(update);
       } catch (error) {
-        logger.error('[STOCK-EVENT] Listener error:', error);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        logger.error('[STOCK-EVENT] Listener error', { error: errorMessage });
       }
     });
   }, []);
 
   const subscribeToStockUpdates = useCallback((callback: (update: StockUpdate) => void) => {
     listeners.current.add(callback);
-    logger.info('[STOCK-EVENT] Listener subscribed. Total:', listeners.current.size);
+    logger.info('[STOCK-EVENT] Listener subscribed. Total', { total: listeners.current.size });
     
     // Retourner fonction de cleanup
     return () => {
       listeners.current.delete(callback);
-      logger.info('[STOCK-EVENT] Listener unsubscribed. Total:', listeners.current.size);
+      logger.info('[STOCK-EVENT] Listener unsubscribed. Total', { total: listeners.current.size });
     };
   }, []);
 
