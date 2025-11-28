@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { generateInvoicePDF, type InvoiceData as PdfInvoiceData } from "@/lib/pdf-invoice";
 import { getUserIdOrFirst } from "@/lib/api-helpers";
-import { logger } from "@/lib/logger";
 import { logger } from '@/lib/logger';
 
 export const dynamic = "force-dynamic";
@@ -279,7 +278,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
   }
 
   // Logs pour debug
-  logger.info('[PDF] Settings shopLogo:', settings?.shopLogo);
+  logger.info('[PDF] Settings shopLogo', { shopLogo: settings?.shopLogo });
   if (!settings?.shopLogo) {
     logger.warn('[PDF] ⚠️ Aucun logo atelier configuré');
   }
@@ -327,7 +326,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
   
   // PRIORITÉ 1: Logo uploadé par utilisateur (PNG uniquement)
   if (routeInvoiceData.shopLogo && typeof routeInvoiceData.shopLogo === 'string') {
-    logger.info('[PDF] 🔍 Tentative chargement logo:', routeInvoiceData.shopLogo);
+    logger.info('[PDF] 🔍 Tentative chargement logo', { shopLogo: routeInvoiceData.shopLogo });
     try {
       const fs = await import('fs');
       const path = await import('path');
@@ -344,8 +343,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
         ? path.join(process.env.USER_DATA_PATH, relativePath)
         : path.join(process.cwd(), 'public', relativePath);
       
-      logger.info('[PDF] 📁 Chemin complet:', fullPath);
-      logger.info('[PDF] 🔧 USER_DATA_PATH:', process.env.USER_DATA_PATH || 'non défini (mode dev)');
+      logger.info('[PDF] 📁 Chemin complet', { fullPath });
+      logger.info('[PDF] 🔧 USER_DATA_PATH', { userDataPath: process.env.USER_DATA_PATH || 'non défini (mode dev)' });
       
       if (fs.existsSync(fullPath)) {
         const buf = fs.readFileSync(fullPath);
@@ -353,10 +352,11 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
         logoLoaded = true;
         logger.info('[PDF] ✅ Logo atelier chargé', { relativePath, bytes: buf.length });
       } else {
-        logger.warn('[PDF] ⚠️ Logo introuvable:', fullPath);
+        logger.warn('[PDF] ⚠️ Logo introuvable', { fullPath });
       }
     } catch (e) {
-      logger.error('[PDF] ❌ Erreur chargement logo:', e);
+      const errorMessage = e instanceof Error ? e.message : String(e);
+      logger.error('[PDF] ❌ Erreur chargement logo', { error: errorMessage });
     }
   } else {
     logger.info('[PDF] ❌ Pas de shopLogo configuré');
@@ -400,7 +400,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
         }
       }
     } catch (e) {
-      logger.error('[PDF] Erreur fallback logo.png:', e);
+      const errorMessage = e instanceof Error ? e.message : String(e);
+      logger.error('[PDF] Erreur fallback logo.png', { error: errorMessage });
     }
   }
   
