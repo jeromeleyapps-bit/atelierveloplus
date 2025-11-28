@@ -44,7 +44,7 @@ export async function POST(req: Request) {
 
     // Parser le header
     const headers = parseCSVLine(lines[0]);
-    logger.info(`[IMPORT SCANNER] Headers:`, headers);
+    logger.info(`[IMPORT SCANNER] Headers`, { headers });
     
     // Parser les lignes
     const scans: { ean: string; quantity: number }[] = [];
@@ -95,7 +95,7 @@ export async function POST(req: Request) {
 
           const validation = validateUnifiedItem(unified);
           if (!validation.valid) {
-            logger.error(`[IMPORT SCANNER] Validation échouée pour ${scan.ean}:`, validation.errors);
+            logger.error(`[IMPORT SCANNER] Validation échouée pour ${scan.ean}`, { errors: validation.errors });
             errors++;
             errorDetails.push(`${scan.ean}: ${validation.errors.join(", ")}`);
             continue;
@@ -123,7 +123,7 @@ export async function POST(req: Request) {
         }
       } catch (e) {
         const message = e instanceof Error ? e.message : 'Erreur inconnue';
-        logger.error(`[IMPORT SCANNER] Erreur EAN ${scan.ean}:`, message);
+        logger.error(`[IMPORT SCANNER] Erreur EAN ${scan.ean}`, { error: message });
         errors++;
         errorDetails.push(`${scan.ean}: ${message}`);
       }
@@ -141,7 +141,7 @@ export async function POST(req: Request) {
 
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Erreur lors de l\'import';
-    logger.error("[IMPORT SCANNER] Erreur:", message);
+    logger.error("[IMPORT SCANNER] Erreur", { error: message });
     return NextResponse.json({
       error: "import_failed",
       message

@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
   try {
     logger.info('[IMPORT-CATALOGSNAP] Début import');
     const userId = getUserId(req);
-    logger.info('[IMPORT-CATALOGSNAP] userId:', userId);
+    logger.info('[IMPORT-CATALOGSNAP] userId', { userId });
     
     if (!userId) {
       return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
     // Lire CSV
     const text = await file.text();
     const lines = text.split('\n').filter(l => l.trim());
-    logger.info('[IMPORT-CATALOGSNAP] Lines:', lines.length);
+    logger.info('[IMPORT-CATALOGSNAP] Lines', { count: lines.length });
     
     if (lines.length === 0) {
       return NextResponse.json({ error: 'Fichier vide' }, { status: 400 });
@@ -60,8 +60,8 @@ export async function POST(req: NextRequest) {
     // Parser header (format CatalogSnap: EAN, Nom, Quantité)
     const header = lines[0].split(';').map(h => h.trim().replace(/"/g, ''));
     const dataLines = lines.slice(1);
-    logger.info('[IMPORT-CATALOGSNAP] Header:', header);
-    logger.info('[IMPORT-CATALOGSNAP] Data lines:', dataLines.length);
+    logger.info('[IMPORT-CATALOGSNAP] Header', { header });
+    logger.info('[IMPORT-CATALOGSNAP] Data lines', { count: dataLines.length });
     
     let created = 0;
     let updated = 0;
@@ -99,7 +99,7 @@ export async function POST(req: NextRequest) {
 
       if (existing) {
         // Mettre à jour stock (incrémenter)
-        logger.info('[IMPORT-CATALOGSNAP] Updating existing:', existing.id);
+        logger.info('[IMPORT-CATALOGSNAP] Updating existing', { id: existing.id });
         await prisma.catalogItem.update({
           where: { id: existing.id },
           data: {
@@ -110,7 +110,7 @@ export async function POST(req: NextRequest) {
         updated++;
       } else {
         // Créer nouveau produit
-        logger.info('[IMPORT-CATALOGSNAP] Creating new product:', name);
+        logger.info('[IMPORT-CATALOGSNAP] Creating new product', { name });
         await prisma.catalogItem.create({
           data: {
             name,
@@ -139,7 +139,8 @@ export async function POST(req: NextRequest) {
     });
 
   } catch (error) {
-    logger.error('[IMPORT-CATALOGSNAP] Erreur:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logger.error('[IMPORT-CATALOGSNAP] Erreur', { error: errorMessage });
     const message = error instanceof Error ? error.message : 'Erreur import';
     return NextResponse.json(
       { error: message },

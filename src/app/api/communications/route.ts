@@ -61,7 +61,7 @@ export async function GET(req: NextRequest) {
 
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    logger.error('List communications error:', message);
+    logger.error('List communications error', { error: message });
     return NextResponse.json({ 
       error: "list_failed", 
       detail: message

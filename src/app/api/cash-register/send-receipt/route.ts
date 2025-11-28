@@ -206,7 +206,7 @@ export async function POST(req: NextRequest) {
 
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Erreur envoi ticket';
-    logger.error('[SEND-RECEIPT] Erreur:', message);
+    logger.error('[SEND-RECEIPT] Erreur', { error: message });
     return NextResponse.json(
       { error: message },
       { status: 500 }

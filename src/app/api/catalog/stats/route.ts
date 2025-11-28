@@ -128,7 +128,7 @@ export async function GET(req: NextRequest) {
 
   } catch (error) {
     const message = error instanceof Error ? error.message : 'stats_failed';
-    logger.error('[GET /api/catalog/stats] Error:', message);
+    logger.error('[GET /api/catalog/stats] Error', { error: message });
     return NextResponse.json(
       { error: message },
       { status: 500 }

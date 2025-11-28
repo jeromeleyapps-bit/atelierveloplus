@@ -154,7 +154,7 @@ export async function POST(req: Request) {
 
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Erreur lors de l\'import';
-    logger.error('[API] Catalog import error:', message);
+    logger.error('[API] Catalog import error', { error: message });
     return NextResponse.json({
       error: "import_failed",
       message: error?.message || String(error)

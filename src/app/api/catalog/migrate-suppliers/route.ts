@@ -76,7 +76,7 @@ export async function POST(_req: Request) {
 
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Erreur lors de la migration';
-    logger.error("[MIGRATE] Erreur:", message);
+    logger.error("[MIGRATE] Erreur", { error: message });
     return NextResponse.json({
       error: "migration_failed",
       message

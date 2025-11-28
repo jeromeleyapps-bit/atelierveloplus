@@ -293,7 +293,7 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json(formatted);
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Erreur lors de la mise à jour';
-    logger.error("Error updating system settings:", message);
+    logger.error("Error updating system settings", { error: message });
     
     // Erreur spécifique pour Foreign Key constraint
     if (error && typeof error === 'object' && 'code' in error) {

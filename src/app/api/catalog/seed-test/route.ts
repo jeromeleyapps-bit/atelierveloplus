@@ -139,7 +139,7 @@ export async function POST(_req: Request) {
 
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Erreur lors de la création des données de test';
-    logger.error("[SEED-TEST] Erreur:", message);
+    logger.error("[SEED-TEST] Erreur", { error: message });
     return NextResponse.json({
       error: "seed_failed",
       message

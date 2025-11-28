@@ -260,7 +260,7 @@ export async function POST(req: Request) {
 
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Erreur lors de l\'envoi';
-    logger.error('Communication send error:', message);
+    logger.error('Communication send error', { error: message });
     return NextResponse.json({ 
       error: "send_failed", 
       detail: error?.message || String(error)

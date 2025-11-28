@@ -124,7 +124,7 @@ export async function POST(req: Request) {
 
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Erreur lors du scan';
-    logger.error("[SCAN] Erreur:", message);
+    logger.error("[SCAN] Erreur", { error: message });
     return NextResponse.json({
       error: "scan_failed",
       message

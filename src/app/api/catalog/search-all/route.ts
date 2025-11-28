@@ -169,7 +169,7 @@ export async function GET(req: Request) {
 
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Erreur lors de la recherche';
-    logger.error("[SEARCH-ALL] Erreur:", message);
+    logger.error("[SEARCH-ALL] Erreur", { error: message });
     return NextResponse.json({
       error: "search_failed",
       message,
