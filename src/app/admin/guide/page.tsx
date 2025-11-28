@@ -66,6 +66,19 @@ export default function GuidePage() {
               <strong>Version 1.0.0</strong> - Mise à jour: Novembre 2025
               <br />✨ Nouvelles fonctionnalités: Widget Actualités Vélo, Auto-entrepreneur TVA 0%, Dashboard harmonisé
             </Alert>
+            
+            <Alert severity="success" sx={{ mb: 2 }}>
+              <strong>📊 Comparatif des licences:</strong> 
+              <Button 
+                component={Link} 
+                href="/admin/license/upgrade" 
+                variant="outlined" 
+                size="small" 
+                sx={{ ml: 1, textTransform: 'none' }}
+              >
+                Voir les fonctionnalités par licence
+              </Button>
+            </Alert>
           </Box>
 
           {/* Démarrage Rapide */}
