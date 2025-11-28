@@ -111,7 +111,7 @@ export default function SimpleBookingSection({
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Erreur inconnue';
-      logger.error('[BOOKING] Erreur activation:', message);
+      logger.error('[BOOKING] Erreur activation:', { error: message });
       setEnabled(false);
       setStatus('error');
       onShowToast(`❌ Erreur: ${message}`, 'error');
@@ -149,7 +149,7 @@ export default function SimpleBookingSection({
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Erreur inconnue';
-      logger.error('[BOOKING] Erreur désactivation:', message);
+      logger.error('[BOOKING] Erreur désactivation:', { error: message });
       setStatus('error');
       onShowToast(`❌ Erreur: ${message}`, 'error');
     }
