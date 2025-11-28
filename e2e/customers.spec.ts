@@ -9,10 +9,12 @@ test.describe('Customers', () => {
 
   test('should display customers page', async ({ page }) => {
     await page.goto('/customers');
+    await page.waitForURL(/\/customers/, { timeout: 10000 });
     await page.waitForLoadState('networkidle');
     
     // Vérifier que la page des clients s'affiche - le titre "👥 Clients" dans un Typography
-    await expect(page.getByText(/clients/i)).toBeVisible({ timeout: 10000 });
+    // Utiliser .first() car il peut y avoir plusieurs éléments avec "Clients"
+    await expect(page.getByText(/clients/i).first()).toBeVisible({ timeout: 10000 });
   });
 
   test('should open create customer dialog', async ({ page }) => {
