@@ -56,7 +56,7 @@ export default function AccountPage() {
   // Logo upload hook avec sauvegarde automatique
   const logoUpload = useLogoUpload({
     onSuccess: async (path) => {
-      logger.info('[Account] Logo uploadé:', path);
+      logger.info('[Account] Logo uploadé:', { path });
       
       // ✅ Mise à jour du formulaire
       setForm(prevForm => ({ ...prevForm, shopLogo: path }));
@@ -69,7 +69,7 @@ export default function AccountPage() {
         // Mise à jour localStorage
         if (saved.shopLogo) {
           window.localStorage.setItem('auth:shopLogo', saved.shopLogo);
-          logger.info('[Account] Logo sauvegardé dans localStorage:', saved.shopLogo);
+          logger.info('[Account] Logo sauvegardé dans localStorage:', { shopLogo: saved.shopLogo });
         }
         
         // ✅ Dispatch événement pour mise à jour bannière
@@ -83,12 +83,14 @@ export default function AccountPage() {
         
         setToast({ open: true, message: '✓ Logo enregistré et affiché dans la bannière', severity: 'success' });
       } catch (err) {
-        logger.error('[Account] Erreur sauvegarde logo:', err);
+        const errorMessage = err instanceof Error ? err.message : String(err);
+        logger.error('[Account] Erreur sauvegarde logo:', { error: errorMessage });
         setToast({ open: true, message: 'Logo uploadé mais erreur de sauvegarde. Cliquez "Enregistrer tout"', severity: 'error' });
       }
     },
     onError: (err) => {
-      logger.error('[Account] Erreur upload logo:', err);
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      logger.error('[Account] Erreur upload logo:', { error: errorMessage });
       setToast({ open: true, message: 'Erreur lors du téléversement', severity: 'error' });
     },
   });
@@ -144,8 +146,8 @@ export default function AccountPage() {
   async function handleSave() {
     setSaving(true);
     logger.info('[ACCOUNT] ===== SAVE DEBUG =====');
-    logger.info('[ACCOUNT] Form à sauvegarder:', form);
-    logger.info('[ACCOUNT] form.shopLogo:', form.shopLogo);
+    logger.info('[ACCOUNT] Form à sauvegarder:', { form });
+    logger.info('[ACCOUNT] form.shopLogo:', { shopLogo: form.shopLogo });
     try {
       const [saved] = await Promise.all([
         updateAccountSettings(form),
