@@ -64,11 +64,11 @@ export async function middleware(request: NextRequest) {
   const host = request.headers.get('host') || '';
   
   // ⚠️ DIAGNOSTIC: Log TOUJOURS pour vérifier que le middleware s'exécute
-  logger.info('🔵 [MIDDLEWARE] EXECUTING for:', pathname);
+  logger.info('🔵 [MIDDLEWARE] EXECUTING for', { pathname });
   
   // Log pour vérifier que le proxy s'exécute
   if (pathname.startsWith('/api/')) {
-    logger.info('[Proxy] Request:', pathname);
+    logger.info('[Proxy] Request', { pathname });
   }
   
   // Rewrite publique: rdv subdomain root -> /rdv (sans redirection visible)
@@ -127,7 +127,7 @@ export async function middleware(request: NextRequest) {
 
   // C'est une API protégée, vérifier l'authentification JWT
   const user = await getUserFromToken(request);
-  logger.info('[Proxy] getUserFromToken result:', user ? `User ${user.userId}` : 'null');
+  logger.info('[Proxy] getUserFromToken result', { result: user ? `User ${user.userId}` : 'null' });
 
   // Pour toutes les APIs protégées en mode Electron local, créer un user admin fictif
   // Pattern: Mode Electron = pas de JWT, mais besoin d'accès aux APIs internes

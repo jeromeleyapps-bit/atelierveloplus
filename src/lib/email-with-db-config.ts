@@ -86,7 +86,8 @@ async function getSmtpConfigFromDB() {
 
     return null;
   } catch (error) {
-    logger.error('[SMTP] Erreur lecture config DB:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logger.error('[SMTP] Erreur lecture config DB', { error: errorMessage });
     return null;
   }
 }
@@ -99,7 +100,7 @@ export async function sendEmail(options: EmailOptions): Promise<void> {
   const dbConfig = await getSmtpConfigFromDB();
   
   if (dbConfig) {
-    logger.info('📧 Utilisation config SMTP depuis DB:', dbConfig.host);
+    logger.info('📧 Utilisation config SMTP depuis DB', { host: dbConfig.host });
     const nodemailer = await import('nodemailer');
     const transport = nodemailer.createTransport({
       host: dbConfig.host,
@@ -127,7 +128,7 @@ export async function sendEmail(options: EmailOptions): Promise<void> {
       attachments: attachments.length > 0 ? attachments : undefined,
     });
     
-    logger.info('✅ Email envoyé via SMTP DB - ID:', info.messageId);
+    logger.info('✅ Email envoyé via SMTP DB - ID', { messageId: info.messageId });
     
     // ✅ TRACING: Enregistrer l'email dans Communication
     try {
@@ -149,7 +150,8 @@ export async function sendEmail(options: EmailOptions): Promise<void> {
         },
       });
     } catch (logError) {
-      logger.error('[email-with-db-config] Error logging email:', logError);
+      const errorMessage = logError instanceof Error ? logError.message : String(logError);
+      logger.error('[email-with-db-config] Error logging email', { error: errorMessage });
     }
     
     return;
@@ -181,7 +183,7 @@ export async function sendEmail(options: EmailOptions): Promise<void> {
       contentType: att.contentType,
     }));
 
-    logger.info('📧 Envoi email via Gmail ENV à:', options.to);
+    logger.info('📧 Envoi email via Gmail ENV à', { to: options.to });
     const info = await transporter.sendMail({
       from,
       to: options.to,
@@ -189,7 +191,7 @@ export async function sendEmail(options: EmailOptions): Promise<void> {
       html: options.html,
       attachments: attachments.length > 0 ? attachments : undefined,
     });
-    logger.info('✅ Email envoyé via Gmail ENV - ID:', info.messageId);
+    logger.info('✅ Email envoyé via Gmail ENV - ID', { messageId: info.messageId });
     
     // ✅ TRACING: Enregistrer l'email dans Communication
     try {
@@ -207,7 +209,8 @@ export async function sendEmail(options: EmailOptions): Promise<void> {
         },
       });
     } catch (logError) {
-      logger.error('[email-with-db-config] Error logging email:', logError);
+      const errorMessage = logError instanceof Error ? logError.message : String(logError);
+      logger.error('[email-with-db-config] Error logging email', { error: errorMessage });
     }
     
     return;
@@ -240,7 +243,7 @@ export async function sendEmail(options: EmailOptions): Promise<void> {
     }));
   }
 
-  logger.info('📧 Envoi email via Resend à:', options.to);
+  logger.info('📧 Envoi email via Resend à', { to: options.to });
   const response = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
@@ -252,7 +255,7 @@ export async function sendEmail(options: EmailOptions): Promise<void> {
 
   if (!response.ok) {
     const errorText = await response.text();
-    logger.error('❌ Erreur Resend:', errorText);
+    logger.error('❌ Erreur Resend', { error: errorText });
     
     // ✅ TRACING: Enregistrer l'erreur dans Communication
     try {
@@ -271,13 +274,14 @@ export async function sendEmail(options: EmailOptions): Promise<void> {
         },
       });
     } catch (logError) {
-      logger.error('[email-with-db-config] Error logging failed email:', logError);
+      const errorMessage = logError instanceof Error ? logError.message : String(logError);
+      logger.error('[email-with-db-config] Error logging failed email', { error: errorMessage });
     }
     
     throw new Error(`Resend API error: ${errorText}`);
   }
   const result = await response.json();
-  logger.info('✅ Email envoyé via Resend - ID:', result.id);
+  logger.info('✅ Email envoyé via Resend - ID', { id: result.id });
   
   // ✅ TRACING: Enregistrer l'email dans Communication
   try {

@@ -29,7 +29,8 @@ async function fetchSupplierOffers(): Promise<SupplierOffer[]> {
     if (!res.ok) throw new Error(data?.message || 'Erreur chargement offres');
     return data.items || [];
   } catch (e: unknown) {
-    logger.error('[B2B] fetchSupplierOffers error:', e);
+    const errorMessage = e instanceof Error ? e.message : String(e);
+    logger.error('[B2B] fetchSupplierOffers error', { error: errorMessage });
     return [];
   }
 }

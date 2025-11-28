@@ -92,14 +92,14 @@ function getDatabaseUrl(): string | undefined {
         resolvedUrl = `file:${absolutePath}`;
         logger.info('[DB] ✅ Converted relative → absolute', { relativePath, absolutePath });
       }
-      logger.info('[DB] Using DATABASE_URL:', resolvedUrl.substring(0, 70) + '...');
+      logger.info('[DB] Using DATABASE_URL', { url: resolvedUrl.substring(0, 70) + '...' });
       return resolvedUrl;
     }
     logger.info('[DB] No DATABASE_URL set, using schema.prisma default');
     return undefined;
   } else {
     // PostgreSQL: Use Supabase or custom URL
-    logger.info('[DB] DATABASE_URL from env:', url ? `${url.substring(0, 30)}...` : 'UNDEFINED');
+    logger.info('[DB] DATABASE_URL from env', { url: url ? `${url.substring(0, 30)}...` : 'UNDEFINED' });
     if (!url) {
       logger.error('[DB] ERROR: DATABASE_URL is not defined in environment variables!');
       throw new Error('DATABASE_URL environment variable is required for PostgreSQL');
@@ -162,7 +162,7 @@ export async function getPrisma(): Promise<PrismaClient | null> {
       // Electron production: Utiliser l'API interne pour spécifier le query engine path
       // Fix pour "Cannot find module '.prisma/client/default'" sur PC2
       if (process.env.PRISMA_QUERY_ENGINE_LIBRARY) {
-        logger.info('[DB] Using Prisma internal API with query engine:', process.env.PRISMA_QUERY_ENGINE_LIBRARY);
+        logger.info('[DB] Using Prisma internal API with query engine', { engine: process.env.PRISMA_QUERY_ENGINE_LIBRARY });
         config.__internal = {
           engine: {
             binaryPath: process.env.PRISMA_QUERY_ENGINE_LIBRARY

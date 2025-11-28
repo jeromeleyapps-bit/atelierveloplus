@@ -66,7 +66,8 @@ export async function verifyToken(token: string): Promise<JWTPayload | null> {
     
     return payload as unknown as JWTPayload;
   } catch (error) {
-    logger.error('[JWT] Token verification failed:', error instanceof Error ? error.message : 'Unknown error');
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    logger.error('[JWT] Token verification failed', { error: errorMessage });
     return null;
   }
 }

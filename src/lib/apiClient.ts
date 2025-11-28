@@ -63,11 +63,12 @@ apiClient.interceptors.response.use(
     }
     
     if (error.response?.status === 403) {
-      logger.error('[API] Accès refusé:', error.response.data)
+      logger.error('[API] Accès refusé', { data: error.response.data })
     }
     
     if (process.env.NODE_ENV === 'development') {
-      logger.error(`[API Error] ${error.config?.method?.toUpperCase()} ${error.config?.url}`, error)
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error(`[API Error] ${error.config?.method?.toUpperCase()} ${error.config?.url}`, { error: errorMessage })
     }
     
     return Promise.reject(error)
