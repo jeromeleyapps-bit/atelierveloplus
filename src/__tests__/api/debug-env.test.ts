@@ -19,7 +19,7 @@ describe('GET /api/debug/env', () => {
 
   it('should return environment information', async () => {
     process.env.DATABASE_URL = 'file:./test.db';
-    process.env.NODE_ENV = 'test';
+    Object.defineProperty(process.env, 'NODE_ENV', { value: 'test', writable: true, configurable: true });
 
     const res = await GET();
     const data = await res.json();
@@ -61,7 +61,7 @@ describe('GET /api/debug/env', () => {
 
   it('should return all env vars', async () => {
     process.env.DATABASE_URL = 'file:./test.db';
-    process.env.NODE_ENV = 'test';
+    Object.defineProperty(process.env, 'NODE_ENV', { value: 'test', writable: true, configurable: true });
     process.env.VERCEL = '1';
 
     const res = await GET();
