@@ -399,17 +399,17 @@ class NativeMonitoring {
 
     switch (entry.level) {
       case 'debug':
-        logger.debug(message, entry.context || '');
+        logger.debug(message, { context: entry.context || '' });
         break;
       case 'info':
-        logger.info(message, entry.context || '');
+        logger.info(message, { context: entry.context || '' });
         break;
       case 'warn':
-        logger.warn(message, entry.context || '');
+        logger.warn(message, { context: entry.context || '' });
         break;
       case 'error':
       case 'critical':
-        logger.error(message, entry.error || entry.context || '');
+        logger.error(message, { error: entry.error || entry.context || '' });
         break;
     }
   }
@@ -503,4 +503,5 @@ export async function stopMonitoring(): Promise<void> {
 
 export { NativeMonitoring };
 export type { LogLevel, LogEntry, MonitoringConfig };
+export { logger } from '@/lib/logger';
 export default getMonitoring;
