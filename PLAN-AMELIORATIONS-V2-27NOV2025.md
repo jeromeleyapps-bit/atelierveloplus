@@ -6,6 +6,12 @@
 **Statut** : 🎯 **PHASE 1 TERMINÉE AVEC SUCCÈS** - Passage à PHASE 2  
 **Objectif** : Application production-ready avec optimisations continues
 
+**📋 Décisions Stratégiques (27/11/2025)** :
+- ✅ **Migration Pino exclue** : Analyse complète dans `ANALYSE-MIGRATION-PINO.md`
+  - ROI négatif, système actuel répond aux besoins
+  - Focus sur correction erreurs TypeScript logger plutôt que migration
+- ✅ **Approche progressive** : Architecture services, TypeScript strict, monitoring natif d'abord
+
 ---
 
 ## 📊 ÉTAT ACTUEL RÉEL (27/11/2025)
@@ -19,7 +25,7 @@
 | **Tests Unitaires** | 454 tests | **451 tests passants** | ✅ **100% SUCCÈS** |
 | **Console.log en Prod** | 0 | **< 10 occurrences** | ✅ **QUASI TERMINÉ** |
 | **TODOs/FIXMEs** | 0 critique | **2 occurrences minimes** | ✅ **TERMINÉ** |
-| **TypeScript Erreurs** | 0 | **208 erreurs** | ❌ **À CORRIGER** |
+| **TypeScript Erreurs** | 0 | **~90-100 réelles** (266 lignes) | ❌ **À CORRIGER** |
 
 ### 🎯 RÉALISATIONS EXCEPTIONNELLES
 
@@ -47,33 +53,47 @@
 **Objectif** : 0 erreur TypeScript, code robuste
 
 **Actions** :
-- [ ] **Correction 208 erreurs TypeScript** :
-  - [ ] Logger : corriger 35 erreurs (signature LogMeta)
-  - [ ] Monitoring : corriger 15 erreurs (imports logger)
-  - [ ] Prisma : corriger 10 erreurs (signature logger)
-  - [ ] Middleware : corriger 5 erreurs (signature logger)
-  - [ ] Tests : corriger 143 erreurs (types mocks)
+- [ ] **Correction ~90-100 erreurs TypeScript réelles** (266 lignes d'erreur) :
+  - [ ] **Logger** : corriger ~50 erreurs (signatures incorrectes `logger.error(message, string)` → `logger.error(message, LogMeta)`)
+    - Analyser toutes les signatures incorrectes
+    - Créer script correction automatique
+    - Valider toutes les corrections
+    - Mettre à jour documentation logger
+  - [ ] **Tests** : corriger ~10 erreurs (Jest matchers `toHaveTextContent`, `toBeInTheDocument`)
+    - Ajouter types Jest-DOM (`@testing-library/jest-dom`)
+    - Configuration jest.setup.js
+  - [ ] **Types Prisma/Unknown** : corriger ~30 erreurs (type guards manquants)
+    - Ajouter validation types explicite
+    - Type guards pour données inconnues
+  - [ ] **Monitoring/Middleware** : corriger ~10 erreurs (imports logger)
+  - [ ] **Next.js généré** : ignorer 1 erreur (`.next/types/app/layout.ts` - généré automatiquement)
 
-- [ ] **🚀 Migration Logger Professionnel (Pino)** :
-  - [ ] **Analyse comparative** : Logger actuel vs Pino/Winston
-  - [ ] **Installation Pino** : `npm install pino pino-pretty`
-  - [ ] **Configuration hybride** : Support Electron + Next.js Edge Runtime
-  - [ ] **Migration progressive** : Remplacer logger existant par Pino
-  - [ ] **Tests compatibilité** : Vérifier 0 erreur TypeScript post-migration
-  - [ ] **Performance validation** : Benchmark vs logger actuel
-  - [ ] **Documentation** : Guide utilisation Pino structuré
+- [ ] **✅ Amélioration Logger Actuel (Optionnel)** :
+  - [ ] **Validation types stricte** : Améliorer interface LogMeta avec validation
+  - [ ] **Documentation** : JSDoc complet sur fonctions logger
+  - [ ] **Helpers supplémentaires** : Ajouter helpers si besoin
 
 **Bénéfices Attendus** :
-- ✅ **5x performance** logging (Pino vs actuel)
-- ✅ **0 erreur TypeScript** (structured logging natif)
-- ✅ **Écosystème professionnel** (transports, serializers)
-- ✅ **Compatibilité Edge Runtime** Next.js
-- ✅ **Maintenance réduite** (solution standard)
+- ✅ **0 erreur TypeScript** (signatures logger corrigées)
+- ✅ **Logger robuste** (sans migration coûteuse)
+- ✅ **Compatibilité Electron** (electron-log natif conservé)
+- ✅ **Simplicité maintenue** (pas de complexité ajoutée)
+- ✅ **Gain temps** : 1-2 jours vs 7-12 jours migration Pino
 
-- [ ] **Activation TypeScript Strict** :
-  - [ ] `strict: true` dans tsconfig.json
-  - [ ] Correction progressive par lot
-  - [ ] Suppression `any` explicites
+**📝 Note Décision** : Migration Pino évaluée et **non recommandée** (voir `ANALYSE-MIGRATION-PINO.md`) :
+- ROI négatif (7-12 jours pour < 1% amélioration)
+- Perte compatibilité Electron native
+- Complexité configuration hybride
+- Système actuel répond aux besoins
+
+- [ ] **Activation TypeScript Strict (Progressive)** :
+  - [ ] **Étape 1** : Corriger toutes les erreurs actuelles (~90-100 erreurs)
+  - [ ] **Étape 2** : Activer strict mode progressivement par module (pas global)
+    - Commencer par `src/lib/` (utilitaires)
+    - Puis routes API critiques
+    - Enfin composants React
+  - [ ] **Étape 3** : Suppression `any` explicites progressivement
+  - [ ] **Note** : Activation globale d'un coup génère 580+ erreurs (voir `SESSION-25NOV-TYPESCRIPT-STRICT.md`)
 
 - [ ] **ESLint Rules** :
   - [ ] Interdire `console.*` en production
@@ -160,16 +180,21 @@
 **Objectif** : Code maintenable et testable
 
 **Actions** :
-- [ ] **Création Services Layer** :
-  - [ ] `src/services/customers.ts`
-  - [ ] `src/services/tickets.ts`
-  - [ ] `src/services/finance.ts`
-  - [ ] `src/services/catalog.ts`
+- [ ] **Création Services Layer (Approche Progressive)** :
+  - [ ] **Phase 1** : Créer service pilote (`src/services/customers.ts`)
+    - Extraire logique métier de routes customers
+    - Tester et valider approche
+  - [ ] **Phase 2** : Étendre progressivement
+    - `src/services/tickets.ts`
+    - `src/services/finance.ts`
+    - `src/services/catalog.ts`
+  - [ ] **Migration route par route** : Éviter migration massive (risque régression)
 
-- [ ] **Refactoring Routes API** :
-  - [ ] Routes deviennent thin controllers
+- [ ] **Refactoring Routes API Progressif** :
+  - [ ] Routes deviennent thin controllers (progressivement)
   - [ ] Logique métier dans services
   - [ ] Validation centralisée
+  - [ ] Tests après chaque migration
 
 - [ ] **Tests Services** :
   - [ ] Tests unitaires services
@@ -187,11 +212,11 @@
 **Objectif** : Visibilité production
 
 **Actions** :
-- [ ] **Intégration Monitoring** :
-  - [ ] Sentry configuration complète
-  - [ ] Tracking erreurs production
-  - [ ] Alertes critiques
-  - [ ] Dashboard métriques
+- [ ] **Amélioration Monitoring Natif** :
+  - [ ] Évaluer système natif existant (`monitoring-native.ts`)
+  - [ ] Améliorer métriques performance si nécessaire
+  - [ ] Ajouter dashboard métriques natif
+  - [ ] **Alternative** : Sentry uniquement si monitoring natif insuffisant
 
 - [ ] **Logs Centralisés** :
   - [ ] Rotation logs automatique
@@ -309,7 +334,7 @@
 ### Phase 2 : Excellence Opérationnelle (Semaines 1-4)
 | Métrique | Actuel | Cible Phase 2 | Impact |
 |---------|--------|---------------|--------|
-| **Erreurs TypeScript** | 208 | **0** | ✅ Confiance compilation |
+| **Erreurs TypeScript** | ~90-100 réelles (266 lignes) | **0** | ✅ Confiance compilation |
 | **Tests E2E** | 14/18 | **18/18** | ✅ Déploiement sûr |
 | **Couverture Tests** | 7.09% | **15%** | ✅ Qualité code |
 | **Temps Chargement** | 5-10s | **<3s** | ✅ UX optimale |
@@ -334,9 +359,14 @@
 ## 🎯 PLAN D'EXÉCUTION V2
 
 ### Semaine 1-2 : TypeScript Qualité
-- Lundi-Mardi : Correction logger errors (50)
-- Mercredi-Jeudi : Correction monitoring/errors (30)
-- Vendredi : Activation strict mode
+- Lundi-Mardi : Correction erreurs logger TypeScript (~50 erreurs signatures)
+  - Créer script correction automatique
+  - Valider corrections
+- Mercredi-Jeudi : Correction autres erreurs TypeScript (~150 erreurs)
+  - Types Prisma/Unknown
+  - Configuration Jest matchers
+  - Erreurs monitoring/middleware
+- Vendredi : Tests et validation (0 erreur TypeScript)
 
 ### Semaine 3-4 : Tests & Performance
 - Lundi-Mardi : Correction E2E (TransformStream)
@@ -406,7 +436,15 @@
 ---
 
 **Créé** : 27 novembre 2025 à 23:30:48  
+**Dernière mise à jour** : 27 novembre 2025 (exclusion migration Pino)  
 **Auteur** : Assistant IA + Analyse code existant  
 **Statut** : 🎯 **PHASE 2 DÉMARRÉE** - Succès Phase 1 validé  
 **Prochaine révision** : 27 décembre 2025 (fin Phase 2)  
 **Confiance** : 95% (basé sur réalisations Phase 1)
+
+**📝 Décisions prises** :
+- ✅ **Migration Pino exclue** : Analyse détaillée dans `ANALYSE-MIGRATION-PINO.md`
+  - ROI négatif (7-12 jours pour < 1% amélioration)
+  - Système actuel répond aux besoins
+  - Focus sur correction erreurs TypeScript plutôt que migration
+- ✅ **Monitoring natif priorisé** : Évaluer système existant avant Sentry
