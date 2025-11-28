@@ -188,7 +188,8 @@ export async function logEmail(
     return communication.id;
   } catch (error: unknown) {
     // Ne pas faire échouer l'envoi d'email si le logging échoue
-    logger.error('[email-logger] Error logging email:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logger.error('[email-logger] Error logging email:', { error: errorMessage });
     return null;
   }
 }
