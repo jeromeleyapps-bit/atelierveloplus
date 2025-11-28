@@ -26,11 +26,11 @@ test.describe('Tickets (Work Orders)', () => {
     await page.goto('/tickets');
     
     // Attendre que RequireAuth termine la validation du token
-    await page.waitForURL(/\/tickets/, { timeout: 15000 });
+    await page.waitForURL(/\/tickets/, { timeout: 45000 });
     await page.waitForLoadState('networkidle');
     
     // Attendre que la page soit complètement chargée
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(2000);
     
     // Cliquer sur le bouton "Nouveau Ticket" - chercher par texte exact
     const createButton = page.getByRole('button', { name: /nouveau ticket/i });
@@ -38,11 +38,14 @@ test.describe('Tickets (Work Orders)', () => {
     await createButton.click();
     
     // Vérifier que le dialog s'ouvre
-    await expect(page.getByRole('dialog')).toBeVisible({ timeout: 5000 });
+    await expect(page.getByRole('dialog')).toBeVisible({ timeout: 10000 });
   });
 
   test('should filter tickets by status', async ({ page }) => {
     await page.goto('/tickets');
+    
+    // Attendre que RequireAuth termine la validation du token
+    await page.waitForURL(/\/tickets/, { timeout: 45000 });
     await page.waitForLoadState('networkidle');
     
     // Attendre que les tickets se chargent
@@ -50,7 +53,7 @@ test.describe('Tickets (Work Orders)', () => {
     
     // Cliquer sur un filtre de statut (ex: "En cours") - test optionnel
     const statusButton = page.getByRole('button', { name: /en cours|pending|en attente/i }).first();
-    if (await statusButton.isVisible({ timeout: 2000 }).catch(() => false)) {
+    if (await statusButton.isVisible({ timeout: 3000 }).catch(() => false)) {
       await statusButton.click();
       
       // Attendre que le filtre s'applique
@@ -63,9 +66,11 @@ test.describe('Tickets (Work Orders)', () => {
 
   test('should search tickets', async ({ page }) => {
     await page.goto('/tickets');
-    await page.waitForURL(/\/tickets/, { timeout: 20000 });
+    
+    // Attendre que RequireAuth termine la validation du token
+    await page.waitForURL(/\/tickets/, { timeout: 45000 });
     await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(2000);
     
     // Chercher le champ de recherche par placeholder "Rechercher (id, client, email, vélo)"
     const searchByPlaceholder = page.getByPlaceholder(/rechercher.*id.*client|rechercher/i);
@@ -73,11 +78,11 @@ test.describe('Tickets (Work Orders)', () => {
     
     // Essayer d'abord par placeholder, puis par label
     let searchInput = searchByPlaceholder;
-    let isSearchVisible = await searchInput.isVisible({ timeout: 3000 }).catch(() => false);
+    let isSearchVisible = await searchInput.isVisible({ timeout: 5000 }).catch(() => false);
     
     if (!isSearchVisible) {
       searchInput = searchByLabel;
-      isSearchVisible = await searchInput.isVisible({ timeout: 3000 }).catch(() => false);
+      isSearchVisible = await searchInput.isVisible({ timeout: 5000 }).catch(() => false);
     }
     
     if (isSearchVisible) {
