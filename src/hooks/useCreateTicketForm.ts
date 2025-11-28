@@ -58,7 +58,8 @@ export function useCreateTicketForm() {
       window.location.href = `/tickets/${created.id}`;
     },
     onError: (error) => {
-      logger.error('Failed to create ticket:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Failed to create ticket:', { error: errorMessage });
       // L'erreur sera gérée par le composant via mutation.isError
     },
   });

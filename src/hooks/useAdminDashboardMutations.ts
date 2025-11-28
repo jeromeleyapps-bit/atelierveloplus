@@ -33,7 +33,8 @@ export function useAdminDashboardMutations(callbacks?: MutationCallbacks) {
       onSuccess?.(`Utilisateur ${user.email} créé avec succès !`);
     },
     onError: (error) => {
-      logger.error('Create user error:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Create user error:', { error: errorMessage });
       onError?.((error as Error).message || 'Erreur lors de la création');
     },
   });
@@ -48,7 +49,8 @@ export function useAdminDashboardMutations(callbacks?: MutationCallbacks) {
       onSuccess?.('Paramètre mis à jour');
     },
     onError: (error) => {
-      logger.error('Toggle setting error:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Toggle setting error:', { error: errorMessage });
       onError?.('Erreur lors de la mise à jour');
     },
   });
@@ -71,7 +73,8 @@ export function useAdminDashboardMutations(callbacks?: MutationCallbacks) {
       onSuccess?.('Export réussi !');
     },
     onError: (error) => {
-      logger.error('Export error:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Export error:', { error: errorMessage });
       onError?.("Erreur lors de l'export");
     },
   });
@@ -86,7 +89,8 @@ export function useAdminDashboardMutations(callbacks?: MutationCallbacks) {
       onSuccess?.(result.message || 'Restauration réussie !');
     },
     onError: (error) => {
-      logger.error('Restore error:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Restore error:', { error: errorMessage });
       onError?.(`Erreur: ${(error as Error).message}`);
     },
   });

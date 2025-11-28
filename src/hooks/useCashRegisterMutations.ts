@@ -30,7 +30,8 @@ export function useCashRegisterMutations(callbacks?: MutationCallbacks) {
       onSuccess?.('Entrée enregistrée');
     },
     onError: (error) => {
-      logger.error('Create entry error:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Create entry error:', { error: errorMessage });
       onError?.("Erreur d'enregistrement");
     },
   });
@@ -43,7 +44,8 @@ export function useCashRegisterMutations(callbacks?: MutationCallbacks) {
       onSuccess?.('Entrée modifiée');
     },
     onError: (error) => {
-      logger.error('Update entry error:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Update entry error:', { error: errorMessage });
       onError?.("Erreur d'enregistrement");
     },
   });
@@ -56,7 +58,8 @@ export function useCashRegisterMutations(callbacks?: MutationCallbacks) {
       onSuccess?.('Entrée supprimée');
     },
     onError: (error) => {
-      logger.error('Delete entry error:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Delete entry error:', { error: errorMessage });
       onError?.('Erreur de suppression');
     },
   });

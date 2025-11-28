@@ -48,7 +48,8 @@ export function useBikeSearch() {
       const data = await res.json();
       setSearchResults(data.customers || []);
     } catch (error) {
-      logger.error('Search error:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Search error:', { error: errorMessage });
     } finally {
       setSearching(false);
     }
@@ -70,7 +71,8 @@ export function useBikeSearch() {
       }));
       setAutocompleteOptions(options);
     } catch (error) {
-      logger.error('Autocomplete error:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Autocomplete error:', { error: errorMessage });
     } finally {
       setLoadingAutocomplete(false);
     }

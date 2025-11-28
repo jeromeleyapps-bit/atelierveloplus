@@ -76,7 +76,8 @@ export function useServiceRatesMutations(callbacks?: MutationCallbacks) {
       onSuccess?.('Prestation créée avec succès');
     },
     onError: (error) => {
-      logger.error('Create service rate error:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Create service rate error:', { error: errorMessage });
       onError?.((error as Error).message || 'Erreur lors de la création');
     },
   });
@@ -89,7 +90,8 @@ export function useServiceRatesMutations(callbacks?: MutationCallbacks) {
       onSuccess?.('Prestation mise à jour avec succès');
     },
     onError: (error) => {
-      logger.error('Update service rate error:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Update service rate error:', { error: errorMessage });
       onError?.((error as Error).message || 'Erreur lors de la mise à jour');
     },
   });
@@ -102,7 +104,8 @@ export function useServiceRatesMutations(callbacks?: MutationCallbacks) {
       onSuccess?.('Prestation supprimée avec succès');
     },
     onError: (error) => {
-      logger.error('Delete service rate error:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Delete service rate error:', { error: errorMessage });
       onError?.((error as Error).message || 'Erreur lors de la suppression');
     },
   });

@@ -59,7 +59,8 @@ export function useSystemSettingsMutations(callbacks?: MutationCallbacks) {
       onSuccess?.('Paramètres mis à jour avec succès');
     },
     onError: (error) => {
-      logger.error('Update settings error:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Update settings error:', { error: errorMessage });
       onError?.((error as Error).message || 'Erreur lors de la mise à jour');
     },
   });
@@ -71,7 +72,8 @@ export function useSystemSettingsMutations(callbacks?: MutationCallbacks) {
       onSuccess?.('Sauvegarde créée avec succès');
     },
     onError: (error) => {
-      logger.error('Backup error:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Backup error:', { error: errorMessage });
       onError?.((error as Error).message || 'Erreur lors de la sauvegarde');
     },
   });

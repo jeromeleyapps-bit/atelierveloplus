@@ -36,7 +36,8 @@ export function useCatalogMutations(callbacks?: MutationCallbacks) {
       onSuccess?.('Pièce créée avec succès', 'success');
     },
     onError: (error) => {
-      logger.error('Create catalog item error:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Create catalog item error:', { error: errorMessage });
       onError?.((error as Error).message || 'Erreur création pièce', 'error');
     },
   });
@@ -50,7 +51,8 @@ export function useCatalogMutations(callbacks?: MutationCallbacks) {
       onSuccess?.('Pièce mise à jour', 'success');
     },
     onError: (error) => {
-      logger.error('Update catalog item error:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Update catalog item error:', { error: errorMessage });
       onError?.((error as Error).message || 'Erreur mise à jour', 'error');
     },
   });
@@ -63,7 +65,8 @@ export function useCatalogMutations(callbacks?: MutationCallbacks) {
       onSuccess?.('Pièce supprimée', 'success');
     },
     onError: (error) => {
-      logger.error('Delete catalog item error:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Delete catalog item error:', { error: errorMessage });
       onError?.((error as Error).message || 'Suppression refusée (référencée)', 'error');
     },
   });
@@ -81,7 +84,8 @@ export function useCatalogMutations(callbacks?: MutationCallbacks) {
       onSuccess?.(`Supprimés: ${data.deleted || 0} • Ignorés: ${data.skipped || 0}`, 'success');
     },
     onError: (error) => {
-      logger.error('Purge catalog error:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Purge catalog error:', { error: errorMessage });
       onError?.((error as Error).message || 'Erreur purge', 'error');
     },
   });
@@ -98,7 +102,8 @@ export function useCatalogMutations(callbacks?: MutationCallbacks) {
       onSuccess?.('Offre supprimée', 'success');
     },
     onError: (error) => {
-      logger.error('Delete offer error:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Delete offer error:', { error: errorMessage });
       onError?.((error as Error).message || 'Erreur suppression offre', 'error');
     },
   });
@@ -119,7 +124,8 @@ export function useCatalogMutations(callbacks?: MutationCallbacks) {
       onSuccess?.(`Offres supprimées: ${data.deleted || 0}`, 'success');
     },
     onError: (error) => {
-      logger.error('Purge offers error:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Purge offers error:', { error: errorMessage });
       onError?.((error as Error).message || 'Erreur purge offres', 'error');
     },
   });

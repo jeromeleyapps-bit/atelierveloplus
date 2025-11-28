@@ -48,7 +48,8 @@ export function useLogoUpload(callbacks?: UseLogoUploadCallbacks) {
       callbacks?.onSuccess?.(data.path);
       return data.path; // Retourner seulement le path, pas l'objet complet
     } catch (error) {
-      logger.error('Upload error:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Upload error:', { error: errorMessage });
       callbacks?.onError?.(error as Error);
       throw error;
     } finally {

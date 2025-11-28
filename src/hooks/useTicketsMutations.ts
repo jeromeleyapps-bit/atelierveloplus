@@ -28,7 +28,8 @@ export function useTicketsMutations(options?: {
       options?.onStartSuccess?.(ticketId); // Démarrer le timer
     },
     onError: (error) => {
-      logger.error('Start ticket failed:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Start ticket failed:', { error: errorMessage });
       options?.onError?.("Erreur: impossible de démarrer le ticket");
     },
   });
@@ -41,7 +42,8 @@ export function useTicketsMutations(options?: {
       options?.onSuccess?.("Ticket marqué comme prêt (HubSpot synchronisé)");
     },
     onError: (error) => {
-      logger.error('Mark ready failed:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Mark ready failed:', { error: errorMessage });
       options?.onError?.("Erreur: impossible de marquer comme prêt");
     },
   });
@@ -54,7 +56,8 @@ export function useTicketsMutations(options?: {
       options?.onSuccess?.("Ticket supprimé");
     },
     onError: (error) => {
-      logger.error('Delete ticket failed:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Delete ticket failed:', { error: errorMessage });
       options?.onError?.("Erreur: impossible de supprimer le ticket");
     },
   });
@@ -68,7 +71,8 @@ export function useTicketsMutations(options?: {
       options?.onSuccess?.("Statut mis à jour");
     },
     onError: (error) => {
-      logger.error('Update status failed:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Update status failed:', { error: errorMessage });
       options?.onError?.("Erreur: impossible de mettre à jour le statut");
     },
   });
@@ -85,7 +89,8 @@ export function useTicketsMutations(options?: {
       options?.onSuccess?.(`${ids.length} ticket(s) supprimé(s)`);
     },
     onError: (error) => {
-      logger.error('Bulk delete failed:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Bulk delete failed:', { error: errorMessage });
       options?.onError?.("Erreur lors de la suppression groupée");
     },
   });

@@ -30,7 +30,8 @@ export function useAdminCatalogMutations(callbacks?: MutationCallbacks) {
       onSuccess?.();
     },
     onError: (error) => {
-      logger.error('Create item error:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Create item error', { error: errorMessage });
       onError?.(error as Error);
     },
   });
@@ -43,7 +44,8 @@ export function useAdminCatalogMutations(callbacks?: MutationCallbacks) {
       onSuccess?.();
     },
     onError: (error) => {
-      logger.error('Update item error:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Update item error', { error: errorMessage });
       onError?.(error as Error);
     },
   });
@@ -56,7 +58,8 @@ export function useAdminCatalogMutations(callbacks?: MutationCallbacks) {
       onSuccess?.();
     },
     onError: (error) => {
-      logger.error('Delete item error:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Delete item error', { error: errorMessage });
       onError?.(error as Error);
     },
   });

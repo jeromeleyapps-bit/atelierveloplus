@@ -66,7 +66,8 @@ async function fetchSystemSettings(): Promise<SystemSettings> {
     const data = await response.json();
     return data;
   } catch (error) {
-    logger.error('JSON parse error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('JSON parse error:', { error: errorMessage });
     throw new Error('Erreur de parsing des paramètres (JSON invalide)');
   }
 }

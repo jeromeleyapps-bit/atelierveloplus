@@ -39,7 +39,8 @@ export function useCustomersMutations(callbacks?: MutationCallbacks) {
       onSuccess?.('Client créé avec succès', 'success');
     },
     onError: (error) => {
-      logger.error('Create customer error:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Create customer error:', { error: errorMessage });
       onError?.('Erreur lors de la création du client', 'error');
     },
   });
@@ -53,7 +54,8 @@ export function useCustomersMutations(callbacks?: MutationCallbacks) {
       onSuccess?.('Client modifié avec succès', 'success');
     },
     onError: (error) => {
-      logger.error('Update customer error:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Update customer error:', { error: errorMessage });
       onError?.('Erreur lors de la modification du client', 'error');
     },
   });
@@ -66,7 +68,8 @@ export function useCustomersMutations(callbacks?: MutationCallbacks) {
       onSuccess?.('Client supprimé avec succès', 'success');
     },
     onError: (error) => {
-      logger.error('Delete customer error:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Delete customer error:', { error: errorMessage });
       onError?.('Erreur lors de la suppression du client', 'error');
     },
   });
@@ -84,7 +87,8 @@ export function useCustomersMutations(callbacks?: MutationCallbacks) {
       onSuccess?.(`${count} client(s) supprimé(s)`, 'success');
     },
     onError: (error) => {
-      logger.error('Bulk delete customers error:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Bulk delete customers error:', { error: errorMessage });
       onError?.('Erreur lors de la suppression groupée', 'error');
     },
   });
@@ -106,7 +110,8 @@ export function useCustomersMutations(callbacks?: MutationCallbacks) {
       onSuccess?.('Vélo enregistré avec succès', 'success');
     },
     onError: (error) => {
-      logger.error('Save bike error:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Save bike error:', { error: errorMessage });
       onError?.('Erreur lors de l\'enregistrement du vélo', 'error');
     },
   });
@@ -121,7 +126,8 @@ export function useCustomersMutations(callbacks?: MutationCallbacks) {
       onSuccess?.('Vélo supprimé avec succès', 'success');
     },
     onError: (error) => {
-      logger.error('Delete bike error:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Delete bike error:', { error: errorMessage });
       onError?.('Erreur lors de la suppression du vélo', 'error');
     },
   });

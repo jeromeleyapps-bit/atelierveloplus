@@ -51,7 +51,8 @@ export function useAppointmentsMutations(callbacks?: MutationCallbacks) {
       onSuccess?.('Réservation enregistrée. Vous recevrez une confirmation.');
     },
     onError: (error) => {
-      logger.error('Create booking error:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Create booking error:', { error: errorMessage });
       onError?.((error as Error).message || 'Erreur lors de la réservation');
     },
   });

@@ -127,7 +127,8 @@ export function useBikesMutations(callbacks?: MutationCallbacks) {
       onSuccess?.('Vélo ajouté avec succès', 'success');
     },
     onError: (error: Error) => {
-      logger.error('[useBikesMutations] Create error:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('[useBikesMutations] Create error:', { error: errorMessage });
       onError?.(error.message || 'Erreur lors de la création');
     },
   });
@@ -141,7 +142,8 @@ export function useBikesMutations(callbacks?: MutationCallbacks) {
       onSuccess?.('Vélo modifié avec succès', 'success');
     },
     onError: (error: Error) => {
-      logger.error('[useBikesMutations] Update error:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('[useBikesMutations] Update error:', { error: errorMessage });
       onError?.(error.message || 'Erreur lors de la modification');
     },
   });
@@ -158,7 +160,8 @@ export function useBikesMutations(callbacks?: MutationCallbacks) {
       onSuccess?.(message, 'success');
     },
     onError: (error: Error) => {
-      logger.error('[useBikesMutations] Delete error:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('[useBikesMutations] Delete error:', { error: errorMessage });
       onError?.(error.message || 'Erreur lors de la suppression');
     },
   });
@@ -176,7 +179,8 @@ export function useBikesMutations(callbacks?: MutationCallbacks) {
       onSuccess?.(message, 'success');
     },
     onError: (error: Error) => {
-      logger.error('[useBikesMutations] Sell error:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('[useBikesMutations] Sell error:', { error: errorMessage });
       onError?.(error.message || 'Erreur lors de la vente');
     },
   });

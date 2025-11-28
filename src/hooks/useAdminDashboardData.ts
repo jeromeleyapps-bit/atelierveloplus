@@ -27,7 +27,7 @@ async function fetchStats(): Promise<AdminStats> {
   try {
     return await adminGetStats();
   } catch (error) {
-    logger.error("Error loading stats:", error);
+    const errorMessage = error instanceof Error ? error.message : String(error);`r`n      logger.error("Error loading stats:", { error: errorMessage });
     return {
       totalUsers: 1,
       activeTickets: 0,
@@ -43,7 +43,7 @@ async function fetchRecentEmails(): Promise<RecentEmail[]> {
     const data = await getRecentEmails();
     return data.emails || [];
   } catch (error) {
-    logger.error("Error loading emails:", error);
+    const errorMessage = error instanceof Error ? error.message : String(error);`r`n      logger.error("Error loading emails:", { error: errorMessage });
     return [];
   }
 }
@@ -53,7 +53,7 @@ async function fetchSystemSettings(): Promise<SystemSettings | undefined> {
     const data = await adminGetSystemSettings();
     return data as SystemSettings;
   } catch (error) {
-    logger.error("Error loading settings:", error);
+    const errorMessage = error instanceof Error ? error.message : String(error);`r`n      logger.error("Error loading settings:", { error: errorMessage });
     return undefined;
   }
 }
