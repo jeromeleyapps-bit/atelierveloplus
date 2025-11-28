@@ -84,7 +84,8 @@ export async function calculateLaborCost(
           }
         }
       } catch (error) {
-        logger.error('[labor-pricing] Error reading hourlyRate setting:', error);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('[labor-pricing] Error reading hourlyRate setting:', { error: errorMessage });
         // Continuer avec valeur par défaut
       }
     }

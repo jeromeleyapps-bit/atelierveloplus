@@ -63,10 +63,10 @@ export async function convertExpiredProBasiqueToGrace(): Promise<number> {
         },
       });
       
-      logger.info('CRON EXPIRATION: License converted to grace period', { 
+      logger.info('CRON EXPIRATION: License converted to grace period', { value: { 
         licenseKey: license.key, 
         tier: license.tier,
-        endsAt: gracePeriodEnds.toLocaleDateString('fr-FR') 
+        endsAt: gracePeriodEnds.toLocaleDateString('fr-FR' }) 
       });
       
       // Envoyer Email notification: "Votre licence a expiré - Grace period 7 jours"
@@ -87,10 +87,10 @@ export async function convertExpiredProBasiqueToGrace(): Promise<number> {
             `,
           });
           
-          logger.info('CRON EXPIRATION: Expiration notification email sent', { 
+          logger.info('CRON EXPIRATION: Expiration notification email sent', { value: { 
             email: license.customerEmail, 
             tier: license.tier 
-          });
+          } });
         }
       } catch (emailError) {
         logger.error('CRON EXPIRATION: Failed to send expiration email', { 
@@ -165,9 +165,9 @@ export async function blockExpiredGracePeriods(): Promise<number> {
             `,
           });
           
-          logger.info('CRON EXPIRATION: Block notification email sent', { 
+          logger.info('CRON EXPIRATION: Block notification email sent', { value: { 
             email: license.customerEmail 
-          });
+          } });
         }
       } catch (emailError) {
         logger.error('CRON EXPIRATION: Failed to send block email', { 
@@ -231,10 +231,10 @@ export async function sendExpirationNotifications(): Promise<void> {
             `,
           });
           
-          logger.info('CRON EXPIRATION: 7-day expiration email sent', { 
+          logger.info('CRON EXPIRATION: 7-day expiration email sent', { value: { 
             email: license.customerEmail, 
             tier: license.tier 
-          });
+          } });
         }
       } catch (emailError) {
         logger.error('CRON EXPIRATION: Failed to send 7-day email', { 
@@ -276,10 +276,10 @@ export async function sendExpirationNotifications(): Promise<void> {
             `,
           });
           
-          logger.info('CRON EXPIRATION: 3-day expiration email sent', { 
+          logger.info('CRON EXPIRATION: 3-day expiration email sent', { value: { 
             email: license.customerEmail, 
             tier: license.tier 
-          });
+          } });
         }
       } catch (emailError) {
         logger.error('CRON EXPIRATION: Failed to send 3-day email', { 
@@ -321,10 +321,10 @@ export async function sendExpirationNotifications(): Promise<void> {
             `,
           });
           
-          logger.info('CRON EXPIRATION: 1-day expiration email sent', { 
+          logger.info('CRON EXPIRATION: 1-day expiration email sent', { value: { 
             email: license.customerEmail, 
             tier: license.tier 
-          });
+          } });
         }
       } catch (emailError) {
         logger.error('CRON EXPIRATION: Failed to send 1-day email', { 
@@ -334,9 +334,9 @@ export async function sendExpirationNotifications(): Promise<void> {
       }
     }
     
-    logger.info('CRON EXPIRATION: Expiration notifications processed', { 
+    logger.info('CRON EXPIRATION: Expiration notifications processed', { value: { 
       count: licenses7Days.length + licenses3Days.length + licenses1Day.length 
-    });
+    } });
   } catch (error) {
     logger.error('CRON EXPIRATION: Error sending expiration notifications', { error });
   }
@@ -386,9 +386,9 @@ export async function sendMaintenanceEndNotifications(): Promise<void> {
             `,
           });
           
-          logger.info('CRON EXPIRATION: 7-day maintenance email sent', { 
+          logger.info('CRON EXPIRATION: 7-day maintenance email sent', { value: { 
             email: license.customerEmail 
-          });
+          } });
         }
       } catch (emailError) {
         logger.error('CRON EXPIRATION: Failed to send 7-day maintenance email', { 
@@ -429,9 +429,9 @@ export async function sendMaintenanceEndNotifications(): Promise<void> {
             `,
           });
           
-          logger.info('CRON EXPIRATION: 3-day maintenance email sent', { 
+          logger.info('CRON EXPIRATION: 3-day maintenance email sent', { value: { 
             email: license.customerEmail 
-          });
+          } });
         }
       } catch (emailError) {
         logger.error('CRON EXPIRATION: Failed to send 3-day maintenance email', { 
@@ -472,9 +472,9 @@ export async function sendMaintenanceEndNotifications(): Promise<void> {
             `,
           });
           
-          logger.info('CRON EXPIRATION: 1-day maintenance email sent', { 
+          logger.info('CRON EXPIRATION: 1-day maintenance email sent', { value: { 
             email: license.customerEmail 
-          });
+          } });
         }
       } catch (emailError) {
         logger.error('CRON EXPIRATION: Failed to send 1-day maintenance email', { 
@@ -484,9 +484,9 @@ export async function sendMaintenanceEndNotifications(): Promise<void> {
       }
     }
     
-    logger.info('CRON EXPIRATION: Maintenance end notifications processed', { 
+    logger.info('CRON EXPIRATION: Maintenance end notifications processed', { value: { 
       count: lifetime7Days.length + lifetime3Days.length + lifetime1Day.length 
-    });
+    } });
   } catch (error) {
     logger.error('CRON EXPIRATION: Error sending maintenance end notifications', { error });
   }
@@ -508,18 +508,18 @@ export async function sendMaintenanceEndNotifications(): Promise<void> {
  * ```
  */
 export async function runDailyLicenseExpirationJobs(): Promise<void> {
-  logger.info('CRON EXPIRATION: Starting daily license expiration jobs', { 
-    time: new Date().toLocaleString('fr-FR') 
+  logger.info('CRON EXPIRATION: Starting daily license expiration jobs', { value: { 
+    time: new Date( }).toLocaleString('fr-FR') 
   });
   
   try {
     // 1. Convertir Pro/Basique expirées en grace
     const converted = await convertExpiredProBasiqueToGrace();
-    logger.info('CRON EXPIRATION: Licenses converted to grace', { count: converted });
+    logger.info('CRON EXPIRATION: Licenses converted to grace', { value: { count: converted } });
     
     // 2. Bloquer grace periods expirées
     const blocked = await blockExpiredGracePeriods();
-    logger.info('CRON EXPIRATION: Licenses blocked', { count: blocked });
+    logger.info('CRON EXPIRATION: Licenses blocked', { value: { count: blocked } });
     
     // 3. Envoyer notifications avant expiration Pro/Basique (7j, 3j, 1j)
     await sendExpirationNotifications();

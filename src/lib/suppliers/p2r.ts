@@ -66,7 +66,8 @@ export class P2RConnector implements SupplierConnector {
 
       return null;
     } catch (error) {
-      logger.error('P2R login error:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('P2R login error:', { error: errorMessage });
       return null;
     }
   }
@@ -108,7 +109,8 @@ export class P2RConnector implements SupplierConnector {
 
       return products.slice(0, options.limit || 20);
     } catch (error) {
-      logger.error('P2R search error:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('P2R search error:', { error: errorMessage });
       const message = error instanceof Error ? error.message : 'Unknown error';
       throw new Error(`P2R search failed: ${message}`);
     }

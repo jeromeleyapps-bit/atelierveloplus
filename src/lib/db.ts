@@ -176,7 +176,8 @@ export async function getPrisma(): Promise<PrismaClient | null> {
     prismaSingleton = g.__prisma__;
     return prismaSingleton;
   } catch (error) {
-    logger.error('[DB] Failed to initialize Prisma:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('[DB] Failed to initialize Prisma:', { error: errorMessage });
     return null;
   }
 }

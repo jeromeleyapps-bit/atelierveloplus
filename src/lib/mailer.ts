@@ -45,7 +45,7 @@ export async function getSmtpConfig(userId?: string): Promise<SmtpConfig | null>
         });
 
         if (settings?.smtpHost && settings.smtpUser && settings.smtpPass) {
-          logger.info('[mailer] Using SMTP config from DB for user:', userId);
+          logger.info('[mailer] Using SMTP config from DB for user:', { value: userId });
           return {
             host: settings.smtpHost,
             port: settings.smtpPort || 587,
@@ -57,7 +57,8 @@ export async function getSmtpConfig(userId?: string): Promise<SmtpConfig | null>
         }
       }
     } catch (error) {
-      logger.error('[mailer] Error loading SMTP config from DB:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('[mailer] Error loading SMTP config from DB:', { error: errorMessage });
       // Continue to fallback
     }
   }
@@ -107,7 +108,7 @@ export default async function sendMail({ to, subject, text, html, userId }: Mail
   const config = await getSmtpConfig(userId);
   
   if (!config) {
-    logger.info("[mailer] SMTP not configured. Email would be sent:", { to, subject, text });
+    logger.info("[mailer] SMTP not configured. Email would be sent:", { value: { to, subject, text } });
     return { queued: false, reason: "smtp_not_configured" };
   }
 
@@ -120,7 +121,7 @@ export default async function sendMail({ to, subject, text, html, userId }: Mail
     html 
   });
   
-  logger.info('[mailer] Email sent:', { messageId: info.messageId, to });
+  logger.info('[mailer] Email sent:', { value: { messageId: info.messageId, to } });
   
   // ✅ TRACING: Enregistrer l'email dans Communication
   try {

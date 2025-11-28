@@ -60,9 +60,9 @@ export async function convertExpiredTrialsToGrace(): Promise<number> {
         },
       });
       
-      logger.info('CRON GRACE: Trial converted to grace period', { 
+      logger.info('CRON GRACE: Trial converted to grace period', { value: { 
         licenseKey: trial.key, 
-        endsAt: gracePeriodEnds.toLocaleDateString('fr-FR') 
+        endsAt: gracePeriodEnds.toLocaleDateString('fr-FR' }) 
       });
       
       // Envoyer Email 1: "Votre essai est terminé - Grace period 7 jours"
@@ -81,7 +81,7 @@ export async function convertExpiredTrialsToGrace(): Promise<number> {
           html: emailHtml,
         });
         
-        logger.info('CRON GRACE: Trial ended email sent', { email: trial.customerEmail });
+        logger.info('CRON GRACE: Trial ended email sent', { value: { email: trial.customerEmail } });
       } catch (emailError) {
         logger.error('CRON GRACE: Failed to send trial ended email', { email: trial.customerEmail, error: emailError });
       }
@@ -139,7 +139,7 @@ export async function sendGracePeriodEmails(): Promise<void> {
           html: emailHtml,
         });
         
-        logger.info('CRON GRACE: Discount email sent', { email: license.customerEmail, daysLeft: 6 });
+        logger.info('CRON GRACE: Discount email sent', { value: { email: license.customerEmail, daysLeft: 6 } });
       } catch (emailError) {
         logger.error('CRON GRACE: Failed to send discount email', { email: license.customerEmail, error: emailError });
       }
@@ -175,13 +175,13 @@ export async function sendGracePeriodEmails(): Promise<void> {
           html: emailHtml,
         });
         
-        logger.info('CRON GRACE: Last chance email sent', { email: license.customerEmail, daysLeft: 1 });
+        logger.info('CRON GRACE: Last chance email sent', { value: { email: license.customerEmail, daysLeft: 1 } });
       } catch (emailError) {
         logger.error('CRON GRACE: Failed to send last chance email', { email: license.customerEmail, error: emailError });
       }
     }
     
-    logger.info('CRON GRACE: Email triggers processed', { count: gracePeriod6Days.length + gracePeriod1Day.length });
+    logger.info('CRON GRACE: Email triggers processed', { value: { count: gracePeriod6Days.length + gracePeriod1Day.length } });
   } catch (error) {
     logger.error('CRON GRACE: Error sending grace emails', { error });
   }
@@ -240,9 +240,9 @@ export async function blockExpiredGracePeriods(): Promise<number> {
             `,
           });
           
-          logger.info('CRON GRACE: Block notification email sent', { 
+          logger.info('CRON GRACE: Block notification email sent', { value: { 
             email: license.customerEmail 
-          });
+          } });
         }
       } catch (emailError) {
         logger.error('CRON GRACE: Failed to send block email', { 
@@ -275,19 +275,19 @@ export async function blockExpiredGracePeriods(): Promise<number> {
  * ```
  */
 export async function runDailyGraceJobs(): Promise<void> {
-  logger.info('CRON GRACE: Starting daily grace period jobs', { time: new Date().toLocaleString('fr-FR') });
+  logger.info('CRON GRACE: Starting daily grace period jobs', { value: { time: new Date( }).toLocaleString('fr-FR') });
   
   try {
     // 1. Convertir trials expirés en grace
     const converted = await convertExpiredTrialsToGrace();
-    logger.info('CRON GRACE: Trials converted', { count: converted });
+    logger.info('CRON GRACE: Trials converted', { value: { count: converted } });
     
     // 2. Envoyer emails grace period (J+15 et J+20)
     await sendGracePeriodEmails();
     
     // 3. Bloquer grace periods expirées
     const blocked = await blockExpiredGracePeriods();
-    logger.info('CRON GRACE: Licenses blocked', { count: blocked });
+    logger.info('CRON GRACE: Licenses blocked', { value: { count: blocked } });
     
     logger.info('CRON GRACE: Daily grace period jobs completed successfully');
   } catch (error) {

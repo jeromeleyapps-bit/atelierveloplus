@@ -428,7 +428,8 @@ class NativeMonitoring {
       // Vider buffer
       this.logBuffer = [];
     } catch (error) {
-      logger.error('[MONITORING] Erreur flush logs:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('[MONITORING] Erreur flush logs:', { error: errorMessage });
     }
   }
 

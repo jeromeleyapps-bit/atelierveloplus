@@ -57,7 +57,7 @@ export async function sendSatisfactionEmails() {
       take: 50, // Limite sécurité
     });
 
-    logger.info('CRON: Found work orders for satisfaction emails', { count: workOrders.length });
+    logger.info('CRON: Found work orders for satisfaction emails', { value: { count: workOrders.length } });
 
     let sent = 0;
     let skipped = 0;
@@ -116,7 +116,7 @@ export async function sendSatisfactionEmails() {
             },
           });
 
-          logger.info('CRON: Satisfaction email sent', { workOrderId: wo.id });
+          logger.info('CRON: Satisfaction email sent', { value: { workOrderId: wo.id } });
           sent++;
         } else {
           const error = await response.text();
@@ -133,7 +133,7 @@ export async function sendSatisfactionEmails() {
       }
     }
 
-    logger.info('CRON: Satisfaction emails summary', { sent, skipped, errors });
+    logger.info('CRON: Satisfaction emails summary', { value: { sent, skipped, errors } });
     return { sent, skipped, errors };
 
   } catch (error) {
@@ -182,7 +182,7 @@ export async function sendMaintenanceReminders() {
       take: 100, // Limite sécurité
     });
 
-    logger.info('CRON: Found customers for maintenance reminders', { count: customers.length });
+    logger.info('CRON: Found customers for maintenance reminders', { value: { count: customers.length } });
 
     let sent = 0;
     let errors = 0;
@@ -221,7 +221,7 @@ export async function sendMaintenanceReminders() {
             },
           });
 
-          logger.info('CRON: Maintenance reminder sent', { customerId: customer.id });
+          logger.info('CRON: Maintenance reminder sent', { value: { customerId: customer.id } });
           sent++;
         } else {
           const error = await response.text();
@@ -238,7 +238,7 @@ export async function sendMaintenanceReminders() {
       }
     }
 
-    logger.info('CRON: Maintenance reminders summary', { sent, errors });
+    logger.info('CRON: Maintenance reminders summary', { value: { sent, errors } });
     return { sent, errors };
 
   } catch (error) {
@@ -265,10 +265,10 @@ export async function runDailyJobs() {
 
     const duration = ((Date.now() - startTime) / 1000).toFixed(2);
     
-    logger.info('CRON: Daily jobs completed', { 
+    logger.info('CRON: Daily jobs completed', { value: { 
       duration: `${duration}s`,
       totalEmails: satisfactionResult.sent + maintenanceResult.sent
-    });
+    } });
 
     return {
       satisfaction: satisfactionResult,
@@ -300,7 +300,7 @@ export function startScheduler() {
     timezone: 'Europe/Paris',
   });
 
-  logger.info('SCHEDULER: Communications cron activated', { schedule: '9h Europe/Paris' });
+  logger.info('SCHEDULER: Communications cron activated', { value: { schedule: '9h Europe/Paris' } });
 
   // Cron 2: Grace Period Trial quotidien à 2h00 (Phase 2.1)
   const graceJob = cron.schedule('0 2 * * *', async () => {
@@ -313,7 +313,7 @@ export function startScheduler() {
     timezone: 'Europe/Paris',
   });
 
-  logger.info('SCHEDULER: Grace period cron activated', { schedule: '2h Europe/Paris' });
+  logger.info('SCHEDULER: Grace period cron activated', { value: { schedule: '2h Europe/Paris' } });
 
   // Cron 3: Expiration Pro/Basique + Notifications quotidien à 2h30 (Phase 2.1)
   const expirationJob = cron.schedule('30 2 * * *', async () => {
@@ -326,7 +326,7 @@ export function startScheduler() {
     timezone: 'Europe/Paris',
   });
 
-  logger.info('SCHEDULER: License expiration cron activated', { schedule: '2h30 Europe/Paris' });
+  logger.info('SCHEDULER: License expiration cron activated', { value: { schedule: '2h30 Europe/Paris' } });
 
   // Job immédiat au démarrage (si avant 9h30 et pas encore exécuté aujourd'hui)
   const now = new Date();

@@ -72,7 +72,8 @@ export async function getUserIdOrFirst(req: Request): Promise<string | null> {
 
     return userId;
   } catch (error) {
-    logger.error('[getUserIdOrFirst] Unexpected error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('[getUserIdOrFirst] Unexpected error:', { error: errorMessage });
     return null;
   }
 }
@@ -102,7 +103,8 @@ export async function getIsAutoEntrepreneur(userId?: string | null): Promise<boo
 
     return settings?.isAutoEntrepreneur || false;
   } catch (error) {
-    logger.error('[API Helper] Error fetching isAutoEntrepreneur:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('[API Helper] Error fetching isAutoEntrepreneur:', { error: errorMessage });
     return false;
   }
 }
@@ -131,7 +133,8 @@ export async function getUserSettings(userId?: string | null) {
 
     return settings;
   } catch (error) {
-    logger.error('[API Helper] Error fetching user settings:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('[API Helper] Error fetching user settings:', { error: errorMessage });
     return null;
   }
 }

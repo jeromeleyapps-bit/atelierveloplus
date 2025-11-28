@@ -179,7 +179,8 @@ function loadPublicKey(): string {
     
     throw new Error('Clé publique RSA non trouvée. Fichier license-rsa-public.pem manquant.');
   } catch (error) {
-    logger.error('[License Manager] Erreur chargement clé publique RSA:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('[License Manager] Erreur chargement clé publique RSA:', { error: errorMessage });
     throw error;
   }
 }
@@ -218,7 +219,8 @@ export function validateRSASignature(key: string): boolean {
     
     return isValid;
   } catch (error) {
-    logger.error('[License Manager] Erreur validation signature RSA:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logger.error('[License Manager] Erreur validation signature RSA', { error: errorMessage });
     return false;
   }
 }
@@ -338,7 +340,8 @@ export async function getActiveLicense() {
   } catch (error: unknown) {
     // ⚠️ CRITIQUE: En cas d'erreur Prisma (table n'existe pas, DB inaccessible), 
     // retourner null pour bloquer toutes les fonctionnalités protégées
-    logger.error('[License Manager] Error fetching license:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logger.error('[License Manager] Error fetching license', { error: errorMessage });
     return null;
   }
 }
@@ -502,7 +505,8 @@ export async function getLicenseInfo(): Promise<LicenseInfo> {
   } catch (error: unknown) {
     // ⚠️ CRITIQUE: En cas d'erreur Prisma (table n'existe pas, DB inaccessible), 
     // retourner mode TRIAL par défaut (mode gracieux)
-    logger.error('[License Manager] Error fetching license info:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('[License Manager] Error fetching license info:', { error: errorMessage });
     return {
       tier: 'trial',
       status: 'active',
@@ -678,7 +682,8 @@ export async function activateLicense(
       license,
     };
   } catch (error) {
-    logger.error('[License Manager] Activation error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('[License Manager] Activation error:', { error: errorMessage });
     const message = error instanceof Error ? error.message : String(error);
     return {
       success: false,
@@ -749,7 +754,8 @@ export async function startTrial(
       license,
     };
   } catch (error) {
-    logger.error('[License Manager] Start trial error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('[License Manager] Start trial error:', { error: errorMessage });
     const message = error instanceof Error ? error.message : String(error);
     return {
       success: false,
@@ -800,7 +806,8 @@ export async function canSendEmail(): Promise<boolean> {
     return canSend;
   } catch (error: unknown) {
     // ⚠️ CRITIQUE: En cas d'erreur (DB inaccessible, table n'existe pas), BLOQUER envoi
-    logger.error('[License Manager] Error checking email limit - BLOCKING:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('[License Manager] Error checking email limit - BLOCKING:', { error: errorMessage });
     return false; // Bloquer par sécurité
   }
 }
@@ -865,7 +872,7 @@ export async function checkFeatureAccess(feature: string): Promise<boolean> {
       // Double vérification: si pas de licence ou basique sans features, bloquer
       const license = await getActiveLicense();
       if (!license) {
-        logger.warn('[License Manager] No license - blocking feature access:', feature);
+        logger.warn('[License Manager] No license - blocking feature access', { feature });
         return false;
       }
     }
@@ -1058,7 +1065,8 @@ export async function verifyLicense(): Promise<{
       message: successMessage,
     };
   } catch (error) {
-    logger.error('[License Manager] Verification error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('[License Manager] Verification error:', { error: errorMessage });
     const message = error instanceof Error ? error.message : String(error);
     return {
       valid: false,
@@ -1139,7 +1147,8 @@ export async function checkAndDowngradeExpiredTrials(): Promise<{ downgraded: nu
     
     return { downgraded, blocked };
   } catch (error: unknown) {
-    logger.error('[License Manager] Downgrade trials error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('[License Manager] Downgrade trials error:', { error: errorMessage });
     return { downgraded: 0, blocked: 0 };
   }
 }

@@ -47,7 +47,7 @@ function getDatabaseUrl(): string | undefined {
     const relativePath = url.replace('file:', '');
     const absolutePath = path.resolve(process.cwd(), relativePath);
     const resolvedUrl = `file:${absolutePath}`;
-    logger.info('[Prisma] ✅ Converted relative → absolute', { relativePath, absolutePath });
+    logger.info('[Prisma] ✅ Converted relative → absolute', { value: { relativePath, absolutePath } });
     return resolvedUrl;
   }
   
@@ -73,13 +73,15 @@ try {
   // Test connection on initialization
   if (process.env.NODE_ENV === 'development') {
     prismaInstance.$connect().catch((err) => {
-      logger.error('[Prisma] Failed to connect to database:', err);
-      logger.error('[Prisma] DATABASE_URL:', process.env.DATABASE_URL ? 'SET' : 'NOT SET');
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      logger.error('[Prisma] Failed to connect to database', { error: errorMessage });
+      logger.error('[Prisma] DATABASE_URL', { status: process.env.DATABASE_URL ? 'SET' : 'NOT SET' });
     });
   }
 } catch (error) {
-  logger.error('[Prisma] Failed to initialize Prisma Client:', error);
-  logger.error('[Prisma] DATABASE_URL:', process.env.DATABASE_URL ? 'SET' : 'NOT SET');
+  const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('[Prisma] Failed to initialize Prisma Client:', { error: errorMessage });
+  logger.error('[Prisma] DATABASE_URL', { status: process.env.DATABASE_URL ? 'SET' : 'NOT SET' });
   prismaInstance = null;
 }
 

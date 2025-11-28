@@ -91,7 +91,8 @@ export async function checkEmailLicense(): Promise<NextResponse | null> {
     return null;
   } catch (error: unknown) {
     // ⚠️ CRITIQUE: En cas d'erreur, BLOQUER l'envoi par sécurité
-    logger.error('[License Guards] Error checking email license - BLOCKING:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logger.error('[License Guards] Error checking email license - BLOCKING', { error: errorMessage });
     return NextResponse.json({
       error: "license_check_failed",
       message: "❌ Erreur lors de la vérification de la licence. L'envoi d'emails est bloqué par sécurité.",
@@ -175,7 +176,8 @@ export async function checkPdfDirectSendAccess(): Promise<NextResponse | null> {
     return null;
   } catch (error: unknown) {
     // ⚠️ CRITIQUE: En cas d'erreur, BLOQUER l'accès par sécurité
-    logger.error('[License Guards] Error checking PDF direct send access - BLOCKING:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logger.error('[License Guards] Error checking PDF direct send access - BLOCKING', { error: errorMessage });
     return NextResponse.json({
       error: "license_check_failed",
       message: "❌ Erreur lors de la vérification de la licence. L'envoi de PDF est bloqué par sécurité.",
@@ -236,7 +238,8 @@ export async function checkMarketingAccess(): Promise<NextResponse | null> {
     
     return null;
   } catch (error: unknown) {
-    logger.error('[License Guards] Error checking marketing access:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logger.error('[License Guards] Error checking marketing access', { error: errorMessage });
     return NextResponse.json({
       error: "license_check_failed",
       message: "❌ Erreur lors de la vérification de la licence. L'accès aux campagnes marketing est bloqué.",
@@ -297,7 +300,8 @@ export async function checkAdvancedStatsAccess(): Promise<NextResponse | null> {
     
     return null;
   } catch (error: unknown) {
-    logger.error('[License Guards] Error checking advanced stats access:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('[License Guards] Error checking advanced stats access:', { error: errorMessage });
     return NextResponse.json({
       error: "license_check_failed",
       message: "❌ Erreur lors de la vérification de la licence. L'accès aux statistiques avancées est bloqué.",
@@ -358,7 +362,8 @@ export async function checkBookingAccess(): Promise<NextResponse | null> {
     
     return null;
   } catch (error: unknown) {
-    logger.error('[License Guards] Error checking booking access:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('[License Guards] Error checking booking access:', { error: errorMessage });
     return NextResponse.json({
       error: "license_check_failed",
       message: "❌ Erreur lors de la vérification de la licence. L'accès aux réservations en ligne est bloqué.",
@@ -431,7 +436,8 @@ export async function checkEmailWithPdfLicense(): Promise<NextResponse | null> {
     return null;
   } catch (error: unknown) {
     // ⚠️ CRITIQUE: En cas d'erreur, BLOQUER l'envoi par sécurité
-    logger.error('[License Guards] Error checking email+PDF license - BLOCKING:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('[License Guards] Error checking email+PDF license - BLOCKING:', { error: errorMessage });
     return NextResponse.json({
       error: "license_check_failed",
       message: "❌ Erreur lors de la vérification de la licence. L'envoi d'emails est bloqué par sécurité.",

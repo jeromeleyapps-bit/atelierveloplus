@@ -92,7 +92,8 @@ export async function logEmail(
           else provider = 'smtp';
         }
       } catch (error) {
-        logger.error('[email-logger] Error detecting provider:', error);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('[email-logger] Error detecting provider:', { error: errorMessage });
       }
     }
 
@@ -215,7 +216,8 @@ export async function updateEmailStatus(
       }
     });
   } catch (error) {
-    logger.error('[email-logger] Error updating email status:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('[email-logger] Error updating email status:', { error: errorMessage });
   }
 }
 

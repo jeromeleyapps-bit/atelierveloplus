@@ -74,7 +74,8 @@ export function encrypt(text: string): string {
     // Format: iv:authTag:encryptedData
     return `${iv.toString('hex')}:${authTag.toString('hex')}:${encrypted}`;
   } catch (error) {
-    logger.error('Encryption error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Encryption error:', { error: errorMessage });
     throw new Error('Failed to encrypt data');
   }
 }
@@ -115,7 +116,8 @@ export function decrypt(encryptedText: string): string {
     
     return decrypted;
   } catch (error) {
-    logger.error('Decryption error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Decryption error:', { error: errorMessage });
     throw new Error('Failed to decrypt data');
   }
 }
@@ -153,4 +155,4 @@ export function generateEncryptionKey(): string {
 
 // Example usage:
 // const key = generateEncryptionKey();
-// logger.info('Add to .env:', `ENCRYPTION_KEY=${key}`);
+// logger.info('Add to .env:', { value: `ENCRYPTION_KEY=${key}` });
