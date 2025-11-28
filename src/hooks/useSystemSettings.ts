@@ -57,7 +57,7 @@ async function fetchSystemSettings(): Promise<SystemSettings> {
   if (!response.ok) {
     // Essayer de parser l'erreur JSON, sinon utiliser texte
     const errorData = await response.json().catch(() => ({ error: response.statusText }));
-    logger.error('API Error:', response.status, errorData);
+    logger.error('API Error', { status: response.status, errorData });
     throw new Error(`Erreur ${response.status}: ${errorData.error || errorData.message || 'Erreur chargement paramètres'}`);
   }
   

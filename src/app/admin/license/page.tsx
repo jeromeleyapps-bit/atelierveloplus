@@ -121,7 +121,7 @@ export default function LicensePage() {
   // ✅ FIX React #310: Log de débogage AVANT tout return conditionnel
   // Tous les hooks doivent être appelés avant tout return conditionnel
   useEffect(() => {
-    logger.info('[LicensePage] Rendu - loading:', loading, 'license:', license);
+    logger.info('[LicensePage] Rendu', { loading, license });
   }, [loading, license]);
 
   const handleActivate = async () => {

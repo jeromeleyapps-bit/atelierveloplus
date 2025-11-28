@@ -47,7 +47,7 @@ function getDatabaseUrl(): string | undefined {
     const relativePath = url.replace('file:', '');
     const absolutePath = path.resolve(process.cwd(), relativePath);
     const resolvedUrl = `file:${absolutePath}`;
-    logger.info('[Prisma] ✅ Converted relative → absolute:', relativePath, '→', absolutePath);
+    logger.info('[Prisma] ✅ Converted relative → absolute', { relativePath, absolutePath });
     return resolvedUrl;
   }
   

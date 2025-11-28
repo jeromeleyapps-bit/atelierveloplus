@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
 
     const formData = await req.formData();
     const file = formData.get('file') as File;
-    logger.info('[IMPORT-CATALOGSNAP] File:', file?.name, file?.size);
+    logger.info('[IMPORT-CATALOGSNAP] File:', { fileName: file?.name, fileSize: file?.size });
     
     if (!file) {
       return NextResponse.json({ error: 'Fichier requis' }, { status: 400 });

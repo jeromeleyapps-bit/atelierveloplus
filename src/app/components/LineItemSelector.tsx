@@ -194,7 +194,7 @@ export default function LineItemSelector({
     
     // Notifier mise à jour stock si c'est une pièce (via CustomEvent global)
     if (dialogType === "part" && selectedPart) {
-      logger.info('[LINEITEM] Émission event stockUpdated:', selectedPart.name, -formData.quantity);
+      logger.info('[LINEITEM] Émission event stockUpdated', { partName: selectedPart.name, quantity: -formData.quantity });
       window.dispatchEvent(new CustomEvent('stockUpdated', {
         detail: {
           itemId: selectedPart.id,

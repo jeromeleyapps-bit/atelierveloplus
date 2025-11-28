@@ -75,7 +75,7 @@ export async function POST(req: Request) {
 
     // Fallback: si pas de settings pour ce userId, prendre le premier user actif
     if (!shopSettings) {
-      logger.info('[COMMS] No AppSetting for userId:', userId, '- using first active user');
+      logger.info('[COMMS] No AppSetting for userId - using first active user', { userId });
       const firstUser = await prisma.user.findFirst({
         where: { active: true },
         orderBy: { createdAt: 'asc' }

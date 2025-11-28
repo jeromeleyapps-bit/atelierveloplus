@@ -351,7 +351,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
         const buf = fs.readFileSync(fullPath);
         logoBytes = new Uint8Array(buf);
         logoLoaded = true;
-        logger.info('[PDF] ✅ Logo atelier chargé:', relativePath, `(${buf.length} bytes)`);
+        logger.info('[PDF] ✅ Logo atelier chargé', { relativePath, bytes: buf.length });
       } else {
         logger.warn('[PDF] ⚠️ Logo introuvable:', fullPath);
       }

@@ -886,7 +886,8 @@ export async function checkFeatureAccess(feature: string): Promise<boolean> {
     }
   } catch (error: unknown) {
     // ⚠️ CRITIQUE: En cas d'erreur, BLOQUER l'accès par sécurité
-    logger.error('[License Manager] Error checking feature access - BLOCKING:', feature, error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logger.error('[License Manager] Error checking feature access - BLOCKING', { feature, error: errorMessage });
     return false; // Bloquer par sécurité
   }
 }

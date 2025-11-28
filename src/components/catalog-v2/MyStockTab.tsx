@@ -160,7 +160,7 @@ export default function MyStockTab({ items, loading, onRefresh, onToast }: MySto
                   onChange={(e) => {
                     const file = e.target.files?.[0];
                     if (file) {
-                      logger.info('[CATALOGSNAP] File selected:', file.name, file.size);
+                      logger.info('[CATALOGSNAP] File selected', { fileName: file.name, fileSize: file.size });
                       // IIFE pour async
                       (async () => {
                         try {

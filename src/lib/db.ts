@@ -90,7 +90,7 @@ function getDatabaseUrl(): string | undefined {
         const relativePath = url.replace('file:', '');
         const absolutePath = path.resolve(process.cwd(), relativePath);
         resolvedUrl = `file:${absolutePath}`;
-        logger.info('[DB] ✅ Converted relative → absolute:', relativePath, '→', absolutePath);
+        logger.info('[DB] ✅ Converted relative → absolute', { relativePath, absolutePath });
       }
       logger.info('[DB] Using DATABASE_URL:', resolvedUrl.substring(0, 70) + '...');
       return resolvedUrl;
