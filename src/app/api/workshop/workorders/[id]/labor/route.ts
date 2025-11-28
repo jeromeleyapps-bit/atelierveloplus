@@ -49,7 +49,7 @@ export async function GET(
     return NextResponse.json(laborEntries);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to fetch labor entries";
-    logger.error("Error fetching labor entries:", message);
+    logger.error("Error fetching labor entries", { error: message });
     return NextResponse.json(
       { error: message },
       { status: 500 }
@@ -89,7 +89,7 @@ export async function POST(
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to add labor entry";
-    logger.error("Error adding labor entry:", message);
+    logger.error("Error adding labor entry", { error: message });
     return NextResponse.json(
       { error: error.message || "Failed to add labor entry" },
       { status: 500 }

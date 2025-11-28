@@ -111,7 +111,7 @@ export async function GET(_req: Request) {
     return NextResponse.json(invoiceableWorkOrders, { status: 200 });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Erreur inconnue';
-    logger.error("[GET /invoiceable] Error:", message);
+    logger.error("[GET /invoiceable] Error", { error: message });
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

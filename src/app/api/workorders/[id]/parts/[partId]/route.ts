@@ -27,7 +27,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     return NextResponse.json(saved, { status: 200 });
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
-    logger.error('Erreur lors de la mise à jour de la pièce:', message);
+    logger.error('Erreur lors de la mise à jour de la pièce', { error: message });
     return NextResponse.json({ error: 'part_update_failed', detail: message }, { status: 500 });
   }
 }
@@ -47,7 +47,7 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
     return NextResponse.json({ ok: true }, { status: 200 });
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
-    logger.error('Erreur lors de la suppression de la pièce:', message);
+    logger.error('Erreur lors de la suppression de la pièce', { error: message });
     return NextResponse.json({ error: 'part_delete_failed', detail: message }, { status: 500 });
   }
 }

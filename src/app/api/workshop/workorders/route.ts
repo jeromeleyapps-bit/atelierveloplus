@@ -101,7 +101,7 @@ export async function POST(req: Request) {
       dueAt: validated.dueAt ? new Date(validated.dueAt) : null,
     };
     
-    logger.info('[WorkOrder Create] Creating with data:', JSON.stringify(Object.assign({}, data, { userId })));
+    logger.info('[WorkOrder Create] Creating with data', { data: JSON.stringify(Object.assign({}, data, { userId })) });
     
     const wo = await prisma.workOrder.create({ 
       data,

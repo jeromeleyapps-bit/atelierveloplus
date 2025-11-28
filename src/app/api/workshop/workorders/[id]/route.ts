@@ -39,7 +39,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     return NextResponse.json(row, { status: 200 });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Erreur inconnue';
-    logger.error('[workorder/id] Error:', message);
+    logger.error('[workorder/id] Error', { error: message });
     return NextResponse.json({ 
       error: "workorder_fetch_failed", 
       detail: message 
@@ -63,7 +63,7 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
     return NextResponse.json({ ok: true }, { status: 200 });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Erreur lors de la suppression';
-    logger.error('[workorder/delete] Error:', message);
+    logger.error('[workorder/delete] Error', { error: message });
     return NextResponse.json({ 
       error: "workorder_delete_failed", 
       detail: error.message 

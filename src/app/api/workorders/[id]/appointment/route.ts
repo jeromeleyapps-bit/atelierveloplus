@@ -58,7 +58,7 @@ export async function POST(
     return NextResponse.json({ success: true, event, workOrder: updated });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to create appointment";
-    logger.error("Error creating appointment:", message);
+    logger.error("Error creating appointment", { error: message });
     return NextResponse.json(
       { error: message },
       { status: 500 }
@@ -106,7 +106,7 @@ export async function DELETE(
     return NextResponse.json({ success: true, workOrder: updated });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to delete appointment";
-    logger.error("Error deleting appointment:", message);
+    logger.error("Error deleting appointment", { error: message });
     return NextResponse.json(
       { error: message },
       { status: 500 }
@@ -162,7 +162,7 @@ export async function PUT(
     return NextResponse.json({ success: true, event, workOrder: updated });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to update appointment";
-    logger.error("Error updating appointment:", message);
+    logger.error("Error updating appointment", { error: message });
     return NextResponse.json(
       { error: message },
       { status: 500 }
