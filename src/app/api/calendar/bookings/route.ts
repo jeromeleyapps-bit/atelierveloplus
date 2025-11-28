@@ -283,9 +283,9 @@ export async function POST(req: NextRequest) {
     }
   } catch (e) {
     const message = e instanceof Error ? e.message : 'Erreur inconnue';
-    logger.error("❌ ERREUR ENVOI EMAIL RDV:", message);
+    logger.error("❌ ERREUR ENVOI EMAIL RDV:", { error: message });
     if (e instanceof Error && e.stack) {
-      logger.error("Stack:", e.stack);
+      logger.error("Stack:", { stack: e.stack });
     }
   }
 
