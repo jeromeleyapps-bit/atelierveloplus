@@ -11,15 +11,8 @@ test.describe('Tickets (Work Orders)', () => {
     await page.goto('/tickets');
     await page.waitForLoadState('networkidle');
     
-    // Vérifier que la page des tickets s'affiche - le titre "Tickets Atelier" dans un Typography
-    const heading = page.getByRole('heading', { name: /tickets|atelier|réparations/i });
-    const text = page.getByText(/tickets.*atelier|réparations/i).first();
-    
-    if (await heading.isVisible({ timeout: 2000 }).catch(() => false)) {
-      await expect(heading).toBeVisible();
-    } else {
-      await expect(text).toBeVisible({ timeout: 10000 });
-    }
+    // Vérifier que la page des tickets s'affiche - le titre "🔧 Tickets Atelier" dans un Typography
+    await expect(page.getByText(/tickets.*atelier|réparations/i)).toBeVisible({ timeout: 10000 });
   });
 
   test('should open create ticket dialog', async ({ page }) => {

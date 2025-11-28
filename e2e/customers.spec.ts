@@ -11,41 +11,23 @@ test.describe('Customers', () => {
     await page.goto('/customers');
     await page.waitForLoadState('networkidle');
     
-    // Vérifier que la page des clients s'affiche - peut être dans un heading ou un Typography
-    const heading = page.getByRole('heading', { name: /clients|customers/i });
-    const text = page.getByText(/clients/i).first();
-    
-    if (await heading.isVisible({ timeout: 2000 }).catch(() => false)) {
-      await expect(heading).toBeVisible();
-    } else {
-      await expect(text).toBeVisible({ timeout: 10000 });
-    }
+    // Vérifier que la page des clients s'affiche - le titre "👥 Clients" dans un Typography
+    await expect(page.getByText(/clients/i)).toBeVisible({ timeout: 10000 });
   });
 
   test('should open create customer dialog', async ({ page }) => {
     await page.goto('/customers');
     await page.waitForLoadState('networkidle');
-    
-    // Attendre que la page soit complètement chargée
     await page.waitForTimeout(1000);
     
-    // Chercher le bouton "Nouveau client" - peut être un bouton avec texte ou un IconButton
-    // Chercher d'abord par texte, puis par aria-label
-    const createButtonByText = page.getByRole('button', { name: /nouveau|créer|ajouter/i }).first();
-    const createButtonByIcon = page.locator('button[aria-label*="nouveau"], button[aria-label*="créer"], button[aria-label*="ajouter"]').first();
+    // Sur la page customers, le formulaire de création est inline (pas de dialog)
+    // Vérifier que la section "Créer un client" est visible
+    const createSection = page.getByText(/créer un client/i);
+    await expect(createSection).toBeVisible({ timeout: 10000 });
     
-    if (await createButtonByText.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await createButtonByText.click();
-    } else if (await createButtonByIcon.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await createButtonByIcon.click();
-    } else {
-      // Si pas de bouton visible, le test passe quand même (peut être optionnel)
-      expect(true).toBe(true);
-      return;
-    }
-    
-    // Vérifier que le dialog s'ouvre
-    await expect(page.getByRole('dialog')).toBeVisible({ timeout: 5000 });
+    // Vérifier que le formulaire est présent avec au moins un champ
+    const emailField = page.getByLabel(/email/i);
+    await expect(emailField).toBeVisible({ timeout: 5000 });
   });
 
   test('should search customers', async ({ page }) => {
@@ -74,24 +56,25 @@ test.describe('Customers', () => {
   test('should display customer details', async ({ page }) => {
     await page.goto('/customers');
     await page.waitForLoadState('networkidle');
-    
-    // Attendre que les clients se chargent
     await page.waitForTimeout(2000);
     
-    // Cliquer sur le premier client (si existe) - peut être une row de table ou un lien
-    const firstCustomerRow = page.getByRole('row').nth(1);
-    const firstCustomerLink = page.getByRole('link').first();
+    // Chercher la première ligne de client dans le tableau (skip l'en-tête row[0])
+    const tableRows = page.getByRole('table').getByRole('row');
+    const rowCount = await tableRows.count();
     
-    if (await firstCustomerRow.isVisible({ timeout: 2000 }).catch(() => false)) {
-      await firstCustomerRow.click();
+    if (rowCount > 1) {
+      // Cliquer sur la première ligne de données (index 1 car 0 est l'en-tête)
+      const firstDataRow = tableRows.nth(1);
+      await firstDataRow.click();
       
-      // Vérifier qu'on est sur la page de détails
-      await expect(page).toHaveURL(/\/customers\/[a-z0-9-]+/, { timeout: 5000 });
-    } else if (await firstCustomerLink.isVisible({ timeout: 2000 }).catch(() => false)) {
-      await firstCustomerLink.click();
-      await expect(page).toHaveURL(/\/customers\/[a-z0-9-]+/, { timeout: 5000 });
+      // Attendre la navigation vers la page de détails
+      await expect(page).toHaveURL(/\/customers\/[a-z0-9-]+/, { timeout: 10000 });
+      await page.waitForLoadState('networkidle');
+      
+      // Vérifier qu'on voit les détails du client
+      await expect(page.getByText(/client|détails/i).first()).toBeVisible({ timeout: 5000 });
     } else {
-      // Si aucun client visible, le test passe quand même (base vide)
+      // Si aucun client dans la table, le test passe quand même (base vide)
       expect(true).toBe(true);
     }
   });
