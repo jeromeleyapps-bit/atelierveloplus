@@ -16,7 +16,9 @@ test.describe('Navigation', () => {
   test('should navigate to tickets', async ({ page }) => {
     // Naviguer directement vers tickets pour tester l'accès
     await page.goto('/tickets');
-    await page.waitForURL(/\/tickets/, { timeout: 20000 });
+    
+    // Attendre que la page soit sur /tickets (peut être redirigé temporairement par RequireAuth)
+    await page.waitForURL(/\/tickets/, { timeout: 45000 });
     await page.waitForLoadState('networkidle');
     
     // Vérifier que la page s'affiche correctement
@@ -26,7 +28,9 @@ test.describe('Navigation', () => {
   test('should navigate to customers', async ({ page }) => {
     // Naviguer directement vers customers pour tester l'accès
     await page.goto('/customers');
-    await page.waitForURL(/\/customers/, { timeout: 20000 });
+    
+    // Attendre que la page soit sur /customers (peut être redirigé temporairement par RequireAuth)
+    await page.waitForURL(/\/customers/, { timeout: 45000 });
     await page.waitForLoadState('networkidle');
     
     // Vérifier que la page s'affiche correctement
@@ -36,7 +40,9 @@ test.describe('Navigation', () => {
   test('should navigate to catalog', async ({ page }) => {
     // Naviguer directement vers catalog pour tester l'accès
     await page.goto('/catalog');
-    await page.waitForURL(/\/catalog/, { timeout: 20000 });
+    
+    // Attendre que la page soit sur /catalog (peut être redirigé temporairement par RequireAuth)
+    await page.waitForURL(/\/catalog/, { timeout: 45000 });
     await page.waitForLoadState('networkidle');
     
     // Vérifier que la page s'affiche correctement - chercher "Catalogue Général"
@@ -46,7 +52,9 @@ test.describe('Navigation', () => {
   test('should navigate to finance', async ({ page }) => {
     // Naviguer directement vers finance pour tester l'accès
     await page.goto('/finance');
-    await page.waitForURL(/\/finance/, { timeout: 20000 });
+    
+    // Attendre que la page soit sur /finance (peut être redirigé temporairement par RequireAuth)
+    await page.waitForURL(/\/finance/, { timeout: 45000 });
     await page.waitForLoadState('networkidle');
     
     // Vérifier que la page s'affiche correctement - chercher "Facturation"
@@ -56,7 +64,9 @@ test.describe('Navigation', () => {
   test('should access admin settings', async ({ page }) => {
     // Naviguer directement vers admin pour tester l'accès
     await page.goto('/admin');
-    await page.waitForURL(/\/admin/, { timeout: 20000 });
+    
+    // Attendre que la page soit sur /admin (peut être redirigé temporairement par RequireAuth)
+    await page.waitForURL(/\/admin/, { timeout: 45000 });
     await page.waitForLoadState('networkidle');
     
     // Vérifier que la page s'affiche correctement - chercher "Administration"

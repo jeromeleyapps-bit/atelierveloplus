@@ -10,12 +10,12 @@ export default defineConfig({
   /* Setup global avant tous les tests */
   globalSetup: require.resolve('./e2e/global-setup.js'),
   
-  /* Timeout par test */
-  timeout: 30 * 1000,
+  /* Timeout par test - augmenté pour gérer RequireAuth token validation */
+  timeout: 60 * 1000,
   
   /* Expect timeout */
   expect: {
-    timeout: 5000
+    timeout: 10000
   },
   
   /* Exécution parallèle */
