@@ -1,5 +1,7 @@
 // Prefer same-origin API routes. If an external API is configured, it will override.
 // Using "/api" ensures we target Next.js route handlers by default.
+import { logger } from '@/lib/logger';
+
 export const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "/api";
 
 function getAuthHeader() {
