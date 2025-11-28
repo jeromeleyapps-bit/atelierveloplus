@@ -67,20 +67,19 @@ test.describe('Tickets (Work Orders)', () => {
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(1000);
     
-    // Chercher un champ de recherche - peut être par placeholder, label, ou role
-    const searchInput = page.getByPlaceholder(/rechercher|search/i)
-      .or(page.getByLabel(/rechercher|search/i))
-      .or(page.getByRole('textbox', { name: /rechercher|search/i }))
-      .first();
+    // Chercher le champ de recherche par placeholder exact
+    const searchInput = page.getByPlaceholder(/rechercher.*id.*client|search/i);
     
-    if (await searchInput.isVisible({ timeout: 3000 }).catch(() => false)) {
+    const isSearchVisible = await searchInput.isVisible({ timeout: 3000 }).catch(() => false);
+    
+    if (isSearchVisible) {
       await searchInput.fill('test');
       
       // Attendre les résultats de recherche
       await page.waitForTimeout(1500);
       
-      // Vérifier que la page est toujours fonctionnelle
-      await expect(page.getByRole('main')).toBeVisible({ timeout: 5000 });
+      // Vérifier que la page contient toujours le titre (pas d'erreur)
+      await expect(page.getByText(/tickets.*atelier/i).first()).toBeVisible({ timeout: 5000 });
     } else {
       // Si pas de champ de recherche visible, le test passe (fonctionnalité optionnelle)
       expect(true).toBe(true);
