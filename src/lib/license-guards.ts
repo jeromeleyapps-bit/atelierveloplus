@@ -301,7 +301,7 @@ export async function checkAdvancedStatsAccess(): Promise<NextResponse | null> {
     return null;
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-      logger.error('[License Guards] Error checking advanced stats access:', { error: errorMessage });
+    logger.error('[License Guards] Error checking advanced stats access', { error: errorMessage });
     return NextResponse.json({
       error: "license_check_failed",
       message: "❌ Erreur lors de la vérification de la licence. L'accès aux statistiques avancées est bloqué.",

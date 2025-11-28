@@ -1,129 +1,13 @@
 # Page snapshot
 
 ```yaml
-- generic [ref=e1]:
-  - generic [ref=e2]:
-    - generic [ref=e3]:
-      - generic [ref=e4]:
-        - link "votre logo" [ref=e5] [cursor=pointer]:
-          - /url: /
-          - generic [ref=e7]:
-            - text: votre
-            - text: logo
-        - heading "Atelier velo +" [level=6] [ref=e8]
-      - generic [ref=e9]:
-        - link "Mon compte" [ref=e10] [cursor=pointer]:
-          - /url: /account
-          - text: Mon compte
-        - button "0" [ref=e11] [cursor=pointer]:
-          - generic [ref=e12]:
-            - img [ref=e13]
-            - generic: "0"
-        - link "aide" [ref=e15] [cursor=pointer]:
-          - /url: /admin/guide
-          - img [ref=e16]
-        - button "toggle theme" [ref=e19] [cursor=pointer]:
-          - img [ref=e20]
-        - button "menu" [ref=e22] [cursor=pointer]:
-          - img [ref=e23]
-    - generic [ref=e25]:
-      - link "Tableau de bord" [ref=e27] [cursor=pointer]:
-        - /url: /dashboard
-        - text: Tableau de bord
-      - link "Clients" [ref=e30] [cursor=pointer]:
-        - /url: /customers
-        - text: Clients
-      - link "Réparations" [ref=e32] [cursor=pointer]:
-        - /url: /tickets
-        - text: Réparations
-      - link "Facturation" [ref=e34] [cursor=pointer]:
-        - /url: /finance
-        - text: Facturation
-      - link "Calendrier atelier" [active] [ref=e36] [cursor=pointer]:
-        - /url: /admin/booking
-        - text: Calendrier atelier
-      - link "RDV client" [ref=e38] [cursor=pointer]:
-        - /url: /booking
-        - text: RDV client
-      - link "Historique Vélos" [ref=e40] [cursor=pointer]:
-        - /url: /bikes/history
-        - text: Historique Vélos
-      - link "Catalogue" [ref=e42] [cursor=pointer]:
-        - /url: /catalog
-        - text: Catalogue
-      - link "Caisse" [ref=e44] [cursor=pointer]:
-        - /url: /cash-register
-        - text: Caisse
-      - link "Statistiques" [ref=e46] [cursor=pointer]:
-        - /url: /stats
-        - text: Statistiques
-  - alert [ref=e51]:
-    - img [ref=e53]
-    - generic [ref=e56]:
-      - generic [ref=e57]:
-        - paragraph [ref=e58]: 🎉 Essai PRO gratuit
-        - paragraph [ref=e59]:
-          - strong [ref=e60]: 12 jours
-          - text: restants
-        - generic [ref=e61]: Jusqu'au 7 décembre
-      - generic [ref=e62]:
-        - progressbar [ref=e63]
-        - generic [ref=e65]: 14%
-    - generic [ref=e67]:
-      - button "Voir les offres" [ref=e68] [cursor=pointer]:
-        - img [ref=e70]
-        - text: Voir les offres
-      - button [ref=e72] [cursor=pointer]:
-        - img [ref=e73]
-  - generic [ref=e75]:
-    - generic [ref=e78]:
-      - img [ref=e79]
-      - generic [ref=e81]:
-        - heading "📊 Tableau de Bord" [level=4] [ref=e82]
-        - paragraph [ref=e83]: Vue d'ensemble de votre activité
-    - generic [ref=e84]:
-      - generic [ref=e85]:
-        - paragraph [ref=e89]
-        - paragraph [ref=e98]
-        - paragraph [ref=e107]
-        - paragraph [ref=e116]
-      - generic [ref=e122]:
-        - generic [ref=e124]:
-          - generic [ref=e125]:
-            - heading "Prochains rendez-vous" [level=2] [ref=e126]
-            - button "Voir tout" [disabled]
-          - list [ref=e127]:
-            - generic [ref=e128]:
-              - listitem [ref=e129]:
-                - paragraph [ref=e134]
-              - separator [ref=e136]
-            - generic [ref=e137]:
-              - listitem [ref=e138]:
-                - paragraph [ref=e143]
-              - separator [ref=e145]
-            - listitem [ref=e147]:
-              - paragraph [ref=e152]
-        - generic [ref=e155]:
-          - generic [ref=e156]:
-            - heading "Derniers tickets" [level=2] [ref=e157]
-            - button "Voir tout" [disabled]
-          - list [ref=e158]:
-            - generic [ref=e159]:
-              - listitem [ref=e160]:
-                - paragraph [ref=e164]
-                - paragraph [ref=e166]
-              - separator [ref=e168]
-            - generic [ref=e169]:
-              - listitem [ref=e170]:
-                - paragraph [ref=e174]
-                - paragraph [ref=e176]
-              - separator [ref=e178]
-            - listitem [ref=e180]:
-              - paragraph [ref=e184]
-              - paragraph [ref=e186]
-  - generic [ref=e188]:
-    - img [ref=e190]
-    - button "Open Tanstack query devtools" [ref=e238] [cursor=pointer]:
-      - img [ref=e239]
-  - alert [ref=e287]
+- generic [active]:
+  - alert [ref=e1]
+  - dialog "Failed to compile" [ref=e4]:
+    - generic [ref=e5]:
+      - heading "Failed to compile" [level=4] [ref=e7]
+      - generic [ref=e8]:
+        - generic [ref=e10]: "./src/lib/api-error.ts Error: x cannot reassign to a variable declared with `const` ,-[C:\\atelier\\src\\lib\\api-error.ts:26:1] 26 | const isDev = process.env.NODE_ENV === 'development'; 27 | 28 | // Log serveur (toujours visible dans les logs) 29 | const errorMessage = error instanceof Error ? error.message : String(error); : ^^^^^^|^^^^^ : `-- const variable was declared here 30 | logger.error(`[API Error${context ? ` - ${context}` : ''}]`, { error: errorMessage }); 31 | 32 | // Déterminer le message d'erreur 33 | let errorMessage = 'internal_error'; 34 | let statusCode = 500; 35 | 36 | if (error instanceof Error) { 37 | // En dev: montrer le message d'erreur 38 | // En prod: message générique sauf pour les erreurs métier connues 39 | if (isDev) { 40 | errorMessage = error.message; : ^^^^^^|^^^^^ : `-- cannot reassign 41 | } else { 42 | // Liste blanche des erreurs métier à exposer 42 | const safeErrors = [ `---- x cannot reassign to a variable declared with `const` ,-[C:\\atelier\\src\\lib\\api-error.ts:26:1] 26 | const isDev = process.env.NODE_ENV === 'development'; 27 | 28 | // Log serveur (toujours visible dans les logs) 29 | const errorMessage = error instanceof Error ? error.message : String(error); : ^^^^^^|^^^^^ : `-- const variable was declared here 30 | logger.error(`[API Error${context ? ` - ${context}` : ''}]`, { error: errorMessage }); 31 | 32 | // Déterminer le message d'erreur 33 | let errorMessage = 'internal_error'; 34 | let statusCode = 500; 35 | 36 | if (error instanceof Error) { 37 | // En dev: montrer le message d'erreur 38 | // En prod: message générique sauf pour les erreurs métier connues 39 | if (isDev) { 40 | errorMessage = error.message; 41 | } else { 42 | // Liste blanche des erreurs métier à exposer 43 | const safeErrors = [ 44 | 'unauthorized', 45 | 'forbidden', 46 | 'not_found', 47 | 'invalid_payload', 48 | 'validation_error', 49 | 'duplicate_entry', 50 | 'no_user_in_database', 51 | 'no_user_found', 52 | ]; 53 | 54 | if (safeErrors.some(safe => error.message.toLowerCase().includes(safe))) { 55 | errorMessage = error.message; : ^^^^^^|^^^^^ : `-- cannot reassign 56 | } 57 | } 57 | `---- x the name `errorMessage` is defined multiple times ,-[C:\\atelier\\src\\lib\\api-error.ts:26:1] 26 | const isDev = process.env.NODE_ENV === 'development'; 27 | 28 | // Log serveur (toujours visible dans les logs) 29 | const errorMessage = error instanceof Error ? error.message : String(error); : ^^^^^^|^^^^^ : `-- previous definition of `errorMessage` here 30 | logger.error(`[API Error${context ? ` - ${context}` : ''}]`, { error: errorMessage }); 31 | 32 | // Déterminer le message d'erreur 33 | let errorMessage = 'internal_error'; : ^^^^^^|^^^^^ : `-- `errorMessage` redefined here 34 | let statusCode = 500; 35 | 35 | if (error instanceof Error) { `----"
+        - contentinfo [ref=e11]:
+          - paragraph [ref=e12]: This error occurred during the build process and can only be dismissed by fixing the error.
 ```

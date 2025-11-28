@@ -62,8 +62,8 @@ export async function convertExpiredTrialsToGrace(): Promise<number> {
       
       logger.info('CRON GRACE: Trial converted to grace period', { value: { 
         licenseKey: trial.key, 
-        endsAt: gracePeriodEnds.toLocaleDateString('fr-FR' }) 
-      });
+        endsAt: gracePeriodEnds.toLocaleDateString('fr-FR')
+      } });
       
       // Envoyer Email 1: "Votre essai est terminé - Grace period 7 jours"
       try {
@@ -275,7 +275,9 @@ export async function blockExpiredGracePeriods(): Promise<number> {
  * ```
  */
 export async function runDailyGraceJobs(): Promise<void> {
-  logger.info('CRON GRACE: Starting daily grace period jobs', { value: { time: new Date( }).toLocaleString('fr-FR') });
+  logger.info('CRON GRACE: Starting daily grace period jobs', { 
+    time: new Date().toLocaleString('fr-FR') 
+  });
   
   try {
     // 1. Convertir trials expirés en grace

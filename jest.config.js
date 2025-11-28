@@ -47,6 +47,9 @@ const customJestConfig = {
     '/src/lib/__tests__/',
     // Exclure les helpers
     '/src/__tests__/helpers/',
+    // Exclure les tests E2E (Playwright)
+    '/e2e/',
+    'e2e/',
   ],
   modulePathIgnorePatterns: [
     '/dist-electron/',

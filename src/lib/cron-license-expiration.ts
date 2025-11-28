@@ -66,8 +66,8 @@ export async function convertExpiredProBasiqueToGrace(): Promise<number> {
       logger.info('CRON EXPIRATION: License converted to grace period', { value: { 
         licenseKey: license.key, 
         tier: license.tier,
-        endsAt: gracePeriodEnds.toLocaleDateString('fr-FR' }) 
-      });
+        endsAt: gracePeriodEnds.toLocaleDateString('fr-FR')
+      } });
       
       // Envoyer Email notification: "Votre licence a expiré - Grace period 7 jours"
       try {
@@ -508,8 +508,8 @@ export async function sendMaintenanceEndNotifications(): Promise<void> {
  * ```
  */
 export async function runDailyLicenseExpirationJobs(): Promise<void> {
-  logger.info('CRON EXPIRATION: Starting daily license expiration jobs', { value: { 
-    time: new Date( }).toLocaleString('fr-FR') 
+  logger.info('CRON EXPIRATION: Starting daily license expiration jobs', { 
+    time: new Date().toLocaleString('fr-FR') 
   });
   
   try {

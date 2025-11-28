@@ -60,12 +60,12 @@
       - generic [ref=e55]:
         - paragraph [ref=e56]: 🎉 Essai PRO gratuit
         - paragraph [ref=e57]:
-          - strong [ref=e58]: 12 jours
+          - strong [ref=e58]: 9 jours
           - text: restants
         - generic [ref=e59]: Jusqu'au 7 décembre
       - generic [ref=e60]:
         - progressbar [ref=e61]
-        - generic [ref=e63]: 14%
+        - generic [ref=e63]: 36%
     - generic [ref=e65]:
       - button "Voir les offres" [ref=e66] [cursor=pointer]:
         - img [ref=e68]
@@ -78,4 +78,27 @@
     - button "Open Tanstack query devtools" [ref=e125] [cursor=pointer]:
       - img [ref=e126]
   - alert [ref=e174]
+  - dialog "Failed to compile" [ref=e177]:
+    - generic [ref=e178]:
+      - generic [ref=e179]:
+        - heading "Failed to compile" [level=4] [ref=e180]
+        - generic [ref=e181]:
+          - text: Next.js (13.5.6) is outdated
+          - link "(learn more)" [ref=e183] [cursor=pointer]:
+            - /url: https://nextjs.org/docs/messages/version-staleness
+      - generic [ref=e184]:
+        - generic [ref=e185]:
+          - link "./src/lib/api-error.ts" [ref=e186] [cursor=pointer]:
+            - text: ./src/lib/api-error.ts
+            - img [ref=e187]
+          - generic [ref=e191]:
+            - text: "Error: x cannot reassign to a variable declared with `const` ,-[C:\\atelier\\src\\lib\\api-error.ts:26:1] 26 | const isDev = process.env.NODE_ENV === 'development'; 27 | 28 | // Log serveur (toujours visible dans les logs) 29 | const errorMessage = error instanceof Error ? error.message : String(error); : ^^^^^^|^^^^^ : `-- const variable was declared here 30 | logger.error(`[API Error${context ? ` - ${context}` : ''}]`, { error: errorMessage }); 31 | 32 | // Déterminer le message d'erreur 33 | let errorMessage = 'internal_error'; 34 | let statusCode = 500; 35 | 36 | if (error instanceof Error) { 37 | // En dev: montrer le message d'erreur 38 | // En prod: message générique sauf pour les erreurs métier connues 39 | if (isDev) { 40 | errorMessage = error.message; : ^^^^^^|^^^^^ : `-- cannot reassign 41 | } else { 42 | // Liste blanche des erreurs métier à exposer 42 | const safeErrors = [ `---- x cannot reassign to a variable declared with `const` ,-[C:\\atelier\\src\\lib\\api-error.ts:26:1] 26 | const isDev = process.env.NODE_ENV === 'development'; 27 | 28 | // Log serveur (toujours visible dans les logs) 29 | const errorMessage = error instanceof Error ? error.message : String(error); : ^^^^^^|^^^^^ : `-- const variable was declared here 30 | logger.error(`[API Error${context ? ` - ${context}` : ''}]`, { error: errorMessage }); 31 | 32 | // Déterminer le message d'erreur 33 | let errorMessage = 'internal_error'; 34 | let statusCode = 500; 35 | 36 | if (error instanceof Error) { 37 | // En dev: montrer le message d'erreur 38 | // En prod: message générique sauf pour les erreurs métier connues 39 | if (isDev) { 40 | errorMessage = error.message; 41 | } else { 42 | // Liste blanche des erreurs métier à exposer 43 | const safeErrors = [ 44 | 'unauthorized', 45 | 'forbidden', 46 | 'not_found', 47 | 'invalid_payload', 48 | 'validation_error', 49 | 'duplicate_entry', 50 | 'no_user_in_database', 51 | 'no_user_found', 52 | ]; 53 | 54 | if (safeErrors.some(safe => error.message.toLowerCase().includes(safe))) { 55 | errorMessage = error.message; : ^^^^^^|^^^^^ : `-- cannot reassign 56 | } 57 | } 57 | `---- x the name `errorMessage` is defined multiple times ,-[C:\\atelier\\src\\lib\\api-error.ts:26:1] 26 | const isDev = process.env.NODE_ENV === 'development'; 27 | 28 | // Log serveur (toujours visible dans les logs) 29 | const errorMessage = error instanceof Error ? error.message : String(error); : ^^^^^^|^^^^^ : `-- previous definition of `errorMessage` here 30 | logger.error(`[API Error${context ? ` - ${context}` : ''}]`, { error: errorMessage }); 31 | 32 | // Déterminer le message d'erreur 33 | let errorMessage = 'internal_error'; : ^^^^^^|^^^^^ : `-- `errorMessage` redefined here 34 | let statusCode = 500; 35 | 35 | if (error instanceof Error) { `---- Import trace for requested module:"
+            - link "./src/lib/api-error.ts" [ref=e192] [cursor=pointer]:
+              - text: ./src/lib/api-error.ts
+              - img [ref=e193]
+            - link "./src/app/api/auth/login/route.ts" [ref=e197] [cursor=pointer]:
+              - text: ./src/app/api/auth/login/route.ts
+              - img [ref=e198]
+        - contentinfo [ref=e202]:
+          - paragraph [ref=e203]: This error occurred during the build process and can only be dismissed by fixing the error.
 ```
