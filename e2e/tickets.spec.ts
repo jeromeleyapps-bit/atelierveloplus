@@ -31,7 +31,7 @@ test.describe('Tickets (Work Orders)', () => {
     
     // Cliquer sur le bouton "Nouveau Ticket" - le texte exact est "Nouveau Ticket"
     const createButton = page.getByRole('button', { name: /nouveau ticket/i }).first();
-    await createButton.waitFor({ state: 'visible', timeout: 10000 });
+    await expect(createButton).toBeVisible({ timeout: 10000 });
     await createButton.click();
     
     // Vérifier que le dialog s'ouvre
