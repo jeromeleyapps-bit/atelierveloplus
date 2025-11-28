@@ -42,7 +42,7 @@ describe('GET /api/debug/env', () => {
   });
 
   it('should include NODE_ENV', async () => {
-    process.env.NODE_ENV = 'production';
+    Object.defineProperty(process.env, 'NODE_ENV', { value: 'production', writable: true, configurable: true });
 
     const res = await GET();
     const data = await res.json();

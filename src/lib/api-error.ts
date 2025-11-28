@@ -26,8 +26,8 @@ export function handleApiError(error: unknown, context?: string): NextResponse {
   const isDev = process.env.NODE_ENV === 'development';
   
   // Log serveur (toujours visible dans les logs)
-  const errorMessage = error instanceof Error ? error.message : String(error);
-  logger.error(`[API Error${context ? ` - ${context}` : ''}]`, { error: errorMessage });
+  const logErrorMessage = error instanceof Error ? error.message : String(error);
+  logger.error(`[API Error${context ? ` - ${context}` : ''}]`, { error: logErrorMessage });
   
   // Déterminer le message d'erreur
   let errorMessage = 'internal_error';
