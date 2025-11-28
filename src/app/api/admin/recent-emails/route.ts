@@ -65,7 +65,7 @@ export async function GET() {
     }, { status: 200 });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Erreur serveur";
-    logger.error("Error fetching recent emails:", message);
+    logger.error("Error fetching recent emails:", { error: message });
     return NextResponse.json(
       { error: message },
       { status: 500 }

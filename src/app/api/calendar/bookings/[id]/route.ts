@@ -27,7 +27,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     return NextResponse.json(updated);
   } catch (e) {
     const message = e instanceof Error ? e.message : 'Not found or update failed';
-    logger.error("[API] Error updating booking:", message);
+    logger.error("[API] Error updating booking:", { error: message });
     return NextResponse.json({ error: "Not found or update failed" }, { status: 404 });
   }
 }

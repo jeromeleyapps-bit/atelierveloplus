@@ -24,7 +24,7 @@ export async function POST() {
 
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Erreur inconnue';
-    logger.error('[API] ❌ Erreur jobs quotidiens:', message);
+    logger.error('[API] ❌ Erreur jobs quotidiens:', { error: message });
     
     return NextResponse.json({
       error: 'job_failed',

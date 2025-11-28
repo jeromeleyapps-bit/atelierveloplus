@@ -113,7 +113,7 @@ Gestion d'atelier vélo simplifiée`,
       `,
     });
 
-    logger.info('[TEST-EMAIL] ✅ Email envoyé:', info.messageId);
+    logger.info('[TEST-EMAIL] ✅ Email envoyé:', { messageId: info.messageId });
 
     return NextResponse.json({
       success: true,
