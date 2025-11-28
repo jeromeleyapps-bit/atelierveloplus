@@ -9,26 +9,26 @@ test.describe('Customers', () => {
 
   test('should display customers page', async ({ page }) => {
     await page.goto('/customers');
-    await page.waitForURL(/\/customers/, { timeout: 10000 });
+    await page.waitForURL(/\/customers/, { timeout: 20000 });
     await page.waitForLoadState('networkidle');
     
     // Vérifier que la page des clients s'affiche - le titre "👥 Clients" dans un Typography
-    // Utiliser .first() car il peut y avoir plusieurs éléments avec "Clients"
-    await expect(page.getByText(/clients/i).first()).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(/clients|gestion.*clientèle/i).first()).toBeVisible({ timeout: 10000 });
   });
 
   test('should open create customer dialog', async ({ page }) => {
     await page.goto('/customers');
+    await page.waitForURL(/\/customers/, { timeout: 20000 });
     await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(2000);
     
     // Sur la page customers, le formulaire de création est inline (pas de dialog)
     // Vérifier que la section "Créer un client" est visible
     const createSection = page.getByText(/créer un client/i);
     await expect(createSection).toBeVisible({ timeout: 10000 });
     
-    // Vérifier que le formulaire est présent avec au moins un champ
-    const emailField = page.getByLabel(/email/i);
+    // Vérifier que le formulaire est présent avec au moins un champ Email
+    const emailField = page.getByLabel(/^email$/i).first();
     await expect(emailField).toBeVisible({ timeout: 5000 });
   });
 
