@@ -141,7 +141,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     return NextResponse.json({ ok: true, messageId: info.messageId }, { status: 200 });
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
-    logger.error('invoice_remind_error', message);
+    logger.error('invoice_remind_error', { error: message });
     return NextResponse.json({ error: 'remind_failed', detail: message }, { status: 500 });
   }
 }

@@ -16,7 +16,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     return NextResponse.json(rows, { status: 200 });
   } catch (e) {
     const message = e instanceof Error ? e.message : 'Erreur inconnue';
-    logger.error("[payments][GET] list_payments_failed", message);
+    logger.error("[payments][GET] list_payments_failed", { error: message });
     return NextResponse.json({ error: "list_payments_failed", detail: String(e?.message || e) }, { status: 500 });
   }
 }

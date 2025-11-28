@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Erreur activation';
-    logger.error('[API] Erreur activation RDV:', message);
+    logger.error('[API] Erreur activation RDV', { error: message });
     return NextResponse.json(
       { error: message },
       { status: 500 }

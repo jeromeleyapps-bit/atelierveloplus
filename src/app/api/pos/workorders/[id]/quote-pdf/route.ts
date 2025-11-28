@@ -171,7 +171,7 @@ export async function GET(
           const buf = fs.readFileSync(fullPath);
           (invoiceData as { logoBytes?: Uint8Array }).logoBytes = new Uint8Array(buf);
           logoLoaded = true;
-          logger.info('[QUOTE-PDF] Logo uploadé chargé:', fullPath);
+          logger.info('[QUOTE-PDF] Logo uploadé chargé', { fullPath });
         }
       } catch (e) {
         logger.error('[QUOTE-PDF] Erreur chargement logo uploadé:', e);

@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true }, { status: 200 });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
-    logger.error("[DIAG] Envoi diagnostics email error:", message);
+    logger.error("[DIAG] Envoi diagnostics email error", { error: message });
     return NextResponse.json(
       { error: "send_failed", message },
       { status: 500 }

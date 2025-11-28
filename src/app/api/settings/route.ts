@@ -38,7 +38,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ key: setting.key, value: setting.value }, { status: 200 });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Erreur interne';
-    logger.error("[POST /api/settings] Error:", message);
+    logger.error("[POST /api/settings] Error", { error: message });
     return NextResponse.json(
       { error: "internal_error", message },
       { status: 500 }

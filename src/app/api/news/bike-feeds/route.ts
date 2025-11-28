@@ -149,7 +149,7 @@ async function parseFeed(feedUrl: string, source: string, category: string): Pro
     
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Erreur de parsing';
-    logger.error(`[RSS] ${source} ERROR:`, message);
+    logger.error(`[RSS] ${source} ERROR`, { error: message });
     return [];
   }
 }
@@ -186,7 +186,7 @@ export async function GET() {
     
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Erreur globale RSS';
-    logger.error('[RSS] Erreur globale:', message);
+    logger.error('[RSS] Erreur globale', { error: message });
     return NextResponse.json({ 
       items: [], 
       count: 0,

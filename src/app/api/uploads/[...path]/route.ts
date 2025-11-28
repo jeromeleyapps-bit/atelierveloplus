@@ -31,13 +31,13 @@ export async function GET(
     
     // Sécurité: Vérifier que le chemin reste dans uploads
     if (!filepath.startsWith(uploadsRoot)) {
-      logger.error('[UPLOADS-SERVE] ❌ Path traversal attempt:', filepath);
+      logger.error('[UPLOADS-SERVE] ❌ Path traversal attempt', { filepath });
       return new NextResponse('Forbidden', { status: 403 });
     }
 
     // Vérifier existence
     if (!existsSync(filepath)) {
-      logger.warn('[UPLOADS-SERVE] ⚠️  Fichier introuvable:', filepath);
+      logger.warn('[UPLOADS-SERVE] ⚠️  Fichier introuvable', { filepath });
       return new NextResponse('Fichier introuvable', { status: 404 });
     }
 
@@ -68,7 +68,7 @@ export async function GET(
 
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Erreur inconnue';
-    logger.error('[UPLOADS-SERVE] ❌ Erreur:', message);
+    logger.error('[UPLOADS-SERVE] ❌ Erreur', { error: message });
     return new NextResponse('Erreur serveur', { status: 500 });
   }
 }

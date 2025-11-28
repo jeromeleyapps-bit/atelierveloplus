@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Erreur désactivation';
-    logger.error('[API] Erreur désactivation RDV:', message);
+    logger.error('[API] Erreur désactivation RDV', { error: message });
     return NextResponse.json(
       { error: message },
       { status: 500 }

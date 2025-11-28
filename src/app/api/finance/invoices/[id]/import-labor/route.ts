@@ -120,7 +120,7 @@ export async function POST(
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to import labor";
-    logger.error("Error importing labor to invoice:", message);
+    logger.error("Error importing labor to invoice", { error: message });
     return NextResponse.json(
       { error: message },
       { status: 500 }

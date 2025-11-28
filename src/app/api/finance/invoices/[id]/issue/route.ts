@@ -85,7 +85,7 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
     return NextResponse.json(updatedInvoice, { status: 200 });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    logger.error('Invoice issue error:', message);
+    logger.error('Invoice issue error', { error: message });
     return NextResponse.json({ 
       error: 'invoice_issue_failed', 
       detail: message

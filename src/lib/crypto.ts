@@ -4,7 +4,6 @@
  */
 
 import crypto from 'crypto';
-import { logger } from './logger';
 import { logger } from '@/lib/logger';
 
 const ALGORITHM = 'aes-256-gcm';

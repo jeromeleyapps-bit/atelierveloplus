@@ -176,7 +176,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     let logoLoaded = false;
     
     logger.info('[send-email] 🔍 Tentative chargement logo...');
-    logger.info('[send-email] Settings shopLogo:', settings?.shopLogo);
+    logger.info('[send-email] Settings shopLogo', { shopLogo: settings?.shopLogo });
     
     // PRIORITÉ 1: Logo uploadé par l'utilisateur
     if (settings?.shopLogo && typeof settings.shopLogo === 'string') {
@@ -192,18 +192,19 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
           ? path.join(process.env.USER_DATA_PATH, relativePath)
           : path.join(process.cwd(), 'public', relativePath);
         
-        logger.info('[send-email] Chemin logo atelier:', fullPath);
+        logger.info('[send-email] Chemin logo atelier', { fullPath });
         
         if (fs.existsSync(fullPath)) {
           const buf = fs.readFileSync(fullPath);
           logoBytes = new Uint8Array(buf);
           logoLoaded = true;
-          logger.info('[send-email] ✅ Logo atelier chargé:', relativePath);
+          logger.info('[send-email] ✅ Logo atelier chargé', { relativePath });
         } else {
-          logger.warn('[send-email] ⚠️ Fichier logo introuvable:', fullPath);
+          logger.warn('[send-email] ⚠️ Fichier logo introuvable', { fullPath });
         }
       } catch (e) {
-        logger.error('[send-email] ❌ Erreur chargement logo atelier:', e);
+        const errorMessage = e instanceof Error ? e.message : String(e);
+        logger.error('[send-email] ❌ Erreur chargement logo atelier', { error: errorMessage });
       }
     } else {
       logger.info('[send-email] Pas de logo atelier configuré (settings.shopLogo vide)');
@@ -219,7 +220,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
         // Electron packaged
         if (resPath) {
           const p = path.join(resPath, 'web', 'public', 'logo.png');
-          logger.info('[send-email] Tentative fallback (resources):', p);
+          logger.info('[send-email] Tentative fallback (resources)', { path: p });
           if (fs.existsSync(p)) {
             const buf = fs.readFileSync(p);
             logoBytes = new Uint8Array(buf);
@@ -231,7 +232,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
         // Dev local
         if (!logoLoaded) {
           const p2 = path.join(process.cwd(), 'public', 'logo.png');
-          logger.info('[send-email] Tentative fallback (public):', p2);
+          logger.info('[send-email] Tentative fallback (public)', { path: p2 });
           if (fs.existsSync(p2)) {
             const buf = fs.readFileSync(p2);
             logoBytes = new Uint8Array(buf);
@@ -240,7 +241,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
           }
         }
       } catch (e) {
-        logger.error('[send-email] ❌ Erreur fallback logo.png:', e);
+        const errorMessage = e instanceof Error ? e.message : String(e);
+        logger.error('[send-email] ❌ Erreur fallback logo.png', { error: errorMessage });
       }
     }
     
@@ -314,7 +316,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
         },
       }, req);
     } catch (logError) {
-      logger.error('[send-email] Error logging email:', logError);
+      const errorMessage = logError instanceof Error ? logError.message : String(logError);
+      logger.error('[send-email] Error logging email', { error: errorMessage });
     }
 
     // ⭐ Incrémenter compteur emails après envoi réussi
@@ -327,7 +330,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     }, { status: 200 });
 
   } catch (error) {
-    logger.error('Email send error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logger.error('Email send error', { error: errorMessage });
     const detail = error instanceof Error ? error.message : String(error);
     return NextResponse.json({ 
       error: 'email_send_failed', 

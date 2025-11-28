@@ -86,14 +86,15 @@ export async function GET(req: Request) {
     
     return NextResponse.json(out, { status: 200 });
   } catch (error) {
-    logger.error('[API /finance/invoices GET] Error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logger.error('[API /finance/invoices GET] Error', { error: errorMessage });
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      logger.error('[API /finance/invoices GET] Error code:', error.code);
-      logger.error('[API /finance/invoices GET] Error meta:', error.meta);
+      logger.error('[API /finance/invoices GET] Error code', { code: error.code });
+      logger.error('[API /finance/invoices GET] Error meta', { meta: error.meta });
       return NextResponse.json({ error: error.message, code: error.code, meta: error.meta }, { status: 500 });
     }
     const message = error instanceof Error ? error.message : 'fetch_error';
-    logger.error('[API /finance/invoices GET] Full error:', JSON.stringify(error, null, 2));
+    logger.error('[API /finance/invoices GET] Full error', { error: JSON.stringify(error, null, 2) });
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
