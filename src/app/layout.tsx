@@ -23,7 +23,16 @@ const inter = Inter({ subsets: ["latin"] });
 // Force dynamic rendering for all pages (fixes useContext pre-rendering issues)
 export const dynamic = 'force-dynamic';
 
+// Déterminer la base URL pour les métadonnées (Open Graph, Twitter Card)
+// Pour Electron en local, utiliser localhost:3000 par défaut
+const getMetadataBase = (): URL => {
+  // En production ou si défini dans l'environnement, utiliser la variable d'environnement
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL || 'http://localhost:3000';
+  return new URL(baseUrl.startsWith('http') ? baseUrl : `https://${baseUrl}`);
+};
+
 export const metadata: Metadata = {
+  metadataBase: getMetadataBase(),
   title: "Atelier Vélo+ | Upgraded Bikes",
   description: "Système de gestion d'atelier vélo - Copyright © 2024-2025 Jérôme Leyssard",
   // Note: viewport + themeColor doivent être exportés via `export const viewport`
