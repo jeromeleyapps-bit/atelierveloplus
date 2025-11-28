@@ -1,6 +1,5 @@
 import { test, expect } from '@playwright/test';
 import { login } from './helpers/auth-helper';
-import { goToDashboard } from './helpers/navigation-helper';
 
 test.describe('Navigation', () => {
   test.beforeEach(async ({ page }) => {
@@ -15,12 +14,15 @@ test.describe('Navigation', () => {
   });
 
   test('should navigate to tickets', async ({ page }) => {
-    await goToDashboard(page);
+    await page.goto('/dashboard');
+    await page.waitForURL(/\/dashboard/, { timeout: 10000 });
     await page.waitForLoadState('networkidle');
     
-    // Les liens de navigation sont des Button avec component={Link}
-    // Chercher par texte du bouton
-    const ticketsLink = page.getByRole('button', { name: /réparations/i }).first();
+    // Attendre que les liens de navigation soient chargés
+    await page.waitForTimeout(1000);
+    
+    // Les liens de navigation sont des Button avec component={Link}, rendus comme des links
+    const ticketsLink = page.getByRole('link', { name: /réparations/i }).first();
     await expect(ticketsLink).toBeVisible({ timeout: 10000 });
     await ticketsLink.click();
     
@@ -29,11 +31,12 @@ test.describe('Navigation', () => {
   });
 
   test('should navigate to customers', async ({ page }) => {
-    await goToDashboard(page);
+    await page.goto('/dashboard');
+    await page.waitForURL(/\/dashboard/, { timeout: 10000 });
     await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(1000);
     
-    // Les liens de navigation sont des Button avec component={Link}
-    const customersLink = page.getByRole('button', { name: /clients/i }).first();
+    const customersLink = page.getByRole('link', { name: /clients/i }).first();
     await expect(customersLink).toBeVisible({ timeout: 10000 });
     await customersLink.click();
     
@@ -42,11 +45,12 @@ test.describe('Navigation', () => {
   });
 
   test('should navigate to catalog', async ({ page }) => {
-    await goToDashboard(page);
+    await page.goto('/dashboard');
+    await page.waitForURL(/\/dashboard/, { timeout: 10000 });
     await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(1000);
     
-    // Les liens de navigation sont des Button avec component={Link}
-    const catalogLink = page.getByRole('button', { name: /catalogue/i }).first();
+    const catalogLink = page.getByRole('link', { name: /catalogue/i }).first();
     await expect(catalogLink).toBeVisible({ timeout: 10000 });
     await catalogLink.click();
     
@@ -55,11 +59,12 @@ test.describe('Navigation', () => {
   });
 
   test('should navigate to finance', async ({ page }) => {
-    await goToDashboard(page);
+    await page.goto('/dashboard');
+    await page.waitForURL(/\/dashboard/, { timeout: 10000 });
     await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(1000);
     
-    // Les liens de navigation sont des Button avec component={Link}
-    const financeLink = page.getByRole('button', { name: /facturation/i }).first();
+    const financeLink = page.getByRole('link', { name: /facturation/i }).first();
     await expect(financeLink).toBeVisible({ timeout: 10000 });
     await financeLink.click();
     
@@ -68,15 +73,15 @@ test.describe('Navigation', () => {
   });
 
   test('should access admin settings', async ({ page }) => {
-    await goToDashboard(page);
+    await page.goto('/dashboard');
+    await page.waitForURL(/\/dashboard/, { timeout: 10000 });
     await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(1000);
     
-    // Les liens de navigation sont des Button avec component={Link}
-    const adminLink = page.getByRole('button', { name: /^admin$/i }).first();
+    const adminLink = page.getByRole('link', { name: /^admin$/i }).first();
     await expect(adminLink).toBeVisible({ timeout: 10000 });
     await adminLink.click();
     
-    // Vérifier qu'on est sur une page admin
     await expect(page).toHaveURL(/\/admin/, { timeout: 10000 });
     await page.waitForLoadState('networkidle');
   });

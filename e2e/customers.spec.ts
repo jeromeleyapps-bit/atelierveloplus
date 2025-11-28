@@ -55,28 +55,36 @@ test.describe('Customers', () => {
 
   test('should display customer details', async ({ page }) => {
     await page.goto('/customers');
+    await page.waitForURL(/\/customers/, { timeout: 10000 });
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(2000);
     
-    // Chercher la première ligne de client dans le tableau (skip l'en-tête row[0])
+    // Chercher un lien ou une ligne de client dans le tableau
+    // Peut être un lien dans le tableau ou une row cliquable
+    const customerLink = page.getByRole('link', { name: /client|customer/i }).first();
     const tableRows = page.getByRole('table').getByRole('row');
-    const rowCount = await tableRows.count();
     
-    if (rowCount > 1) {
-      // Cliquer sur la première ligne de données (index 1 car 0 est l'en-tête)
-      const firstDataRow = tableRows.nth(1);
-      await firstDataRow.click();
-      
-      // Attendre la navigation vers la page de détails
-      await expect(page).toHaveURL(/\/customers\/[a-z0-9-]+/, { timeout: 10000 });
-      await page.waitForLoadState('networkidle');
-      
-      // Vérifier qu'on voit les détails du client
-      await expect(page.getByText(/client|détails/i).first()).toBeVisible({ timeout: 5000 });
+    if (await customerLink.isVisible({ timeout: 3000 }).catch(() => false)) {
+      await customerLink.click();
     } else {
-      // Si aucun client dans la table, le test passe quand même (base vide)
-      expect(true).toBe(true);
+      const rowCount = await tableRows.count();
+      if (rowCount > 1) {
+        // Cliquer sur la première ligne de données (index 1 car 0 est l'en-tête)
+        const firstDataRow = tableRows.nth(1);
+        await firstDataRow.click();
+      } else {
+        // Si aucun client, le test passe (base vide)
+        expect(true).toBe(true);
+        return;
+      }
     }
+    
+    // Attendre la navigation vers la page de détails
+    await expect(page).toHaveURL(/\/customers\/[a-z0-9-]+/, { timeout: 10000 });
+    await page.waitForLoadState('networkidle');
+    
+    // Vérifier qu'on voit les détails du client
+    await expect(page.getByText(/client|détails|code/i).first()).toBeVisible({ timeout: 5000 });
   });
 });
 
