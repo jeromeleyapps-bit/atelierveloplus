@@ -13,6 +13,7 @@ export const TEST_CREDENTIALS = {
  */
 export async function login(page: Page, email = TEST_CREDENTIALS.email, password = TEST_CREDENTIALS.password) {
   await page.goto('/auth/login');
+  await page.waitForLoadState('networkidle');
   
   // Remplir le formulaire de connexion
   await page.getByLabel(/email/i).fill(email);
@@ -23,6 +24,11 @@ export async function login(page: Page, email = TEST_CREDENTIALS.email, password
   
   // Attendre la redirection vers le dashboard
   await page.waitForURL(/\/dashboard/, { timeout: 10000 });
+  await page.waitForLoadState('networkidle');
+  
+  // Attendre que l'authentification soit complètement initialisée
+  // Cela permet à RequireAuth de valider le token avant de naviguer ailleurs
+  await page.waitForTimeout(1000);
 }
 
 /**

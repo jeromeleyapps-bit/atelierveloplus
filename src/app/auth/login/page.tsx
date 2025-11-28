@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useState, useEffect } from "react";
 import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
@@ -24,7 +24,7 @@ export default function LoginPage() {
 }
 
 function LoginContent() {
-  const { user, login, logout } = useAuth();
+  const { user, login, logout, ready } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -32,6 +32,13 @@ function LoginContent() {
   const router = useRouter();
   const params = useSearchParams();
   const next = params.get("next") || "/dashboard";
+
+  // Rediriger automatiquement si l'utilisateur est déjà connecté
+  useEffect(() => {
+    if (ready && user) {
+      router.replace(next as Route);
+    }
+  }, [ready, user, next, router]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();

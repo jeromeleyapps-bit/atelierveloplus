@@ -8,23 +8,33 @@ test.describe('Tickets (Work Orders)', () => {
   });
 
   test('should display tickets page', async ({ page }) => {
+    // Naviguer vers tickets - RequireAuth peut rediriger temporairement vers login
     await page.goto('/tickets');
+    
+    // Attendre que la page soit finalement sur /tickets
+    // (la page de login redirige maintenant automatiquement si user connecté)
+    await page.waitForURL(/\/tickets/, { timeout: 20000 });
     await page.waitForLoadState('networkidle');
     
-    // Vérifier que la page des tickets s'affiche - le titre "🔧 Tickets Atelier" dans un Typography
-    await expect(page.getByText(/tickets.*atelier|réparations/i)).toBeVisible({ timeout: 10000 });
+    // Le titre est "🔧 Tickets Atelier" - chercher le texte
+    await expect(
+      page.getByText(/tickets.*atelier|gestion.*réparations/i).first()
+    ).toBeVisible({ timeout: 10000 });
   });
 
   test('should open create ticket dialog', async ({ page }) => {
     await page.goto('/tickets');
+    
+    // Attendre que RequireAuth termine la validation du token
+    await page.waitForURL(/\/tickets/, { timeout: 15000 });
     await page.waitForLoadState('networkidle');
     
     // Attendre que la page soit complètement chargée
     await page.waitForTimeout(1000);
     
-    // Cliquer sur le bouton "Nouveau Ticket" - le texte exact est "Nouveau Ticket"
-    const createButton = page.getByRole('button', { name: /nouveau ticket/i }).first();
-    await expect(createButton).toBeVisible({ timeout: 10000 });
+    // Cliquer sur le bouton "Nouveau Ticket" - chercher par texte exact
+    const createButton = page.getByRole('button', { name: /nouveau ticket/i });
+    await expect(createButton).toBeVisible({ timeout: 15000 });
     await createButton.click();
     
     // Vérifier que le dialog s'ouvre
