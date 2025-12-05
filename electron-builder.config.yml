@@ -177,9 +177,8 @@ extraResources:
 # ============================================================================
 win:
   target:
-    # ✅ FIX: Construire seulement NSIS pour éviter ENAMETOOLONG avec dir + nsis
-    # Le build dir est fait séparément si nécessaire
-    - target: nsis  # Créer installateur .exe pour distribution
+    # DIR: Crée seulement le dossier unpacked (pas d'installer)
+    - target: dir
       arch:
         - x64
   # FIX SIGNING TIMEOUT: Désactiver COMPLÈTEMENT la signature (évite ENAMETOOLONG)
@@ -187,6 +186,7 @@ win:
   # Avec node_modules complet, trop de fichiers → ENAMETOOLONG
   # Solution: Désactiver via variable d'environnement CSC_IDENTITY_AUTO_DISCOVERY=false
   forceCodeSigning: false
+  signAndEditExecutable: false
   
   # ✅ BEST PRACTICE ELECTRON: Configuration icône Windows
   # Format: .ico avec plusieurs tailles (16x16, 32x32, 48x48, 256x256)
