@@ -628,14 +628,16 @@ function createWindow() {
   
   mainWindow = new BrowserWindow(windowOptions);
 
-  // Force logout au démarrage (vide localStorage JWT)
-  mainWindow.webContents.on('did-finish-load', () => {
-    mainWindow.webContents.executeJavaScript(`
-      localStorage.removeItem('jwt_token');
-      localStorage.removeItem('user');
-      console.log('[ELECTRON] Logout forcé au démarrage');
-    `).catch(err => log.warn('[ELECTRON] Erreur logout:', err));
-  });
+  // ❌ DÉSACTIVÉ : Logout forcé causait page blanche (solution existante 27/11/2024)
+  // RAISON: Le logout forcé au démarrage peut causer des problèmes de redirection et page blanche
+  // REF: OUTILS-DIAGNOSTIC-PAGE-BLANCHE.md
+  // mainWindow.webContents.on('did-finish-load', () => {
+  //   mainWindow.webContents.executeJavaScript(`
+  //     localStorage.removeItem('jwt_token');
+  //     localStorage.removeItem('user');
+  //     console.log('[ELECTRON] Logout forcé au démarrage');
+  //   `).catch(err => log.warn('[ELECTRON] Erreur logout:', err));
+  // });
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show();

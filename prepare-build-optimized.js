@@ -44,7 +44,7 @@ const PATHS = {
   prismaClient: path.join(__dirname, 'node_modules', '@prisma', 'client'),
   dotPrisma: path.join(__dirname, 'node_modules', '.prisma', 'client'),
   licensePublicKey: path.join(__dirname, 'src', 'lib', 'license-rsa-public.pem'),
-  
+
   // Destination
   resources: path.join(__dirname, 'electron-resources', 'web'),
   schemaSQL: path.join(__dirname, 'electron-resources', 'schema.sql'),
@@ -68,15 +68,15 @@ const SERVER_ONLY_MODULES = [
   'postcss',
   'watchpack',          // Next.js dependency (file watching)
   'graceful-fs',        // watchpack dependency (CRITIQUE - manquant causait écran noir)
-  
+
   // ===== REACT CORE (OBLIGATOIRE) =====
   'react',
   'react-dom',
-  
+
   // ===== DATABASE (OBLIGATOIRE) =====
   '@prisma/client',
   '.prisma',
-  
+
   // ===== IMAGES (OBLIGATOIRE) =====
   'sharp',
   '@img',  // Binaires natifs libvips
@@ -87,15 +87,15 @@ const SERVER_ONLY_MODULES = [
   'color-name',         // sharp → color-convert dependency
   'simple-swizzle',     // sharp → color dependency
   'semver',             // sharp dependency
-  
+
   // ===== AUTH & SECURITY (OBLIGATOIRE) =====
   'jsonwebtoken',
   'jose',
   'bcryptjs',
-  
+
   // ===== EMAIL (OBLIGATOIRE) =====
   'nodemailer',
-  
+
   // ===== UTILITIES (OBLIGATOIRE) =====
   'date-fns',
   'zod',
@@ -103,16 +103,16 @@ const SERVER_ONLY_MODULES = [
   'fs-extra',
   'axios',
   'micromatch',
-  
+
   // ===== MONITORING (NATIF - pas de dépendances externes) =====
   // Sentry désactivé (fin période essai) - Utiliser monitoring-native.ts
-  
+
   // ===== CRON JOBS (SI UTILISÉ SERVEUR) =====
   'node-cron',
-  
+
   // ===== PDF GENERATION (SI UTILISÉ SERVEUR) =====
   'pdf-lib',
-  
+
   // ===== MACHINE ID (LICENSING) =====
   'node-machine-id',
   'hw-fingerprint',
@@ -180,28 +180,28 @@ fs.ensureDirSync(path.join(__dirname, 'electron-resources'));
 // Générer schema.sql depuis Prisma schema
 try {
   log('⚙️', 'Génération SQL depuis prisma/schema.prisma...');
-  
+
   const sqlRaw = execSync(
     'npx prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma --script',
     { encoding: 'utf8' }
   );
-  
+
   // Supprimer pollution: Tout avant premier "-- CreateTable"
   const lines = sqlRaw.split('\n');
-  const firstCreateIndex = lines.findIndex(line => 
+  const firstCreateIndex = lines.findIndex(line =>
     line.trim().startsWith('-- CreateTable') || line.trim().startsWith('CREATE TABLE')
   );
-  
-  const cleanSql = firstCreateIndex > 0 
+
+  const cleanSql = firstCreateIndex > 0
     ? lines.slice(firstCreateIndex).join('\n')
     : sqlRaw;
-  
+
   // Écrire fichier nettoyé
   fs.writeFileSync(PATHS.schemaSQL, cleanSql, 'utf8');
-  
+
   if (fs.existsSync(PATHS.schemaSQL)) {
     const stats = fs.statSync(PATHS.schemaSQL);
-    logSuccess(`schema.sql généré PROPRE (${Math.round(stats.size/1024)}KB)`);
+    logSuccess(`schema.sql généré PROPRE (${Math.round(stats.size / 1024)}KB)`);
     if (firstCreateIndex > 0) {
       log('🧹', `Pollution supprimée (${firstCreateIndex} lignes)`);
     }
@@ -263,7 +263,7 @@ log('📦', 'ÉTAPE 4/7 - Copie .next/ ORIGINAL (pas standalone)...');
 
 try {
   const nextDest = path.join(PATHS.resources, '.next');
-  
+
   // Copier TOUT .next/ (server/, static/, etc.) MAIS EXCLURE standalone
   // ✅ FIX CRITIQUE: Exclure .next/standalone/ explicitement (gain: -495 MB)
   // Raison: Si output: 'standalone' activé dans next.config.js, Next.js crée .next/standalone/ même si on copie .next/ ORIGINAL
@@ -273,9 +273,9 @@ try {
       if (src.includes('.next/standalone') || src.includes('.next\\standalone')) {
         return false;
       }
-      
+
       // OPTIMISATION: Exclure cache, fichiers temporaires, source maps
-      return !src.includes('cache') 
+      return !src.includes('cache')
         && !src.includes('.DS_Store')
         && !src.match(/\.tmp\d*$/)  // Exclure .tmp, .tmp4832, etc.
         && !src.match(/\.tmp$/)
@@ -284,7 +284,7 @@ try {
         && !src.endsWith('.css.map'); // Source maps CSS
     }
   });
-  
+
   // Vérifier chunks serveur
   const serverChunks = path.join(nextDest, 'server');
   if (fs.existsSync(serverChunks)) {
@@ -294,7 +294,22 @@ try {
     logError('.next/server/ manquant après copie!');
     process.exit(1);
   }
-  
+
+  // ✅ VÉRIFICATION CRITIQUE : BUILD_ID
+  // Next.js 14+ ne génère plus automatiquement BUILD_ID dans .next/
+  // Ce fichier est CRITIQUE pour le démarrage du serveur Next.js
+  const buildIdPath = path.join(nextDest, 'BUILD_ID');
+  if (!fs.existsSync(buildIdPath)) {
+    console.log('[PREBUILD] ⚠️  BUILD_ID manquant - Création...');
+    const crypto = require('crypto');
+    const buildId = crypto.randomBytes(10).toString('hex');
+    fs.writeFileSync(buildIdPath, buildId);
+    console.log(`[PREBUILD] ✅ BUILD_ID créé : ${buildId}`);
+  } else {
+    const buildId = fs.readFileSync(buildIdPath, 'utf8').trim();
+    console.log(`[PREBUILD] ✅ BUILD_ID présent : ${buildId}`);
+  }
+
 } catch (error) {
   logError(`Échec copie .next/: ${error.message}`);
   process.exit(1);
@@ -311,7 +326,7 @@ try {
   // Créer structure src/lib dans electron-resources/web
   const srcLibDest = path.join(PATHS.resources, 'src', 'lib');
   fs.ensureDirSync(srcLibDest);
-  
+
   // Copier clé publique RSA
   if (fs.existsSync(PATHS.licensePublicKey)) {
     const publicKeyDest = path.join(srcLibDest, 'license-rsa-public.pem');
@@ -361,47 +376,49 @@ try {
 }
 
 // ============================================================================
-// ÉTAPE 6: COPIE NODE_MODULES COMPLÈTE (BUILD AUTONOME)
+// ÉTAPE 6: INSTALLATION NODE_MODULES PROD (BUILD OPTIMISÉ)
 // ============================================================================
 
 console.log('');
-log('📚', 'ÉTAPE 6/7 - Copie node_modules COMPLÈTE (build autonome)...');
-log('ℹ️', 'Objectif: aucun copier/coller manuel post-build, zéro écran noir');
+log('📚', 'ÉTAPE 6/7 - Installation node_modules PRODUCTION (npm ci --omit=dev)...');
+log('ℹ️', 'Objectif: Réduire drastiquement le nombre de fichiers pour éviter ENAMETOOLONG');
 console.log('');
 
 const nodeModulesDest = path.join(PATHS.resources, 'node_modules');
+const tempInstallDir = path.join(__dirname, 'temp_build_deps');
 
 try {
-  if (!fs.existsSync(PATHS.nodeModules)) {
-    logError(`node_modules introuvable: ${PATHS.nodeModules}`);
-    process.exit(1);
+  // 1. Nettoyage destination et temp
+  if (fs.existsSync(nodeModulesDest)) {
+    fs.removeSync(nodeModulesDest);
   }
+  if (fs.existsSync(tempInstallDir)) {
+    fs.removeSync(tempInstallDir);
+  }
+  fs.ensureDirSync(tempInstallDir);
 
-  // Copie complète de node_modules vers electron-resources/web/node_modules
-  // On garde un filtrage léger (tmp, tests, docs) pour éviter les fichiers inutiles,
-  // mais on ne fait PLUS de liste blanche de paquets.
-  fs.copySync(PATHS.nodeModules, nodeModulesDest, {
-    filter: (src) => {
-      const basename = path.basename(src);
+  // 2. Copie package.json et package-lock.json
+  log('📋', 'Copie des fichiers de définition de paquets...');
+  fs.copySync(path.join(__dirname, 'package.json'), path.join(tempInstallDir, 'package.json'));
+  fs.copySync(path.join(__dirname, 'package-lock.json'), path.join(tempInstallDir, 'package-lock.json'));
 
-      // Exclure fichiers temporaires évidents
-      if (src.match(/\.tmp\d*$/) || src.match(/\.tmp$/)) return false;
-
-      // Exclure caches et dossiers de test/documentation non nécessaires au runtime
-      if (src.includes('__tests__') || src.includes('/tests/') || src.includes('\\tests\\')) return false;
-      if (src.includes('/examples/') || src.includes('\\examples\\')) return false;
-      if (src.includes('/benchmarks/') || src.includes('\\benchmarks\\')) return false;
-
-      if (basename === 'CHANGELOG.md' || basename === 'CHANGELOG' ||
-          basename === 'LICENSE' || basename === 'LICENSE.md') {
-        return false;
-      }
-
-      return true;
-    }
+  // 3. Installation PROD uniquement
+  log('⬇️', 'Installation des dépendances de production (patience...)...');
+  // Utilisation de npm ci pour une installation propre et rapide basée sur le lockfile
+  execSync('npm ci --omit=dev --ignore-scripts', {
+    cwd: tempInstallDir,
+    stdio: 'inherit',
+    env: { ...process.env, NODE_ENV: 'production' }
   });
 
-  logSuccess('node_modules complet copié vers electron-resources/web/node_modules');
+  // 4. Déplacement vers destination
+  log('🚚', 'Déplacement vers electron-resources/web/node_modules...');
+  fs.moveSync(path.join(tempInstallDir, 'node_modules'), nodeModulesDest);
+
+  // 5. Nettoyage temp
+  fs.removeSync(tempInstallDir);
+
+  logSuccess('node_modules optimisé installé avec succès');
 
   // Copier package.json racine (pour version info)
   try {
@@ -414,7 +431,8 @@ try {
   }
 
 } catch (error) {
-  logError(`Échec copie node_modules complet: ${error.message}`);
+  logError(`Échec installation node_modules optimisé: ${error.message}`);
+  // try { fs.removeSync(tempInstallDir); } catch (e) {} // Garder pour debug
   process.exit(1);
 }
 
@@ -492,7 +510,7 @@ log('🔄', 'BONUS - Renommage node_modules → npm_modules...');
 try {
   const nmSrc = path.join(PATHS.resources, 'node_modules');
   const nmDest = path.join(PATHS.resources, 'npm_modules');
-  
+
   if (fs.existsSync(nmSrc)) {
     fs.renameSync(nmSrc, nmDest);
     logSuccess('node_modules → npm_modules (contourne ignore electron-builder)');
