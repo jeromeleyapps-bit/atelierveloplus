@@ -165,7 +165,12 @@ extraResources:
   - from: .env.production
     to: web/.env.production
   
-  # 5. CLOUDFLARED (Désactivé - Fichier non présent)
+  # 5. ICÔNE APPLICATION (pour BrowserWindow en mode packagé)
+  # Nécessaire car signAndEditExecutable: false
+  - from: resources/icon.ico
+    to: icon.ico
+  
+  # 6. CLOUDFLARED (Désactivé - Fichier non présent)
   # Tunnel Cloudflare embarqué - À activer si nécessaire
   # - from: resources/cloudflared
   #   to: cloudflared
@@ -181,10 +186,8 @@ win:
     - target: dir
       arch:
         - x64
-  # FIX SIGNING TIMEOUT: Désactiver COMPLÈTEMENT la signature (évite ENAMETOOLONG)
-  # Même avec forceCodeSigning: false, electron-builder essaie de signer certains fichiers
-  # Avec node_modules complet, trop de fichiers → ENAMETOOLONG
-  # Solution: Désactiver via variable d'environnement CSC_IDENTITY_AUTO_DISCOVERY=false
+  # FIX ENAMETOOLONG: Désactiver signature ET édition
+  # L'icône sera définie via BrowserWindow dans main.js
   forceCodeSigning: false
   signAndEditExecutable: false
   

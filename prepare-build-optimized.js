@@ -418,6 +418,19 @@ try {
   // 5. Nettoyage temp
   fs.removeSync(tempInstallDir);
 
+  // 6. CRITIQUE: Copier .prisma/client depuis node_modules principal
+  // Car --ignore-scripts empêche prisma generate de s'exécuter
+  log('🔧', 'Copie .prisma/client (Prisma Query Engine)...');
+  const prismaClientSrc = path.join(__dirname, 'node_modules', '.prisma');
+  const prismaClientDest = path.join(nodeModulesDest, '.prisma');
+  
+  if (fs.existsSync(prismaClientSrc)) {
+    fs.copySync(prismaClientSrc, prismaClientDest);
+    logSuccess('.prisma/client copié avec succès');
+  } else {
+    logWarning('.prisma non trouvé - exécutez npx prisma generate');
+  }
+
   logSuccess('node_modules optimisé installé avec succès');
 
   // Copier package.json racine (pour version info)
