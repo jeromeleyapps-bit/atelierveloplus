@@ -45,9 +45,15 @@ const PATHS = {
   dotPrisma: path.join(__dirname, 'node_modules', '.prisma', 'client'),
   licensePublicKey: path.join(__dirname, 'src', 'lib', 'license-rsa-public.pem'),
 
-  // Destination
-  resources: path.join(__dirname, 'electron-resources', 'web'),
-  schemaSQL: path.join(__dirname, 'electron-resources', 'schema.sql'),
+  // ============================================================================
+  // DESTINATION: electron/web/ (DANS ASAR)
+  // ============================================================================
+  // CHANGEMENT 7 déc 2025: Copier vers electron/web/ au lieu de electron-resources/web/
+  // RAISON: Tout le code sera inclus dans app.asar pour éviter ENAMETOOLONG
+  // electron-builder inclura electron/**/* dans l'ASAR
+  // ============================================================================
+  resources: path.join(__dirname, 'electron', 'web'),
+  schemaSQL: path.join(__dirname, 'electron', 'schema.sql'),
 };
 
 // ============================================================================
@@ -538,23 +544,19 @@ app.prepare().then(() => {
 }
 
 // ============================================================================
-// ÉTAPE BONUS: RENOMMER NODE_MODULES → NPM_MODULES
+// ÉTAPE BONUS: RENOMMER NODE_MODULES → NPM_MODULES (DÉSACTIVÉ)
+// ============================================================================
+// CHANGEMENT 7 déc 2025: Ne plus renommer node_modules
+// RAISON: En mode ASAR, Prisma a besoin de node_modules/ (pas npm_modules/)
+// pour résoudre require('.prisma/client/default')
+// L'ancien workaround était pour contourner un bug electron-builder
+// qui ignorait node_modules/, mais avec ASAR ce n'est plus nécessaire
 // ============================================================================
 
 console.log('');
-log('🔄', 'BONUS - Renommage node_modules → npm_modules...');
+log('ℹ️', 'BONUS - node_modules conservé (mode ASAR - Prisma compatible)');
 
-try {
-  const nmSrc = path.join(PATHS.resources, 'node_modules');
-  const nmDest = path.join(PATHS.resources, 'npm_modules');
-
-  if (fs.existsSync(nmSrc)) {
-    fs.renameSync(nmSrc, nmDest);
-    logSuccess('node_modules → npm_modules (contourne ignore electron-builder)');
-  }
-} catch (error) {
-  logWarning(`Renommage échoué: ${error.message}`);
-}
+// NOTE: Ne plus renommer - garder node_modules tel quel
 
 // ============================================================================
 // RAPPORT FINAL
@@ -584,9 +586,9 @@ const stats = {
   '.next/': fs.existsSync(path.join(PATHS.resources, '.next')),
   'server.js': fs.existsSync(path.join(PATHS.resources, 'server.js')),
   '.env.production': fs.existsSync(path.join(PATHS.resources, '.env.production')),
-  'npm_modules/': fs.existsSync(path.join(PATHS.resources, 'npm_modules')),
-  '@prisma/client': fs.existsSync(path.join(PATHS.resources, 'npm_modules', '@prisma', 'client')),
-  '.prisma/client': fs.existsSync(path.join(PATHS.resources, 'npm_modules', '.prisma', 'client')),
+  'node_modules/': fs.existsSync(path.join(PATHS.resources, 'node_modules')),
+  '@prisma/client': fs.existsSync(path.join(PATHS.resources, 'node_modules', '@prisma', 'client')),
+  '.prisma/client': fs.existsSync(path.join(PATHS.resources, 'node_modules', '.prisma', 'client')),
 };
 
 Object.entries(stats).forEach(([name, exists]) => {

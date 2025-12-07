@@ -152,11 +152,7 @@ function createWindow(config, isDev, logger) {
   } else {
     logger.info('[WINDOW] Mode prod - attente serveur...');
     waitForServer(mainWindow, url, logger);
-    // DevTools activé temporairement pour diagnostic page blanche (29/11/2025)
-    mainWindow.webContents.once('did-finish-load', () => {
-      mainWindow.webContents.openDevTools();
-      logger.info('[WINDOW] DevTools activés pour diagnostic');
-    });
+    // NOTE 7 déc 2025: DevTools désactivés en production (diagnostic terminé)
   }
   
   return mainWindow;

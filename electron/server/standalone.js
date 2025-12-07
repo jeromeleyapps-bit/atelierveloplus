@@ -1,37 +1,38 @@
 /**
- * Next.js Standalone Server Manager
+ * Next.js Standalone Server Manager (MODE ASAR)
  * 
  * RESPONSABILITÉ: Démarrage/arrêt serveur Next.js en production
  * ISOLATION: Gestion processus + logs + env vars
+ * 
+ * CHANGEMENT 7 déc 2025: web/ est maintenant dans app.asar
+ * - server.js dans app.asar/web/server.js
+ * - npm_modules dans app.asar/web/npm_modules/
+ * - Query engine dans app.asar.unpacked/
+ * - .env.production dans extraResources (resources/)
  */
 
 const fs = require('fs');
 const path = require('path');
 const { spawn, execSync } = require('child_process');
 const dotenv = require('dotenv');
+const { app } = require('electron');
 
 let serverProcess = null;
 
 /**
- * Charge variables d'environnement depuis .env et .env.production
+ * Charge variables d'environnement depuis extraResources
+ * CHANGEMENT 7 déc 2025: .env.production dans resources/ (pas resources/web/)
  * 
- * @param {string} webPath - Chemin resources/web
+ * @param {string} resourcesPath - Chemin process.resourcesPath
  * @returns {Object} - Variables d'environnement
  */
-function loadEnvFiles(webPath) {
+function loadEnvFiles(resourcesPath) {
   const envVars = {};
   
-  // .env.production (prioritaire)
-  const envProdPath = path.join(webPath, '.env.production');
+  // .env.production dans extraResources (pas dans ASAR)
+  const envProdPath = path.join(resourcesPath, '.env.production');
   if (fs.existsSync(envProdPath)) {
     const parsed = dotenv.parse(fs.readFileSync(envProdPath));
-    Object.assign(envVars, parsed);
-  }
-  
-  // .env (fallback)
-  const envPath = path.join(webPath, '.env');
-  if (fs.existsSync(envPath)) {
-    const parsed = dotenv.parse(fs.readFileSync(envPath));
     Object.assign(envVars, parsed);
   }
   
@@ -39,23 +40,39 @@ function loadEnvFiles(webPath) {
 }
 
 /**
- * Trouve le chemin du query engine Prisma
+ * Trouve le chemin du query engine Prisma dans app.asar.unpacked
+ * CHANGEMENT 7 déc 2025: Engine dans app.asar.unpacked (binaire natif)
  * 
- * @param {string} webPath - Chemin resources/web
+ * @param {string} resourcesPath - Chemin process.resourcesPath
  * @param {Object} logger - Logger
  * @returns {string|null} - Chemin engine ou null
  */
-function findPrismaEngine(webPath, logger) {
-  const engineRoot = path.join(webPath, 'npm_modules', '.prisma', 'client');
+function findPrismaEngine(resourcesPath, logger) {
+  // Query engine dans app.asar.unpacked (binaire natif)
+  // CHEMIN: app.asar.unpacked/electron/web/node_modules/.prisma/client/
+  const engineRoot = path.join(
+    resourcesPath,
+    'app.asar.unpacked',
+    'electron',
+    'web',
+    'node_modules',
+    '.prisma',
+    'client'
+  );
   
   try {
     logger.log('[PRISMA] Recherche query engine dans:', engineRoot);
+    
+    if (!fs.existsSync(engineRoot)) {
+      logger.error('[PRISMA] ❌ engineRoot non trouvé:', engineRoot);
+      return null;
+    }
+    
     const engineFile = fs.readdirSync(engineRoot).find((file) => file.endsWith('.node'));
     
     if (engineFile) {
       const enginePath = path.join(engineRoot, engineFile);
       logger.log('[PRISMA] ✅ Query engine trouvé:', engineFile);
-      logger.log('[PRISMA] Fichier existe:', fs.existsSync(enginePath));
       return enginePath;
     } else {
       logger.error('[PRISMA] ❌ Aucun fichier .node trouvé');
@@ -68,42 +85,31 @@ function findPrismaEngine(webPath, logger) {
 }
 
 /**
- * Démarre le serveur Next.js standalone
+ * Démarre le serveur Next.js standalone (MODE ASAR)
+ * 
+ * CHANGEMENT 7 déc 2025: web/ est dans app.asar
+ * Plus besoin de symlink node_modules → npm_modules
  * 
  * @param {Object} config - Configuration
  * @param {string} config.resourcesPath - Chemin process.resourcesPath
  * @param {string} config.dataPath - Chemin userData
  * @param {string} config.dbPath - Chemin base de données
- * @param {Function} config.ensureSymlink - Fonction création symlink
  * @param {Object} logger - Logger
  * @returns {Object} - Processus serveur
  */
 function startStandaloneServer(config, logger) {
-  const { resourcesPath, dataPath, dbPath, ensureSymlink } = config;
+  const { resourcesPath, dataPath, dbPath } = config;
   
-  const webPath = path.join(resourcesPath, 'web');
+  // MODE ASAR: web/ est dans app.asar/electron/web/
+  const webPath = path.join(app.getAppPath(), 'electron', 'web');
   const serverPath = path.join(webPath, 'server.js');
+  const nodeModulesPath = path.join(webPath, 'node_modules');
   
-  // WORKAROUND: Créer symlink node_modules → npm_modules
-  // CRITIQUE: Doit être fait AVANT démarrage serveur
-  if (!fs.existsSync(path.join(webPath, 'node_modules'))) {
-    const success = ensureSymlink(webPath, logger);
-    if (!success) {
-      logger.error('[NEXT] ❌ CRITIQUE: node_modules manquant');
-      logger.error('[NEXT] Serveur Next.js ne pourra pas démarrer');
-      
-      const { dialog, app } = require('electron');
-      dialog.showErrorBox(
-        'Erreur Serveur',
-        'Impossible de configurer le serveur Next.js.\n\n' +
-        'Le dossier node_modules ne peut pas être créé.\n' +
-        'L\'application doit se fermer.'
-      );
-      
-      app.quit();
-      return null;
-    }
-  }
+  // Wrapper pour contourner le problème de chdir dans ASAR
+  // Le wrapper est dans electron/ (hors de web/) donc accessible
+  const wrapperPath = path.join(app.getAppPath(), 'electron', 'server-wrapper.js');
+  
+  // NOTE 7 déc 2025: Plus besoin de symlink, Electron résout les chemins ASAR
   
   logger.info('[NEXT] ===== DÉMARRAGE SERVEUR NEXT.JS =====');
   logger.info('[NEXT] webPath:', webPath);
@@ -133,11 +139,11 @@ function startStandaloneServer(config, logger) {
   // Pattern standard Electron (VS Code, Slack, Discord utilisent ce pattern)
   const nodePath = process.execPath;
 
-  // Charger variables d'environnement
-  const envVars = loadEnvFiles(webPath);
+  // Charger variables d'environnement (depuis extraResources, pas ASAR)
+  const envVars = loadEnvFiles(resourcesPath);
   
-  // Trouver Prisma engine
-  const enginePath = findPrismaEngine(webPath, logger);
+  // Trouver Prisma engine (dans app.asar.unpacked)
+  const enginePath = findPrismaEngine(resourcesPath, logger);
   
   // Configuration complète environnement
   const env = {
@@ -159,7 +165,9 @@ function startStandaloneServer(config, logger) {
     // Variables Prisma critiques
     PRISMA_CLIENT_ENGINE_TYPE: 'library',
     PRISMA_QUERY_ENGINE_LIBRARY: enginePath,
-    NODE_PATH: path.join(webPath, 'npm_modules')
+    NODE_PATH: nodeModulesPath,
+    // Cache Next.js hors de l'ASAR (évite erreurs ENOTDIR)
+    NEXT_CACHE_DIR: path.join(dataPath, 'cache', 'next')
   };
 
   logger.info('[PRISMA] Variables environnement configurées');
@@ -168,8 +176,20 @@ function startStandaloneServer(config, logger) {
   logger.info('[NEXT] Port:', env.PORT);
   logger.info('[NEXT] Database:', env.DATABASE_URL);
   
-  // Lancer le serveur
-  serverProcess = spawn(nodePath, [serverPath], { cwd: webPath, env });
+  // Lancer le serveur via le wrapper
+  // Le wrapper contourne le problème de process.chdir() dans ASAR
+  const actualCwd = resourcesPath;
+  logger.info('[NEXT] CWD (réel):', actualCwd);
+  logger.info('[NEXT] wrapperPath:', wrapperPath);
+  logger.info('[NEXT] serverPath (ASAR):', serverPath);
+  
+  // Le wrapper reçoit le chemin du server.js en argument
+  serverProcess = spawn(nodePath, [wrapperPath, serverPath], { 
+    cwd: actualCwd, 
+    env,
+    stdio: ['ignore', 'pipe', 'pipe'],
+    windowsHide: true
+  });
   logger.info('[NEXT] ✅ Process spawned, PID:', serverProcess.pid);
 
   // Capturer logs

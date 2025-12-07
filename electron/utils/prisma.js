@@ -1,16 +1,17 @@
 /**
- * Prisma Client Loader - Mode Packagé
+ * Prisma Client Loader - Mode Packagé (ASAR)
  * 
- * CAUSE: Electron packagé nécessite résolution modules custom
- * Prisma fait require('.prisma/client/default') qui doit trouver chemin
+ * CHANGEMENT 7 déc 2025: web/ est maintenant dans app.asar
+ * - npm_modules dans app.asar/web/npm_modules/
+ * - Query engine dans app.asar.unpacked/web/npm_modules/.prisma/client/
  * 
- * SOLUTION: createRequire depuis contexte @prisma/client
- * 
- * PRÉ-REQUIS: Symlink node_modules → npm_modules créé
+ * Plus besoin de symlink node_modules → npm_modules
+ * Electron résout automatiquement les chemins dans ASAR
  * 
  * HISTORIQUE:
  * - Commit 353c90c: Fix ordre exécution (symlink AVANT loadPrismaClient)
  * - Commit 5d9532d: Utiliser web/npm_modules au lieu de prisma-client/
+ * - 7 déc 2025: Mode ASAR - Plus de symlink nécessaire
  */
 
 const fs = require('fs');
@@ -18,21 +19,12 @@ const path = require('path');
 const Module = require('module');
 
 /**
- * Charge Prisma Client avec résolution correcte en mode packagé
+ * Charge Prisma Client avec résolution correcte en mode ASAR
  * 
  * @param {Object} app - Instance Electron app
  * @param {Object} logger - Logger (console par défaut)
- * @param {Function} createRequireFn - Fonction createRequire (pour tests, défaut: Module.createRequire)
+ * @param {Function} createRequireFn - Fonction createRequire (pour tests)
  * @returns {Object} - Module @prisma/client
- * 
- * @example
- * const { PrismaClient } = loadPrismaClient(app);
- * const prisma = new PrismaClient();
- * 
- * @example
- * // Pour les tests : injection de dépendance
- * const mockCreateRequire = jest.fn((path) => jest.fn((id) => mockPrismaClient));
- * loadPrismaClient(mockApp, mockLogger, mockCreateRequire);
  */
 function loadPrismaClient(app, logger = console, createRequireFn = Module.createRequire) {
   // Mode développement: require standard
@@ -41,51 +33,64 @@ function loadPrismaClient(app, logger = console, createRequireFn = Module.create
     return require('@prisma/client');
   }
 
-  logger.log('[PRISMA] Mode packagé: résolution custom...');
+  logger.log('[PRISMA] Mode packagé ASAR: résolution custom...');
 
-  // Utiliser web/npm_modules/ (structure correcte pour Prisma)
-  const webPath = path.join(process.resourcesPath, 'web');
-  const npmModulesPath = path.join(webPath, 'npm_modules');
-  const clientRoot = path.join(npmModulesPath, '@prisma', 'client');
-  const engineRoot = path.join(npmModulesPath, '.prisma', 'client');
+  // MODE ASAR: web/ est dans app.asar/electron/web/
+  // app.getAppPath() retourne le chemin vers app.asar
+  // La structure dans l'ASAR est: electron/web/node_modules/
+  const webPath = path.join(app.getAppPath(), 'electron', 'web');
+  const nodeModulesPath = path.join(webPath, 'node_modules');
+  const clientRoot = path.join(nodeModulesPath, '@prisma', 'client');
+  
+  // Query engine dans app.asar.unpacked (binaire natif)
+  // CHEMIN: app.asar.unpacked/electron/web/node_modules/.prisma/client/
+  const engineRoot = path.join(
+    process.resourcesPath,
+    'app.asar.unpacked',
+    'electron',
+    'web',
+    'node_modules',
+    '.prisma',
+    'client'
+  );
 
-  // ✅ createRequire depuis contexte @prisma/client (injecté pour tests)
-  // Ceci permet à Prisma de résoudre ses require relatifs: require('.prisma/client/default')
-  // IMPORTANT: Symlink node_modules → npm_modules créé au runtime
-  // NOTE: createRequireFn injecté pour faciliter les tests unitaires (inversion de dépendances)
+  logger.log('[PRISMA] webPath (ASAR):', webPath);
+  logger.log('[PRISMA] clientRoot:', clientRoot);
+  logger.log('[PRISMA] engineRoot (unpacked):', engineRoot);
+
+  // createRequire depuis contexte @prisma/client
   const createRequire = createRequireFn || Module.createRequire || Module.createRequireFromPath;
   const requireFromPrisma = createRequire(
     path.join(clientRoot, 'package.json')
   );
 
   // Configuration variables d'environnement Prisma
-  if (!process.env.PRISMA_CLIENT_ENGINE_TYPE) {
-    process.env.PRISMA_CLIENT_ENGINE_TYPE = 'library';
-    logger.log('[PRISMA] Engine type: library');
-  }
+  process.env.PRISMA_CLIENT_ENGINE_TYPE = 'library';
+  logger.log('[PRISMA] Engine type: library');
 
   if (!process.env.PRISMA_QUERY_ENGINE_LIBRARY) {
     try {
-      // Filtrer explicitement pour le binaire Windows
-      // Format Prisma: libquery_engine-windows.dll.node
-      // Doc: https://www.prisma.io/docs/concepts/components/prisma-engines
-      const engineFile = fs
-        .readdirSync(engineRoot)
-        .find((file) => file.includes('windows') && file.endsWith('.node'));
-      
-      if (engineFile) {
-        process.env.PRISMA_QUERY_ENGINE_LIBRARY = path.join(engineRoot, engineFile);
-        logger.log('[PRISMA] Engine Windows trouvé:', engineFile);
+      // Chercher dans app.asar.unpacked (binaires natifs)
+      if (fs.existsSync(engineRoot)) {
+        const engineFile = fs
+          .readdirSync(engineRoot)
+          .find((file) => file.endsWith('.node'));
+        
+        if (engineFile) {
+          process.env.PRISMA_QUERY_ENGINE_LIBRARY = path.join(engineRoot, engineFile);
+          logger.log('[PRISMA] ✅ Engine trouvé:', engineFile);
+        } else {
+          logger.error('[PRISMA] ❌ Aucun .node trouvé dans:', engineRoot);
+        }
       } else {
-        logger.error('[PRISMA] ❌ Aucun binaire Windows trouvé dans:', engineRoot);
-        logger.error('[PRISMA] Fichiers présents:', fs.readdirSync(engineRoot).join(', '));
+        logger.error('[PRISMA] ❌ engineRoot non trouvé:', engineRoot);
       }
     } catch (error) {
       logger.warn('[PRISMA] Erreur lecture engineRoot:', error.message);
     }
   }
 
-  // ✅ Require via contexte créé (résout correctement .prisma/client/default)
+  // Require via contexte créé
   logger.log('[PRISMA] Chargement @prisma/client...');
   return requireFromPrisma('@prisma/client');
 }

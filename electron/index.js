@@ -37,7 +37,8 @@ const { WINDOW_CONFIG, TIMEOUTS: _TIMEOUTS } = require('./config/constants');
 
 // Utils
 const { configureLogger } = require('./utils/logger');
-const { ensureNodeModulesSymlink } = require('./utils/symlink');
+// NOTE 7 déc 2025: ensureNodeModulesSymlink plus nécessaire (mode ASAR)
+// const { ensureNodeModulesSymlink } = require('./utils/symlink');
 
 // Windows
 const { createWindow } = require('./windows/mainWindow');
@@ -94,25 +95,70 @@ if (!gotTheLock) {
 }
 
 // ============================================================================
-// SYMLINK CREATION (Mode Packagé Uniquement)
+// MODE ASAR - 7 déc 2025
 // ============================================================================
-// CRITIQUE: Créer symlink AVANT chargement Prisma
-// Raison: Prisma requiert node_modules/ pour résolution
-// Phase 1 (10 nov 2025): fs-extra + fallback copie physique
+// CHANGEMENT: web/ est maintenant dans app.asar (pas extraResources)
+// Plus besoin de symlink node_modules → npm_modules
+// Electron résout automatiquement les chemins dans ASAR
 // ============================================================================
 
-if (app.isPackaged) {
-  const webPath = path.join(process.resourcesPath, 'web');
-  
-  // APPEL: Fonction helper avec validation retour
-  const success = ensureNodeModulesSymlink(webPath, console);
-  
-  if (!success) {
-    // CAUSE: Échec symlink ET copie physique
-    // CONSÉQUENCE: Prisma va échouer au chargement
-    console.error('[INIT] ❌ Configuration node_modules échouée');
-    // Ne pas quitter - dialog.showErrorBox déjà affiché dans fonction
+/**
+ * Retourne le chemin vers web/ (dans ASAR en mode packagé)
+ */
+function getWebPath() {
+  if (app.isPackaged) {
+    // MODE ASAR: Structure est app.asar/electron/web/
+    return path.join(app.getAppPath(), 'electron', 'web');
   }
+  return path.join(__dirname, '..', '.next', 'standalone');
+}
+
+/**
+ * Retourne le chemin vers npm_modules (dans ASAR en mode packagé)
+ */
+function getNodeModulesPath() {
+  if (app.isPackaged) {
+    // MODE ASAR: node_modules dans app.asar/electron/web/node_modules/
+    return path.join(app.getAppPath(), 'electron', 'web', 'node_modules');
+  }
+  return path.join(__dirname, '..', 'node_modules');
+}
+
+/**
+ * Trouve le Prisma query engine dans app.asar.unpacked
+ * CHEMIN: app.asar.unpacked/electron/web/npm_modules/.prisma/client/
+ */
+function findPrismaEngine() {
+  if (!app.isPackaged) return null;
+  
+  // Le chemin dans unpacked suit la structure de l'ASAR
+  // electron/web/node_modules/.prisma/client/
+  const unpackedPath = path.join(
+    process.resourcesPath,
+    'app.asar.unpacked',
+    'electron',
+    'web',
+    'node_modules',
+    '.prisma',
+    'client'
+  );
+  
+  try {
+    console.log('[PRISMA] Recherche engine dans:', unpackedPath);
+    if (fs.existsSync(unpackedPath)) {
+      const files = fs.readdirSync(unpackedPath);
+      const engine = files.find(f => f.endsWith('.node'));
+      if (engine) {
+        console.log('[PRISMA] ✅ Engine trouvé:', engine);
+        return path.join(unpackedPath, engine);
+      }
+    } else {
+      console.error('[PRISMA] ❌ Chemin non trouvé:', unpackedPath);
+    }
+  } catch (e) {
+    console.error('[PRISMA] Erreur recherche engine:', e.message);
+  }
+  return null;
 }
 
 // ============================================================================
@@ -142,8 +188,10 @@ app.whenReady().then(async () => {
     log.info('[INIT] Chemins - Data:', dataPath, '| DB:', dbPath);
     
     // 1.5. Charger variables d'environnement (mode packagé uniquement)
+    // CHANGEMENT 7 déc 2025: .env.production est dans extraResources (resources/)
+    // pas dans resources/web/ (qui est maintenant dans ASAR)
     if (!isDev) {
-      const envPath = path.join(process.resourcesPath, 'web', '.env.production');
+      const envPath = path.join(process.resourcesPath, '.env.production');
       if (fs.existsSync(envPath)) {
         dotenv.config({ path: envPath });
         log.info('[INIT] ✅ .env.production chargé:', envPath);
@@ -189,31 +237,17 @@ app.whenReady().then(async () => {
         PrismaClient = prismaModule.PrismaClient;
       }
       
-      // En mode packagé: Localiser query engine explicitement
-      // (Pattern main.js lignes 1080-1095)
+      // En mode packagé: Localiser query engine dans app.asar.unpacked
+      // CHANGEMENT 7 déc 2025: Engine dans app.asar.unpacked (pas resources/web/)
       let enginePath = null;
       if (app.isPackaged) {
-        const webPath = path.join(process.resourcesPath, 'web');
-        const npmModulesPath = path.join(webPath, 'npm_modules');
-        const engineRoot = path.join(npmModulesPath, '.prisma', 'client');
+        // Utiliser la fonction findPrismaEngine() définie plus haut
+        enginePath = findPrismaEngine();
         
-        try {
-          // Filtrer explicitement pour le binaire Windows
-          // Doc Prisma: https://www.prisma.io/docs/concepts/components/prisma-engines
-          // Format: libquery_engine-windows.dll.node
-          const engineFile = fs
-            .readdirSync(engineRoot)
-            .find((file) => file.includes('windows') && file.endsWith('.node'));
-          
-          if (engineFile) {
-            enginePath = path.join(engineRoot, engineFile);
-            log.info('[INIT] Query engine Windows trouvé:', engineFile);
-          } else {
-            log.error('[INIT] ❌ Aucun binaire Windows trouvé dans:', engineRoot);
-            log.error('[INIT] Fichiers présents:', fs.readdirSync(engineRoot));
-          }
-        } catch (error) {
-          log.error('[INIT] Erreur recherche query engine:', error.message);
+        if (enginePath) {
+          log.info('[INIT] Query engine trouvé:', enginePath);
+        } else {
+          log.error('[INIT] ❌ Query engine non trouvé dans app.asar.unpacked');
         }
       }
       
@@ -259,11 +293,11 @@ app.whenReady().then(async () => {
     if (!isDev) {
       log.info('[INIT] Démarrage serveur Next.js...');
       
+      // MODE ASAR: Plus besoin de ensureSymlink
       serverProcess = startStandaloneServer({
         resourcesPath: process.resourcesPath,
         dataPath,
-        dbPath,
-        ensureSymlink: ensureNodeModulesSymlink
+        dbPath
       }, log);
       
       if (serverProcess) {
@@ -280,11 +314,11 @@ app.whenReady().then(async () => {
     const serverManager = {
       start: () => {
         if (!serverProcess) {
+          // MODE ASAR: Plus besoin de ensureSymlink
           serverProcess = startStandaloneServer({
             resourcesPath: process.resourcesPath,
             dataPath,
-            dbPath,
-            ensureSymlink: ensureNodeModulesSymlink
+            dbPath
           }, log);
         }
       },

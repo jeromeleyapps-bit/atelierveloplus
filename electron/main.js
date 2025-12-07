@@ -82,168 +82,122 @@ try {
 }
 
 // ============================================================================
-// CRITIQUE: Symlink node_modules → npm_modules (AVANT loadPrismaClient)
+// SOLUTION ASAR TOTALE - 7 déc 2025
 // ============================================================================
-// Raison: @prisma/client fait require('.prisma/client/default') qui DOIT
-// trouver le chemin depuis node_modules/ (pas npm_modules/)
-// electron-builder renomme node_modules/ en npm_modules/, donc on crée
-// un symlink au runtime pour que Prisma trouve ses modules
-//
-// FIX 10/11/2025: Chemin RELATIF (comme afterPack) + Fallback copie physique
-// Bug récurrent: Chemin ABSOLU échoue en Program Files (permissions)
+// CHANGEMENT: web/ est maintenant dans app.asar (pas extraResources)
+// AVANTAGES:
+// - Évite ENAMETOOLONG (2929 fichiers → 1 fichier ASAR)
+// - Plus besoin de symlink node_modules → npm_modules
+// - Electron résout automatiquement les chemins dans ASAR
+// - Meilleure sécurité (code protégé)
 // ============================================================================
+
 /**
- * Crée symlink node_modules → npm_modules avec fallback copie physique
- * 
- * CAUSE: electron-builder renomme node_modules → npm_modules (workaround bug)
- * Prisma requiert node_modules/ pour résolution modules (@prisma/client → .prisma/client)
- * 
- * SOLUTION: Symlink relatif (optimal, 0 overhead) OU copie physique (fallback +220MB)
- * 
- * @param {string} webPath - Chemin vers resources/web
- * @returns {boolean} - true si succès (symlink OU copie), false si échec critique
+ * Retourne le chemin vers web/ (dans ASAR en mode packagé)
  */
-function ensureNodeModulesSymlink(webPath) {
-  const nmPath = path.join(webPath, 'node_modules');
-  const npmPath = path.join(webPath, 'npm_modules');
-
-  // ===== VÉRIFICATION PRÉ-REQUIS =====
-  // CAUSE: Build corrompu si npm_modules absent
-  // CONSÉQUENCE: Prisma ne peut pas charger → Crash application
-  if (!fs.existsSync(npmPath)) {
-    console.error('[SYMLINK] ❌ npm_modules introuvable:', npmPath);
-    console.error('[SYMLINK] Build corrompu - Prisma ne fonctionnera pas');
-
-    // FEEDBACK UTILISATEUR: Dialogue clair avec action recommandée
-    dialog.showErrorBox(
-      'Erreur Configuration',
-      'Le dossier npm_modules est manquant.\n\n' +
-      'Le build de l\'application est corrompu.\n' +
-      'Veuillez réinstaller l\'application.'
-    );
-
-    return false; // Échec critique - Pas de solution
+function getWebPath() {
+  if (app.isPackaged) {
+    // En mode packagé, web/ est dans app.asar/web/
+    return path.join(app.getAppPath(), 'web');
   }
+  // En dev, utiliser le dossier standalone
+  return path.join(__dirname, '..', '.next', 'standalone');
+}
 
-  // CAUSE: node_modules existe déjà (symlink ou copie précédente)
-  // CONSÉQUENCE: Pas besoin de recréer (optimisation)
-  if (fs.existsSync(nmPath)) {
-    console.log('[SYMLINK] ℹ️  node_modules existe déjà');
-    return true; // Succès - Déjà configuré
+/**
+ * Retourne le chemin vers npm_modules (dans ASAR en mode packagé)
+ */
+function getNpmModulesPath() {
+  if (app.isPackaged) {
+    // npm_modules dans ASAR (auto-résolu par Electron)
+    return path.join(app.getAppPath(), 'web', 'npm_modules');
   }
+  return path.join(__dirname, '..', 'node_modules');
+}
 
-  // ===== TENTATIVE 1: SYMLINK RELATIF =====
-  // AVANTAGES: 0 overhead, portable, standard Windows junction
-  // CAUSE ÉCHEC POTENTIEL: Permissions Program Files, NTFS readonly
+/**
+ * Trouve le Prisma query engine dans app.asar.unpacked
+ * Les binaires .node sont automatiquement unpacked par electron-builder
+ */
+function findPrismaEngine() {
+  if (!app.isPackaged) {
+    return null; // En dev, Prisma trouve son engine automatiquement
+  }
+  
+  const unpackedPath = path.join(
+    process.resourcesPath,
+    'app.asar.unpacked',
+    'web',
+    'npm_modules',
+    '.prisma',
+    'client'
+  );
+  
   try {
-    // ✅ fs-extra.ensureSymlinkSync: Auto-création dossiers parents + retry
-    // CRITIQUE: Chemin relatif 'npm_modules' (pas absolu npmPath)
-    // RAISON: Portabilité (symlink fonctionne si app déplacée)
-    fse.ensureSymlinkSync('npm_modules', nmPath, 'junction');
-    console.log('[SYMLINK] ✅ Symlink créé avec succès (fs-extra, relatif)');
-    return true; // Succès optimal
-
-  } catch (symlinkErr) {
-    // CAUSE: Permissions insuffisantes (Program Files) OU NTFS readonly
-    console.error('[SYMLINK] ❌ Échec symlink:', symlinkErr.code, symlinkErr.message);
-    console.warn('[SYMLINK] ⚠️  FALLBACK: Tentative copie physique...');
-
-    // ===== TENTATIVE 2: COPIE PHYSIQUE =====
-    // DÉSAVANTAGES: +220MB disque, +10s temps copie
-    // AVANTAGES: 100% fiable, fonctionne TOUJOURS
-    try {
-      // ✅ fs-extra.copySync: Copie récursive robuste avec retry automatique
-      // OPTIONS:
-      // - overwrite: false (ne pas écraser si existe par miracle)
-      // - errorOnExist: false (pas d'erreur si existe)
-      // - dereference: true (suivre symlinks sources si présents)
-      fse.copySync(npmPath, nmPath, {
-        overwrite: false,
-        errorOnExist: false,
-        dereference: true
-      });
-
-      console.log('[SYMLINK] ✅ Copie physique réussie (~220MB)');
-      console.warn('[SYMLINK] ⚠️  Note: Build plus volumineux mais stable');
-      return true; // Succès fallback
-
-    } catch (copyErr) {
-      // CAUSE: Disque plein, permissions système, corruption filesystem
-      // CONSÉQUENCE: Application INUTILISABLE
-      console.error('[SYMLINK] ❌❌ FALLBACK échoué:', copyErr.message);
-      console.error('[SYMLINK] Stack:', copyErr.stack);
-      console.error('[SYMLINK] ❌❌ CRITIQUE: Prisma ne fonctionnera pas!');
-
-      // FEEDBACK UTILISATEUR: Dialogue détaillé avec contexte technique
-      dialog.showErrorBox(
-        'Erreur Critique',
-        'Impossible de configurer Prisma Client.\n\n' +
-        'Erreur technique:\n' + copyErr.message + '\n\n' +
-        'L\'application ne peut pas démarrer correctement.\n' +
-        'Veuillez contacter le support technique.'
-      );
-
-      return false; // Échec total
+    if (fs.existsSync(unpackedPath)) {
+      const files = fs.readdirSync(unpackedPath);
+      const engine = files.find(f => f.endsWith('.node'));
+      if (engine) {
+        const enginePath = path.join(unpackedPath, engine);
+        console.log('[PRISMA] ✅ Query engine trouvé:', enginePath);
+        return enginePath;
+      }
     }
+    console.warn('[PRISMA] ⚠️ Query engine non trouvé dans:', unpackedPath);
+  } catch (e) {
+    console.error('[PRISMA] ❌ Erreur recherche engine:', e.message);
   }
+  return null;
 }
 
-if (app.isPackaged) {
-  const webPath = path.join(process.resourcesPath, 'web');
-
-  // APPEL: Fonction helper avec validation retour
-  const success = ensureNodeModulesSymlink(webPath);
-
-  if (!success) {
-    // CAUSE: Échec symlink ET copie physique (disque plein, permissions, corruption)
-    // CONSÉQUENCE: Prisma va échouer au chargement avec "Cannot find module"
-    console.error('[INIT] ❌ Configuration node_modules échouée');
-    // Ne pas quitter ici - Laisser Prisma échouer avec message clair
-    // RAISON: dialog.showErrorBox déjà affiché dans ensureNodeModulesSymlink()
-  }
-}
+// NOTE: Plus besoin de ensureNodeModulesSymlink() car web/ est dans ASAR
+// Electron résout automatiquement les chemins dans ASAR
 
 // ============================================================================
-// CRITIQUE: Configuration Prisma pour mode packagé
+// CRITIQUE: Configuration Prisma pour mode packagé (MODE ASAR)
 // ============================================================================
-// Pré-requis: Symlink node_modules → npm_modules créé ci-dessus
-// createRequire résout depuis @prisma/client/, trouve ../node_modules/.prisma/
+// CHANGEMENT 7 déc 2025: Prisma est maintenant dans app.asar/electron/web/
+// Le query engine .node est dans app.asar.unpacked/
 // ============================================================================
 function _loadPrismaClient() {
   if (!app.isPackaged) {
     return require('@prisma/client');
   }
 
-  // SOLUTION FINALE: Prisma dans web/npm_modules/
-  // Le symlink node_modules → npm_modules permet require('@prisma/client') standard
-  const webPath = path.join(process.resourcesPath, 'web');
-  const engineRoot = path.join(webPath, 'npm_modules', '.prisma', 'client');
+  // MODE ASAR: Prisma dans app.asar/electron/web/npm_modules/
+  const webPath = getWebPath();
+  const npmModulesPath = getNpmModulesPath();
+  
+  // Engine dans app.asar.unpacked (binaire natif)
+  const enginePath = findPrismaEngine();
 
-  console.log('[INIT] Loading Prisma from web/npm_modules');
-  console.log('[INIT] webPath:', webPath);
+  console.log('[PRISMA] Loading from ASAR');
+  console.log('[PRISMA] webPath:', webPath);
+  console.log('[PRISMA] npmModulesPath:', npmModulesPath);
+  console.log('[PRISMA] enginePath:', enginePath);
 
   // Configuration variables d'environnement Prisma
-  if (!process.env.PRISMA_CLIENT_ENGINE_TYPE) {
-    process.env.PRISMA_CLIENT_ENGINE_TYPE = 'library';
+  process.env.PRISMA_CLIENT_ENGINE_TYPE = 'library';
+  if (enginePath) {
+    process.env.PRISMA_QUERY_ENGINE_LIBRARY = enginePath;
   }
 
-  if (!process.env.PRISMA_QUERY_ENGINE_LIBRARY) {
-    try {
-      const engineFile = fs
-        .readdirSync(engineRoot)
-        .find((file) => file.endsWith('.node'));
-      if (engineFile) {
-        process.env.PRISMA_QUERY_ENGINE_LIBRARY = path.join(engineRoot, engineFile);
-        console.log('[INIT] Prisma engine found:', process.env.PRISMA_QUERY_ENGINE_LIBRARY);
-      }
-    } catch (error) {
-      console.warn('[Prisma] Unable to locate query engine binary:', error.message);
-    }
+  // Ajouter npm_modules au module.paths pour que require() fonctionne
+  const Module = require('module');
+  if (!Module._nodeModulePaths.__patched) {
+    const originalPaths = Module._nodeModulePaths;
+    Module._nodeModulePaths = function(from) {
+      const paths = originalPaths.call(this, from);
+      // Ajouter npm_modules de l'ASAR en priorité
+      paths.unshift(npmModulesPath);
+      return paths;
+    };
+    Module._nodeModulePaths.__patched = true;
   }
 
-  // ✅ Require Prisma via résolution standard Node.js
-  // Le symlink node_modules → npm_modules créé par ensureNodeModulesSymlink() permet ceci
-  return require('@prisma/client');
+  // Require Prisma depuis le chemin ASAR
+  const prismaPath = path.join(npmModulesPath, '@prisma', 'client');
+  return require(prismaPath);
 }
 // ============================================================================
 // 2. CONFIGURATION
@@ -343,13 +297,26 @@ function isProcessRunningWin(exeName) {
 /**
  * Charge les variables d'environnement depuis .env files
  * Utilise dotenv pour parsing robuste (gère quotes, multiline, escape)
+ * 
+ * CHANGEMENT 7 déc 2025: .env.production est dans extraResources (pas ASAR)
+ * Chemin: resources/.env.production (pas resources/web/)
  */
 function loadEnvFiles() {
-  const envFiles = ['.env.production', '.env'];
   const envVars = {};
 
-  for (const f of envFiles) {
-    const envPath = path.join(process.resourcesPath, 'web', f);
+  // En mode packagé, .env.production est dans extraResources (resources/)
+  // En dev, il est à la racine du projet
+  const envPaths = app.isPackaged
+    ? [
+        path.join(process.resourcesPath, '.env.production'),
+        path.join(process.resourcesPath, '.env'),
+      ]
+    : [
+        path.join(__dirname, '..', '.env.production'),
+        path.join(__dirname, '..', '.env'),
+      ];
+
+  for (const envPath of envPaths) {
     log.info('[ENV] Checking', envPath);
 
     if (fs.existsSync(envPath)) {
@@ -357,9 +324,9 @@ function loadEnvFiles() {
         // dotenv.parse gère correctement tous les cas edge
         const envConfig = dotenv.parse(fs.readFileSync(envPath));
         Object.assign(envVars, envConfig);
-        log.info('[ENV] ✅ Loaded', f, '- keys=', Object.keys(envConfig).length);
+        log.info('[ENV] ✅ Loaded', path.basename(envPath), '- keys=', Object.keys(envConfig).length);
       } catch (e) {
-        log.error('[ENV] ❌ Failed to read', f, e.message);
+        log.error('[ENV] ❌ Failed to read', path.basename(envPath), e.message);
       }
     } else {
       log.warn('[ENV] ⚠️  File not found:', envPath);
@@ -434,24 +401,26 @@ function runMigrationsIfAvailable() {
 
 /**
  * Démarre le serveur Next.js standalone en production
+ * CHANGEMENT 7 déc 2025: web/ est maintenant dans ASAR
  */
 async function startStandaloneServer() {
   const _port = 3000;
 
-  // ASAR ACTIVÉ: Code Electron dans ASAR, mais 'web' est dans extraResources
-  // CORRECTION: web est dans resources/web (extraResources), PAS dans app.asar
-  const webPath = path.join(process.resourcesPath, 'web');
+  // ============================================================================
+  // SOLUTION ASAR TOTALE - 7 déc 2025
+  // ============================================================================
+  // web/ est maintenant dans app.asar (pas extraResources)
+  // Utiliser getWebPath() pour obtenir le chemin correct
+  // ============================================================================
+  const webPath = getWebPath();
+  const serverPath = path.join(webPath, 'server.js');
 
-  // Fallback dev (non-packaged)
-  const serverPath = app.isPackaged
-    ? path.join(webPath, 'server.js')
-    : path.join(__dirname, '../.next/standalone/server.js');
-
-  log.info('[NEXT] ===== DÉMARRAGE SERVEUR NEXT.JS =====');
+  log.info('[NEXT] ===== DÉMARRAGE SERVEUR NEXT.JS (MODE ASAR) =====');
   log.info('[NEXT] webPath:', webPath);
   log.info('[NEXT] serverPath:', serverPath);
+  log.info('[NEXT] isPackaged:', app.isPackaged);
 
-  // Vérifier que server.js existe
+  // Vérifier que server.js existe (fonctionne dans ASAR)
   if (!fs.existsSync(serverPath)) {
     log.error('[NEXT] ❌ Fichier server.js INTROUVABLE:', serverPath);
     try {
@@ -476,30 +445,20 @@ async function startStandaloneServer() {
   const nodePath = process.execPath;
 
   // Charger variables d'environnement
+  // NOTE: .env.production est dans extraResources (pas ASAR)
   const envVars = loadEnvFiles();
 
-  // Configuration Prisma pour le serveur Next.js
-  // STRATÉGIE EXTRA-RESOURCES: Prisma est dans resources/prisma-client
-  const prismaClientPath = path.join(process.resourcesPath, 'prisma-client');
-  const engineRoot = path.join(prismaClientPath, '.prisma', 'client');
-  let enginePath = null;
+  // ============================================================================
+  // PRISMA ENGINE - Dans app.asar.unpacked
+  // ============================================================================
+  // Les binaires .node sont automatiquement unpacked par electron-builder
+  // Utiliser findPrismaEngine() pour trouver le chemin
+  // ============================================================================
+  const enginePath = findPrismaEngine();
+  const npmModulesPath = getNpmModulesPath();
 
-  try {
-    log.info('[PRISMA] Recherche query engine dans:', engineRoot);
-    if (fs.existsSync(engineRoot)) {
-      const engineFile = fs.readdirSync(engineRoot).find((file) => file.endsWith('.node'));
-      if (engineFile) {
-        enginePath = path.join(engineRoot, engineFile);
-        log.info('[PRISMA] ✅ Query engine trouvé:', enginePath);
-      } else {
-        log.error('[PRISMA] ❌ Aucun fichier .node trouvé dans:', engineRoot);
-      }
-    } else {
-      log.warn('[PRISMA] Dossier engineRoot introuvable (dev mode?)');
-    }
-  } catch (error) {
-    log.error('[PRISMA] ❌ Erreur lecture engineRoot:', error.message);
-  }
+  log.info('[PRISMA] enginePath:', enginePath);
+  log.info('[PRISMA] npmModulesPath:', npmModulesPath);
 
   const env = {
     ...process.env,
@@ -519,9 +478,9 @@ async function startStandaloneServer() {
     PRISMA_CLIENT_ENGINE_TYPE: 'library',
     PRISMA_QUERY_ENGINE_LIBRARY: enginePath,
 
-    // NODE_PATH: Inclure web/node_modules (ASAR) ET prisma-client (ExtraResources)
-    // Important pour que Next.js trouve ses deps ET Prisma
-    NODE_PATH: `${path.join(webPath, 'node_modules')}${path.delimiter}${prismaClientPath}`
+    // NODE_PATH: npm_modules dans ASAR
+    // Electron résout automatiquement les chemins dans ASAR
+    NODE_PATH: npmModulesPath
   };
 
   log.info('[PRISMA] Variables environnement pour Next.js:');

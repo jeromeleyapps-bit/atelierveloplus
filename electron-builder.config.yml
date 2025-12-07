@@ -23,58 +23,70 @@ npmRebuild: false
 directories:
   output: dist-electron
   buildResources: resources  # ✅ BEST PRACTICE: Icône doit être dans resources/icon.ico
-                             # electron-builder copie automatiquement l'icône dans l'exe Windows
-                             # L'icône sera utilisée pour: exe, barre des tâches, fenêtre
+
+# Hook afterPack pour intégrer l'icône (contourne ENAMETOOLONG)
+afterPack: "./electron-builder-afterpack.js"
 
 # ============================================================================
-# FICHIERS INCLUS DANS ASAR
+# FICHIERS INCLUS DANS ASAR (SOLUTION ENAMETOOLONG - 7 déc 2025)
 # ============================================================================
-# Principe: Code application dans ASAR (protégé)
-# Binaires natifs et fichiers modifiables HORS ASAR
+# CHANGEMENT: Inclure TOUT dans ASAR (electron/ + web/)
+# RAISON: Éviter ENAMETOOLONG en réduisant fichiers hors ASAR à ~25
+# AVANT: 2929 fichiers hors ASAR → 255 523 chars (7.8x limite)
+# APRÈS: ~25 fichiers hors ASAR → ~2500 chars (13x sous limite)
+# ============================================================================
 files:
   - package.json
-  - electron/**/*
+  - electron/**/*           # Code Electron + web/ (TOUT dans ASAR)
+  - electron/web/node_modules/**/*  # EXPLICITE: Inclure node_modules de web/ (ignoré par défaut)
   - "!electron/**/*.md"
   
   # ============================================================================
-  # OPTIMISATIONS SPRINT 1.3 - Réduction Taille Build
+  # INCLURE SEULEMENT les dépendances Electron nécessaires
+  # ============================================================================
+  # CRITIQUE: Le node_modules racine ne contient pas .prisma/client généré
+  # Mais le code Electron a besoin de certains modules (dotenv, electron-log, etc.)
+  # ============================================================================
+  # Inclure les dépendances Electron runtime
+  - node_modules/dotenv/**/*
+  - node_modules/electron-log/**/*
+  - node_modules/fs-extra/**/*
+  - node_modules/graceful-fs/**/*
+  - node_modules/jsonfile/**/*
+  - node_modules/universalify/**/*
+  # Exclure tout le reste de node_modules
+  - "!node_modules/@prisma/**/*"
+  - "!node_modules/.prisma/**/*"
+  - "!node_modules/next/**/*"
+  - "!node_modules/react/**/*"
+  - "!node_modules/react-dom/**/*"
+  
+  # ============================================================================
+  # OPTIMISATIONS - Exclure node_modules RACINE (pas electron/web/node_modules)
+  # ============================================================================
+  # IMPORTANT: Utiliser des patterns spécifiques pour le node_modules racine
+  # Ne PAS utiliser **/node_modules/** car ça exclut aussi electron/web/node_modules
   # ============================================================================
   
-  # Exclure outils de build (ne doivent PAS être dans le build final)
-  - "!**/node_modules/@sentry/cli-win32-x64/**/*"
-  - "!**/node_modules/app-builder-bin/**/*"
-  - "!**/node_modules/app-builder-lib/**/*"
-  - "!**/node_modules/electron-builder/**/*"
-  - "!**/node_modules/electron-builder-squirrel-windows/**/*"
-  
-  # OPTIMISATIONS SPRINT 1.3 - 25 nov 2024
-  # Exclure Playwright (tests E2E uniquement)
-  - "!**/node_modules/@playwright/**/*"
-  - "!**/node_modules/playwright/**/*"
-  - "!**/node_modules/playwright-core/**/*"
-  
-  # Exclure Jest (tests unitaires uniquement)
-  - "!**/node_modules/jest/**/*"
-  - "!**/node_modules/jest-*/**/*"
-  - "!**/node_modules/@jest/**/*"
-  
-  # Exclure TypeScript (dev uniquement)
-  - "!**/node_modules/typescript/**/*"
-  - "!**/node_modules/@types/**/*"
-  
-  # Exclure ESLint (dev uniquement)
-  - "!**/node_modules/eslint/**/*"
-  - "!**/node_modules/eslint-*/**/*"
-  - "!**/node_modules/@eslint/**/*"
-  
-  # Exclure fichiers volumineux inutiles
-  - "!**/node_modules/**/*.md"
-  - "!**/node_modules/**/LICENSE*"
-  - "!**/node_modules/**/CHANGELOG*"
-  - "!**/node_modules/**/README*"
-  - "!**/node_modules/**/.github/**/*"
-  - "!**/node_modules/**/docs/**/*"
-  - "!**/node_modules/**/examples/**/*"
+  # Exclure outils de build du node_modules RACINE
+  - "!node_modules/@sentry/**/*"
+  - "!node_modules/app-builder-bin/**/*"
+  - "!node_modules/app-builder-lib/**/*"
+  - "!node_modules/electron-builder/**/*"
+  - "!node_modules/@playwright/**/*"
+  - "!node_modules/playwright/**/*"
+  - "!node_modules/playwright-core/**/*"
+  - "!node_modules/jest/**/*"
+  - "!node_modules/@jest/**/*"
+  - "!node_modules/typescript/**/*"
+  - "!node_modules/@types/**/*"
+  - "!node_modules/eslint/**/*"
+  - "!node_modules/@eslint/**/*"
+  - "!node_modules/next/**/*"
+  - "!node_modules/react/**/*"
+  - "!node_modules/react-dom/**/*"
+  - "!node_modules/@prisma/**/*"
+  - "!node_modules/.prisma/**/*"
   
   # Exclure fichiers de développement
   - "!**/*.map"
@@ -130,67 +142,61 @@ files:
 asar: true
 asarUnpack:
   # ============================================================================
-  # OPTIMISATION SPRINT 1.3 - Dédupliquer binaires natifs
+  # BINAIRES NATIFS - DOIVENT ÊTRE HORS ASAR
   # ============================================================================
-  # Binaires natifs ne peuvent PAS être dans ASAR
-  # STRATÉGIE: Garder UNE SEULE copie de chaque binaire
+  # CHANGEMENT 7 déc 2025: web/ maintenant dans ASAR
+  # Les binaires .node sont automatiquement unpacked dans app.asar.unpacked/
+  # ============================================================================
   
   # 1. Prisma Query Engine (binaire natif SQLite)
-  # Note: Prisma utilisé depuis web/npm_modules (extraResources)
-  # Pattern spécifique pour éviter duplications
-  - "**/npm_modules/.prisma/client/*.node"
-  - "**/npm_modules/@prisma/client/runtime/*.node"
+  - "**/web/node_modules/.prisma/client/*.node"
+  - "**/web/node_modules/@prisma/client/runtime/*.node"
   
-  # 2. Better-sqlite3 (si présent dans electron/)
-  - "**/npm_modules/better-sqlite3/build/Release/*.node"
+  # 2. Sharp/libvips (traitement images)
+  - "**/web/node_modules/sharp/**/*.node"
+  - "**/web/node_modules/@img/**/*.node"
+  - "**/web/node_modules/@img/**/*.dll"
   
-  # 3. Autres binaires natifs (.node)
+  # 3. Better-sqlite3 (si présent)
+  - "**/node_modules/better-sqlite3/build/Release/*.node"
+  
+  # 4. Tous les autres binaires natifs
   - "**/*.node"
-  
-  # Sharp/libvips SUPPRIMÉ: Déjà accessible via web/ extraResources
-  # Gain: -18 MB (pas de duplication app.asar.unpacked)
+  - "**/*.dll"
 
 # ============================================================================
-# RESSOURCES HORS ASAR (extraResources)
+# RESSOURCES HORS ASAR (MINIMAL - SOLUTION ENAMETOOLONG)
 # ============================================================================
-# Pattern DoltHub: Utiliser extraResources pour fichiers critiques
-# Copié dans: resources/ (accessible via process.resourcesPath)
+# CHANGEMENT 7 déc 2025: Réduire au STRICT MINIMUM
+# AVANT: electron-resources/web/ (2929 fichiers) → ENAMETOOLONG
+# APRÈS: Seulement .env.production + icon.ico (~2 fichiers)
+# web/ est maintenant dans ASAR via electron/web/
+# ============================================================================
 extraResources:
-  # FIX ENAMETOOLONG: Configuration minimaliste absolue
-  - from: electron-resources/web
-    to: web
-  
-  # 4. ENV PRODUCTION (CRITIQUE - Secrets)
-  # Solution validée: electron-builder docs, communauté
+  # 1. ENV PRODUCTION (CRITIQUE - Secrets, ne peut pas être dans ASAR)
   - from: .env.production
-    to: web/.env.production
+    to: .env.production
   
-  # 5. ICÔNE APPLICATION (pour BrowserWindow en mode packagé)
-  # Nécessaire car signAndEditExecutable: false
+  # 2. ICÔNE APPLICATION (pour BrowserWindow en mode packagé)
   - from: resources/icon.ico
     to: icon.ico
-  
-  # 6. CLOUDFLARED (Désactivé - Fichier non présent)
-  # Tunnel Cloudflare embarqué - À activer si nécessaire
-  # - from: resources/cloudflared
-  #   to: cloudflared
-  #   filter:
-  #     - "**/*"
 
 # ============================================================================
 # CONFIGURATION WINDOWS
 # ============================================================================
 win:
   target:
-    # DIR + NSIS: Crée unpacked ET installateur
+    # DIR + ZIP: Crée unpacked ET archive zip
+    # NOTE: NSIS/portable désactivés car ENAMETOOLONG (ligne commande trop longue)
+    # L'utilisateur peut extraire le zip et lancer l'exe directement
     - target: dir
       arch:
         - x64
-    - target: nsis
+    - target: zip
       arch:
         - x64
-  # MODE STANDALONE: Signature désactivée (ENAMETOOLONG persiste même avec 2929 fichiers)
-  # L'icône sera intégrée via rcedit post-build
+  # MODE STANDALONE: Signature et rcedit désactivés (ENAMETOOLONG)
+  # L'icône sera intégrée via rcedit post-build (voir afterPack hook)
   forceCodeSigning: false
   signAndEditExecutable: false
   
