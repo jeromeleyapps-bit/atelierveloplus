@@ -5,8 +5,12 @@ import { useRouter } from "next/navigation";
 import { logger } from '@/lib/logger';
 
 export default function HomePage() {
-  logger.info('[HOME] HomePage mounting');
   const router = useRouter();
+  
+  // Logger après déclaration des hooks (règles React)
+  useEffect(() => {
+    logger.info('[HOME] HomePage mounting');
+  }, []);
 
   useEffect(() => {
     logger.info('[HOME] Redirecting to /auth/login');

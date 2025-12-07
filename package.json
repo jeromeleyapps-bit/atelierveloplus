@@ -156,6 +156,7 @@
         "png-to-ico": "^3.0.1",
         "prettier": "^3.6.2",
         "prisma": "^6.18.0",
+        "rcedit": "^4.0.1",
         "recharts": "^3.3.0",
         "rimraf": "^6.1.0",
         "ts-node": "^10.9.2",

@@ -336,7 +336,7 @@ export default function AdminSettingsPage() {
             />
             <CardContent>
               <Typography variant="body2" sx={{ mb: 2 }}>
-                Configurez les jours d'ouverture, les horaires et l'option PRO "un jour sur rendez-vous uniquement".
+                Configurez les jours d&apos;ouverture, les horaires et l&apos;option PRO &quot;un jour sur rendez-vous uniquement&quot;.
               </Typography>
               <Button
                 variant="contained"

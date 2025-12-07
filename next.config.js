@@ -4,8 +4,12 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 });
 
 const nextConfig = {
-  // Mode standalone DÉSACTIVÉ
-  // output: 'standalone',
+  // ============================================================================
+  // MODE STANDALONE - Activé pour réduire node_modules (ENAMETOOLONG fix)
+  // ============================================================================
+  // Next.js trace automatiquement les dépendances nécessaires
+  // Résultat: ~3000 fichiers au lieu de ~110000
+  output: 'standalone',
 
   // Désactiver les source maps en production
   productionBrowserSourceMaps: false,
@@ -24,6 +28,10 @@ const nextConfig = {
   // Tree-shaking MUI automatique
   experimental: {
     optimizePackageImports: ['@mui/material', '@mui/icons-material'],
+    // Forcer l'inclusion des binaires Prisma dans le tracing standalone
+    outputFileTracingIncludes: {
+      '/*': ['./node_modules/.prisma/client/**/*'],
+    },
   },
 
   // Configuration Webpack minimale

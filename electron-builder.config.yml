@@ -182,12 +182,15 @@ extraResources:
 # ============================================================================
 win:
   target:
-    # DIR: Crée seulement le dossier unpacked (pas d'installer)
+    # DIR + NSIS: Crée unpacked ET installateur
     - target: dir
       arch:
         - x64
-  # FIX ENAMETOOLONG: Désactiver signature ET édition
-  # L'icône sera définie via BrowserWindow dans main.js
+    - target: nsis
+      arch:
+        - x64
+  # MODE STANDALONE: Signature désactivée (ENAMETOOLONG persiste même avec 2929 fichiers)
+  # L'icône sera intégrée via rcedit post-build
   forceCodeSigning: false
   signAndEditExecutable: false
   

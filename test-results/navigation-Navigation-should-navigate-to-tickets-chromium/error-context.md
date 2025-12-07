@@ -1,13 +1,193 @@
 # Page snapshot
 
 ```yaml
-- generic [active]:
-  - alert [ref=e1]
-  - dialog "Failed to compile" [ref=e4]:
-    - generic [ref=e5]:
-      - heading "Failed to compile" [level=4] [ref=e7]
-      - generic [ref=e8]:
-        - generic [ref=e10]: "./src/lib/api-error.ts Error: x cannot reassign to a variable declared with `const` ,-[C:\\atelier\\src\\lib\\api-error.ts:26:1] 26 | const isDev = process.env.NODE_ENV === 'development'; 27 | 28 | // Log serveur (toujours visible dans les logs) 29 | const errorMessage = error instanceof Error ? error.message : String(error); : ^^^^^^|^^^^^ : `-- const variable was declared here 30 | logger.error(`[API Error${context ? ` - ${context}` : ''}]`, { error: errorMessage }); 31 | 32 | // Déterminer le message d'erreur 33 | let errorMessage = 'internal_error'; 34 | let statusCode = 500; 35 | 36 | if (error instanceof Error) { 37 | // En dev: montrer le message d'erreur 38 | // En prod: message générique sauf pour les erreurs métier connues 39 | if (isDev) { 40 | errorMessage = error.message; : ^^^^^^|^^^^^ : `-- cannot reassign 41 | } else { 42 | // Liste blanche des erreurs métier à exposer 42 | const safeErrors = [ `---- x cannot reassign to a variable declared with `const` ,-[C:\\atelier\\src\\lib\\api-error.ts:26:1] 26 | const isDev = process.env.NODE_ENV === 'development'; 27 | 28 | // Log serveur (toujours visible dans les logs) 29 | const errorMessage = error instanceof Error ? error.message : String(error); : ^^^^^^|^^^^^ : `-- const variable was declared here 30 | logger.error(`[API Error${context ? ` - ${context}` : ''}]`, { error: errorMessage }); 31 | 32 | // Déterminer le message d'erreur 33 | let errorMessage = 'internal_error'; 34 | let statusCode = 500; 35 | 36 | if (error instanceof Error) { 37 | // En dev: montrer le message d'erreur 38 | // En prod: message générique sauf pour les erreurs métier connues 39 | if (isDev) { 40 | errorMessage = error.message; 41 | } else { 42 | // Liste blanche des erreurs métier à exposer 43 | const safeErrors = [ 44 | 'unauthorized', 45 | 'forbidden', 46 | 'not_found', 47 | 'invalid_payload', 48 | 'validation_error', 49 | 'duplicate_entry', 50 | 'no_user_in_database', 51 | 'no_user_found', 52 | ]; 53 | 54 | if (safeErrors.some(safe => error.message.toLowerCase().includes(safe))) { 55 | errorMessage = error.message; : ^^^^^^|^^^^^ : `-- cannot reassign 56 | } 57 | } 57 | `---- x the name `errorMessage` is defined multiple times ,-[C:\\atelier\\src\\lib\\api-error.ts:26:1] 26 | const isDev = process.env.NODE_ENV === 'development'; 27 | 28 | // Log serveur (toujours visible dans les logs) 29 | const errorMessage = error instanceof Error ? error.message : String(error); : ^^^^^^|^^^^^ : `-- previous definition of `errorMessage` here 30 | logger.error(`[API Error${context ? ` - ${context}` : ''}]`, { error: errorMessage }); 31 | 32 | // Déterminer le message d'erreur 33 | let errorMessage = 'internal_error'; : ^^^^^^|^^^^^ : `-- `errorMessage` redefined here 34 | let statusCode = 500; 35 | 35 | if (error instanceof Error) { `----"
-        - contentinfo [ref=e11]:
-          - paragraph [ref=e12]: This error occurred during the build process and can only be dismissed by fixing the error.
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4]:
+        - link "votre logo" [ref=e5] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e7]:
+            - text: votre
+            - text: logo
+        - heading "Atelier velo +" [level=6] [ref=e8]
+      - generic [ref=e9]:
+        - link "Mon compte" [ref=e10] [cursor=pointer]:
+          - /url: /account
+          - text: Mon compte
+        - button "0" [ref=e11] [cursor=pointer]:
+          - generic [ref=e12]:
+            - img [ref=e13]
+            - generic: "0"
+        - link "aide" [ref=e15] [cursor=pointer]:
+          - /url: /admin/guide
+          - img [ref=e16]
+        - button "toggle theme" [ref=e19] [cursor=pointer]:
+          - img [ref=e20]
+        - button "menu" [ref=e22] [cursor=pointer]:
+          - img [ref=e23]
+    - generic [ref=e25]:
+      - link "Tableau de bord" [ref=e27] [cursor=pointer]:
+        - /url: /dashboard
+        - text: Tableau de bord
+      - link "Clients" [ref=e29] [cursor=pointer]:
+        - /url: /customers
+        - text: Clients
+      - link "Réparations" [ref=e31] [cursor=pointer]:
+        - /url: /tickets
+        - text: Réparations
+      - link "Facturation" [ref=e34] [cursor=pointer]:
+        - /url: /finance
+        - text: Facturation
+      - link "Calendrier atelier" [ref=e36] [cursor=pointer]:
+        - /url: /admin/booking
+        - text: Calendrier atelier
+      - link "RDV client" [ref=e38] [cursor=pointer]:
+        - /url: /booking
+        - text: RDV client
+      - link "Historique Vélos" [ref=e40] [cursor=pointer]:
+        - /url: /bikes/history
+        - text: Historique Vélos
+      - link "Catalogue" [ref=e42] [cursor=pointer]:
+        - /url: /catalog
+        - text: Catalogue
+      - link "Caisse" [ref=e44] [cursor=pointer]:
+        - /url: /cash-register
+        - text: Caisse
+      - link "Statistiques" [ref=e46] [cursor=pointer]:
+        - /url: /stats
+        - text: Statistiques
+  - alert [ref=e51]:
+    - img [ref=e53]
+    - generic [ref=e56]:
+      - generic [ref=e57]:
+        - paragraph [ref=e58]: 🎉 Essai PRO gratuit
+        - paragraph [ref=e59]:
+          - strong [ref=e60]: 9 jours
+          - text: restants
+        - generic [ref=e61]: Jusqu'au 7 décembre
+      - generic [ref=e62]:
+        - progressbar [ref=e63]
+        - generic [ref=e65]: 36%
+    - generic [ref=e67]:
+      - button "Voir les offres" [ref=e68] [cursor=pointer]:
+        - img [ref=e70]
+        - text: Voir les offres
+      - button [ref=e72] [cursor=pointer]:
+        - img [ref=e73]
+  - generic [ref=e75]:
+    - generic [ref=e78]:
+      - generic [ref=e79]:
+        - img [ref=e80]
+        - generic [ref=e82]:
+          - heading "🔧 Tickets Atelier" [level=4] [ref=e83]
+          - paragraph [ref=e84]: Gestion des réparations et interventions
+      - generic [ref=e85]:
+        - button "Actualiser" [ref=e86] [cursor=pointer]:
+          - img [ref=e88]
+          - text: Actualiser
+        - button "Nouveau Ticket" [ref=e90] [cursor=pointer]:
+          - img [ref=e92]
+          - text: Nouveau Ticket
+    - generic [ref=e94]:
+      - generic [ref=e96]:
+        - generic [ref=e97]:
+          - generic [ref=e99]:
+            - img [ref=e101]
+            - textbox "Rechercher (id, client, email, vélo)" [ref=e103]
+            - group
+          - tablist [ref=e107]:
+            - tab "Tous" [selected] [ref=e108] [cursor=pointer]: Tous
+            - tab "Créés" [ref=e109] [cursor=pointer]: Créés
+            - tab "En cours" [ref=e110] [cursor=pointer]: En cours
+            - tab "Prêts" [ref=e111] [cursor=pointer]: Prêts
+            - tab "Livrés" [ref=e112] [cursor=pointer]: Livrés
+        - generic [ref=e114]:
+          - button "Prêts aujourd'hui" [ref=e115] [cursor=pointer]:
+            - generic [ref=e116]: Prêts aujourd'hui
+          - button "Cette semaine" [ref=e117] [cursor=pointer]:
+            - generic [ref=e118]: Cette semaine
+          - button "Colonnes visibles" [ref=e119] [cursor=pointer]:
+            - img [ref=e120]
+          - button "Export CSV" [ref=e122] [cursor=pointer]:
+            - img [ref=e124]
+            - text: Export CSV
+          - generic [ref=e126] [cursor=pointer]:
+            - checkbox "Compact" [ref=e129]
+            - generic [ref=e132]: Compact
+      - generic [ref=e133]:
+        - generic [ref=e135]:
+          - generic [ref=e137]:
+            - paragraph [ref=e138]: Lignes par page
+            - generic [ref=e139]:
+              - combobox "Lignes par page 10" [ref=e140] [cursor=pointer]: "10"
+              - textbox: "10"
+              - img
+            - paragraph [ref=e141]: 0–0 sur 0
+            - generic [ref=e142]:
+              - button "Go to previous page" [disabled]:
+                - img
+              - button "Go to next page" [disabled]:
+                - img
+          - generic [ref=e143]:
+            - generic: Aller à la page
+            - generic [ref=e144]:
+              - textbox "Aller à la page" [ref=e145]
+              - group:
+                - generic: Aller à la page
+          - button "Aller" [ref=e146] [cursor=pointer]: Aller
+        - table [ref=e148]:
+          - rowgroup [ref=e149]:
+            - row "N° Ticket Nom client Vélo Type réparation Statut Actions" [ref=e150]:
+              - columnheader [ref=e151]:
+                - generic [ref=e152] [cursor=pointer]:
+                  - checkbox [ref=e153]
+                  - img [ref=e154]
+              - columnheader "N° Ticket" [ref=e156]:
+                - button "N° Ticket" [ref=e157] [cursor=pointer]:
+                  - text: N° Ticket
+                  - img [ref=e158]
+              - columnheader "Nom client" [ref=e160]:
+                - button "Nom client" [ref=e161] [cursor=pointer]:
+                  - text: Nom client
+                  - img [ref=e162]
+              - columnheader "Vélo" [ref=e164]:
+                - button "Vélo" [ref=e165] [cursor=pointer]:
+                  - text: Vélo
+                  - img [ref=e166]
+              - columnheader "Type réparation" [ref=e168]
+              - columnheader "Statut" [ref=e169]:
+                - button "Statut" [ref=e170] [cursor=pointer]:
+                  - text: Statut
+                  - img [ref=e171]
+              - columnheader "Actions" [ref=e173]
+          - rowgroup [ref=e174]:
+            - row "Aucun ticket" [ref=e175]:
+              - cell "Aucun ticket" [ref=e176]:
+                - paragraph [ref=e178]: Aucun ticket
+        - generic [ref=e180]:
+          - generic [ref=e182]:
+            - paragraph [ref=e183]: Lignes par page
+            - generic [ref=e184]:
+              - combobox "Lignes par page 10" [ref=e185] [cursor=pointer]: "10"
+              - textbox: "10"
+              - img
+            - paragraph [ref=e186]: 0–0 sur 0
+            - generic [ref=e187]:
+              - button "Go to previous page" [disabled]:
+                - img
+              - button "Go to next page" [disabled]:
+                - img
+          - generic [ref=e188]:
+            - generic: Aller à la page
+            - generic [ref=e189]:
+              - textbox "Aller à la page" [ref=e190]
+              - group:
+                - generic: Aller à la page
+          - button "Aller" [ref=e191] [cursor=pointer]: Aller
+  - generic [ref=e192]:
+    - img [ref=e194]
+    - button "Open Tanstack query devtools" [ref=e242] [cursor=pointer]:
+      - img [ref=e243]
+  - alert [ref=e291]
 ```

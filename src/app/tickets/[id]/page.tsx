@@ -30,16 +30,18 @@ import FinancialSummaryCard from "@/app/components/FinancialSummaryCard";
 import LineItemsTable from "@/app/components/LineItemsTable";
 import LineItemSelector, { type LineItem } from "@/app/components/LineItemSelector";
 import CreateQuoteDialog from "@/app/finance/components/CreateQuoteDialog";
+import RequireAuth from "@/app/components/RequireAuth";
 
 // API
 import { getWorkOrder, startWorkOrder, type WorkOrder } from "@/lib/api";
 import { useRepairTimer } from "@/contexts/RepairTimerContext";
+import { useAuth } from "@/app/auth/AuthContext";
 
 // Theme
 import { usePageTheme } from "@/hooks/usePageTheme";
 import { logger } from '@/lib/logger';
 
-export default function TicketDetailPageNew() {
+function TicketDetailPageContent() {
   const params = useParams();
   const id = (params?.id as string) || "";
   const router = useRouter();
@@ -148,12 +150,14 @@ export default function TicketDetailPageNew() {
     await Promise.all([loadTicket(), loadLines(), loadUserSettings(), loadInvoice()]);
   }
 
+  const { ready } = useAuth();
+
+  // Attendre que l'authentification soit prête avant de charger les données
   useEffect(() => {
-    if (id) {
-      refresh();
-    }
+    if (!ready || !id) return;
+    refresh();
     // eslint-disable-next-line react-hooks/exhaustive-deps -- refresh uses stable functions that depend on id (already in deps)
-  }, [id]);
+  }, [id, ready]);
 
   // Gestion lignes
   async function handleAddLine(line: LineItem) {
@@ -625,5 +629,14 @@ export default function TicketDetailPageNew() {
         }}
       />
     </>
+  );
+}
+
+// Wrapper avec protection d'authentification
+export default function TicketDetailPageNew() {
+  return (
+    <RequireAuth>
+      <TicketDetailPageContent />
+    </RequireAuth>
   );
 }

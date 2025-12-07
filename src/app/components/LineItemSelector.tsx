@@ -94,10 +94,31 @@ export default function LineItemSelector({
     customType: "service",
   });
 
+  // ✅ Réinitialiser complètement l'état au montage pour éviter les états corrompus après relance
   useEffect(() => {
+    // Réinitialiser tous les états au montage
+    setAnchorEl(null);
+    setDialogType(null);
+    setSelectedService(null);
+    setSelectedPart(null);
+    setIsCustomService(false);
+    setIsCustomPart(false);
+    setFormData({
+      name: "",
+      description: "",
+      quantity: 1,
+      priceHT: 0,
+      vatRate: isAutoEntrepreneur ? 0 : 10,
+      duration: 0,
+      notes: "",
+      customType: "service",
+    });
+    
+    // Charger les données
     loadServiceRates();
     loadCatalogItems();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Uniquement au montage
 
   async function loadServiceRates() {
     try {

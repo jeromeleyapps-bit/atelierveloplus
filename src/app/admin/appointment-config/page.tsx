@@ -171,7 +171,7 @@ export default function AppointmentConfigPage() {
         <Grid item xs={12} md={6}>
           <Paper sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>
-              Jours d'ouverture
+              Jours d&apos;ouverture
             </Typography>
             <Stack spacing={1} sx={{ mt: 2 }}>
               {DAYS.map(day => (
@@ -196,7 +196,7 @@ export default function AppointmentConfigPage() {
         <Grid item xs={12} md={6}>
           <Paper sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>
-              Horaires d'ouverture
+              Horaires d&apos;ouverture
             </Typography>
             <Stack spacing={2} sx={{ mt: 2 }}>
               {DAYS.map(day => (

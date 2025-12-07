@@ -67,7 +67,18 @@ export async function verifyToken(token: string): Promise<JWTPayload | null> {
     return payload as unknown as JWTPayload;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    logger.error('[JWT] Token verification failed', { error: errorMessage });
+    const isExpirationError = errorMessage.includes('exp') || errorMessage.includes('expired');
+    const isDevelopment = process.env.NODE_ENV !== 'production';
+    
+    // En développement, ne pas logger les erreurs d'expiration (c'est normal)
+    // En production, logger toutes les erreurs
+    if (!isDevelopment || !isExpirationError) {
+      logger.error('[JWT] Token verification failed', { error: errorMessage });
+    } else {
+      // En développement, logger seulement en debug (silencieux par défaut)
+      logger.debug('[JWT] Token expired (development)', { error: errorMessage });
+    }
+    
     return null;
   }
 }

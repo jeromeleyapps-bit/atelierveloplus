@@ -2,12 +2,17 @@
  * Logger Centralisé - Atelier Vélo+
  * 
  * Remplace console.log par un système de logging structuré
- * avec niveaux, filtrage et intégration electron-log
+ * avec niveaux et filtrage
+ * 
+ * ⚠️ IMPORTANT: Ne PAS utiliser electron-log dans ce fichier
+ * electron-log n'est pas disponible dans le renderer process Electron
+ * et cause l'erreur "Cannot set properties of undefined (setting 'level')"
+ * 
+ * Pour le code serveur uniquement, utiliser logger-server.ts qui utilise
+ * electron-log avec import conditionnel sécurisé.
  * 
  * @module lib/logger
  */
-
-import electronLog from 'electron-log';
 
 // Types de log
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
@@ -19,13 +24,6 @@ export interface LogMeta {
 
 // Configuration
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
-const IS_ELECTRON = typeof window !== 'undefined' && (window as { electron?: unknown }).electron;
-
-// Configuration electron-log
-if (IS_ELECTRON) {
-  electronLog.transports.file.level = IS_PRODUCTION ? 'info' : 'debug';
-  electronLog.transports.console.level = IS_PRODUCTION ? 'warn' : 'debug';
-}
 
 /**
  * Filtre les données sensibles des métadonnées
@@ -56,6 +54,7 @@ function formatMessage(level: LogLevel, message: string, meta?: LogMeta): string
 
 /**
  * Logger principal
+ * Utilise uniquement console.* (pas electron-log)
  */
 export const logger = {
   /**
@@ -67,12 +66,7 @@ export const logger = {
     if (IS_PRODUCTION) return;
 
     const sanitized = sanitizeMeta(meta);
-    
-    if (IS_ELECTRON) {
-      electronLog.debug(message, sanitized);
-    } else {
-      console.log(formatMessage('debug', message, sanitized));
-    }
+    console.log(formatMessage('debug', message, sanitized));
   },
 
   /**
@@ -82,12 +76,7 @@ export const logger = {
    */
   info: (message: string, meta?: LogMeta) => {
     const sanitized = sanitizeMeta(meta);
-    
-    if (IS_ELECTRON) {
-      electronLog.info(message, sanitized);
-    } else {
-      console.log(formatMessage('info', message, sanitized));
-    }
+    console.log(formatMessage('info', message, sanitized));
   },
 
   /**
@@ -97,12 +86,7 @@ export const logger = {
    */
   warn: (message: string, meta?: LogMeta) => {
     const sanitized = sanitizeMeta(meta);
-    
-    if (IS_ELECTRON) {
-      electronLog.warn(message, sanitized);
-    } else {
-      console.warn(formatMessage('warn', message, sanitized));
-    }
+    console.warn(formatMessage('warn', message, sanitized));
   },
 
   /**
@@ -112,12 +96,7 @@ export const logger = {
    */
   error: (message: string, meta?: LogMeta) => {
     const sanitized = sanitizeMeta(meta);
-    
-    if (IS_ELECTRON) {
-      electronLog.error(message, sanitized);
-    } else {
-      console.error(formatMessage('error', message, sanitized));
-    }
+    console.error(formatMessage('error', message, sanitized));
   },
 };
 
