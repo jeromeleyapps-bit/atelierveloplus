@@ -116,10 +116,11 @@ jobs:
         run: npx electron-builder --mac --x64 -c electron-builder.macos.yml
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # Signature macOS (requis pour distribution professionnelle)
+          # Signature macOS (OPTIONNEL - fonctionne sans)
+          # Si non définis, l'app sera non signée mais fonctionnelle
+          CSC_IDENTITY_AUTO_DISCOVERY: ${{ secrets.MAC_CSC_LINK && 'true' || 'false' }}
           CSC_LINK: ${{ secrets.MAC_CSC_LINK }}
           CSC_KEY_PASSWORD: ${{ secrets.MAC_CSC_KEY_PASSWORD }}
-          # Notarization Apple (requis depuis Catalina)
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
@@ -188,6 +189,8 @@ jobs:
         run: npx electron-builder --mac --arm64 -c electron-builder.macos.yml
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Signature macOS (OPTIONNEL - fonctionne sans)
+          CSC_IDENTITY_AUTO_DISCOVERY: ${{ secrets.MAC_CSC_LINK && 'true' || 'false' }}
           CSC_LINK: ${{ secrets.MAC_CSC_LINK }}
           CSC_KEY_PASSWORD: ${{ secrets.MAC_CSC_KEY_PASSWORD }}
           APPLE_ID: ${{ secrets.APPLE_ID }}
