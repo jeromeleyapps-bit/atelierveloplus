@@ -3,7 +3,23 @@
 
 ---
 
-## 1. RÉPARTITION ACTUELLE DU BUILD (396 MB)
+## 0. RÉSUMÉ OPTIMISATIONS RÉALISÉES
+
+| Optimisation | Gain | Statut |
+|--------------|------|--------|
+| Suppression @next/swc (afterPack) | -122 MB | ✅ FAIT |
+| Remplacement date-fns → dayjs | -21 MB | ✅ FAIT |
+| Remplacement sharp → jimp | -17 MB | ✅ FAIT |
+| **TOTAL** | **-143 MB (27.5%)** | ✅ |
+
+| État | Taille |
+|------|--------|
+| Build initial | 518 MB |
+| **Build actuel** | **376 MB** |
+
+---
+
+## 1. RÉPARTITION ACTUELLE DU BUILD (376 MB)
 
 ### Composants Principaux
 
@@ -94,39 +110,17 @@
 
 ## 3. SOLUTIONS ENVISAGEABLES
 
-### Solution 1 : Remplacer Sharp par Jimp (Gain: ~17 MB)
+### ~~Solution 1 : Remplacer Sharp par Jimp~~ ✅ FAIT
 
-**Effort** : Moyen (2-3h)
-**Risque** : Faible
+**Gain réalisé** : 17 MB
+**Fichier modifié** : `src/app/api/account/upload-logo/route.ts`
 
-```javascript
-// Avant (Sharp)
-import sharp from 'sharp';
-await sharp(buffer).resize(200, 200).toBuffer();
+### ~~Solution 2 : Remplacer date-fns par dayjs~~ ✅ FAIT
 
-// Après (Jimp)
-import Jimp from 'jimp';
-const image = await Jimp.read(buffer);
-await image.resize(200, 200).getBufferAsync(Jimp.MIME_PNG);
-```
+**Gain réalisé** : 21 MB
+**Fichiers modifiés** : `src/lib/format.ts`, `src/hooks/useTicketsData.ts`
 
-### Solution 2 : Remplacer date-fns par dayjs (Gain: ~20 MB)
-
-**Effort** : Faible (1-2h)
-**Risque** : Faible
-
-```javascript
-// Avant (date-fns - 22 MB)
-import { format, addDays } from 'date-fns';
-import { fr } from 'date-fns/locale';
-
-// Après (dayjs - 2 MB)
-import dayjs from 'dayjs';
-import 'dayjs/locale/fr';
-dayjs.locale('fr');
-```
-
-### Solution 3 : Lazy Loading PDF-lib (Gain: ~15 MB au démarrage)
+### Solution 3 : Lazy Loading PDF-lib (Gain: ~15 MB au démarrage) - À FAIRE
 
 **Effort** : Faible (1h)
 **Risque** : Aucun
@@ -173,13 +167,14 @@ upx --best "Atelier Velo+.exe"
 
 ## 4. PLAN D'ACTION RECOMMANDÉ
 
-### Phase 1 : Quick Wins (Gain estimé: ~40 MB)
+### Phase 1 : Quick Wins ✅ COMPLÈTE
 
-| Action | Gain | Effort | Priorité |
-|--------|------|--------|----------|
-| Remplacer date-fns par dayjs | 20 MB | 2h | HAUTE |
-| Remplacer Sharp par Jimp | 17 MB | 3h | HAUTE |
-| Lazy load pdf-lib | 0 MB (perf) | 1h | MOYENNE |
+| Action | Gain | Statut |
+|--------|------|--------|
+| ~~Remplacer date-fns par dayjs~~ | 21 MB | ✅ FAIT |
+| ~~Remplacer Sharp par Jimp~~ | 17 MB | ✅ FAIT |
+| ~~Supprimer @next/swc~~ | 122 MB | ✅ FAIT |
+| Lazy load pdf-lib | Perf | ⏳ À faire |
 
 ### Phase 2 : Optimisations Avancées (Gain estimé: ~20 MB)
 
@@ -199,9 +194,11 @@ upx --best "Atelier Velo+.exe"
 
 ## 5. RÉSUMÉ
 
-### Taille Actuelle : 396 MB
+### ~~Taille Initiale : 518 MB~~
 
-### Taille Atteignable (Phase 1+2) : ~340 MB
+### Taille Actuelle : 376 MB (-27.5%)
+
+### Taille Atteignable (Phase 2) : ~350 MB
 
 ### Taille Minimale Théorique (Electron) : ~300 MB
 

@@ -217,8 +217,8 @@ src/
 
 | Metrique | Avant | Actuel | 1 Mois | 3 Mois |
 |----------|-------|--------|--------|--------|
-| Taille Build | 518 MB | **396 MB** | 380 MB | 350 MB |
-| Installateur | 125 MB | ~100 MB | 95 MB | 90 MB |
+| Taille Build | 518 MB | **376 MB** | 360 MB | 340 MB |
+| Installateur | 125 MB | ~95 MB | 90 MB | 85 MB |
 | Couverture Tests | 7% | 10.8% | 15% | 25% |
 | Tests | 451 | 501 | 550 | 650 |
 | Erreurs TS | 2 | 0 | 0 | 0 |
