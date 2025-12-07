@@ -12,8 +12,21 @@
  */
 
 // src/app/layout.tsx (Server Component)
-import type { Metadata, Viewport } from "next";
+import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+
+// Type Viewport pour Next.js 13.x (introduit nativement dans Next.js 14)
+type Viewport = {
+  width?: string | number;
+  height?: string | number;
+  initialScale?: number;
+  minimumScale?: number;
+  maximumScale?: number;
+  userScalable?: boolean;
+  viewportFit?: "auto" | "cover" | "contain";
+  themeColor?: string | { media: string; color: string }[];
+  colorScheme?: "normal" | "light" | "dark" | "light dark" | "dark light";
+};
 import "./globals.css";
 import { AppProviders } from "./providers";
 import { SentryProvider } from "@/components/providers/SentryProvider";
