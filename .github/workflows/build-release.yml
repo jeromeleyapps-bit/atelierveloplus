@@ -1,0 +1,234 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version à builder (ex: 1.2.0)'
+        required: true
+        default: '1.2.0'
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  # ==========================================================================
+  # BUILD WINDOWS
+  # ==========================================================================
+  build-windows:
+    runs-on: windows-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Generate Prisma Client
+        run: npx prisma generate
+      
+      - name: Build Next.js
+        run: npm run build
+      
+      - name: Prepare Electron resources
+        run: node prepare-electron-resources.js
+      
+      - name: Build Electron (Windows)
+        run: npx electron-builder --win -c electron-builder.config.yml
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Signature Windows (optionnel)
+          # CSC_LINK: ${{ secrets.WIN_CSC_LINK }}
+          # CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
+      
+      - name: Upload Windows artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-build
+          path: |
+            dist-electron/*.exe
+            dist-electron/*.zip
+          retention-days: 30
+
+  # ==========================================================================
+  # BUILD macOS (Intel x64)
+  # ==========================================================================
+  build-macos-x64:
+    runs-on: macos-13  # Intel runner
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Rebuild native modules for macOS x64
+        run: npm rebuild
+      
+      - name: Generate Prisma Client
+        run: npx prisma generate
+      
+      - name: Build Next.js
+        run: npm run build
+      
+      - name: Prepare Electron resources
+        run: node prepare-electron-resources.js
+      
+      - name: Convert icon to icns
+        run: |
+          if [ ! -f "resources/icon.icns" ]; then
+            echo "Conversion de l'icône depuis icon-256.png..."
+            mkdir -p icon.iconset
+            # Utiliser icon-256.png comme source
+            SOURCE="resources/icon-256.png"
+            sips -z 16 16 $SOURCE --out icon.iconset/icon_16x16.png 2>/dev/null || true
+            sips -z 32 32 $SOURCE --out icon.iconset/icon_16x16@2x.png 2>/dev/null || true
+            sips -z 32 32 $SOURCE --out icon.iconset/icon_32x32.png 2>/dev/null || true
+            sips -z 64 64 $SOURCE --out icon.iconset/icon_32x32@2x.png 2>/dev/null || true
+            sips -z 128 128 $SOURCE --out icon.iconset/icon_128x128.png 2>/dev/null || true
+            sips -z 256 256 $SOURCE --out icon.iconset/icon_128x128@2x.png 2>/dev/null || true
+            sips -z 256 256 $SOURCE --out icon.iconset/icon_256x256.png 2>/dev/null || true
+            cp $SOURCE icon.iconset/icon_256x256@2x.png 2>/dev/null || true
+            cp $SOURCE icon.iconset/icon_512x512.png 2>/dev/null || true
+            cp $SOURCE icon.iconset/icon_512x512@2x.png 2>/dev/null || true
+            iconutil -c icns icon.iconset -o resources/icon.icns || echo "Icône non convertie"
+            rm -rf icon.iconset
+          fi
+      
+      - name: Build Electron (macOS x64)
+        run: npx electron-builder --mac --x64 -c electron-builder.macos.yml
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Signature macOS (requis pour distribution professionnelle)
+          CSC_LINK: ${{ secrets.MAC_CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.MAC_CSC_KEY_PASSWORD }}
+          # Notarization Apple (requis depuis Catalina)
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      
+      - name: Upload macOS x64 artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-x64-build
+          path: |
+            dist-electron/*.dmg
+            dist-electron/*.zip
+          retention-days: 30
+
+  # ==========================================================================
+  # BUILD macOS (Apple Silicon arm64)
+  # ==========================================================================
+  build-macos-arm64:
+    runs-on: macos-14  # Apple Silicon runner (M1)
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Rebuild native modules for macOS arm64
+        run: npm rebuild
+      
+      - name: Generate Prisma Client
+        run: npx prisma generate
+      
+      - name: Build Next.js
+        run: npm run build
+      
+      - name: Prepare Electron resources
+        run: node prepare-electron-resources.js
+      
+      - name: Convert icon to icns
+        run: |
+          if [ ! -f "resources/icon.icns" ]; then
+            echo "Conversion de l'icône depuis icon-256.png..."
+            mkdir -p icon.iconset
+            SOURCE="resources/icon-256.png"
+            sips -z 16 16 $SOURCE --out icon.iconset/icon_16x16.png 2>/dev/null || true
+            sips -z 32 32 $SOURCE --out icon.iconset/icon_16x16@2x.png 2>/dev/null || true
+            sips -z 32 32 $SOURCE --out icon.iconset/icon_32x32.png 2>/dev/null || true
+            sips -z 64 64 $SOURCE --out icon.iconset/icon_32x32@2x.png 2>/dev/null || true
+            sips -z 128 128 $SOURCE --out icon.iconset/icon_128x128.png 2>/dev/null || true
+            sips -z 256 256 $SOURCE --out icon.iconset/icon_128x128@2x.png 2>/dev/null || true
+            sips -z 256 256 $SOURCE --out icon.iconset/icon_256x256.png 2>/dev/null || true
+            cp $SOURCE icon.iconset/icon_256x256@2x.png 2>/dev/null || true
+            cp $SOURCE icon.iconset/icon_512x512.png 2>/dev/null || true
+            cp $SOURCE icon.iconset/icon_512x512@2x.png 2>/dev/null || true
+            iconutil -c icns icon.iconset -o resources/icon.icns || echo "Icône non convertie"
+            rm -rf icon.iconset
+          fi
+      
+      - name: Build Electron (macOS arm64)
+        run: npx electron-builder --mac --arm64 -c electron-builder.macos.yml
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_LINK: ${{ secrets.MAC_CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.MAC_CSC_KEY_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      
+      - name: Upload macOS arm64 artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-arm64-build
+          path: |
+            dist-electron/*.dmg
+            dist-electron/*.zip
+          retention-days: 30
+
+  # ==========================================================================
+  # CRÉER LA RELEASE GITHUB
+  # ==========================================================================
+  create-release:
+    needs: [build-windows, build-macos-x64, build-macos-arm64]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      
+      - name: Display structure of downloaded files
+        run: ls -R artifacts
+      
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            artifacts/windows-build/*
+            artifacts/macos-x64-build/*
+            artifacts/macos-arm64-build/*
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
