@@ -1,0 +1,262 @@
+# ============================================================================
+# ELECTRON-BUILDER CONFIG macOS - Atelier Vélo+
+# ============================================================================
+# Date: 7 décembre 2025
+# Version: 1.2.0
+# IMPORTANT: Ce build DOIT être exécuté sur macOS (pas de cross-compilation)
+# Raison: Binaires natifs Prisma doivent être compilés sur la plateforme cible
+# ============================================================================
+
+appId: com.upgradedbikes.ateliervelo
+productName: Atelier Velo+
+copyright: Copyright © 2025 Jérôme Leyssard - Upgraded Bikes
+
+# ============================================================================
+# BUILD NATIF - CRITIQUE POUR macOS
+# ============================================================================
+# Les binaires natifs (Prisma, better-sqlite3) DOIVENT être recompilés
+# pour l'architecture cible (x64 Intel ou arm64 Apple Silicon)
+npmRebuild: true
+
+# ============================================================================
+# DOSSIERS
+# ============================================================================
+directories:
+  output: dist-electron
+  buildResources: resources
+
+# Hook afterPack pour nettoyage post-build
+afterPack: "./electron-builder-afterpack-macos.js"
+
+# ============================================================================
+# FICHIERS INCLUS DANS ASAR
+# ============================================================================
+files:
+  - package.json
+  - electron/**/*
+  - electron/web/node_modules/**/*
+  - "!electron/**/*.md"
+  
+  # Exclusions modules de build (économie ~140 MB)
+  - "!electron/web/node_modules/@next/swc-*/**/*"
+  - "!electron/web/node_modules/typescript/**/*"
+  - "!electron/web/node_modules/@types/**/*"
+  - "!electron/web/node_modules/eslint*/**/*"
+  - "!electron/web/node_modules/@eslint/**/*"
+  
+  # Dépendances Electron runtime
+  - node_modules/dotenv/**/*
+  - node_modules/electron-log/**/*
+  - node_modules/fs-extra/**/*
+  - node_modules/graceful-fs/**/*
+  - node_modules/jsonfile/**/*
+  - node_modules/universalify/**/*
+  
+  # Exclusions node_modules racine
+  - "!node_modules/@sentry/**/*"
+  - "!node_modules/app-builder-bin/**/*"
+  - "!node_modules/app-builder-lib/**/*"
+  - "!node_modules/electron-builder/**/*"
+  - "!node_modules/@playwright/**/*"
+  - "!node_modules/playwright/**/*"
+  - "!node_modules/playwright-core/**/*"
+  - "!node_modules/jest/**/*"
+  - "!node_modules/@jest/**/*"
+  - "!node_modules/typescript/**/*"
+  - "!node_modules/@types/**/*"
+  - "!node_modules/eslint/**/*"
+  - "!node_modules/@eslint/**/*"
+  - "!node_modules/next/**/*"
+  - "!node_modules/react/**/*"
+  - "!node_modules/react-dom/**/*"
+  - "!node_modules/@prisma/**/*"
+  - "!node_modules/.prisma/**/*"
+  
+  # Exclusions fichiers dev
+  - "!**/*.map"
+  - "!**/*.d.ts"
+  - "!**/__tests__/**/*"
+  - "!**/__mocks__/**/*"
+  - "!**/test/**/*"
+  - "!**/tests/**/*"
+  - "!**/*.test.js"
+  - "!**/*.test.ts"
+  - "!**/*.spec.js"
+  - "!**/*.spec.ts"
+  - "!**/examples/**/*"
+  - "!**/docs/**/*"
+  - "!**/*.md"
+  - "!**/LICENSE"
+  - "!**/CHANGELOG*"
+  - "!**/README*"
+
+# ============================================================================
+# ASAR
+# ============================================================================
+asar: true
+asarUnpack:
+  # Prisma Query Engine (binaire natif SQLite)
+  - "**/web/node_modules/.prisma/client/*.node"
+  - "**/web/node_modules/@prisma/client/runtime/*.node"
+  
+  # Better-sqlite3 (si présent)
+  - "**/node_modules/better-sqlite3/build/Release/*.node"
+  
+  # Tous les binaires natifs (.node pour Node, .dylib pour macOS)
+  - "**/*.node"
+  - "**/*.dylib"
+
+# ============================================================================
+# RESSOURCES HORS ASAR
+# ============================================================================
+extraResources:
+  - from: .env.production
+    to: .env.production
+  - from: resources/icon.icns
+    to: icon.icns
+
+# ============================================================================
+# CONFIGURATION macOS
+# ============================================================================
+mac:
+  target:
+    # DMG: Image disque standard macOS (recommandé pour distribution)
+    - target: dmg
+      arch:
+        - x64       # Intel Macs (avant 2020)
+        - arm64     # Apple Silicon M1/M2/M3 (2020+)
+    # ZIP: Archive pour distribution directe ou tests
+    - target: zip
+      arch:
+        - x64
+        - arm64
+  
+  # Catégorie App Store (pour future soumission)
+  category: public.app-category.business
+  
+  # Icône macOS (format .icns OBLIGATOIRE - pas .ico)
+  icon: resources/icon.icns
+  
+  # Nom du fichier généré
+  artifactName: "${productName}-${version}-${os}-${arch}.${ext}"
+  
+  # ============================================================================
+  # CODE SIGNING macOS
+  # ============================================================================
+  # SANS SIGNATURE (mode développement):
+  # - macOS affiche "Application de développeur non identifié"
+  # - L'utilisateur doit: Ctrl+Click > Ouvrir > Ouvrir quand même
+  # - OU: Préférences Système > Sécurité > Ouvrir quand même
+  #
+  # AVEC SIGNATURE (distribution):
+  # - Nécessite Apple Developer Account (99$/an)
+  # - Créer certificat "Developer ID Application"
+  # - Variables d'environnement requises:
+  #   CSC_LINK: Chemin vers certificat .p12
+  #   CSC_KEY_PASSWORD: Mot de passe certificat
+  #   APPLE_ID: Email compte Apple Developer
+  #   APPLE_APP_SPECIFIC_PASSWORD: Mot de passe app-specific
+  # ============================================================================
+  
+  # Désactiver signature pour build initial (développement)
+  identity: null
+  
+  # Hardened Runtime (requis pour notarization future)
+  hardenedRuntime: true
+  
+  # Entitlements (permissions macOS)
+  entitlements: build/entitlements.mac.plist
+  entitlementsInherit: build/entitlements.mac.plist
+  
+  # Désactiver Gatekeeper assessment (pas de signature)
+  gatekeeperAssess: false
+
+# ============================================================================
+# DMG (Image Disque macOS)
+# ============================================================================
+dmg:
+  # Fenêtre d'installation personnalisée
+  window:
+    width: 540
+    height: 380
+  
+  # Disposition des icônes
+  contents:
+    - x: 130
+      y: 220
+      type: file
+    - x: 410
+      y: 220
+      type: link
+      path: /Applications
+  
+  # Fond d'écran (optionnel - créer resources/dmg-background.png si souhaité)
+  # background: resources/dmg-background.png
+  
+  # Nom du fichier DMG
+  artifactName: "${productName}-${version}-${arch}.dmg"
+
+# ============================================================================
+# LOCALES - Français + Anglais fallback
+# ============================================================================
+electronLanguages: 
+  - fr
+  - en
+
+# ============================================================================
+# PUBLICATION GitHub Releases
+# ============================================================================
+publish:
+  - provider: github
+    owner: jeromeleyssard-pixel
+    repo: atelier-velo-plus
+    releaseType: release
+
+# ============================================================================
+# COMPRESSION - Store pour installation rapide
+# ============================================================================
+compression: store
+
+# ============================================================================
+# NOTES TECHNIQUES macOS
+# ============================================================================
+# 
+# 1. BINAIRES NATIFS (CRITIQUE):
+#    Prisma et better-sqlite3 contiennent du code compilé C/C++
+#    Ils DOIVENT être recompilés sur macOS pour fonctionner
+#    
+#    Sur le Mac, exécuter:
+#    npm rebuild
+#    # OU pour architecture spécifique:
+#    npm rebuild --platform=darwin --arch=x64    # Intel
+#    npm rebuild --platform=darwin --arch=arm64  # Apple Silicon
+#
+# 2. ICÔNE macOS:
+#    Format .icns obligatoire (pas .ico comme Windows)
+#    Créer avec:
+#    - iconutil -c icns icon.iconset (macOS natif)
+#    - https://cloudconvert.com/ico-to-icns (en ligne)
+#    - https://www.img2icnsapp.com/ (app macOS gratuite)
+#
+# 3. SANS CODE SIGNING:
+#    Au premier lancement, macOS bloque l'app
+#    Solution utilisateur:
+#    a) Ctrl+Click sur l'app > Ouvrir
+#    b) Cliquer "Ouvrir" dans la boîte de dialogue
+#    OU
+#    a) Préférences Système > Sécurité et confidentialité
+#    b) Cliquer "Ouvrir quand même" à côté du message
+#
+# 4. AVEC CODE SIGNING (futur):
+#    - Apple Developer Account: 99$/an
+#    - Créer certificat "Developer ID Application"
+#    - Notarization obligatoire depuis macOS Catalina
+#    - Voir: https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution
+#
+# 5. UNIVERSAL BINARY (x64 + arm64 combinés):
+#    Possible mais complexe avec binaires natifs
+#    Recommandé: Distribuer 2 versions séparées
+#    - Atelier Velo+-1.2.0-mac-x64.dmg (Intel)
+#    - Atelier Velo+-1.2.0-mac-arm64.dmg (Apple Silicon)
+#
+# ============================================================================
