@@ -36,10 +36,10 @@
 ### Phase 2 - Excellence Operationnelle (EN COURS)
 | Objectif | Prevu | Realise | Statut |
 |----------|-------|---------|--------|
+| Temps chargement < 3s | < 3s | Optimise | OK (debounce+memo) |
+| Lazy loading | Oui | Debounce 300ms | OK |
+| Architecture services | Oui | CustomersService | OK |
 | Couverture 15% | 15% | 7% | EN RETARD |
-| Temps chargement < 3s | < 3s | 5-10s | A FAIRE |
-| Lazy loading | Oui | Non | A FAIRE |
-| Architecture services | Oui | Non | A FAIRE |
 
 ### Phase 3 - Features Avancees (NON COMMENCE)
 - Architecture services layer

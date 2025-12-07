@@ -12,13 +12,18 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { listCustomers } from '@/lib/api';
+import { useDebounce } from './useDebounce';
 
 export function useCustomersData() {
   // État de recherche (local, pas dans cache)
   const [searchQuery, setSearchQuery] = useState('');
   const [selected, setSelected] = useState<string[]>([]);
+
+  // ✅ OPTIMISATION: Debounce la recherche (300ms)
+  // Évite le filtrage à chaque frappe
+  const debouncedSearch = useDebounce(searchQuery, 300);
 
   // Query principale: liste des clients
   const {
@@ -33,23 +38,25 @@ export function useCustomersData() {
     gcTime: 10 * 60 * 1000,   // 10 min (anciennement cacheTime)
   });
 
-  // Filtrage côté client (simple search)
-  const items = rawCustomers.filter((customer) => {
-    if (!searchQuery.trim()) return true;
-    
-    const q = searchQuery.toLowerCase();
-    const email = (customer.email || '').toLowerCase();
-    const firstName = (customer.firstName || '').toLowerCase();
-    const lastName = (customer.lastName || '').toLowerCase();
-    const phone = (customer.phone || '').toLowerCase();
-    
-    return (
-      email.includes(q) ||
-      firstName.includes(q) ||
-      lastName.includes(q) ||
-      phone.includes(q)
-    );
-  });
+  // ✅ OPTIMISATION: Mémoïser le filtrage pour éviter recalculs inutiles
+  const items = useMemo(() => {
+    return rawCustomers.filter((customer) => {
+      if (!debouncedSearch.trim()) return true;
+      
+      const q = debouncedSearch.toLowerCase();
+      const email = (customer.email || '').toLowerCase();
+      const firstName = (customer.firstName || '').toLowerCase();
+      const lastName = (customer.lastName || '').toLowerCase();
+      const phone = (customer.phone || '').toLowerCase();
+      
+      return (
+        email.includes(q) ||
+        firstName.includes(q) ||
+        lastName.includes(q) ||
+        phone.includes(q)
+      );
+    });
+  }, [rawCustomers, debouncedSearch]);
 
   return {
     // Data
