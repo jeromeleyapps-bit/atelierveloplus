@@ -70,21 +70,29 @@ export async function POST(req: NextRequest) {
 
     logger.debug('UPLOAD LOGO: Destination file', { filepath });
 
-    // Convertir en PNG avec sharp (garantit compatibilité PDF)
+    // Convertir en PNG avec Jimp (alternative légère à Sharp: 2 MB vs 19 MB)
     const buffer = Buffer.from(await file.arrayBuffer());
     logger.debug('UPLOAD LOGO: Buffer created', { size: buffer.length });
     
-    const sharp = (await import('sharp')).default;
-    logger.debug('UPLOAD LOGO: Sharp imported');
-    
     try {
-      const pngBuffer = await sharp(buffer)
-        .resize(512, 512, { 
-          fit: 'inside', 
-          withoutEnlargement: true 
-        })
-        .png({ quality: 90 })
-        .toBuffer();
+      const { Jimp } = await import('jimp');
+      logger.debug('UPLOAD LOGO: Jimp imported');
+      
+      const image = await Jimp.read(buffer);
+      
+      // Redimensionner en conservant le ratio (max 512x512)
+      const width = image.width;
+      const height = image.height;
+      if (width > 512 || height > 512) {
+        if (width > height) {
+          image.resize({ w: 512 });
+        } else {
+          image.resize({ h: 512 });
+        }
+      }
+      
+      // Convertir en PNG
+      const pngBuffer = await image.getBuffer('image/png');
       
       logger.debug('UPLOAD LOGO: Image converted', { size: pngBuffer.length });
       logger.debug('UPLOAD LOGO: Writing file');

@@ -36,6 +36,8 @@ function cleanupBuildModules(appOutDir) {
   let totalSaved = 0;
   const modulesToRemove = [
     '@next',      // Compilateur SWC (~122 MB) - Non nécessaire en standalone
+    '@img',       // Sharp binaires (~19 MB) - Remplacé par Jimp
+    'sharp',      // Sharp (~19 MB) - Remplacé par Jimp
     'typescript', // TypeScript compiler
     '@types',     // Type definitions
     'eslint',     // Linter

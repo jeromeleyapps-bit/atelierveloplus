@@ -163,10 +163,8 @@ asarUnpack:
   - "**/web/node_modules/.prisma/client/*.node"
   - "**/web/node_modules/@prisma/client/runtime/*.node"
   
-  # 2. Sharp/libvips (traitement images)
-  - "**/web/node_modules/sharp/**/*.node"
-  - "**/web/node_modules/@img/**/*.node"
-  - "**/web/node_modules/@img/**/*.dll"
+  # 2. Sharp/libvips - SUPPRIME (remplacé par Jimp)
+  # Jimp est en JavaScript pur, pas de binaires natifs
   
   # 3. Better-sqlite3 (si présent)
   - "**/node_modules/better-sqlite3/build/Release/*.node"

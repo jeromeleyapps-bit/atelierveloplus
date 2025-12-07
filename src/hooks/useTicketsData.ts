@@ -1,7 +1,15 @@
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { searchWorkOrders, listCustomers, listCustomerBikes, type WorkOrder } from '@/lib/api';
-import { isToday, isThisWeek } from 'date-fns';
+import dayjs from 'dayjs';
+import isoWeek from 'dayjs/plugin/isoWeek';
+
+// Plugin pour semaine ISO
+dayjs.extend(isoWeek);
+
+// Helpers pour remplacer date-fns
+const isToday = (date: Date): boolean => dayjs(date).isSame(dayjs(), 'day');
+const isThisWeek = (date: Date): boolean => dayjs(date).isoWeek() === dayjs().isoWeek() && dayjs(date).year() === dayjs().year();
 
 /**
  * Hook personnalisé pour gérer les données des tickets

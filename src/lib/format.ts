@@ -1,14 +1,20 @@
 /**
- * Formatage utilities avec date-fns
+ * Formatage utilities avec dayjs
  * 
  * Centralise tout le formatage de dates, prix, téléphones, etc.
+ * 
+ * Migration date-fns -> dayjs (22 MB -> 2 MB)
  */
 
-// Use dynamic import for better Jest compatibility
-import * as dateFns from 'date-fns';
-import { fr } from 'date-fns/locale';
+import dayjs from 'dayjs';
+import 'dayjs/locale/fr';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+import localizedFormat from 'dayjs/plugin/localizedFormat';
 
-const { format, parseISO, isValid } = dateFns;
+// Configuration dayjs
+dayjs.extend(customParseFormat);
+dayjs.extend(localizedFormat);
+dayjs.locale('fr');
 
 // === DATES ===
 
@@ -16,9 +22,9 @@ export function formatDate(date: Date | string | null | undefined): string {
   if (!date) return '-'
   
   try {
-    const d = typeof date === 'string' ? parseISO(date) : date
-    if (!isValid(d)) return '-'
-    return format(d, 'dd/MM/yyyy', { locale: fr })
+    const d = dayjs(date);
+    if (!d.isValid()) return '-'
+    return d.format('DD/MM/YYYY')
   } catch {
     return '-'
   }
@@ -28,9 +34,9 @@ export function formatDateTime(date: Date | string | null | undefined): string {
   if (!date) return '-'
   
   try {
-    const d = typeof date === 'string' ? parseISO(date) : date
-    if (!isValid(d)) return '-'
-    return format(d, 'dd/MM/yyyy à HH:mm', { locale: fr })
+    const d = dayjs(date);
+    if (!d.isValid()) return '-'
+    return d.format('DD/MM/YYYY à HH:mm')
   } catch {
     return '-'
   }
@@ -40,9 +46,9 @@ export function formatDateLong(date: Date | string | null | undefined): string {
   if (!date) return '-'
   
   try {
-    const d = typeof date === 'string' ? parseISO(date) : date
-    if (!isValid(d)) return '-'
-    return format(d, 'EEEE d MMMM yyyy', { locale: fr })
+    const d = dayjs(date);
+    if (!d.isValid()) return '-'
+    return d.format('dddd D MMMM YYYY')
   } catch {
     return '-'
   }
@@ -52,9 +58,9 @@ export function formatTime(date: Date | string | null | undefined): string {
   if (!date) return '-'
   
   try {
-    const d = typeof date === 'string' ? parseISO(date) : date
-    if (!isValid(d)) return '-'
-    return format(d, 'HH:mm', { locale: fr })
+    const d = dayjs(date);
+    if (!d.isValid()) return '-'
+    return d.format('HH:mm')
   } catch {
     return '-'
   }
