@@ -42,6 +42,17 @@ files:
   - "!electron/**/*.md"
   
   # ============================================================================
+  # EXCLUSIONS CRITIQUES - Modules de build inutiles en production
+  # ============================================================================
+  # @next/swc-* : Compilateur SWC (122 MB) - Non nécessaire en standalone
+  - "!electron/web/node_modules/@next/swc-*/**/*"
+  # Autres outils de build
+  - "!electron/web/node_modules/typescript/**/*"
+  - "!electron/web/node_modules/@types/**/*"
+  - "!electron/web/node_modules/eslint*/**/*"
+  - "!electron/web/node_modules/@eslint/**/*"
+  
+  # ============================================================================
   # INCLURE SEULEMENT les dépendances Electron nécessaires
   # ============================================================================
   # CRITIQUE: Le node_modules racine ne contient pas .prisma/client généré
@@ -161,6 +172,7 @@ asarUnpack:
   - "**/node_modules/better-sqlite3/build/Release/*.node"
   
   # 4. Tous les autres binaires natifs
+  # Note: @next/swc sera supprimé par afterPack hook (non nécessaire en standalone)
   - "**/*.node"
   - "**/*.dll"
 

@@ -1,21 +1,28 @@
 "use client";
 
+import React, { memo } from "react";
 import ResponsiveContainer from "@/components/ResponsiveContainer";
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 // LicenseBanner supprimé - GlobalTrialBanner déjà affiché globalement dans providers.tsx
 
-export default function PageShell({
-  title,
-  children,
-  maxWidth = "xl" as const,
-  headerColor,
-}: {
+interface PageShellProps {
   title: string;
   children: React.ReactNode;
   maxWidth?: "xs" | "sm" | "md" | "lg" | "xl" | false;
   headerColor?: string;
-}) {
+}
+
+/**
+ * PageShell - Layout de page principal
+ * Optimisé avec React.memo pour éviter les re-renders inutiles
+ */
+const PageShell = memo(function PageShell({
+  title,
+  children,
+  maxWidth = "xl" as const,
+  headerColor,
+}: PageShellProps) {
   return (
     <>
       <ResponsiveContainer maxWidth={maxWidth} sx={{ py: 4, minHeight: 'calc(100vh - 120px)' }}>
@@ -55,4 +62,6 @@ export default function PageShell({
       </Box>
     </>
   );
-}
+});
+
+export default PageShell;

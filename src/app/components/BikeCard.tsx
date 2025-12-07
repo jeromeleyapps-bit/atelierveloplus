@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from 'react';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';
@@ -24,7 +25,11 @@ interface BikeCardProps {
   elevation?: number;
 }
 
-export default function BikeCard({ bike, onEdit, elevation = 0 }: BikeCardProps) {
+/**
+ * BikeCard - Carte d'affichage vélo
+ * Optimisé avec React.memo pour éviter les re-renders inutiles
+ */
+const BikeCard = memo(function BikeCard({ bike, onEdit, elevation = 0 }: BikeCardProps) {
   if (!bike) {
     return (
       <Card elevation={elevation} sx={{ border: 1, borderColor: 'divider' }}>
@@ -86,4 +91,6 @@ export default function BikeCard({ bike, onEdit, elevation = 0 }: BikeCardProps)
       </CardContent>
     </Card>
   );
-}
+});
+
+export default BikeCard;

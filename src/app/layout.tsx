@@ -15,18 +15,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 
-// Type Viewport pour Next.js 13.x (introduit nativement dans Next.js 14)
-type Viewport = {
-  width?: string | number;
-  height?: string | number;
-  initialScale?: number;
-  minimumScale?: number;
-  maximumScale?: number;
-  userScalable?: boolean;
-  viewportFit?: "auto" | "cover" | "contain";
-  themeColor?: string | { media: string; color: string }[];
-  colorScheme?: "normal" | "light" | "dark" | "light dark" | "dark light";
-};
+// Note: viewport config via meta tags dans head (Next.js 13.x)
 import "./globals.css";
 import { AppProviders } from "./providers";
 import { SentryProvider } from "@/components/providers/SentryProvider";
@@ -75,12 +64,7 @@ export const metadata: Metadata = {
   },
 };
 
-// Déplacer la configuration viewport + themeColor ici (Next.js App Router)
-export const viewport: Viewport = {
-  width: "device-width",
-  initialScale: 1,
-  themeColor: "#3b82f6",
-};
+// Note: viewport et themeColor sont configurés via meta tags dans le head ci-dessous
 
 export default function RootLayout({
   children,
@@ -90,6 +74,8 @@ export default function RootLayout({
   return (
     <html lang="fr" className={inter.className}>
       <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="theme-color" content="#3b82f6" />
         <meta httpEquiv="Permissions-Policy" content="camera=*, microphone=*, geolocation=*" />
       </head>
       <body>

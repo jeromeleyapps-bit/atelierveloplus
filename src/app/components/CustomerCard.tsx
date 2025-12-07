@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from 'react';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';
@@ -30,7 +31,11 @@ interface CustomerCardProps {
   elevation?: number;
 }
 
-export default function CustomerCard({ customer, onEdit, elevation = 0 }: CustomerCardProps) {
+/**
+ * CustomerCard - Carte d'affichage client
+ * Optimisé avec React.memo pour éviter les re-renders inutiles
+ */
+const CustomerCard = memo(function CustomerCard({ customer, onEdit, elevation = 0 }: CustomerCardProps) {
   if (!customer) {
     return (
       <Card elevation={elevation} sx={{ border: 1, borderColor: 'divider' }}>
@@ -120,4 +125,6 @@ export default function CustomerCard({ customer, onEdit, elevation = 0 }: Custom
       </CardContent>
     </Card>
   );
-}
+});
+
+export default CustomerCard;
