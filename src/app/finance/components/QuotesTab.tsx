@@ -1,0 +1,365 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Chip from '@mui/material/Chip';
+import Paper from '@mui/material/Paper';
+import Stack from '@mui/material/Stack';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Typography from '@mui/material/Typography';
+import Checkbox from '@mui/material/Checkbox';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
+import AddIcon from "@mui/icons-material/Add";
+import TransformIcon from "@mui/icons-material/Transform";
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EmailIcon from "@mui/icons-material/Email";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
+import Link from "next/link";
+import { convertQuoteToInvoice, type Invoice } from "@/lib/api";
+import CreateQuoteDialog from "./CreateQuoteDialog";
+import { logger } from '@/lib/logger';
+
+interface QuotesTabProps {
+  quotes: Invoice[];
+  onRefresh: () => void;
+}
+
+export default function QuotesTab({ quotes, onRefresh }: QuotesTabProps) {
+  const router = useRouter();
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [converting, setConverting] = useState<string | null>(null);
+  const [selected, setSelected] = useState<string[]>([]);
+  const [toast, setToast] = useState<{ open: boolean; message: string; severity: "success" | "error" | "warning" }>({ open: false, message: "", severity: "success" });
+
+  const handleConvert = async (quoteId: string) => {
+    if (!confirm("Convertir ce devis en facture ?")) return;
+
+    setConverting(quoteId);
+    try {
+      const result = await convertQuoteToInvoice(quoteId);
+      alert("Facture créée avec succès !");
+      router.push(`/finance/invoices/${result.invoice.id}`);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Erreur inconnue";
+      alert(`Erreur: ${message}`);
+    } finally {
+      setConverting(null);
+    }
+  };
+
+  const getStatusLabel = (quote: Invoice) => {
+    if (quote.convertedAt) return "Converti";
+    if (quote.status === "draft") return "Brouillon";
+    if (quote.status === "issued") return "Envoyé";
+    return quote.status;
+  };
+
+  const getStatusColor = (quote: Invoice): "success" | "warning" | "default" | "info" => {
+    if (quote.convertedAt) return "success";
+    if (quote.status === "draft") return "warning";
+    if (quote.status === "issued") return "info";
+    return "default";
+  };
+
+  return (
+    <Box>
+      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
+        <Typography variant="h5">Devis</Typography>
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={() => setCreateDialogOpen(true)}
+        >
+          Créer un devis
+        </Button>
+      </Stack>
+
+      {/* Bandeau d'actions groupées */}
+      {selected.length > 0 && (
+        <Paper elevation={2} sx={{ p: 2, mb: 3, borderRadius: 2, bgcolor: 'action.hover', border: '2px solid', borderColor: 'divider' }}>
+          <Stack direction={{ xs: 'column', md: 'row' }} spacing={1} alignItems="center" sx={{ flexWrap: 'wrap', rowGap: 1 }}>
+            <Typography variant="subtitle1" fontWeight={600} sx={{ mr: 2 }}>
+              {selected.length} devis sélectionné{selected.length > 1 ? 's' : ''}
+            </Typography>
+            <Button 
+              size="small" 
+              variant="contained"
+              sx={{ bgcolor: '#FF9800', '&:hover': { bgcolor: '#F57C00' } }}
+              onClick={async () => {
+                const token = localStorage.getItem('jwt_token');
+                let successCount = 0;
+                for (const id of selected) {
+                  try {
+                    const res = await fetch(`/api/finance/invoices/${id}/issue`, {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                      },
+                    });
+                    if (res.ok) successCount++;
+                  } catch (e) {
+                    logger.error('Issue error:', e);
+                  }
+                }
+                if (successCount > 0) {
+                  setToast({ open: true, message: `${successCount} devis émis`, severity: 'success' });
+                  onRefresh();
+                } else {
+                  setToast({ open: true, message: 'Erreur lors de l\'émission', severity: 'error' });
+                }
+              }}
+            >
+              Émettre
+            </Button>
+            <Button 
+              size="small" 
+              variant="outlined"
+              startIcon={<PictureAsPdfIcon />}
+              onClick={async () => {
+                for (const id of selected) {
+                  try {
+                    const response = await fetch(`/api/finance/invoices/${id}/pdf`);
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `devis-${id}.pdf`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                  } catch (error) {
+                    logger.error('Erreur téléchargement PDF:', error);
+                  }
+                }
+              }}
+            >
+              Télécharger PDF
+            </Button>
+            <Button 
+              size="small" 
+              variant="outlined"
+              startIcon={<EmailIcon />}
+              onClick={async () => {
+                const token = localStorage.getItem('jwt_token');
+                let successCount = 0;
+                for (const id of selected) {
+                  try {
+                    const res = await fetch(`/api/finance/invoices/${id}/send-email`, { 
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                      },
+                    });
+                    if (res.ok) successCount++;
+                  } catch (e) {
+                    logger.error('Email error:', e);
+                  }
+                }
+                if (successCount > 0) {
+                  setToast({ open: true, message: `${successCount} devis envoyé${successCount > 1 ? 's' : ''}`, severity: 'success' });
+                } else {
+                  setToast({ open: true, message: 'Erreur lors de l\'envoi des emails', severity: 'error' });
+                }
+              }}
+            >
+              Envoyer par email
+            </Button>
+            <Button 
+              size="small" 
+              variant="outlined" 
+              color="error"
+              startIcon={<DeleteIcon />}
+              onClick={async () => {
+                if (!confirm(`Supprimer définitivement ${selected.length} devis ? Cette action est irréversible.`)) return;
+                let successCount = 0;
+                const token = window.localStorage.getItem("jwt_token");
+                const userId = window.localStorage.getItem("auth:userId");
+                for (const id of selected) {
+                  try {
+                    const res = await fetch(`/api/finance/invoices/${id}`, { 
+                      method: 'DELETE',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        'x-user-id': userId || '',
+                        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+                      }
+                    });
+                    if (res.ok) successCount++;
+                  } catch (e) {
+                    logger.error('Delete error:', e);
+                  }
+                }
+                setToast({ open: true, message: `${successCount} devis supprimé${successCount > 1 ? 's' : ''}`, severity: 'success' });
+                setSelected([]);
+                onRefresh();
+              }}
+            >
+              Supprimer
+            </Button>
+            <Button 
+              size="small" 
+              variant="text"
+              onClick={() => setSelected([])}
+            >
+              Annuler sélection
+            </Button>
+          </Stack>
+        </Paper>
+      )}
+
+      {quotes.length === 0 ? (
+        <Paper sx={{ p: 4, textAlign: "center" }}>
+          <Typography variant="body1" color="text.secondary" gutterBottom>
+            Aucun devis
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            Créez votre premier devis pour commencer
+          </Typography>
+          <Button
+            variant="outlined"
+            startIcon={<AddIcon />}
+            onClick={() => setCreateDialogOpen(true)}
+          >
+            Créer un devis
+          </Button>
+        </Paper>
+      ) : (
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell padding="checkbox">
+                  <Checkbox
+                    indeterminate={selected.length > 0 && selected.length < quotes.length}
+                    checked={quotes.length > 0 && selected.length === quotes.length}
+                    onChange={(e) => {
+                      if (e.target.checked) setSelected(quotes.map(q => q.id)); else setSelected([]);
+                    }}
+                  />
+                </TableCell>
+                <TableCell>Numéro</TableCell>
+                <TableCell>Date création</TableCell>
+                <TableCell>Valide jusqu&apos;au</TableCell>
+                <TableCell>Statut</TableCell>
+                <TableCell align="right">Montant TTC</TableCell>
+                <TableCell align="right">Actions</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {quotes.map((quote) => (
+                <TableRow key={quote.id} hover selected={selected.includes(quote.id)}>
+                  <TableCell padding="checkbox">
+                    <Checkbox
+                      checked={selected.includes(quote.id)}
+                      onChange={(e) => {
+                        setSelected((prev) => e.target.checked ? Array.from(new Set([...prev, quote.id])) : prev.filter(id => id !== quote.id));
+                      }}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="body2" fontWeight={600}>
+                      {quote.number || "Brouillon"}
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    {new Date(quote.createdAt).toLocaleDateString("fr-FR")}
+                  </TableCell>
+                  <TableCell>
+                    {quote.validUntil ? (
+                      <Typography
+                        variant="body2"
+                        color={
+                          new Date(quote.validUntil) < new Date()
+                            ? "error"
+                            : "text.primary"
+                        }
+                      >
+                        {new Date(quote.validUntil).toLocaleDateString("fr-FR")}
+                      </Typography>
+                    ) : (
+                      "-"
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <Chip
+                      size="small"
+                      label={getStatusLabel(quote)}
+                      color={getStatusColor(quote)}
+                    />
+                  </TableCell>
+                  <TableCell align="right">
+                    <Typography variant="body2" fontWeight={600}>
+                      {quote.totalTTC.toFixed(2)} €
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="right">
+                    <Stack direction="row" spacing={1} justifyContent="flex-end">
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        component={Link}
+                        href={`/finance/quotes/${quote.id}`}
+                        startIcon={<OpenInNewIcon />}
+                      >
+                        Voir
+                      </Button>
+                      {!quote.convertedAt && (
+                        <Button
+                          size="small"
+                          variant="contained"
+                          color="success"
+                          startIcon={<TransformIcon />}
+                          onClick={() => handleConvert(quote.id)}
+                          disabled={converting === quote.id}
+                        >
+                          {converting === quote.id ? "..." : "Convertir"}
+                        </Button>
+                      )}
+                      {quote.convertedAt && quote.convertedToId && (
+                        <Button
+                          size="small"
+                          variant="text"
+                          component={Link}
+                          href={`/finance/invoices/${quote.convertedToId}`}
+                        >
+                          Voir facture
+                        </Button>
+                      )}
+                    </Stack>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
+
+      <CreateQuoteDialog
+        open={createDialogOpen}
+        onClose={() => setCreateDialogOpen(false)}
+        onSuccess={(_quoteId) => {
+          setCreateDialogOpen(false);
+          onRefresh();
+        }}
+      />
+
+      <Snackbar open={toast.open} autoHideDuration={3500} onClose={() => setToast((t) => ({ ...t, open: false }))} anchorOrigin={{ vertical: "bottom", horizontal: "center" }}>
+        <Alert onClose={() => setToast((t) => ({ ...t, open: false }))} severity={toast.severity} sx={{ width: '100%' }}>
+          {toast.message}
+        </Alert>
+      </Snackbar>
+    </Box>
+  );
+}

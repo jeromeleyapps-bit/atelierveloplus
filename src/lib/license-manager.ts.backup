@@ -1,0 +1,392 @@
+/**
+ * License Manager - Phase 2
+ * Gestion centralisée des licences Basique/Pro
+ */
+
+import { prisma } from './prisma';
+import * as crypto from 'crypto';
+import * as os from 'os';
+
+export interface LicenseInfo {
+  tier: 'basique' | 'pro';
+  status: 'active' | 'suspended' | 'expired' | 'grace' | 'trial';
+  features: {
+    unlimitedEmails: boolean;
+    marketingCampaigns: boolean;
+    bookingOnline: boolean;
+    advancedStats: boolean;
+    togglesUnlocked: boolean;
+  };
+  limits: {
+    emailsPerWeek: number;
+    emailsRemaining: number;
+    emailResetDate: Date;
+  };
+  expiresAt?: Date;
+  daysUntilExpiry?: number;
+}
+
+// Récupérer l'ID matériel unique de la machine
+export function getHardwareId(): string {
+  const networkInterfaces = os.networkInterfaces();
+  const macs: string[] = [];
+  
+  for (const name of Object.keys(networkInterfaces)) {
+    const nets = networkInterfaces[name];
+    if (!nets) continue;
+    
+    for (const net of nets) {
+      if (!net.internal && net.mac !== '00:00:00:00:00:00') {
+        macs.push(net.mac);
+      }
+    }
+  }
+  
+  const platform = os.platform();
+  const hostname = os.hostname();
+  const cpus = os.cpus()[0]?.model || 'unknown';
+  
+  // Hash SHA-256 pour anonymiser
+  const combined = `${macs.join('-')}-${platform}-${hostname}-${cpus}`;
+  return crypto.createHash('sha256').update(combined).digest('hex').substring(0, 16);
+}
+
+// Générer une clé de licence
+export function generateLicenseKey(tier: 'basique' | 'pro', expiryDate: Date): string {
+  const tierCode = tier === 'basique' ? 'AVBS' : 'AVPR';
+  
+  // Segment aléatoire (4 chars alphanumériques)
+  const randomSegment = () => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let result = '';
+    for (let i = 0; i < 4; i++) {
+      result += chars[Math.floor(Math.random() * chars.length)];
+    }
+    return result;
+  };
+  
+  // Encoder la date d'expiration sur 4 chars (MMYY en base36)
+  const expirySegment = () => {
+    const month = (expiryDate.getMonth() + 1).toString().padStart(2, '0');
+    const year = expiryDate.getFullYear().toString().slice(-2);
+    return `${month}${year}`;
+  };
+  
+  // Checksum simple (CRC8)
+  const checksumSegment = (segments: string[]) => {
+    const data = segments.join('');
+    let crc = 0;
+    for (let i = 0; i < data.length; i++) {
+      crc = (crc + data.charCodeAt(i)) % 256;
+    }
+    return crc.toString(16).padStart(2, '0').toUpperCase();
+  };
+  
+  const segments = [tierCode, randomSegment(), expirySegment()];
+  const checksum = checksumSegment(segments);
+  segments.push(checksum + randomSegment().substring(0, 2)); // 4 chars pour dernier segment
+  
+  return segments.join('-');
+}
+
+// Valider le format d'une clé
+export function validateLicenseKeyFormat(key: string): boolean {
+  const segments = key.split('-');
+  if (segments.length !== 4) return false;
+  
+  // Vérifier format de chaque segment (4 chars alphanumériques)
+  for (const segment of segments) {
+    if (!/^[A-Z0-9]{4}$/.test(segment)) return false;
+  }
+  
+  // Vérifier tier code
+  const tierCode = segments[0];
+  if (tierCode !== 'AVBS' && tierCode !== 'AVPR') return false;
+  
+  return true;
+}
+
+// Récupérer la licence active
+export async function getActiveLicense() {
+  return await prisma.license.findFirst({
+    where: {
+      status: {
+        in: ['active', 'trial', 'grace']
+      }
+    },
+    orderBy: {
+      createdAt: 'desc'
+    }
+  });
+}
+
+// Récupérer les informations de licence
+export async function getLicenseInfo(): Promise<LicenseInfo> {
+  const license = await getActiveLicense();
+  
+  if (!license) {
+    // Pas de licence = Basique par défaut
+    return {
+      tier: 'basique',
+      status: 'active',
+      features: {
+        unlimitedEmails: false,
+        marketingCampaigns: false,
+        bookingOnline: false,
+        advancedStats: false,
+        togglesUnlocked: false,
+      },
+      limits: {
+        emailsPerWeek: 50,
+        emailsRemaining: 50,
+        emailResetDate: new Date(),
+      },
+    };
+  }
+  
+  const isPro = license.tier === 'pro';
+  const daysUntilExpiry = license.expiresAt 
+    ? Math.floor((license.expiresAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+    : undefined;
+  
+  return {
+    tier: license.tier as 'basique' | 'pro',
+    status: license.status as any,
+    features: {
+      unlimitedEmails: isPro || license.maxEmailsPerWeek === -1,
+      marketingCampaigns: license.marketingEnabled,
+      bookingOnline: license.bookingEnabled,
+      advancedStats: license.advancedStatsEnabled,
+      togglesUnlocked: isPro,
+    },
+    limits: {
+      emailsPerWeek: license.maxEmailsPerWeek,
+      emailsRemaining: Math.max(0, license.maxEmailsPerWeek - license.emailsThisWeek),
+      emailResetDate: license.emailResetDate,
+    },
+    expiresAt: license.expiresAt || undefined,
+    daysUntilExpiry,
+  };
+}
+
+// Activer une licence
+export async function activateLicense(key: string, customerEmail?: string, customerName?: string): Promise<{ success: boolean; message: string; license?: any }> {
+  // Valider format
+  if (!validateLicenseKeyFormat(key)) {
+    return {
+      success: false,
+      message: 'Format de clé invalide. Format attendu: XXXX-XXXX-XXXX-XXXX',
+    };
+  }
+  
+  // Vérifier si déjà utilisée
+  const existing = await prisma.license.findUnique({ where: { key } });
+  if (existing) {
+    return {
+      success: false,
+      message: 'Cette clé de licence est déjà utilisée.',
+    };
+  }
+  
+  // Extraire le tier
+  const tierCode = key.split('-')[0];
+  const tier = tierCode === 'AVBS' ? 'basique' : 'pro';
+  
+  // Extraire date d'expiration (segment 2: MMYY)
+  const expirySegment = key.split('-')[2];
+  const month = parseInt(expirySegment.substring(0, 2), 10);
+  const year = 2000 + parseInt(expirySegment.substring(2, 4), 10);
+  const expiresAt = new Date(year, month - 1, 1); // Premier jour du mois
+  expiresAt.setMonth(expiresAt.getMonth() + 1); // Fin du mois
+  
+  // Vérifier expiration
+  if (expiresAt < new Date()) {
+    return {
+      success: false,
+      message: 'Cette clé de licence est expirée.',
+    };
+  }
+  
+  // Obtenir hardware ID
+  const hardwareId = getHardwareId();
+  
+  // Créer licence
+  const license = await prisma.license.create({
+    data: {
+      key,
+      tier,
+      status: 'active',
+      activatedAt: new Date(),
+      expiresAt,
+      lastVerified: new Date(),
+      maxEmailsPerWeek: tier === 'pro' ? -1 : 50, // -1 = illimité
+      emailsThisWeek: 0,
+      emailResetDate: new Date(),
+      marketingEnabled: tier === 'pro',
+      bookingEnabled: tier === 'pro',
+      advancedStatsEnabled: tier === 'pro',
+      customerEmail,
+      customerName,
+      hardwareId,
+    },
+  });
+  
+  // Logger activation
+  await prisma.licenseVerification.create({
+    data: {
+      licenseId: license.id,
+      verificationType: 'manual',
+      status: 'success',
+      responseCode: '200',
+    },
+  });
+  
+  return {
+    success: true,
+    message: `Licence ${tier.toUpperCase()} activée avec succès! Valide jusqu'au ${expiresAt.toLocaleDateString('fr-FR')}.`,
+    license,
+  };
+}
+
+// Vérifier si un email peut être envoyé
+export async function canSendEmail(): Promise<{ allowed: boolean; reason?: string }> {
+  const license = await getActiveLicense();
+  
+  if (!license) {
+    // Pas de licence = Basique par défaut
+    return { allowed: true }; // On autorise car limite par défaut
+  }
+  
+  // Pro = illimité
+  if (license.tier === 'pro' || license.maxEmailsPerWeek === -1) {
+    return { allowed: true };
+  }
+  
+  // Vérifier reset hebdomadaire
+  const now = new Date();
+  const daysSinceReset = Math.floor((now.getTime() - license.emailResetDate.getTime()) / (1000 * 60 * 60 * 24));
+  
+  if (daysSinceReset >= 7) {
+    // Reset compteur
+    await prisma.license.update({
+      where: { id: license.id },
+      data: {
+        emailsThisWeek: 0,
+        emailResetDate: now,
+      },
+    });
+    return { allowed: true };
+  }
+  
+  // Vérifier limite
+  if (license.emailsThisWeek >= license.maxEmailsPerWeek) {
+    return {
+      allowed: false,
+      reason: `Limite hebdomadaire atteinte (${license.maxEmailsPerWeek} emails). Passez en Pro pour l'illimité!`,
+    };
+  }
+  
+  return { allowed: true };
+}
+
+// Incrémenter le compteur d'emails
+export async function incrementEmailCount(): Promise<void> {
+  const license = await getActiveLicense();
+  
+  if (!license || license.maxEmailsPerWeek === -1) {
+    return; // Pro ou pas de licence = pas de comptage
+  }
+  
+  await prisma.license.update({
+    where: { id: license.id },
+    data: {
+      emailsThisWeek: {
+        increment: 1,
+      },
+    },
+  });
+}
+
+// Vérifier l'accès à une fonctionnalité
+export async function checkFeatureAccess(feature: 'marketing' | 'booking' | 'stats' | 'toggles'): Promise<boolean> {
+  const license = await getActiveLicense();
+  
+  if (!license) {
+    return false; // Basique par défaut
+  }
+  
+  switch (feature) {
+    case 'marketing':
+      return license.marketingEnabled;
+    case 'booking':
+      return license.bookingEnabled;
+    case 'stats':
+      return license.advancedStatsEnabled;
+    case 'toggles':
+      return license.tier === 'pro';
+    default:
+      return false;
+  }
+}
+
+// Vérifier la licence (périodique)
+export async function verifyLicense(): Promise<{ valid: boolean; message?: string }> {
+  const license = await getActiveLicense();
+  
+  if (!license) {
+    return { valid: true }; // Pas de licence = mode basique OK
+  }
+  
+  // Vérifier expiration
+  if (license.expiresAt && license.expiresAt < new Date()) {
+    await prisma.license.update({
+      where: { id: license.id },
+      data: { status: 'expired' },
+    });
+    
+    return {
+      valid: false,
+      message: 'Licence expirée. Veuillez renouveler votre abonnement.',
+    };
+  }
+  
+  // Vérifier hardware ID (anti-partage)
+  const currentHardwareId = getHardwareId();
+  if (license.hardwareId && license.hardwareId !== currentHardwareId) {
+    await prisma.license.update({
+      where: { id: license.id },
+      data: { status: 'suspended' },
+    });
+    
+    await prisma.licenseVerification.create({
+      data: {
+        licenseId: license.id,
+        verificationType: 'periodic',
+        status: 'failed',
+        errorMessage: 'Hardware ID mismatch - licence liée à une autre machine',
+      },
+    });
+    
+    return {
+      valid: false,
+      message: 'Licence invalide: liée à une autre machine. Contactez le support.',
+    };
+  }
+  
+  // Mettre à jour lastVerified
+  await prisma.license.update({
+    where: { id: license.id },
+    data: { lastVerified: new Date() },
+  });
+  
+  await prisma.licenseVerification.create({
+    data: {
+      licenseId: license.id,
+      verificationType: 'periodic',
+      status: 'success',
+      responseCode: '200',
+    },
+  });
+  
+  return { valid: true };
+}
