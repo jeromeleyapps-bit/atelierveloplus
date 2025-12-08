@@ -66,10 +66,25 @@ async function isDatabaseValid(dbPath, prismaClient = null) {
 async function applySchema(dbPath, isDev, log, prismaClient) {
   log.info('[DB] Application du schéma SQL...');
   
+  // ============================================================================
   // Localiser schema.sql
-  const schemaPath = isDev
-    ? path.join(process.cwd(), 'electron-resources', 'schema.sql')
-    : path.join(process.resourcesPath, 'schema.sql');
+  // ============================================================================
+  // En dev: electron-resources/schema.sql (copié par prepare-build)
+  // En prod: Dans l'ASAR à electron/schema.sql (via __dirname)
+  // NOTE 7 déc 2025: schema.sql est dans l'ASAR, pas dans extraResources
+  // __dirname pointe vers le dossier electron/ dans l'ASAR
+  // ============================================================================
+  let schemaPath;
+  
+  if (isDev) {
+    schemaPath = path.join(process.cwd(), 'electron-resources', 'schema.sql');
+  } else {
+    // En production, __dirname = resources/app.asar/electron/
+    // schema.sql est dans le même dossier
+    schemaPath = path.join(__dirname, 'schema.sql');
+  }
+  
+  log.info(`[DB] Chemin schema.sql: ${schemaPath}`);
   
   if (!fs.existsSync(schemaPath)) {
     throw new Error(`Fichier schema.sql introuvable: ${schemaPath}`);

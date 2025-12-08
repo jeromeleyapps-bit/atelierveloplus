@@ -246,19 +246,27 @@ checkPath(PATHS.licensePublicKey, 'src/lib/license-rsa-public.pem');
 // ============================================================================
 // ÉTAPE 3: NETTOYAGE ET CRÉATION STRUCTURE
 // ============================================================================
+// CHANGEMENT 7 déc 2025: Ne PAS supprimer electron/web/ car il contient
+// des fichiers du repo (server.js, public/, src/). On nettoie seulement
+// les dossiers générés (.next/, node_modules/) pour éviter les conflits.
+// ============================================================================
 
 console.log('');
-log('🧹', 'ÉTAPE 3/7 - Nettoyage electron-resources/web...');
+log('🧹', 'ÉTAPE 3/7 - Nettoyage electron/web (partiel)...');
 
-// Nettoyer electron-resources/web
-if (fs.existsSync(PATHS.resources)) {
-  fs.removeSync(PATHS.resources);
-  log('ℹ️', 'Ancien dossier supprimé');
-}
+// Nettoyer SEULEMENT les dossiers générés, PAS les fichiers du repo
+const generatedDirs = ['.next', 'node_modules'];
+generatedDirs.forEach(dir => {
+  const dirPath = path.join(PATHS.resources, dir);
+  if (fs.existsSync(dirPath)) {
+    fs.removeSync(dirPath);
+    log('ℹ️', `${dir}/ supprimé (généré)`);
+  }
+});
 
-// Créer structure
+// Créer structure si elle n'existe pas
 fs.ensureDirSync(PATHS.resources);
-logSuccess('Dossier electron-resources/web créé');
+logSuccess('Dossier electron/web prêt');
 
 // ============================================================================
 // ÉTAPE 4: COPIE STANDALONE (MODE OPTIMISÉ)
@@ -308,6 +316,26 @@ try {
     if (fs.existsSync(serverChunks)) {
       const files = fs.readdirSync(serverChunks);
       logSuccess(`.next/ copié depuis standalone (${files.length} items serveur)`);
+    }
+    
+    // ============================================================================
+    // COPIE EXPLICITE .next/static (CRITIQUE - 7 déc 2025)
+    // ============================================================================
+    // Next.js standalone NE COPIE PAS .next/static automatiquement
+    // Les fichiers JS/CSS clients sont dans .next/static/chunks/
+    // Sans eux: erreur 404 + React error #423
+    // Ref: https://nextjs.org/docs/pages/api-reference/next-config-js/output
+    // ============================================================================
+    const staticSrc = path.join(__dirname, '.next', 'static');
+    const staticDest = path.join(nextDest, 'static');
+    
+    if (fs.existsSync(staticSrc)) {
+      fs.copySync(staticSrc, staticDest);
+      const staticFiles = fs.readdirSync(staticDest, { recursive: true });
+      logSuccess(`.next/static/ copié (${staticFiles.length} items) - CRITIQUE pour client JS`);
+    } else {
+      logError('.next/static/ manquant! Les fichiers JS client ne seront pas disponibles.');
+      process.exit(1);
     }
   } else {
     logError('.next/ manquant dans standalone!');
@@ -400,10 +428,18 @@ try {
 console.log('');
 log('📁', 'ÉTAPE 5/7 - Copie fichiers statiques...');
 
-// Copier public/
+// Copier public/ (merge avec existant)
 try {
-  if (fs.existsSync(PATHS.public)) {
-    const publicDest = path.join(PATHS.resources, 'public');
+  const publicDest = path.join(PATHS.resources, 'public');
+  if (fs.existsSync(publicDest)) {
+    // public/ existe déjà dans le repo, on merge
+    if (fs.existsSync(PATHS.public)) {
+      fs.copySync(PATHS.public, publicDest, { overwrite: false });
+      logSuccess('public/ mergé (fichiers du repo préservés)');
+    } else {
+      logSuccess('public/ du repo préservé');
+    }
+  } else if (fs.existsSync(PATHS.public)) {
     fs.copySync(PATHS.public, publicDest);
     logSuccess('public/ copié');
   } else {
@@ -494,13 +530,17 @@ try {
 // Next.js génère un server.js minimal optimisé dans standalone
 
 console.log('');
-log('⚙️', 'ÉTAPE 7/7 - Copie server.js depuis standalone...');
+log('⚙️', 'ÉTAPE 7/7 - Vérification server.js...');
 
 try {
   const standaloneServerJs = path.join(standalonePath, 'server.js');
   const serverDest = path.join(PATHS.resources, 'server.js');
   
-  if (fs.existsSync(standaloneServerJs)) {
+  // CHANGEMENT 7 déc 2025: Préserver server.js du repo s'il existe
+  // Le server.js du repo est personnalisé pour Electron
+  if (fs.existsSync(serverDest)) {
+    logSuccess('server.js du repo préservé (personnalisé pour Electron)');
+  } else if (fs.existsSync(standaloneServerJs)) {
     fs.copySync(standaloneServerJs, serverDest);
     logSuccess('server.js copié depuis standalone (serveur Next.js optimisé)');
   } else {
