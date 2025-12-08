@@ -109,11 +109,11 @@ asarUnpack:
 # ============================================================================
 # RESSOURCES HORS ASAR
 # ============================================================================
+# NOTE: Ne PAS inclure icon.icns ici - electron-builder le gère via mac.icon
+# Inclure l'icône dans extraResources ET mac.icon cause EEXIST error
 extraResources:
   - from: .env.production
     to: .env.production
-  - from: resources/icon.icns
-    to: icon.icns
 
 # ============================================================================
 # CONFIGURATION macOS
