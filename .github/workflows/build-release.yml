@@ -112,6 +112,9 @@ jobs:
             rm -rf icon.iconset
           fi
       
+      - name: Clean dist before build
+        run: rm -rf dist-electron
+      
       - name: Build Electron (macOS x64)
         run: npx electron-builder --mac --x64 -c electron-builder.macos.yml
         env:
@@ -184,6 +187,9 @@ jobs:
             iconutil -c icns icon.iconset -o resources/icon.icns || echo "Icône non convertie"
             rm -rf icon.iconset
           fi
+      
+      - name: Clean dist before build
+        run: rm -rf dist-electron
       
       - name: Build Electron (macOS arm64)
         run: npx electron-builder --mac --arm64 -c electron-builder.macos.yml
