@@ -8,8 +8,10 @@ build/
 
 # Env
 .env
-.env.*
+.env.local
+.env.development
 !.env.example
+!.env.production
 !apps/api/.env.example
 !apps/web/.env.example
 
