@@ -156,31 +156,53 @@ function loadPublicKey(): string {
   if (PUBLIC_KEY) return PUBLIC_KEY;
   
   try {
-    // Option 1: Fichier PEM dans src/lib/
-    const publicKeyPath = path.join(process.cwd(), 'src', 'lib', 'license-rsa-public.pem');
-    if (fs.existsSync(publicKeyPath)) {
-      PUBLIC_KEY = fs.readFileSync(publicKeyPath, 'utf8');
-      return PUBLIC_KEY;
+    // Détecter si on est dans un ASAR (production Electron)
+    const isAsar = __dirname.includes('app.asar');
+    const resourcesPath = typeof process !== 'undefined' && (process as NodeJS.Process & { resourcesPath?: string }).resourcesPath;
+    
+    // Chemins possibles pour la clé publique
+    const possiblePaths = [
+      // Dev: src/lib/
+      path.join(process.cwd(), 'src', 'lib', 'license-rsa-public.pem'),
+      // Dev: electron-resources/
+      path.join(process.cwd(), 'electron-resources', 'web', 'src', 'lib', 'license-rsa-public.pem'),
+      // Production ASAR: chemin direct dans l'ASAR
+      ...(resourcesPath ? [
+        path.join(resourcesPath, 'app.asar', 'electron', 'web', 'src', 'lib', 'license-rsa-public.pem'),
+      ] : []),
+      // Production ASAR: __dirname pointe vers le dossier du fichier compilé
+      path.join(__dirname, 'license-rsa-public.pem'),
+      // Production: chemin relatif depuis le serveur Next.js
+      path.join(process.cwd(), 'electron', 'web', 'src', 'lib', 'license-rsa-public.pem'),
+      // Production: chemin depuis __dirname vers src/lib (remonte depuis .next/server/)
+      ...(isAsar ? [
+        path.join(__dirname, '..', '..', 'src', 'lib', 'license-rsa-public.pem'),
+        path.join(__dirname, '..', '..', '..', 'src', 'lib', 'license-rsa-public.pem'),
+      ] : []),
+    ];
+    
+    for (const pemPath of possiblePaths) {
+      if (fs.existsSync(pemPath)) {
+        logger.info('[License Manager] Clé publique trouvée:', { path: pemPath });
+        PUBLIC_KEY = fs.readFileSync(pemPath, 'utf8');
+        return PUBLIC_KEY;
+      }
     }
     
-    // Option 2: Fichier PEM dans electron-resources/ (build)
-    const electronPublicKeyPath = path.join(process.cwd(), 'electron-resources', 'web', 'src', 'lib', 'license-rsa-public.pem');
-    if (fs.existsSync(electronPublicKeyPath)) {
-      PUBLIC_KEY = fs.readFileSync(electronPublicKeyPath, 'utf8');
-      return PUBLIC_KEY;
-    }
-    
-    // Option 3: Base64 embarqué dans variable d'environnement (fallback)
+    // Option fallback: Base64 embarqué dans variable d'environnement
     const publicKeyBase64 = process.env.LICENSE_PUBLIC_KEY_BASE64;
     if (publicKeyBase64) {
+      logger.info('[License Manager] Clé publique chargée depuis env BASE64');
       PUBLIC_KEY = Buffer.from(publicKeyBase64, 'base64').toString('utf8');
       return PUBLIC_KEY;
     }
     
+    // Log tous les chemins testés pour debug
+    logger.error('[License Manager] Clé publique non trouvée. Chemins testés:', { paths: possiblePaths });
     throw new Error('Clé publique RSA non trouvée. Fichier license-rsa-public.pem manquant.');
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-      logger.error('[License Manager] Erreur chargement clé publique RSA:', { error: errorMessage });
+    logger.error('[License Manager] Erreur chargement clé publique RSA:', { error: errorMessage });
     throw error;
   }
 }
@@ -351,6 +373,15 @@ export async function getActiveLicense() {
  */
 export async function getLicenseInfo(): Promise<LicenseInfo> {
   try {
+    // ✅ Vérifier et mettre à jour les trials expirés AVANT de récupérer la licence
+    // Ceci garantit que les trials expirés passent en grace period ou sont bloqués
+    try {
+      await checkAndDowngradeExpiredTrials();
+    } catch (checkError) {
+      // Ignorer les erreurs de vérification pour ne pas bloquer l'accès
+      logger.warn('[License Manager] Error checking expired trials:', checkError);
+    }
+    
     let license = await getActiveLicense();
     
     if (!license) {
