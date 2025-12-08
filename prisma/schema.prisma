@@ -1,0 +1,729 @@
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "windows"]
+  output = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  User              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model AppSetting {
+  id                 String   @id @default(cuid())
+  userId             String   @unique
+  shopName           String?
+  shopEmail          String?
+  shopPhone          String?
+  address1           String?
+  address2           String?
+  zip                String?
+  city               String?
+  country            String?
+  shopLogo           String?
+  legalFooter        String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime          @updatedAt
+  capital            String?
+  insurance          String?
+  rcs                String?
+  siret              String?
+  tva                String?
+  isAutoEntrepreneur Boolean  @default(false)
+  User               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Bike {
+  id                 String   @id @default(cuid())
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime          @updatedAt
+  type               String   @default("ROAD")
+  condition          String   @default("NEW")
+  brand              String
+  model              String
+  year               Int
+  size               String
+  color              String?
+  serialNumber       String?  @unique(map: "sqlite_autoindex_Bike_2")
+  frameSize          String?
+  frameMaterial      String?
+  wheelSize          String?
+  weight             Float?
+  groupset           String?
+  brakeType          String?
+  drivetrain         String?
+  fork               String?
+  wheels             String?
+  isElectric         Boolean  @default(false)
+  motor              String?
+  battery            Int?
+  range              Int?
+  mileage            Int?     // Kilométrage (pour vélos électriques)
+  conditionNotes     String?
+  maintenanceHistory String?
+  purchasePriceHT    Float
+  sellingPriceHT     Float
+  vatRate            Float    @default(0.20)
+  stock              Int      @default(1)
+  location           String?
+  photos             String?
+  internalNotes      String?
+  active             Boolean  @default(true)
+  userId             String
+  User               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([brand])
+  @@index([condition])
+  @@index([type])
+  @@index([userId, active])
+  @@index([userId])
+}
+
+model Booking {
+  id          String    @id @default(cuid())
+  start       DateTime
+  end         DateTime
+  status      String    @default("pending")
+  name        String
+  email       String?
+  phone       String?
+  bike        String?
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime          @updatedAt
+  customerId  String?
+  Customer    Customer? @relation(fields: [customerId], references: [id])
+
+  @@index([customerId])
+  @@index([start, end])
+}
+
+model CalendarBlock {
+  id        String   @id @default(cuid())
+  reason    String?
+  start     DateTime
+  end       DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime          @updatedAt
+}
+
+model CalendarConfig {
+  id             Int      @id @default(autoincrement())
+  timezone       String   @default("Europe/Paris")
+  slotMinutes    Int      @default(60)
+  leadTimeHours  Int      @default(6)
+  maxConcurrent  Int      @default(1)
+  saturdayByAppt Boolean  @default(true)
+  businessHours  String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime          @updatedAt
+}
+
+model CalendarEvent {
+  id          String      @id @default(cuid())
+  title       String
+  description String?
+  start       DateTime
+  end         DateTime
+  status      String      @default("planned")
+  blocksAvail Boolean     @default(true)
+  color       String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime          @updatedAt
+  WorkOrder   WorkOrder[]
+}
+
+model CashRegister {
+  id          String   @id @default(cuid())
+  type        String
+  amount      Float
+  description String?
+  invoiceId   String?
+  userId      String
+  createdAt   DateTime @default(now())
+  User        User     @relation(fields: [userId], references: [id])
+  Invoice     Invoice? @relation(fields: [invoiceId], references: [id])
+
+  @@index([userId])
+  @@index([invoiceId])
+  @@index([createdAt])
+  @@index([type])
+}
+
+model CatalogItem {
+  id                 String          @id @default(cuid())
+  sku                String?         @unique
+  ean                String?
+  supplierSku        String?
+  category           String
+  name               String
+  priceHT            Float
+  priceTTC           Float
+  vatRate            Float
+  active             Boolean         @default(true)
+  stockQty           Int             @default(0)
+  minStock           Int             @default(0)
+  reorderQty         Int             @default(0)
+  location           String?
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime          @updatedAt
+  purchasePriceHT    Float?
+  purchasePriceTTC   Float?
+  supplierVatEnabled Boolean         @default(false)
+  supplierName       String?
+  availability       String?
+  marginCoeff        Float?          @default(1)
+  StockMovement      StockMovement[]
+  SupplierItem       SupplierItem[]
+  SupplierOffer      SupplierOffer[]
+
+  @@index([supplierSku])
+  @@index([ean])
+}
+
+model Communication {
+  id          String     @id @default(cuid())
+  customerId  String
+  workOrderId String?
+  invoiceId   String?
+  type        String
+  event       String
+  recipient   String
+  subject     String?
+  content     String
+  status      String
+  provider    String     @default("hubspot")
+  externalId  String?
+  sentAt      DateTime?
+  deliveredAt DateTime?
+  error       String?
+  metadata    String?
+  createdAt   DateTime   @default(now())
+  WorkOrder   WorkOrder? @relation(fields: [workOrderId], references: [id])
+  Customer    Customer   @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([event])
+  @@index([status])
+  @@index([workOrderId])
+  @@index([customerId])
+}
+
+model Customer {
+  id                          String          @id @default(cuid())
+  email                       String?         @unique
+  firstName                   String?
+  lastName                    String?
+  phone                       String?
+  address1                    String?
+  address2                    String?
+  zip                         String?
+  city                        String?
+  country                     String?
+  bikeBrand                   String?
+  bikeModel                   String?
+  nationalFileId              String?
+  shipAddress1                String?
+  shipAddress2                String?
+  shipZip                     String?
+  shipCity                    String?
+  shipCountry                 String?
+  notes                       String?
+  createdAt                   DateTime        @default(now())
+  updatedAt                   DateTime          @updatedAt
+  // Phase 1 Communications - Maintenance tracking
+  lastServiceDate             DateTime?
+  maintenanceInterval         Int             @default(6)  // Mois entre entretiens
+  maintenanceReminderSent     Boolean         @default(false)
+  maintenanceReminderSentAt   DateTime?
+  marketingOptIn              Boolean         @default(true)  // RGPD
+  Booking                     Booking[]
+  Communication               Communication[]
+  CustomerBike                CustomerBike[]
+  WorkOrder                   WorkOrder[]
+
+  @@index([lastServiceDate])
+  @@index([maintenanceReminderSent])
+  @@index([marketingOptIn])
+}
+
+model CustomerBike {
+  id             String      @id @default(cuid())
+  customerId     String
+  index          Int
+  brand          String?
+  model          String?
+  nationalFileId String?
+  serialNumber   String?
+  color          String?
+  notes          String?
+  wheelSize      String?
+  tireSize       String?
+  frameMaterial  String?
+  frameSize      String?
+  brakeType      String?
+  gearSystem     String?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime          @updatedAt
+  Customer       Customer    @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  WorkOrder      WorkOrder[]
+
+  @@unique([customerId, index])
+}
+
+model EmailTemplate {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  event       String
+  subject     String
+  htmlContent String
+  textContent String
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@index([event])
+}
+
+model GlobalSetting {
+  key   String  @id
+  value String?
+}
+
+model Invoice {
+  id              String           @id @default(cuid())
+  workOrderId     String?
+  number          String?          @unique
+  issueDate       DateTime?
+  status          String           @default("draft")
+  type            String           @default("invoice")
+  parentId        String?
+  pricingMode     String           @default("HT_TVA")
+  currency        String           @default("EUR")
+  vatRate         Float            @default(20)
+  laborRate       Float            @default(60)
+  subtotalHT      Float            @default(0)
+  vatAmount       Float            @default(0)
+  totalTTC        Float            @default(0)
+  discountAmount  Float?           @default(0)
+  paidAt          DateTime?
+  paymentMethod   String?
+  cancelledAt     DateTime?
+  cancelledReason String?
+  dueDate         DateTime?
+  reminderCount   Int              @default(0)
+  lastReminderAt  DateTime?
+  validUntil      DateTime?
+  convertedAt     DateTime?
+  convertedToId   String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime          @updatedAt
+  customerId      String?
+  CashRegister    CashRegister[]
+  WorkOrder       WorkOrder?       @relation(fields: [workOrderId], references: [id])
+  InvoiceLine     InvoiceLine[]
+  InvoicePayment  InvoicePayment[]
+
+  @@index([customerId])
+  // ✅ OPTIMISATION: Indexes composites pour améliorer performance filtres
+  @@index([status, createdAt])
+  @@index([customerId, status])
+}
+
+model InvoiceLine {
+  id              String  @id @default(cuid())
+  invoiceId       String
+  type            String  @default("part")
+  description     String
+  qty             Float   @default(1)
+  unitPriceHT     Float?
+  unitPriceTTC    Float?
+  vatRate         Float?
+  totalHT         Float   @default(0)
+  totalTTC        Float   @default(0)
+  partId          String?
+  purchasePriceHT Float?
+  Invoice         Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+}
+
+model InvoicePayment {
+  id        String   @id @default(cuid())
+  invoiceId String
+  amount    Float
+  method    String?
+  paidAt    DateTime
+  note      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime          @updatedAt
+  Invoice   Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([invoiceId])
+}
+
+model InvoiceSequence {
+  id         String   @id @default(cuid())
+  year       Int      @unique
+  lastNumber Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime          @updatedAt
+}
+
+model PricingMargin {
+  id          String   @id @default(cuid())
+  minPrice    Float
+  maxPrice    Float?
+  coefficient Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@index([minPrice])
+}
+
+model SMSTemplate {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  event     String
+  content   String
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime          @updatedAt
+
+  @@index([event])
+}
+
+model ServiceRate {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  priceHT     Float
+  bikeType    String?
+  category    String?
+  duration    Int?
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@index([category])
+  @@index([bikeType])
+  @@index([active])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  User         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model StockMovement {
+  id          String      @id @default(cuid())
+  itemId      String
+  type        String
+  qty         Int
+  refType     String?
+  refId       String?
+  note        String?
+  createdAt   DateTime    @default(now())
+  CatalogItem CatalogItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+}
+
+model Supplier {
+  id                 String               @id @default(cuid())
+  name               String
+  website            String?
+  connectorType      String               @default("MOCK")
+  active             Boolean              @default(true)
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime          @updatedAt
+  SupplierCredential SupplierCredential[]
+  SupplierItem       SupplierItem[]
+  SupplierOffer      SupplierOffer[]
+}
+
+model SupplierCredential {
+  id         String   @id @default(cuid())
+  supplierId String
+  userId     String
+  username   String?
+  password   String?
+  extraJson  String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime          @updatedAt
+  Supplier   Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+}
+
+model SupplierItem {
+  id               String       @id @default(cuid())
+  supplierId       String
+  catalogItemId    String?
+  supplierSku      String
+  ean              String?
+  lastPriceHT      Float?
+  lastAvailability String?
+  lastCheckedAt    DateTime?
+  favorite         Boolean      @default(false)
+  Supplier         Supplier     @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  CatalogItem      CatalogItem? @relation(fields: [catalogItemId], references: [id])
+}
+
+model SupplierOffer {
+  id            String       @id @default(cuid())
+  supplierId    String
+  catalogItemId String?
+  externalId    String?
+  name          String
+  description   String?
+  reference     String?
+  brand         String?
+  price         Float
+  priceHT       Float?
+  currency      String       @default("EUR")
+  availability  String?
+  stock         Int?
+  deliveryDays  Int?
+  url           String?
+  imageUrl      String?
+  metadata      String?
+  fetchedAt     DateTime     @default(now())
+  expiresAt     DateTime
+  Supplier      Supplier     @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  CatalogItem   CatalogItem? @relation(fields: [catalogItemId], references: [id])
+
+  @@index([expiresAt])
+  @@index([fetchedAt])
+  @@index([externalId])
+  @@index([catalogItemId])
+  @@index([supplierId])
+}
+
+model SupplierProduct {
+  id           String   @id @default(cuid())
+  userId       String
+  reference    String
+  name         String
+  category     String?
+  priceHT      Float
+  stock        Int      @default(0)
+  available    Boolean  @default(true)
+  supplierName String   @default("Fournisseur")
+  lastImport   DateTime @default(now())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime          @updatedAt
+  User         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, reference])
+  @@index([userId, name])
+  @@index([userId, category])
+}
+
+model SystemSettings {
+  id                        String   @id @default(cuid())
+  userId                    String   @unique
+  notificationsEnabled      Boolean  @default(true)
+  emailNotificationsEnabled Boolean  @default(true)
+  activityLogsEnabled       Boolean  @default(true)
+  automatedEmailsEnabled    Boolean  @default(true)  // Phase 1: Communications auto (satisfaction, maintenance)
+  autoBackupEnabled         Boolean  @default(false)
+  backupFrequency           String   @default("weekly")
+  emailProvider             String   @default("resend")
+  emailApiKey               String?
+  emailFromAddress          String?
+  emailFromName             String?
+  requireAdmin2FA           Boolean  @default(false)
+  hardDeleteEnabled         Boolean  @default(false)
+  maintenanceMode           Boolean  @default(false)
+  securityAlertsEnabled     Boolean  @default(true)
+  tunnelConfigured          Boolean  @default(false)
+  tunnelHostname            String?
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime          @updatedAt
+  smtpHost                  String?
+  smtpPort                  Int?     @default(587)
+  smtpSecure                Boolean  @default(false)
+  smtpUser                  String?
+  smtpPass                  String?
+  User                      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AppointmentConfig {
+  id                        String   @id @default(cuid())
+  userId                    String   @unique
+  // Jours d'ouverture (JSON: { "monday": true, "tuesday": true, ... })
+  openingDays               String   @default("{\"monday\":true,\"tuesday\":true,\"wednesday\":true,\"thursday\":true,\"friday\":true,\"saturday\":false,\"sunday\":false}")
+  // Horaires par jour (JSON: { "monday": { "start": "09:00", "end": "18:00" }, ... })
+  openingHours              String   @default("{\"monday\":{\"start\":\"09:00\",\"end\":\"18:00\"},\"tuesday\":{\"start\":\"09:00\",\"end\":\"18:00\"},\"wednesday\":{\"start\":\"09:00\",\"end\":\"18:00\"},\"thursday\":{\"start\":\"09:00\",\"end\":\"18:00\"},\"friday\":{\"start\":\"09:00\",\"end\":\"18:00\"},\"saturday\":{\"start\":\"10:00\",\"end\":\"17:00\"},\"sunday\":{\"start\":\"09:00\",\"end\":\"18:00\"}}")
+  // Option PRO: Un jour sur RDV uniquement avec numéro de téléphone
+  appointmentOnlyDayEnabled Boolean  @default(false)  // PRO uniquement
+  appointmentOnlyDay        String?  // "saturday" par exemple
+  appointmentOnlyDayPhone    String?  // Numéro de téléphone (récupéré depuis AppSetting.shopPhone si null)
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime          @updatedAt
+  User                      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id              String            @id @default(cuid())
+  name            String?
+  email           String            @unique
+  emailVerified   DateTime?
+  image           String?
+  password        String?
+  role            String            @default("admin")
+  active          Boolean           @default(true)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  Account         Account[]
+  AppSetting      AppSetting?
+  Bike            Bike[]
+  CashRegister    CashRegister[]
+  Session         Session[]
+  SupplierProduct SupplierProduct[]
+  SystemSettings  SystemSettings?
+  AppointmentConfig AppointmentConfig?
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model WorkOrder {
+  id                        String          @id @default(cuid())
+  status                    String          @default("created")
+  customerId                String?
+  bikeId                    String?
+  type                      String?         @default("repair")
+  estimatedMinutes          Int?
+  hourlyRate                Float?
+  appointmentDate           DateTime?
+  calendarEventId           String?
+  createdAt                 DateTime        @default(now())
+  updatedAt                 DateTime          @updatedAt
+  dueAt                     DateTime?
+  // Phase 1 Communications - Satisfaction tracking
+  completedAt               DateTime?
+  satisfactionEmailSent     Boolean         @default(false)
+  satisfactionEmailSentAt   DateTime?
+  satisfactionRating        Int?            // 1-5 stars
+  satisfactionComment       String?
+  Communication             Communication[]
+  Invoice                   Invoice[]
+  CalendarEvent             CalendarEvent?  @relation(fields: [calendarEventId], references: [id])
+  Customer                  Customer?       @relation(fields: [customerId], references: [id])
+  CustomerBike              CustomerBike?   @relation(fields: [bikeId], references: [id])
+  WorkOrderLine             WorkOrderLine[]
+
+  @@index([status])
+  @@index([bikeId])
+  @@index([customerId])
+  @@index([completedAt])
+  @@index([satisfactionEmailSent])
+  // ✅ OPTIMISATION: Indexes composites pour améliorer performance filtres
+  @@index([status, createdAt])
+  @@index([customerId, status])
+}
+
+model WorkOrderLine {
+  id          String    @id @default(cuid())
+  workOrderId String
+  type        String
+  description String
+  quantity    Int       @default(1)
+  priceHT     Float
+  vatRate     Float
+  duration    Int?
+  sourceId    String?
+  notes       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime          @updatedAt
+  WorkOrder   WorkOrder @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+
+  @@index([type])
+  @@index([workOrderId])
+}
+
+model License {
+  id                    String   @id @default(cuid())
+  key                   String   @unique // Format: AVTR-XXXX (Trial), AVBS-XXXX (Basique), AVPR-XXXX (Pro), AVPL-XXXX (Pro Lifetime)
+  tier                  String   @default("basique") // trial, basique, pro, pro_lifetime
+  status                String   @default("active") // active, suspended, expired, grace
+  activatedAt           DateTime?
+  expiresAt             DateTime?
+  lastVerified          DateTime?
+  verificationToken     String?
+  
+  // Trial (Phase 2.1)
+  trialStartedAt        DateTime?
+  trialEndsAt           DateTime?
+  
+  // Grace Period (Phase 2.1 - Option C)
+  gracePeriodEndsAt     DateTime? // Date fin grace period (7 jours après fin trial)
+  
+  // Lifetime (Phase 2.1)
+  isLifetime            Boolean  @default(false)  // true si pro_lifetime
+  maintenanceExpiresAt  DateTime? // Date fin maintenance (3 ans après achat pour lifetime)
+  
+  // Limitations emails (Phase 2.1 - mensuel au lieu d'hebdomadaire)
+  maxEmailsPerMonth     Int      @default(30)  // 30 en Basique, -1 (illimité) en Pro/Pro Lifetime
+  emailsThisMonth       Int      @default(0)
+  emailResetDate        DateTime @default(now()) // Reset mensuel
+  
+  // Features Pro
+  marketingEnabled      Boolean  @default(false)  // true si Pro ou Pro Lifetime
+  bookingEnabled        Boolean  @default(false)  // true si Pro ou Pro Lifetime
+  advancedStatsEnabled  Boolean  @default(false) // true si Pro ou Pro Lifetime
+  pdfDirectSendEnabled  Boolean  @default(false) // true si Pro ou Pro Lifetime (Phase 2.1 - Basic peut créer PDF mais pas envoyer)
+  
+  // Metadata
+  customerEmail         String?
+  customerName          String?
+  hardwareId            String?  // Lier à une machine spécifique (anti-partage)
+  
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  
+  LicenseVerification   LicenseVerification[]
+}
+
+model LicenseVerification {
+  id               String   @id @default(cuid())
+  licenseId        String
+  verificationType String   // startup, periodic, manual
+  status           String   // success, failed, offline
+  responseCode     String?
+  errorMessage     String?
+  verifiedAt       DateTime @default(now())
+  
+  License          License  @relation(fields: [licenseId], references: [id], onDelete: Cascade)
+  
+  @@index([licenseId])
+  @@index([verifiedAt])
+}
+
+model schema_version {
+  version    Int       @id @default(autoincrement())
+  applied_at DateTime? @default(now())
+
+  @@map("_schema_version")
+}
