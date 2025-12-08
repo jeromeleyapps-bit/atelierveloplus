@@ -64,7 +64,7 @@ jobs:
   # BUILD macOS (Intel x64)
   # ==========================================================================
   build-macos-x64:
-    runs-on: macos-13  # Intel runner
+    runs-on: macos-15  # Intel runner (macos-13 deprecated)
     
     steps:
       - name: Checkout code
@@ -138,7 +138,7 @@ jobs:
   # BUILD macOS (Apple Silicon arm64)
   # ==========================================================================
   build-macos-arm64:
-    runs-on: macos-14  # Apple Silicon runner (M1)
+    runs-on: macos-latest  # Apple Silicon runner (M1) - macos-14 deprecated
     
     steps:
       - name: Checkout code
