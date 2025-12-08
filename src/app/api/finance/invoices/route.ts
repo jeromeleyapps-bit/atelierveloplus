@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getIsAutoEntrepreneur } from "@/lib/api-helpers";
+import { generateInvoiceNumber } from "@/lib/invoice-number";
 import { Prisma } from "@prisma/client";
 import { logger } from "@/lib/logger";
 
@@ -131,9 +132,13 @@ export async function POST(req: Request) {
     
     logger.info(`[POST Invoice] workOrderId: ${workOrderId}, customerId: ${finalCustomerId}`);
     
-    // 1. Créer la facture vide
+    // Générer le numéro de facture professionnel (FAC-2025-0001)
+    const invoiceNumber = await generateInvoiceNumber('invoice');
+    
+    // 1. Créer la facture
     const inv = await prisma.invoice.create({
       data: {
+        number: invoiceNumber,
         workOrderId: workOrderId || null,
         customerId: finalCustomerId,
         type: "invoice", // Type par défaut: facture

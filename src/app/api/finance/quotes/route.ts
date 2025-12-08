@@ -4,6 +4,7 @@ import { Prisma } from "@prisma/client";
 import { recomputeTotals } from "@/lib/invoice-totals";
 import { calculateLaborCost } from "@/lib/labor-pricing";
 import { getIsAutoEntrepreneur } from "@/lib/api-helpers";
+import { generateInvoiceNumber } from "@/lib/invoice-number";
 import { logger } from '@/lib/logger';
 
 export const dynamic = "force-dynamic";
@@ -89,9 +90,13 @@ export async function POST(req: Request) {
       vatRate: line.vatRate != null ? line.vatRate : defaultVatRate,
     })));
 
+    // Générer le numéro de devis professionnel (DEV-2025-0001)
+    const quoteNumber = await generateInvoiceNumber('quote');
+    
     // Create the quote
     const quote = await prisma.invoice.create({
       data: {
+        number: quoteNumber,
         workOrderId,
         type: "quote",
         status: "draft",

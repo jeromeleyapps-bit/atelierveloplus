@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getIsAutoEntrepreneur } from "@/lib/api-helpers";
 import { calculateLaborCost } from "@/lib/labor-pricing";
+import { generateInvoiceNumber } from "@/lib/invoice-number";
 import { logger } from '@/lib/logger';
 
 type RouteContext = {
@@ -77,9 +78,13 @@ export async function POST(
     // Total TTC
     const totalTTC = totalHT + totalTVA;
 
+    // Générer le numéro de facture professionnel (FAC-2025-0001)
+    const invoiceNumber = await generateInvoiceNumber('invoice');
+    
     // Créer la facture
     const invoice = await prisma.invoice.create({
       data: {
+        number: invoiceNumber,
         workOrderId: workOrder.id,
         status: "draft",
         type: "invoice",

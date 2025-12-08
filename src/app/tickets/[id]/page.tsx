@@ -242,13 +242,29 @@ function TicketDetailPageContent() {
     }
   }
 
-  // Calcul totaux
+  // Calcul totaux (incluant main d'œuvre)
   function calculateTotals() {
     let totalHT = 0;
     let tva0 = 0;
     let tva10 = 0;
     let tva20 = 0;
 
+    // 1. Calculer la main d'œuvre (facturation par tranches de 30 min)
+    let laborCostHT = 0;
+    if (wo?.estimatedMinutes && wo?.hourlyRate) {
+      // Arrondir au 30 min supérieur
+      const roundedMinutes = Math.ceil(wo.estimatedMinutes / 30) * 30;
+      laborCostHT = (roundedMinutes / 60) * wo.hourlyRate;
+      totalHT += laborCostHT;
+      
+      // TVA main d'œuvre: 10% (0% si auto-entrepreneur)
+      if (!isAutoEntrepreneur) {
+        const laborTVA = laborCostHT * 0.1;
+        tva10 += laborTVA;
+      }
+    }
+
+    // 2. Calculer les pièces
     lines.forEach(line => {
       const lineHT = line.priceHT * line.quantity;
       totalHT += lineHT;
@@ -267,10 +283,23 @@ function TicketDetailPageContent() {
     const totalTVA = tva0 + tva10 + tva20;
     const totalTTC = totalHT + totalTVA;
 
-    return { totalHT, tva0, tva10, tva20, totalTVA, totalTTC };
+    return { totalHT, tva0, tva10, tva20, totalTVA, totalTTC, laborCostHT };
   }
 
   const totals = calculateTotals();
+
+  // Créer ligne virtuelle main d'œuvre pour affichage
+  const laborLine: LineItem | null = (wo?.estimatedMinutes && wo?.hourlyRate && totals.laborCostHT > 0) ? {
+    id: 'labor-virtual',
+    description: `Main d'œuvre - ${wo.estimatedMinutes} minutes`,
+    quantity: 1,
+    priceHT: totals.laborCostHT,
+    vatRate: isAutoEntrepreneur ? 0 : 10, // 10% TVA main d'œuvre (0% si AE)
+    type: 'service', // Type "service" pour main d'œuvre (LineItem n'a pas "labor")
+  } : null;
+
+  // Combiner main d'œuvre + pièces pour affichage
+  const allLines: LineItem[] = laborLine ? [laborLine, ...lines] : lines;
 
   // Mapper status vers français
   const statusLabels: Record<string, string> = {
@@ -409,9 +438,21 @@ function TicketDetailPageContent() {
                   </Box>
                 ) : (
                   <LineItemsTable
-                    lines={lines}
-                    onUpdateLine={handleUpdateLine}
-                    onDeleteLine={handleDeleteLine}
+                    lines={allLines}
+                    onUpdateLine={(index, updates) => {
+                      // Ne pas permettre la modification de la ligne main d'œuvre virtuelle
+                      if (allLines[index]?.id === 'labor-virtual') return;
+                      // Ajuster l'index si main d'œuvre présente
+                      const realIndex = laborLine ? index - 1 : index;
+                      if (realIndex >= 0) handleUpdateLine(realIndex, updates);
+                    }}
+                    onDeleteLine={(index) => {
+                      // Ne pas permettre la suppression de la ligne main d'œuvre virtuelle
+                      if (allLines[index]?.id === 'labor-virtual') return;
+                      // Ajuster l'index si main d'œuvre présente
+                      const realIndex = laborLine ? index - 1 : index;
+                      if (realIndex >= 0) handleDeleteLine(realIndex);
+                    }}
                   />
                 )}
               </CardContent>
