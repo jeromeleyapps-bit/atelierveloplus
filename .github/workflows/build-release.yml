@@ -30,7 +30,7 @@ jobs:
   # BUILD macOS (Intel x64)
   # ==========================================================================
   build-macos-x64:
-    runs-on: macos-13  # Intel x64 runner (seul runner Intel disponible)
+    runs-on: macos-15-intel  # Intel x64 runner (macos-13 retiré)
     
     steps:
       - name: Checkout code
