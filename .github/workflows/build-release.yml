@@ -82,6 +82,24 @@ jobs:
       - name: Prepare Electron resources
         run: node prepare-electron-resources.js
       
+      - name: Remove ARM64 binaries from electron/web (CRITICAL for x64)
+        run: |
+          echo "=== Suppression FINALE des binaires ARM64 de electron/web ==="
+          echo "Recherche dans electron/web/node_modules..."
+          find electron/web/node_modules -name "*darwin-arm64*" -type f 2>/dev/null || echo "Aucun trouvé dans electron/web"
+          # Supprimer TOUS les binaires ARM64
+          find electron/web/node_modules -name "*darwin-arm64*" -type f -delete 2>/dev/null || true
+          find electron/web -name "*darwin-arm64*" -type f -delete 2>/dev/null || true
+          echo "Vérification après suppression:"
+          find electron/web -name "*darwin*" -type f 2>/dev/null | head -10
+          # Vérifier qu'il ne reste QUE le binaire x64
+          if find electron/web -name "*darwin-arm64*" -type f 2>/dev/null | grep -q .; then
+            echo "ERREUR: Binaires ARM64 encore présents!"
+            find electron/web -name "*darwin-arm64*" -type f 2>/dev/null
+            exit 1
+          fi
+          echo "✅ Aucun binaire ARM64 dans electron/web"
+      
       - name: Convert icon to icns
         run: |
           if [ ! -f "resources/icon.icns" ]; then
@@ -177,6 +195,23 @@ jobs:
       
       - name: Prepare Electron resources
         run: node prepare-electron-resources.js
+      
+      - name: Remove x64 binaries from electron/web (CRITICAL for arm64)
+        run: |
+          echo "=== Suppression FINALE des binaires x64 de electron/web ==="
+          echo "Recherche dans electron/web/node_modules..."
+          find electron/web/node_modules -name "libquery_engine-darwin.dylib.node" -type f 2>/dev/null || echo "Aucun trouvé"
+          # Supprimer les binaires x64 (darwin sans arm64)
+          find electron/web/node_modules -name "libquery_engine-darwin.dylib.node" -type f -delete 2>/dev/null || true
+          find electron/web -name "libquery_engine-darwin.dylib.node" -type f -delete 2>/dev/null || true
+          echo "Vérification après suppression:"
+          find electron/web -name "*darwin*" -type f 2>/dev/null | head -10
+          # Vérifier qu'il reste le binaire ARM64
+          if ! find electron/web -name "*darwin-arm64*" -type f 2>/dev/null | grep -q .; then
+            echo "ERREUR: Binaire ARM64 non trouvé!"
+            exit 1
+          fi
+          echo "✅ Binaire darwin-arm64 présent dans electron/web"
       
       - name: Convert icon to icns
         run: |
