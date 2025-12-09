@@ -11,6 +11,10 @@ on:
         required: true
         default: '1.2.0'
 
+# Permissions requises pour créer des releases GitHub
+permissions:
+  contents: write
+
 env:
   NODE_VERSION: '20'
 
