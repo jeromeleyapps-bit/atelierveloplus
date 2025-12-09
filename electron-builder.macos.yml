@@ -126,18 +126,15 @@ extraResources:
 # ============================================================================
 # CONFIGURATION macOS
 # ============================================================================
+# IMPORTANT: Ne PAS spécifier arch ici !
+# L'architecture est contrôlée par --x64 ou --arm64 en ligne de commande
+# Sinon electron-builder génère les DEUX architectures à chaque build
 mac:
   target:
     # DMG: Image disque standard macOS (recommandé pour distribution)
-    - target: dmg
-      arch:
-        - x64       # Intel Macs (avant 2020)
-        - arm64     # Apple Silicon M1/M2/M3 (2020+)
+    - dmg
     # ZIP: Archive pour distribution directe ou tests
-    - target: zip
-      arch:
-        - x64
-        - arm64
+    - zip
   
   # Catégorie App Store (pour future soumission)
   category: public.app-category.business
