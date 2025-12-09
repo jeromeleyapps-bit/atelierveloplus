@@ -58,8 +58,23 @@ jobs:
       
       - name: Generate Prisma Client for x64
         run: npx prisma generate
-        env:
-          PRISMA_CLI_BINARY_TARGETS: darwin
+      
+      - name: Remove ARM64 Prisma binaries (keep only x64)
+        run: |
+          echo "Suppression des binaires ARM64 pour build x64..."
+          echo "Avant suppression:"
+          find node_modules/.prisma -name "*darwin*" -type f 2>/dev/null | head -20
+          # Supprimer les binaires ARM64
+          find node_modules/.prisma -name "*darwin-arm64*" -type f -delete 2>/dev/null || true
+          find node_modules/@prisma -name "*darwin-arm64*" -type f -delete 2>/dev/null || true
+          echo "Après suppression:"
+          find node_modules/.prisma -name "*darwin*" -type f 2>/dev/null | head -20
+          # Vérifier qu'il reste le binaire x64
+          if ! find node_modules/.prisma -name "*libquery_engine-darwin.dylib.node*" -type f | grep -q .; then
+            echo "ERREUR: Binaire darwin x64 non trouvé!"
+            exit 1
+          fi
+          echo "✅ Binaire darwin x64 présent"
       
       - name: Build Next.js
         run: npm run build
@@ -139,8 +154,23 @@ jobs:
       
       - name: Generate Prisma Client for arm64
         run: npx prisma generate
-        env:
-          PRISMA_CLI_BINARY_TARGETS: darwin-arm64
+      
+      - name: Remove x64 Prisma binaries (keep only ARM64)
+        run: |
+          echo "Suppression des binaires x64 pour build ARM64..."
+          echo "Avant suppression:"
+          find node_modules/.prisma -name "*darwin*" -type f 2>/dev/null | head -20
+          # Supprimer les binaires x64 (darwin sans arm64)
+          find node_modules/.prisma -name "libquery_engine-darwin.dylib.node" -type f -delete 2>/dev/null || true
+          find node_modules/@prisma -name "libquery_engine-darwin.dylib.node" -type f -delete 2>/dev/null || true
+          echo "Après suppression:"
+          find node_modules/.prisma -name "*darwin*" -type f 2>/dev/null | head -20
+          # Vérifier qu'il reste le binaire ARM64
+          if ! find node_modules/.prisma -name "*darwin-arm64*" -type f | grep -q .; then
+            echo "ERREUR: Binaire darwin-arm64 non trouvé!"
+            exit 1
+          fi
+          echo "✅ Binaire darwin-arm64 présent"
       
       - name: Build Next.js
         run: npm run build
