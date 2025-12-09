@@ -1,6 +1,11 @@
 generator client {
   provider = "prisma-client-js"
-  binaryTargets = ["native", "windows"]
+  // IMPORTANT: Inclure TOUS les targets pour builds multi-plateforme
+  // - native: Plateforme de build actuelle
+  // - windows: Windows x64
+  // - darwin: macOS Intel x64
+  // - darwin-arm64: macOS Apple Silicon (M1/M2/M3)
+  binaryTargets = ["native", "windows", "darwin", "darwin-arm64"]
   output = "../node_modules/.prisma/client"
 }
 

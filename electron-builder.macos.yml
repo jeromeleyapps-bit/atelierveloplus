@@ -95,16 +95,24 @@ files:
 # ============================================================================
 asar: true
 asarUnpack:
+  # ============================================================================
+  # BINAIRES NATIFS - DOIVENT ÊTRE HORS ASAR POUR FONCTIONNER
+  # ============================================================================
   # Prisma Query Engine (binaire natif SQLite)
-  - "**/web/node_modules/.prisma/client/*.node"
-  - "**/web/node_modules/@prisma/client/runtime/*.node"
+  # Chemins explicites pour electron/web/node_modules/
+  - "electron/web/node_modules/.prisma/**/*.node"
+  - "electron/web/node_modules/.prisma/**/*.dylib.node"
+  - "electron/web/node_modules/@prisma/client/**/*.node"
+  - "electron/web/node_modules/@prisma/engines/**/*"
   
   # Better-sqlite3 (si présent)
-  - "**/node_modules/better-sqlite3/build/Release/*.node"
+  - "**/better-sqlite3/**/*.node"
   
-  # Tous les binaires natifs (.node pour Node, .dylib pour macOS)
+  # Pattern générique pour TOUS les binaires natifs
+  # CRITIQUE: Les fichiers .node et .dylib ne peuvent pas s'exécuter depuis ASAR
   - "**/*.node"
   - "**/*.dylib"
+  - "**/libquery_engine*.dylib.node"
 
 # ============================================================================
 # RESSOURCES HORS ASAR

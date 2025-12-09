@@ -94,23 +94,25 @@ try {
 
 /**
  * Retourne le chemin vers web/ (dans ASAR en mode packagé)
+ * Structure: app.asar/electron/web/
  */
 function getWebPath() {
   if (app.isPackaged) {
-    // En mode packagé, web/ est dans app.asar/web/
-    return path.join(app.getAppPath(), 'web');
+    // En mode packagé, web/ est dans app.asar/electron/web/
+    return path.join(app.getAppPath(), 'electron', 'web');
   }
   // En dev, utiliser le dossier standalone
   return path.join(__dirname, '..', '.next', 'standalone');
 }
 
 /**
- * Retourne le chemin vers npm_modules (dans ASAR en mode packagé)
+ * Retourne le chemin vers node_modules (dans ASAR en mode packagé)
+ * Structure: app.asar/electron/web/node_modules/
  */
 function getNpmModulesPath() {
   if (app.isPackaged) {
-    // npm_modules dans ASAR (auto-résolu par Electron)
-    return path.join(app.getAppPath(), 'web', 'npm_modules');
+    // node_modules dans ASAR (pas renommé en npm_modules)
+    return path.join(app.getAppPath(), 'electron', 'web', 'node_modules');
   }
   return path.join(__dirname, '..', 'node_modules');
 }
@@ -118,35 +120,50 @@ function getNpmModulesPath() {
 /**
  * Trouve le Prisma query engine dans app.asar.unpacked
  * Les binaires .node sont automatiquement unpacked par electron-builder
+ * 
+ * Structure attendue (macOS):
+ * - app.asar.unpacked/electron/web/node_modules/.prisma/client/libquery_engine-darwin-arm64.dylib.node
+ * - app.asar.unpacked/electron/web/node_modules/.prisma/client/libquery_engine-darwin.dylib.node
  */
 function findPrismaEngine() {
   if (!app.isPackaged) {
     return null; // En dev, Prisma trouve son engine automatiquement
   }
   
-  const unpackedPath = path.join(
-    process.resourcesPath,
-    'app.asar.unpacked',
-    'web',
-    'npm_modules',
-    '.prisma',
-    'client'
-  );
+  // Chemins possibles pour le query engine Prisma
+  const possiblePaths = [
+    // Structure actuelle: electron/web/node_modules/
+    path.join(process.resourcesPath, 'app.asar.unpacked', 'electron', 'web', 'node_modules', '.prisma', 'client'),
+    // Ancienne structure: web/npm_modules/
+    path.join(process.resourcesPath, 'app.asar.unpacked', 'web', 'npm_modules', '.prisma', 'client'),
+    // Fallback: web/node_modules/
+    path.join(process.resourcesPath, 'app.asar.unpacked', 'web', 'node_modules', '.prisma', 'client'),
+    // Racine node_modules
+    path.join(process.resourcesPath, 'app.asar.unpacked', 'node_modules', '.prisma', 'client'),
+  ];
   
-  try {
-    if (fs.existsSync(unpackedPath)) {
-      const files = fs.readdirSync(unpackedPath);
-      const engine = files.find(f => f.endsWith('.node'));
-      if (engine) {
-        const enginePath = path.join(unpackedPath, engine);
-        console.log('[PRISMA] ✅ Query engine trouvé:', enginePath);
-        return enginePath;
+  for (const unpackedPath of possiblePaths) {
+    try {
+      if (fs.existsSync(unpackedPath)) {
+        const files = fs.readdirSync(unpackedPath);
+        // Chercher le fichier engine pour la plateforme actuelle
+        // macOS: libquery_engine-darwin.dylib.node ou libquery_engine-darwin-arm64.dylib.node
+        const engine = files.find(f => 
+          f.endsWith('.node') && 
+          (f.includes('libquery_engine') || f.includes('query-engine'))
+        );
+        if (engine) {
+          const enginePath = path.join(unpackedPath, engine);
+          console.log('[PRISMA] ✅ Query engine trouvé:', enginePath);
+          return enginePath;
+        }
       }
+    } catch (e) {
+      // Continuer avec le prochain chemin
     }
-    console.warn('[PRISMA] ⚠️ Query engine non trouvé dans:', unpackedPath);
-  } catch (e) {
-    console.error('[PRISMA] ❌ Erreur recherche engine:', e.message);
   }
+  
+  console.warn('[PRISMA] ⚠️ Query engine non trouvé. Chemins testés:', possiblePaths);
   return null;
 }
 

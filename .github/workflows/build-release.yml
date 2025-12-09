@@ -30,7 +30,7 @@ jobs:
   # BUILD macOS (Intel x64)
   # ==========================================================================
   build-macos-x64:
-    runs-on: macos-15  # Intel runner (macos-13 deprecated)
+    runs-on: macos-13  # Intel x64 runner (seul runner Intel disponible)
     
     steps:
       - name: Checkout code
@@ -45,11 +45,21 @@ jobs:
       - name: Install dependencies
         run: npm ci
       
+      - name: Verify architecture is x64
+        run: |
+          echo "Architecture: $(uname -m)"
+          if [ "$(uname -m)" != "x86_64" ]; then
+            echo "ERROR: Expected x86_64 but got $(uname -m)"
+            exit 1
+          fi
+      
       - name: Rebuild native modules for macOS x64
         run: npm rebuild
       
-      - name: Generate Prisma Client
+      - name: Generate Prisma Client for x64
         run: npx prisma generate
+        env:
+          PRISMA_CLI_BINARY_TARGETS: darwin
       
       - name: Build Next.js
         run: npm run build
@@ -116,11 +126,21 @@ jobs:
       - name: Install dependencies
         run: npm ci
       
+      - name: Verify architecture is arm64
+        run: |
+          echo "Architecture: $(uname -m)"
+          if [ "$(uname -m)" != "arm64" ]; then
+            echo "ERROR: Expected arm64 but got $(uname -m)"
+            exit 1
+          fi
+      
       - name: Rebuild native modules for macOS arm64
         run: npm rebuild
       
-      - name: Generate Prisma Client
+      - name: Generate Prisma Client for arm64
         run: npx prisma generate
+        env:
+          PRISMA_CLI_BINARY_TARGETS: darwin-arm64
       
       - name: Build Next.js
         run: npm run build
