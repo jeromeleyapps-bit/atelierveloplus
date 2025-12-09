@@ -49,11 +49,7 @@ jobs:
       
       - name: Build Electron (Windows)
         run: npx electron-builder --win -c electron-builder.config.yml --publish never
-        env:
-          # Pas de GH_TOKEN ici - la publication est gérée par le job create-release
-          # Signature Windows (optionnel)
-          # CSC_LINK: ${{ secrets.WIN_CSC_LINK }}
-          # CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
+        # Pas de GH_TOKEN ici - la publication est gérée par le job create-release
       
       - name: Upload Windows artifacts
         uses: actions/upload-artifact@v4
@@ -123,14 +119,8 @@ jobs:
         run: npx electron-builder --mac --x64 -c electron-builder.macos.yml --publish never
         env:
           # Pas de GH_TOKEN ici - la publication est gérée par le job create-release
-          # Signature macOS (OPTIONNEL - fonctionne sans)
-          # Si non définis, l'app sera non signée mais fonctionnelle
-          CSC_IDENTITY_AUTO_DISCOVERY: ${{ secrets.MAC_CSC_LINK && 'true' || 'false' }}
-          CSC_LINK: ${{ secrets.MAC_CSC_LINK }}
-          CSC_KEY_PASSWORD: ${{ secrets.MAC_CSC_KEY_PASSWORD }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          # Signature macOS désactivée (pas de certificat configuré)
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
       
       - name: Upload macOS x64 artifacts
         uses: actions/upload-artifact@v4
@@ -199,13 +189,8 @@ jobs:
         run: npx electron-builder --mac --arm64 -c electron-builder.macos.yml --publish never
         env:
           # Pas de GH_TOKEN ici - la publication est gérée par le job create-release
-          # Signature macOS (OPTIONNEL - fonctionne sans)
-          CSC_IDENTITY_AUTO_DISCOVERY: ${{ secrets.MAC_CSC_LINK && 'true' || 'false' }}
-          CSC_LINK: ${{ secrets.MAC_CSC_LINK }}
-          CSC_KEY_PASSWORD: ${{ secrets.MAC_CSC_KEY_PASSWORD }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          # Signature macOS désactivée (pas de certificat configuré)
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
       
       - name: Upload macOS arm64 artifacts
         uses: actions/upload-artifact@v4
