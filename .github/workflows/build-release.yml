@@ -20,45 +20,11 @@ env:
 
 jobs:
   # ==========================================================================
-  # BUILD WINDOWS
+  # BUILD WINDOWS - DÉSACTIVÉ (utiliser branche windows pour builds Windows)
   # ==========================================================================
-  build-windows:
-    runs-on: windows-latest
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-      
-      - name: Install dependencies
-        run: npm ci
-      
-      - name: Generate Prisma Client
-        run: npx prisma generate
-      
-      - name: Build Next.js
-        run: npm run build
-      
-      - name: Prepare Electron resources
-        run: node prepare-electron-resources.js
-      
-      - name: Build Electron (Windows)
-        run: npx electron-builder --win -c electron-builder.config.yml --publish never
-        # Pas de GH_TOKEN ici - la publication est gérée par le job create-release
-      
-      - name: Upload Windows artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows-build
-          path: |
-            dist-electron/*.exe
-            dist-electron/*.zip
-          retention-days: 30
+  # build-windows:
+  #   runs-on: windows-latest
+  #   ... (voir branche windows)
 
   # ==========================================================================
   # BUILD macOS (Intel x64)
@@ -205,7 +171,7 @@ jobs:
   # CRÉER LA RELEASE GITHUB
   # ==========================================================================
   create-release:
-    needs: [build-windows, build-macos-x64, build-macos-arm64]
+    needs: [build-macos-x64, build-macos-arm64]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
     
@@ -222,7 +188,6 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            artifacts/windows-build/*
             artifacts/macos-x64-build/*
             artifacts/macos-arm64-build/*
           draft: false
