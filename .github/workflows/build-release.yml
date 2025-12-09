@@ -48,9 +48,9 @@ jobs:
         run: node prepare-electron-resources.js
       
       - name: Build Electron (Windows)
-        run: npx electron-builder --win -c electron-builder.config.yml
+        run: npx electron-builder --win -c electron-builder.config.yml --publish never
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Pas de GH_TOKEN ici - la publication est gérée par le job create-release
           # Signature Windows (optionnel)
           # CSC_LINK: ${{ secrets.WIN_CSC_LINK }}
           # CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
@@ -120,9 +120,9 @@ jobs:
         run: rm -rf dist-electron
       
       - name: Build Electron (macOS x64)
-        run: npx electron-builder --mac --x64 -c electron-builder.macos.yml
+        run: npx electron-builder --mac --x64 -c electron-builder.macos.yml --publish never
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Pas de GH_TOKEN ici - la publication est gérée par le job create-release
           # Signature macOS (OPTIONNEL - fonctionne sans)
           # Si non définis, l'app sera non signée mais fonctionnelle
           CSC_IDENTITY_AUTO_DISCOVERY: ${{ secrets.MAC_CSC_LINK && 'true' || 'false' }}
@@ -196,9 +196,9 @@ jobs:
         run: rm -rf dist-electron
       
       - name: Build Electron (macOS arm64)
-        run: npx electron-builder --mac --arm64 -c electron-builder.macos.yml
+        run: npx electron-builder --mac --arm64 -c electron-builder.macos.yml --publish never
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Pas de GH_TOKEN ici - la publication est gérée par le job create-release
           # Signature macOS (OPTIONNEL - fonctionne sans)
           CSC_IDENTITY_AUTO_DISCOVERY: ${{ secrets.MAC_CSC_LINK && 'true' || 'false' }}
           CSC_LINK: ${{ secrets.MAC_CSC_LINK }}
