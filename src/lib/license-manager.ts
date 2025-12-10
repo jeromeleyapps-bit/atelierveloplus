@@ -209,24 +209,41 @@ function loadPublicKey(): string {
 
 /**
  * Valide la signature RSA d'une clé de licence
+ * Format clé v2 (avec hardwareId): PREFIX-RANDOM-EXPIRY-HWID-SIGNATURE
+ * Format clé v1 (legacy): PREFIX-RANDOM-EXPIRY-SIGNATURE
  * @param {string} key - Clé de licence complète
  * @returns {boolean} True si signature valide
  */
 export function validateRSASignature(key: string): boolean {
   try {
     const parts = key.split('-');
+    
+    // Format v2 avec hardwareId: 5 parties (PREFIX-RANDOM-EXPIRY-HWID-SIGNATURE)
+    // Format v1 legacy: 4 parties (PREFIX-RANDOM-EXPIRY-SIGNATURE)
     if (parts.length < 4) return false;
     
-    const [prefix, randomSegment, expirySegment, signature] = parts;
+    let dataForVerification: string;
+    let signature: string;
+    
+    if (parts.length >= 5 && parts[3].length === 16) {
+      // Format v2: PREFIX-RANDOM-EXPIRY-HWID-SIGNATURE
+      const [prefix, randomSegment, expirySegment, hwid, sig] = parts;
+      signature = sig;
+      dataForVerification = `${prefix}-${randomSegment}-${expirySegment}-${hwid}`;
+      logger.info('[License Manager] Format v2 détecté (avec hardwareId)', { hwid });
+    } else {
+      // Format v1 legacy: PREFIX-RANDOM-EXPIRY-SIGNATURE
+      const [prefix, randomSegment, expirySegment, sig] = parts;
+      signature = sig;
+      dataForVerification = `${prefix}-${randomSegment}-${expirySegment}`;
+      logger.info('[License Manager] Format v1 legacy détecté (sans hardwareId)');
+    }
     
     // Vérifier que la signature fait 512 chars (RSA 2048 en hex)
     if (signature.length !== 512) return false;
     
     // Vérifier que la signature est en hex (case insensitive)
     if (!/^[A-Fa-f0-9]{512}$/.test(signature)) return false;
-    
-    // Reconstruire les données signées
-    const dataForVerification = `${prefix}-${randomSegment}-${expirySegment}`;
     
     // Charger clé publique
     const publicKey = loadPublicKey();
@@ -249,15 +266,53 @@ export function validateRSASignature(key: string): boolean {
 
 /**
  * Valide le format d'une clé de licence (RSA uniquement)
+ * Format v2 (avec hardwareId): AVXX-XXXX-XXXX-HWIDXXXXXXXX-512CHARS
+ * Format v1 (legacy): AVXX-XXXX-XXXX-512CHARS
  */
 export function validateLicenseKeyFormat(key: string): boolean {
-  // Format RSA: AVXX-XXXX-XXXX-512CHARS (signature = 512 chars hex)
-  // Segment 1: Préfixe tier (4 chars)
-  // Segment 2: Aléatoire (4 chars hex)
-  // Segment 3: Expiration MMYY (4 chiffres)
-  // Segment 4: Signature RSA (512 chars hex, case insensitive)
-  const regex = /^(AVTR|AVBS|AVPR|AVPL)-[A-Fa-f0-9]{4}-[0-9]{4}-[A-Fa-f0-9]{512}$/;
-  return regex.test(key);
+  // Format v2 avec hardwareId: AVXX-XXXX-XXXX-16CHARS-512CHARS
+  const regexV2 = /^(AVTR|AVBS|AVPR|AVPL)-[A-Fa-f0-9]{4}-[0-9]{4}-[A-Fa-f0-9]{16}-[A-Fa-f0-9]{512}$/;
+  // Format v1 legacy: AVXX-XXXX-XXXX-512CHARS
+  const regexV1 = /^(AVTR|AVBS|AVPR|AVPL)-[A-Fa-f0-9]{4}-[0-9]{4}-[A-Fa-f0-9]{512}$/;
+  return regexV2.test(key) || regexV1.test(key);
+}
+
+/**
+ * Extrait le hardwareId d'une clé de licence (format v2 uniquement)
+ * @returns Le hardwareId (16 chars) ou null si format v1
+ */
+export function extractHardwareIdFromKey(key: string): string | null {
+  const parts = key.split('-');
+  // Format v2: 5 parties avec hwid de 16 chars en position 3
+  if (parts.length >= 5 && parts[3].length === 16) {
+    return parts[3].toUpperCase();
+  }
+  return null;
+}
+
+/**
+ * Vérifie si le hardwareId de la clé correspond à cette machine
+ * @returns true si match ou si clé v1 (legacy sans hwid)
+ */
+export function verifyHardwareIdMatch(key: string): { valid: boolean; message: string } {
+  const keyHwid = extractHardwareIdFromKey(key);
+  
+  // Format v1 legacy: pas de vérification hwid
+  if (!keyHwid) {
+    return { valid: true, message: 'Clé format v1 (legacy) - pas de vérification machine' };
+  }
+  
+  // Format v2: vérifier que le hwid correspond
+  const currentHwid = getHardwareId().substring(0, 16).toUpperCase();
+  
+  if (keyHwid === currentHwid) {
+    return { valid: true, message: 'Identifiant machine vérifié' };
+  }
+  
+  return { 
+    valid: false, 
+    message: `Cette licence est liée à une autre machine (${keyHwid}). Votre machine: ${currentHwid}` 
+  };
 }
 
 /**
@@ -595,6 +650,17 @@ export async function activateLicense(
     }
     
     logger.info('[License Manager] ✅ Signature RSA valide');
+    
+    // ✅ NOUVEAU v2: Vérifier que le hardwareId correspond à cette machine
+    const hwidCheck = verifyHardwareIdMatch(key);
+    if (!hwidCheck.valid) {
+      logger.warn('[License Manager] ❌ Hardware ID mismatch', { message: hwidCheck.message });
+      return {
+        success: false,
+        message: `❌ ${hwidCheck.message}. Contactez le support pour obtenir une licence pour cette machine.`,
+      };
+    }
+    logger.info('[License Manager] ✅ ' + hwidCheck.message);
     
     // Vérifier si la clé existe déjà
     const existing = await prisma.license.findUnique({

@@ -26,6 +26,8 @@ import PersonIcon from "@mui/icons-material/Person";
 import SettingsIcon from "@mui/icons-material/Settings";
 import VpnKeyIcon from "@mui/icons-material/VpnKey";
 import StarIcon from "@mui/icons-material/Star";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import ComputerIcon from "@mui/icons-material/Computer";
 import type { AccountSettings } from "@/lib/api";
 import { updateAccountSettings, setSetting } from "@/lib/api";
 import { useQueryClient } from '@tanstack/react-query';
@@ -52,6 +54,8 @@ export default function AccountPage() {
     severity: 'success' | 'error';
   }>({ open: false, message: '', severity: 'success' });
   const [license, setLicense] = useState<{ tier: string; status: string; isTrial?: boolean; trial?: { endsAt: string; daysRemaining?: number }; features?: Record<string, boolean> } | null>(null);
+  const [hardwareId, setHardwareId] = useState<string | null>(null);
+  const [hardwareIdCopied, setHardwareIdCopied] = useState(false);
 
   // Logo upload hook avec sauvegarde automatique
   const logoUpload = useLogoUpload({
@@ -95,7 +99,7 @@ export default function AccountPage() {
     },
   });
 
-  // Load license info
+  // Load license info and hardware ID
   useEffect(() => {
     async function fetchLicense() {
       try {
@@ -113,7 +117,21 @@ export default function AccountPage() {
         logger.error('[Account] Error fetching license:', err);
       }
     }
+    
+    async function fetchHardwareId() {
+      try {
+        const res = await fetch('/api/admin/license/hardware-id');
+        if (res.ok) {
+          const data = await res.json();
+          setHardwareId(data.displayId);
+        }
+      } catch (err) {
+        logger.error('[Account] Error fetching hardware ID:', err);
+      }
+    }
+    
     fetchLicense();
+    fetchHardwareId();
   }, []);
 
   // Load data once - FIX: Utiliser seulement isLoading pour éviter boucle infinie
@@ -315,6 +333,67 @@ export default function AccountPage() {
                       >
                         {license.isTrial ? 'Voir les offres' : 'Gérer ma licence'}
                       </Button>
+                    </Stack>
+                  </Paper>
+                </Box>
+              )}
+
+              {/* Identifiant Machine - Pour activation de licence */}
+              {hardwareId && (
+                <Box>
+                  <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1.5 }}>
+                    IDENTIFIANT MACHINE
+                  </Typography>
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: 2,
+                      bgcolor: '#fafafa',
+                      border: 1,
+                      borderColor: '#e0e0e0',
+                      borderRadius: 2,
+                    }}
+                  >
+                    <Stack spacing={1.5}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                        <ComputerIcon sx={{ fontSize: 24, color: '#757575' }} />
+                        <Box sx={{ flex: 1 }}>
+                          <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                            Code à communiquer pour obtenir votre licence
+                          </Typography>
+                          <Typography 
+                            variant="h6" 
+                            fontWeight="bold" 
+                            sx={{ 
+                              fontFamily: 'monospace',
+                              letterSpacing: 1,
+                              color: '#1976d2'
+                            }}
+                          >
+                            {hardwareId}
+                          </Typography>
+                        </Box>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          startIcon={<ContentCopyIcon />}
+                          onClick={() => {
+                            navigator.clipboard.writeText(hardwareId);
+                            setHardwareIdCopied(true);
+                            setTimeout(() => setHardwareIdCopied(false), 2000);
+                            setToast({ open: true, message: 'Identifiant copié !', severity: 'success' });
+                          }}
+                          sx={{ minWidth: 100 }}
+                        >
+                          {hardwareIdCopied ? 'Copié !' : 'Copier'}
+                        </Button>
+                      </Box>
+                      <Alert severity="info" sx={{ py: 0.5 }}>
+                        <Typography variant="caption">
+                          Cet identifiant unique est lié à votre ordinateur. Communiquez-le lors de l&apos;achat 
+                          de votre licence pour recevoir une clé d&apos;activation personnalisée.
+                        </Typography>
+                      </Alert>
                     </Stack>
                   </Paper>
                 </Box>
