@@ -584,13 +584,85 @@ app.prepare().then(() => {
 }
 
 // ============================================================================
+// ÉTAPE 7: COPIER DÉPENDANCES ELECTRON MAIN PROCESS
+// ============================================================================
+// AJOUT 13 déc 2025: Le code electron/*.js a besoin de modules externes
+// Ces modules doivent être dans electron/node_modules (pas node_modules racine)
+// car node_modules racine est exclu du build pour réduire la taille
+// ============================================================================
+
+console.log('');
+log('🔍', 'ÉTAPE 7/7 - Copie dépendances Electron main process...');
+console.log('');
+
+const ELECTRON_DEPENDENCIES = [
+  'dotenv',
+  'electron-log',
+  'fs-extra',
+  'graceful-fs',
+  'jsonfile',
+  'universalify',
+  'archiver',
+  'check-disk-space',
+  'hw-fingerprint',
+  'node-machine-id',
+  // Dépendances transitives
+  'readable-stream',
+  'buffer-crc32',
+  'compress-commons',
+  'crc-32',
+  'crc32-stream',
+  'lazystream',
+  'normalize-path',
+  'readdir-glob',
+  'tar-stream',
+  'zip-stream',
+  'async',
+  'b4a',
+  'bare-events',
+  'fast-fifo',
+  'queue-tick',
+  'streamx',
+  'text-decoder',
+];
+
+const electronNodeModules = path.join(__dirname, 'electron', 'node_modules');
+fs.ensureDirSync(electronNodeModules);
+
+let copiedCount = 0;
+ELECTRON_DEPENDENCIES.forEach(dep => {
+  const src = path.join(__dirname, 'node_modules', dep);
+  const dest = path.join(electronNodeModules, dep);
+  
+  if (fs.existsSync(src)) {
+    try {
+      fs.copySync(src, dest, { overwrite: true });
+      copiedCount++;
+    } catch (err) {
+      logWarning(`Impossible de copier ${dep}: ${err.message}`);
+    }
+  } else {
+    // Essayer dans un scope @
+    const scopedSrc = path.join(__dirname, 'node_modules', '@' + dep.split('/')[0]);
+    if (fs.existsSync(scopedSrc)) {
+      try {
+        fs.copySync(scopedSrc, path.join(electronNodeModules, '@' + dep.split('/')[0]), { overwrite: true });
+        copiedCount++;
+      } catch (err) {
+        logWarning(`Impossible de copier @${dep}: ${err.message}`);
+      }
+    }
+  }
+});
+
+logSuccess(`${copiedCount} dépendances Electron copiées dans electron/node_modules`);
+
+// ============================================================================
 // ÉTAPE BONUS: RENOMMER NODE_MODULES → NPM_MODULES (DÉSACTIVÉ)
 // ============================================================================
 // CHANGEMENT 7 déc 2025: Ne plus renommer node_modules
 // RAISON: En mode ASAR, Prisma a besoin de node_modules/ (pas npm_modules/)
 // pour résoudre require('.prisma/client/default')
-// L'ancien workaround était pour contourner un bug electron-builder
-// qui ignorait node_modules/, mais avec ASAR ce n'est plus nécessaire
 // ============================================================================
 
 console.log('');

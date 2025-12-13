@@ -6,7 +6,7 @@
 ; ============================================================================
 
 #define MyAppName "Atelier Velo+"
-#define MyAppVersion "1.0.38"
+#define MyAppVersion "1.1.0"
 #define MyAppPublisher "Upgraded Bikes - Jérôme Leyssard"
 #define MyAppURL "https://upgradedbikes.com"
 #define MyAppExeName "Atelier Velo+.exe"

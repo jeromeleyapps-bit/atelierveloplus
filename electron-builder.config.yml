@@ -38,7 +38,10 @@ afterPack: "./electron-builder-afterpack.js"
 files:
   - package.json
   - electron/**/*           # Code Electron + web/ (TOUT dans ASAR)
+  - electron/node_modules/**/*  # EXPLICITE: Dépendances Electron main process (dotenv, electron-log, etc.)
   - electron/web/node_modules/**/*  # EXPLICITE: Inclure node_modules de web/ (ignoré par défaut)
+  # CRITIQUE: Inclure explicitement .prisma (dotfiles ignorés par défaut - bug electron-builder #733)
+  - electron/web/node_modules/.prisma/**/*
   - "!electron/**/*.md"
   
   # ============================================================================
@@ -53,49 +56,37 @@ files:
   - "!electron/web/node_modules/@eslint/**/*"
   
   # ============================================================================
-  # INCLURE SEULEMENT les dépendances Electron nécessaires
+  # NODE_MODULES RACINE - Partiellement inclus (13 déc 2025)
   # ============================================================================
-  # CRITIQUE: Le node_modules racine ne contient pas .prisma/client généré
-  # Mais le code Electron a besoin de certains modules (dotenv, electron-log, etc.)
+  # CRITIQUE: Le code Electron a besoin de certains modules du node_modules racine
+  # On exclut les gros modules inutiles mais on garde les dépendances Electron
   # ============================================================================
-  # Inclure les dépendances Electron runtime
-  - node_modules/dotenv/**/*
-  - node_modules/electron-log/**/*
-  - node_modules/fs-extra/**/*
-  - node_modules/graceful-fs/**/*
-  - node_modules/jsonfile/**/*
-  - node_modules/universalify/**/*
-  # Exclure tout le reste de node_modules
-  - "!node_modules/@prisma/**/*"
-  - "!node_modules/.prisma/**/*"
-  - "!node_modules/next/**/*"
-  - "!node_modules/react/**/*"
-  - "!node_modules/react-dom/**/*"
-  
-  # ============================================================================
-  # OPTIMISATIONS - Exclure node_modules RACINE (pas electron/web/node_modules)
-  # ============================================================================
-  # IMPORTANT: Utiliser des patterns spécifiques pour le node_modules racine
-  # Ne PAS utiliser **/node_modules/** car ça exclut aussi electron/web/node_modules
-  # ============================================================================
-  
-  # Exclure outils de build du node_modules RACINE
+  # Exclure les gros modules inutiles
+  - "!node_modules/@aws-sdk/**/*"
+  - "!node_modules/@aws-crypto/**/*"
+  - "!node_modules/@smithy/**/*"
+  - "!node_modules/@jimp/**/*"
   - "!node_modules/@sentry/**/*"
-  - "!node_modules/app-builder-bin/**/*"
-  - "!node_modules/app-builder-lib/**/*"
-  - "!node_modules/electron-builder/**/*"
   - "!node_modules/@playwright/**/*"
   - "!node_modules/playwright/**/*"
   - "!node_modules/playwright-core/**/*"
-  - "!node_modules/jest/**/*"
   - "!node_modules/@jest/**/*"
+  - "!node_modules/jest/**/*"
+  - "!node_modules/@testing-library/**/*"
+  - "!node_modules/vitest/**/*"
+  - "!node_modules/@vitest/**/*"
   - "!node_modules/typescript/**/*"
   - "!node_modules/@types/**/*"
   - "!node_modules/eslint/**/*"
   - "!node_modules/@eslint/**/*"
+  - "!node_modules/electron-builder/**/*"
+  - "!node_modules/app-builder-lib/**/*"
+  - "!node_modules/app-builder-bin/**/*"
+  # Exclure Next.js, React, Prisma du racine (déjà dans electron/web/node_modules)
   - "!node_modules/next/**/*"
   - "!node_modules/react/**/*"
   - "!node_modules/react-dom/**/*"
+  - "!node_modules/@next/**/*"
   - "!node_modules/@prisma/**/*"
   - "!node_modules/.prisma/**/*"
   
@@ -352,3 +343,6 @@ compression: store
 #    - Binaires unpacked = fonctionnels
 #    - sandbox: false (electron/main.js) = OK pour desktop standalone
 # ============================================================================
+
+
+
