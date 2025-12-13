@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { prisma, ensureSqliteBikeMileageColumn } from "@/lib/prisma";
 import { getUserFromToken } from "@/lib/jwt";
 import { Prisma } from "@prisma/client";
 import { logger } from '@/lib/logger';
@@ -9,6 +9,7 @@ export const dynamic = 'force-dynamic';
 // GET /api/bikes - Liste vélos avec filtres
 export async function GET(req: NextRequest) {
   try {
+    await ensureSqliteBikeMileageColumn(prisma);
     const user = await getUserFromToken(req);
     let userId = user?.userId;
     
@@ -71,6 +72,7 @@ export async function GET(req: NextRequest) {
 // POST /api/bikes - Créer vélo
 export async function POST(req: NextRequest) {
   try {
+    await ensureSqliteBikeMileageColumn(prisma);
     const user = await getUserFromToken(req);
     let userId = user?.userId;
     

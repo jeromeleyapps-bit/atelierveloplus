@@ -841,7 +841,7 @@ function DashboardContent({ user }: { user: { id: string; email?: string; shopNa
                 <Button
                   size="small"
                   variant="contained"
-                  onClick={() => router.push("/calendar")}
+                  onClick={() => router.push("/admin/calendar")}
                   sx={{ bgcolor: '#26C6DA', '&:hover': { bgcolor: '#00ACC1' } }}
                 >
                   Voir tout

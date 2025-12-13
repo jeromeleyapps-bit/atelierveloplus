@@ -2,6 +2,23 @@ import { PrismaClient } from "@prisma/client";
 import path from "path";
 import { logger } from "./logger";
 
+export async function ensureSqliteBikeMileageColumn(prisma: PrismaClient, datasourceUrl?: string) {
+  try {
+    const url = datasourceUrl || process.env.DATABASE_URL || '';
+    if (!url.startsWith('file:')) return;
+
+    const rows = await prisma.$queryRawUnsafe<Array<{ name: string }>>("PRAGMA table_info('Bike')");
+    const hasMileage = Array.isArray(rows) && rows.some(r => r?.name === 'mileage');
+    if (hasMileage) return;
+
+    logger.warn('[Prisma] Missing column Bike.mileage detected, applying SQLite patch (ALTER TABLE)');
+    await prisma.$executeRawUnsafe('ALTER TABLE "Bike" ADD COLUMN "mileage" INTEGER');
+    logger.info('[Prisma] ✅ SQLite patch applied: Bike.mileage added');
+  } catch (e) {
+    logger.warn('[Prisma] SQLite patch failed (Bike.mileage)', e);
+  }
+}
+
 // Fix Prisma ASAR: En production Electron, pointer vers extraResources
 // SOLUTION FORUMS 2024: Basée sur GitHub discussions #10562, #21027
 if (typeof process !== 'undefined' && process.env.NODE_ENV === 'production') {
@@ -78,6 +95,9 @@ try {
       logger.error('[Prisma] DATABASE_URL', { status: process.env.DATABASE_URL ? 'SET' : 'NOT SET' });
     });
   }
+
+  // SQLite production/dev: patch compatibility for older DBs missing columns
+  void ensureSqliteBikeMileageColumn(prismaInstance, datasourceUrl);
 } catch (error) {
   const errorMessage = error instanceof Error ? error.message : String(error);
       logger.error('[Prisma] Failed to initialize Prisma Client:', { error: errorMessage });
