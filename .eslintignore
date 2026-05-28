@@ -31,7 +31,7 @@ Thumbs.db
 archives/
 archives-md-old/
 archives-scripts-old/
-backups/
+/backups/
 
 # Electron files (CommonJS - require() is valid)
 electron/

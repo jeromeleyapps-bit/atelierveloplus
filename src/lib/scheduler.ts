@@ -7,6 +7,7 @@ import cron from 'node-cron';
 import { prisma } from '@/lib/prisma';
 import { runDailyGraceJobs } from './cron-trial-grace';
 import { runDailyLicenseExpirationJobs } from './cron-license-expiration';
+import { createBackup } from './backup-service';
 import { logger } from './logger';
 
 /**
@@ -328,6 +329,19 @@ export function startScheduler() {
 
   logger.info('SCHEDULER: License expiration cron activated', { value: { schedule: '2h30 Europe/Paris' } });
 
+  // Cron 4 (Sprint 2) : Sauvegarde SQLite quotidienne à 3h.
+  const backupJob = cron.schedule('0 3 * * *', async () => {
+    try {
+      const info = await createBackup();
+      logger.info('SCHEDULER: Daily backup created', { file: info.filename, size: info.sizeBytes });
+    } catch (error) {
+      logger.error('SCHEDULER: Backup cron failed', { error });
+    }
+  }, {
+    timezone: 'Europe/Paris',
+  });
+  logger.info('SCHEDULER: Backup cron activated', { value: { schedule: '3h Europe/Paris' } });
+
   // Job immédiat au démarrage (si avant 9h30 et pas encore exécuté aujourd'hui)
   const now = new Date();
   const hour = now.getHours();
@@ -338,7 +352,7 @@ export function startScheduler() {
     });
   }
 
-  return { dailyJob, graceJob, expirationJob };
+  return { dailyJob, graceJob, expirationJob, backupJob };
 }
 
 /**
