@@ -19,6 +19,7 @@ jest.mock('@/lib/prisma', () => ({
       create: jest.fn(),
     },
   },
+  ensureSqliteBikeMileageColumn: jest.fn().mockResolvedValue(undefined),
 }));
 
 jest.mock('@/lib/jwt', () => ({

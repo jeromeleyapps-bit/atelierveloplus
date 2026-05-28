@@ -31,6 +31,10 @@ jest.mock('@/lib/api-helpers', () => ({
   getIsAutoEntrepreneur: jest.fn(),
 }));
 
+jest.mock('@/lib/invoice-number', () => ({
+  generateInvoiceNumber: jest.fn().mockResolvedValue('FAC-2025-0001'),
+}));
+
 jest.mock('@/lib/logger', () => ({
   logger: {
     info: jest.fn(),

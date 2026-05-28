@@ -35,6 +35,10 @@ jest.mock('@/lib/invoice-totals', () => ({
   recomputeTotals: jest.fn(),
 }));
 
+jest.mock('@/lib/invoice-number', () => ({
+  generateInvoiceNumber: jest.fn().mockResolvedValue('DEV-2025-0001'),
+}));
+
 jest.mock('@/lib/logger', () => ({
   logger: {
     info: jest.fn(),
