@@ -1,7 +1,9 @@
+import crypto from 'crypto';
 import { SignJWT, jwtVerify } from 'jose';
 import { logger } from './logger';
 
-const JWT_EXPIRES_IN = '7d'; // 7 jours
+const JWT_EXPIRES_IN = '7d';
+const MIN_SECRET_BYTES = 32;
 
 export interface JWTPayload {
   userId: string;
@@ -9,38 +11,38 @@ export interface JWTPayload {
   role: string;
 }
 
-/**
- * Get JWT secret with production validation
- */
+let cachedDevSecret: string | null = null;
+
 function getJWTSecret(): string {
   const secret = process.env.JWT_SECRET;
   const isProduction = process.env.NODE_ENV === 'production';
-  
-  if (!secret) {
-    if (isProduction) {
-      // CRITICAL: Never use default secret in production
-      throw new Error(
-        'JWT_SECRET must be set in production environment. ' +
-        'Generate one with: node -e "console.log(require(\'crypto\').randomBytes(64).toString(\'hex\'))"'
-      );
-    }
-    // Development: Use default secret (NOT for production!)
-    console.warn('⚠️ JWT_SECRET not set, using default secret (DEV ONLY)');
-    return 'dev-secret-CHANGE-IN-PRODUCTION-IMMEDIATELY';
+
+  if (secret && secret.length >= MIN_SECRET_BYTES) {
+    return secret;
   }
-  
-  return secret;
+
+  if (isProduction) {
+    throw new Error(
+      `JWT_SECRET must be set with at least ${MIN_SECRET_BYTES} characters in production. ` +
+      `Generate one with: node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"`
+    );
+  }
+
+  if (!cachedDevSecret) {
+    cachedDevSecret = crypto.randomBytes(64).toString('hex');
+    logger.warn(
+      `[JWT] JWT_SECRET missing or too short (<${MIN_SECRET_BYTES} chars). ` +
+      `Using a random per-process secret for development. Existing tokens will be invalid on restart.`
+    );
+  }
+  return cachedDevSecret;
 }
 
-// Convertir le secret en Uint8Array pour jose
 const getSecretKey = () => new TextEncoder().encode(getJWTSecret());
 
-/**
- * Générer un token JWT (compatible Edge Runtime)
- */
 export async function generateToken(payload: JWTPayload): Promise<string> {
   const secret = getSecretKey();
-  
+
   return await new SignJWT({ ...payload })
     .setProtectedHeader({ alg: 'HS256', typ: 'JWT' })
     .setIssuedAt()
@@ -49,75 +51,77 @@ export async function generateToken(payload: JWTPayload): Promise<string> {
     .sign(secret);
 }
 
-/**
- * Vérifier et décoder un token JWT (compatible Edge Runtime)
- */
 export async function verifyToken(token: string): Promise<JWTPayload | null> {
   try {
     const secret = getSecretKey();
     const { payload } = await jwtVerify(token, secret, {
       issuer: 'atelier-velo',
     });
-    
-    // Vérifier que le payload contient les champs requis
+
     if (!payload.userId || !payload.email || !payload.role) {
       return null;
     }
-    
+
     return payload as unknown as JWTPayload;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     const isExpirationError = errorMessage.includes('exp') || errorMessage.includes('expired');
     const isDevelopment = process.env.NODE_ENV !== 'production';
-    
-    // En développement, ne pas logger les erreurs d'expiration (c'est normal)
-    // En production, logger toutes les erreurs
+
     if (!isDevelopment || !isExpirationError) {
       logger.error('[JWT] Token verification failed', { error: errorMessage });
     } else {
-      // En développement, logger seulement en debug (silencieux par défaut)
       logger.debug('[JWT] Token expired (development)', { error: errorMessage });
     }
-    
+
     return null;
   }
 }
 
-/**
- * Extraire le token depuis les headers
- */
 export function extractToken(req: Request): string | null {
   const authHeader = req.headers.get('authorization');
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return null;
   }
-  return authHeader.substring(7); // Remove "Bearer "
+  return authHeader.substring(7);
 }
 
 /**
- * Récupérer l'utilisateur depuis le token ou les headers (mode Electron local)
+ * Validates the per-session Electron auth token.
+ * Only the Electron main process knows ELECTRON_AUTH_TOKEN; other local processes can't forge it.
  */
+function isValidElectronSession(req: Request): boolean {
+  const expected = process.env.ELECTRON_AUTH_TOKEN;
+  if (!expected) return false;
+  const provided = req.headers.get('x-electron-auth-token');
+  if (!provided || provided.length !== expected.length) return false;
+  try {
+    return crypto.timingSafeEqual(Buffer.from(provided), Buffer.from(expected));
+  } catch {
+    return false;
+  }
+}
+
 export async function getUserFromToken(req: Request): Promise<JWTPayload | null> {
-  // 1. Essayer avec le JWT
   const token = extractToken(req);
   if (token) {
     const user = await verifyToken(token);
     if (user) return user;
   }
-  
-  // 2. Fallback: Mode Electron local (headers x-user-id et x-user-role)
-  const userId = req.headers.get('x-user-id');
-  const userRole = req.headers.get('x-user-role');
-  
-  if (userId && userRole === 'admin') {
-    // Mode Electron local: retourner un user fictif
-    // Les APIs feront le vrai lookup dans la DB si nécessaire
-    return {
-      userId,
-      email: 'electron-local',
-      role: 'admin'
-    };
+
+  // Electron local fallback — only honoured when the request carries the per-session token
+  // injected by the main process. Closes the cross-process bypass.
+  if (isValidElectronSession(req)) {
+    const userId = req.headers.get('x-user-id');
+    const userRole = req.headers.get('x-user-role');
+    if (userId && userRole === 'admin') {
+      return {
+        userId,
+        email: 'electron-local',
+        role: 'admin',
+      };
+    }
   }
-  
+
   return null;
 }
