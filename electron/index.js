@@ -26,7 +26,12 @@
 const { app, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
+const crypto = require('crypto');
 const dotenv = require('dotenv');
+
+// Per-session auth token: closes the cross-process bypass on localhost.
+// The middleware refuses to auto-grant admin without this header.
+process.env.ELECTRON_AUTH_TOKEN = crypto.randomBytes(32).toString('hex');
 
 // ============================================================================
 // IMPORTS MODULES

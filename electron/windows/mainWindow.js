@@ -5,9 +5,30 @@
  * ISOLATION: BrowserWindow + configuration + lifecycle
  */
 
-const { BrowserWindow, Menu } = require('electron');
+const { BrowserWindow, Menu, session } = require('electron');
 const path = require('path');
 const http = require('http');
+
+const LOCAL_SERVER_HOSTS = new Set(['127.0.0.1', 'localhost']);
+
+function attachElectronAuthHeader(browserSession, logger) {
+  const token = process.env.ELECTRON_AUTH_TOKEN;
+  if (!token) {
+    logger.warn('[SECURITY] ELECTRON_AUTH_TOKEN missing — local auth bypass not closed');
+    return;
+  }
+  browserSession.webRequest.onBeforeSendHeaders((details, callback) => {
+    try {
+      const { hostname } = new URL(details.url);
+      if (LOCAL_SERVER_HOSTS.has(hostname)) {
+        details.requestHeaders['x-electron-auth-token'] = token;
+      }
+    } catch {
+      // non-http URL (devtools://, file://) — skip
+    }
+    callback({ requestHeaders: details.requestHeaders });
+  });
+}
 
 /**
  * Crée la fenêtre principale de l'application
@@ -34,7 +55,9 @@ function createWindow(config, isDev, logger) {
     },
     show: false  // Afficher seulement quand prêt
   });
-  
+
+  attachElectronAuthHeader(mainWindow.webContents.session, logger);
+
   // ❌ DÉSACTIVÉ : Logout forcé causait page blanche (solution existante 27/11/2024)
   // RAISON: Le logout forcé au démarrage peut causer des problèmes de redirection et page blanche
   // REF: OUTILS-DIAGNOSTIC-PAGE-BLANCHE.md

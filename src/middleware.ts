@@ -149,13 +149,30 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/api/bikes');  // Ajout bikes pour vente vélos
   
   if (!user && needsElectronAuth) {
-    // Mode Electron local: on crée un user fictif admin
-    // L'API fera le vrai lookup du premier user dans la DB
-    // IMPORTANT: Setter les headers sur la REQUEST, pas la RESPONSE
+    // Mode Electron local: on auto-injecte un user admin SEULEMENT si la requête
+    // provient bien du process Electron (token de session vérifié).
+    // En dev pur (npm run dev sans Electron), ELECTRON_AUTH_TOKEN n'est pas défini :
+    // on tolère l'auto-injection pour ne pas casser le workflow.
+    const expectedToken = process.env.ELECTRON_AUTH_TOKEN;
+    const providedToken = request.headers.get('x-electron-auth-token');
+    const isProduction = process.env.NODE_ENV === 'production';
+    if (expectedToken && providedToken !== expectedToken) {
+      return NextResponse.json(
+        { error: 'unauthorized', message: 'Invalid Electron session token' },
+        { status: 401 }
+      );
+    }
+    if (!expectedToken && isProduction) {
+      return NextResponse.json(
+        { error: 'unauthorized', message: 'Electron session token required in production' },
+        { status: 401 }
+      );
+    }
+
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set('x-user-id', 'electron-local');
     requestHeaders.set('x-user-role', 'admin');
-    
+
     return NextResponse.next({
       request: {
         headers: requestHeaders
