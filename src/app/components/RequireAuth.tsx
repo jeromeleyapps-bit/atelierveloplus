@@ -25,9 +25,12 @@ export default function RequireAuth({
   const router = useRouter();
   const [tokenValid, setTokenValid] = useState<boolean | null>(null);
 
-  // Vérifier la validité du token côté serveur
+  // Vérifier la validité du token côté serveur.
+  // tokenValid reste à null (= "inconnu") tant qu'on attend AuthContext, sinon
+  // l'effet de redirection ligne 75 déclenche router.replace avant que la vérif n'ait pu tourner.
   useEffect(() => {
-    if (!ready || !user) {
+    if (!ready) return;
+    if (!user) {
       setTokenValid(false);
       return;
     }
