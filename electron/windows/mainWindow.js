@@ -11,6 +11,29 @@ const http = require('http');
 
 const LOCAL_SERVER_HOSTS = new Set(['127.0.0.1', 'localhost']);
 
+function attachContentSecurityPolicy(browserSession) {
+  // Permet les ressources locales + Stripe/Resend en sortie. Bloque le reste.
+  const csp = [
+    "default-src 'self' http://127.0.0.1:* http://localhost:*",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' http://127.0.0.1:* http://localhost:* https://js.stripe.com",
+    "style-src 'self' 'unsafe-inline' http://127.0.0.1:* http://localhost:* https://fonts.googleapis.com",
+    "font-src 'self' data: https://fonts.gstatic.com",
+    "img-src 'self' data: blob: http://127.0.0.1:* http://localhost:*",
+    "connect-src 'self' http://127.0.0.1:* http://localhost:* https://api.stripe.com https://api.resend.com",
+    "frame-src 'self' https://js.stripe.com https://hooks.stripe.com",
+    "object-src 'none'",
+    "base-uri 'self'",
+  ].join('; ');
+  browserSession.webRequest.onHeadersReceived((details, callback) => {
+    callback({
+      responseHeaders: {
+        ...details.responseHeaders,
+        'Content-Security-Policy': [csp],
+      },
+    });
+  });
+}
+
 function attachElectronAuthHeader(browserSession, logger) {
   const token = process.env.ELECTRON_AUTH_TOKEN;
   if (!token) {
@@ -47,16 +70,18 @@ function createWindow(config, isDev, logger) {
     title: 'Atelier Vélo+',
     backgroundColor: config.backgroundColor || '#1a1a1a',
     webPreferences: {
-      nodeIntegration: false,      // ✅ Sécurité: Pas de Node.js dans renderer
-      contextIsolation: true,      // ✅ Sécurité: Isolation contexte
-      sandbox: false,              // ✅ Désactivé: Fix bug focus inputs (desktop app standalone)
-      webSecurity: false,          // ⚠️ TEMPORAIRE: Désactivé pour diagnostic page blanche (29/11/2025)
+      nodeIntegration: false,
+      contextIsolation: true,
+      sandbox: false,              // Désactivé volontairement : fix bug focus inputs sur desktop standalone
+      webSecurity: true,
+      allowRunningInsecureContent: false,
       preload: path.join(__dirname, '..', 'preload.js')
     },
     show: false  // Afficher seulement quand prêt
   });
 
   attachElectronAuthHeader(mainWindow.webContents.session, logger);
+  attachContentSecurityPolicy(mainWindow.webContents.session);
 
   // ❌ DÉSACTIVÉ : Logout forcé causait page blanche (solution existante 27/11/2024)
   // RAISON: Le logout forcé au démarrage peut causer des problèmes de redirection et page blanche
