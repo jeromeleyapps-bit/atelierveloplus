@@ -206,15 +206,17 @@ export async function sendExpirationNotifications(): Promise<void> {
         tier: { in: ['pro', 'basique'] },
         status: 'active',
         expiresAt: {
-          gte: new Date(sevenDaysFromNow.getTime() - 24 * 60 * 60 * 1000), // -1 jour pour fenêtre
-          lt: new Date(sevenDaysFromNow.getTime() + 24 * 60 * 60 * 1000), // +1 jour pour fenêtre
+          gte: new Date(sevenDaysFromNow.getTime() - 24 * 60 * 60 * 1000),
+          lt: new Date(sevenDaysFromNow.getTime() + 24 * 60 * 60 * 1000),
         },
+        OR: [
+          { lastExpirationEmailDays: null },
+          { lastExpirationEmailDays: { lt: 7 } },
+        ],
       },
     });
-    
+
     for (const license of licenses7Days) {
-      // Vérifier si email déjà envoyé (éviter doublons)
-      // TODO: Ajouter champ lastExpirationEmailSentAt dans schema License
       try {
         if (license.customerEmail && license.expiresAt) {
           const tierName = license.tier === 'pro' ? 'Pro' : 'Basique';
@@ -231,13 +233,18 @@ export async function sendExpirationNotifications(): Promise<void> {
             `,
           });
           
-          logger.info('CRON EXPIRATION: 7-day expiration email sent', { value: { 
-            email: license.customerEmail, 
-            tier: license.tier 
+          await prisma.license.update({
+            where: { id: license.id },
+            data: { lastExpirationEmailDays: 7 },
+          });
+
+          logger.info('CRON EXPIRATION: 7-day expiration email sent', { value: {
+            email: license.customerEmail,
+            tier: license.tier
           } });
         }
       } catch (emailError) {
-        logger.error('CRON EXPIRATION: Failed to send 7-day email', { 
+        logger.error('CRON EXPIRATION: Failed to send 7-day email', {
           email: license.customerEmail, 
           error: emailError 
         });
@@ -256,9 +263,13 @@ export async function sendExpirationNotifications(): Promise<void> {
           gte: new Date(threeDaysFromNow.getTime() - 24 * 60 * 60 * 1000),
           lt: new Date(threeDaysFromNow.getTime() + 24 * 60 * 60 * 1000),
         },
+        OR: [
+          { lastExpirationEmailDays: null },
+          { lastExpirationEmailDays: { lt: 3 } },
+        ],
       },
     });
-    
+
     for (const license of licenses3Days) {
       try {
         if (license.customerEmail && license.expiresAt) {
@@ -276,13 +287,18 @@ export async function sendExpirationNotifications(): Promise<void> {
             `,
           });
           
-          logger.info('CRON EXPIRATION: 3-day expiration email sent', { value: { 
-            email: license.customerEmail, 
-            tier: license.tier 
+          await prisma.license.update({
+            where: { id: license.id },
+            data: { lastExpirationEmailDays: 3 },
+          });
+
+          logger.info('CRON EXPIRATION: 3-day expiration email sent', { value: {
+            email: license.customerEmail,
+            tier: license.tier
           } });
         }
       } catch (emailError) {
-        logger.error('CRON EXPIRATION: Failed to send 3-day email', { 
+        logger.error('CRON EXPIRATION: Failed to send 3-day email', {
           email: license.customerEmail, 
           error: emailError 
         });
@@ -301,9 +317,13 @@ export async function sendExpirationNotifications(): Promise<void> {
           gte: new Date(oneDayFromNow.getTime() - 24 * 60 * 60 * 1000),
           lt: new Date(oneDayFromNow.getTime() + 24 * 60 * 60 * 1000),
         },
+        OR: [
+          { lastExpirationEmailDays: null },
+          { lastExpirationEmailDays: { lt: 1 } },
+        ],
       },
     });
-    
+
     for (const license of licenses1Day) {
       try {
         if (license.customerEmail && license.expiresAt) {
@@ -321,13 +341,18 @@ export async function sendExpirationNotifications(): Promise<void> {
             `,
           });
           
-          logger.info('CRON EXPIRATION: 1-day expiration email sent', { value: { 
-            email: license.customerEmail, 
-            tier: license.tier 
+          await prisma.license.update({
+            where: { id: license.id },
+            data: { lastExpirationEmailDays: 1 },
+          });
+
+          logger.info('CRON EXPIRATION: 1-day expiration email sent', { value: {
+            email: license.customerEmail,
+            tier: license.tier
           } });
         }
       } catch (emailError) {
-        logger.error('CRON EXPIRATION: Failed to send 1-day email', { 
+        logger.error('CRON EXPIRATION: Failed to send 1-day email', {
           email: license.customerEmail, 
           error: emailError 
         });
@@ -367,6 +392,10 @@ export async function sendMaintenanceEndNotifications(): Promise<void> {
           gte: new Date(sevenDaysFromNow.getTime() - 24 * 60 * 60 * 1000),
           lt: new Date(sevenDaysFromNow.getTime() + 24 * 60 * 60 * 1000),
         },
+        OR: [
+          { lastMaintenanceEmailDays: null },
+          { lastMaintenanceEmailDays: { lt: 7 } },
+        ],
       },
     });
     
@@ -386,12 +415,17 @@ export async function sendMaintenanceEndNotifications(): Promise<void> {
             `,
           });
           
-          logger.info('CRON EXPIRATION: 7-day maintenance email sent', { value: { 
-            email: license.customerEmail 
+          await prisma.license.update({
+            where: { id: license.id },
+            data: { lastMaintenanceEmailDays: 7 },
+          });
+
+          logger.info('CRON EXPIRATION: 7-day maintenance email sent', { value: {
+            email: license.customerEmail
           } });
         }
       } catch (emailError) {
-        logger.error('CRON EXPIRATION: Failed to send 7-day maintenance email', { 
+        logger.error('CRON EXPIRATION: Failed to send 7-day maintenance email', {
           email: license.customerEmail, 
           error: emailError 
         });
@@ -410,6 +444,10 @@ export async function sendMaintenanceEndNotifications(): Promise<void> {
           gte: new Date(threeDaysFromNow.getTime() - 24 * 60 * 60 * 1000),
           lt: new Date(threeDaysFromNow.getTime() + 24 * 60 * 60 * 1000),
         },
+        OR: [
+          { lastMaintenanceEmailDays: null },
+          { lastMaintenanceEmailDays: { lt: 3 } },
+        ],
       },
     });
     
@@ -429,12 +467,17 @@ export async function sendMaintenanceEndNotifications(): Promise<void> {
             `,
           });
           
-          logger.info('CRON EXPIRATION: 3-day maintenance email sent', { value: { 
-            email: license.customerEmail 
+          await prisma.license.update({
+            where: { id: license.id },
+            data: { lastMaintenanceEmailDays: 3 },
+          });
+
+          logger.info('CRON EXPIRATION: 3-day maintenance email sent', { value: {
+            email: license.customerEmail
           } });
         }
       } catch (emailError) {
-        logger.error('CRON EXPIRATION: Failed to send 3-day maintenance email', { 
+        logger.error('CRON EXPIRATION: Failed to send 3-day maintenance email', {
           email: license.customerEmail, 
           error: emailError 
         });
@@ -453,6 +496,10 @@ export async function sendMaintenanceEndNotifications(): Promise<void> {
           gte: new Date(oneDayFromNow.getTime() - 24 * 60 * 60 * 1000),
           lt: new Date(oneDayFromNow.getTime() + 24 * 60 * 60 * 1000),
         },
+        OR: [
+          { lastMaintenanceEmailDays: null },
+          { lastMaintenanceEmailDays: { lt: 1 } },
+        ],
       },
     });
     
@@ -472,12 +519,17 @@ export async function sendMaintenanceEndNotifications(): Promise<void> {
             `,
           });
           
-          logger.info('CRON EXPIRATION: 1-day maintenance email sent', { value: { 
-            email: license.customerEmail 
+          await prisma.license.update({
+            where: { id: license.id },
+            data: { lastMaintenanceEmailDays: 1 },
+          });
+
+          logger.info('CRON EXPIRATION: 1-day maintenance email sent', { value: {
+            email: license.customerEmail
           } });
         }
       } catch (emailError) {
-        logger.error('CRON EXPIRATION: Failed to send 1-day maintenance email', { 
+        logger.error('CRON EXPIRATION: Failed to send 1-day maintenance email', {
           email: license.customerEmail, 
           error: emailError 
         });

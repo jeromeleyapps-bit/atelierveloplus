@@ -699,10 +699,15 @@ model License {
   customerEmail         String?
   customerName          String?
   hardwareId            String?  // Lier à une machine spécifique (anti-partage)
-  
+
+  // Dédup notifications cron (Sprint 1) : dernier seuil (7/3/1) envoyé.
+  // Permet d'éviter d'envoyer plusieurs fois le même mail sur la fenêtre ±1j du cron.
+  lastExpirationEmailDays  Int?
+  lastMaintenanceEmailDays Int?
+
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
-  
+
   LicenseVerification   LicenseVerification[]
 }
 
