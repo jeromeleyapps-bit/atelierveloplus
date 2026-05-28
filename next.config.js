@@ -19,9 +19,10 @@ const nextConfig = {
     unoptimized: true,
   },
 
-  // Ignorer les erreurs TS pendant le build
+  // Erreurs TS bloquantes pendant le build (réactivé Sprint 1).
+  // Note : `strict: true` reste désactivé — voir docs/SPRINT-1-RAPPORT.md, traitement progressif.
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
 
   // OPTIMISATIONS SPRINT 1.3 - 25 nov 2024
