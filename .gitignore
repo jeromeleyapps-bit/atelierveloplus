@@ -33,3 +33,4 @@ Thumbs.db
 
 .vercel
 package.json.backup-mojibake
+.env*.bak.*
