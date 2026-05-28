@@ -29,9 +29,6 @@ const publicPatterns = [
   /^\/api\/finance\/invoices\/[^/]+\/pdf$/,     // PDFs factures
   /^\/api\/finance\/quotes\/[^/]+\/pdf$/,       // PDFs devis
   /^\/api\/finance\/credits\/[^/]+\/pdf$/,      // PDFs avoirs
-  /^\/api\/finance\/invoices\/[^/]+\/email$/,   // Envoi email facture
-  /^\/api\/finance\/quotes\/[^/]+\/email$/,     // Envoi email devis
-  /^\/api\/finance\/credits\/[^/]+\/email$/,    // Envoi email avoir
   /^\/api\/catalog\/items$/,                     // Liste des items (GET uniquement, page protégée côté client)
   /^\/api\/catalog\/categories$/,                // Liste des catégories (GET uniquement)
 ];

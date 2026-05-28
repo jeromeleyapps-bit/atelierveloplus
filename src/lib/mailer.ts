@@ -3,12 +3,19 @@ import { getPrisma } from "./db";
 import { logEmail } from "./email-logger";
 import { logger } from "./logger";
 
+export type MailAttachment = {
+  filename: string;
+  content: Buffer | Uint8Array | string;
+  contentType?: string;
+};
+
 export type MailInput = {
   to: string;
   subject: string;
   text?: string;
   html?: string;
   userId?: string; // Optionnel: pour charger config depuis DB
+  attachments?: MailAttachment[];
 };
 
 interface SmtpConfig {
@@ -104,21 +111,26 @@ function createTransporter(config: SmtpConfig): nodemailer.Transporter {
  * Envoyer un email
  * Utilise la config DB si userId fourni, sinon fallback sur process.env
  */
-export default async function sendMail({ to, subject, text, html, userId }: MailInput) {
+export default async function sendMail({ to, subject, text, html, userId, attachments }: MailInput) {
   const config = await getSmtpConfig(userId);
-  
+
   if (!config) {
     logger.info("[mailer] SMTP not configured. Email would be sent:", { value: { to, subject, text } });
     return { queued: false, reason: "smtp_not_configured" };
   }
 
   const transporter = createTransporter(config);
-  const info = await transporter.sendMail({ 
-    from: config.from, 
-    to, 
-    subject, 
-    text, 
-    html 
+  const info = await transporter.sendMail({
+    from: config.from,
+    to,
+    subject,
+    text,
+    html,
+    attachments: attachments?.map(a => ({
+      filename: a.filename,
+      content: a.content instanceof Uint8Array && !(a.content instanceof Buffer) ? Buffer.from(a.content) : a.content,
+      contentType: a.contentType,
+    })),
   });
   
   logger.info('[mailer] Email sent:', { value: { messageId: info.messageId, to } });

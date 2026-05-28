@@ -116,7 +116,7 @@ function FinanceContent() {
 
   async function sendInvoiceEmail(id: string) {
     try {
-      const res = await fetch(`/api/finance/invoices/${id}/email`, { method: 'POST' });
+      const res = await fetch(`/api/finance/invoices/${id}/send-email`, { method: 'POST' });
       if (!res.ok) {
         const t = await res.text();
         throw new Error(t || 'email_failed');
@@ -576,7 +576,7 @@ function FinanceContent() {
                 onClick={async () => {
                   for (const id of selected) {
                     try {
-                      await fetch(`/api/finance/invoices/${id}/email`, { method: 'POST' });
+                      await fetch(`/api/finance/invoices/${id}/send-email`, { method: 'POST' });
                     } catch (e) {
                       logger.error('Email error:', e);
                     }
