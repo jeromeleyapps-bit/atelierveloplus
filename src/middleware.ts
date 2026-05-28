@@ -17,6 +17,10 @@ const publicApiRoutes = [
   '/api/catalog/import/supplier-csv-stream',  // Import CSV fournisseur (streaming)
   '/api/catalog/scan-bulk',       // Import CSV scanner
   '/api/admin/service-rates/import',  // Import CSV tarifs et prestations
+  '/api/billing/checkout',        // Stripe Checkout (vente éditeur, public)
+  '/api/billing/webhook',         // Stripe webhook (signature vérifiée en interne)
+  '/api/billing/order-status',    // Polling statut commande après checkout
+  '/api/integrations/stripe/callback',  // OAuth callback Stripe Connect (state cookie vérifié)
 ];
 
 // Patterns de routes publiques (regex)

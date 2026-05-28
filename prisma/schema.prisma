@@ -711,6 +711,45 @@ model License {
   LicenseVerification   LicenseVerification[]
 }
 
+/// Commande Stripe (vente éditeur de l'app) — idempotence par stripe_payment_intent_id.
+model Order {
+  id                      String   @id @default(cuid())
+  stripeCheckoutSessionId String   @unique
+  stripePaymentIntentId   String?  @unique
+  stripeMode              String   // "test" | "live"
+  customerEmail           String
+  customerName            String?
+  tier                    String   // "basique" | "pro" | "pro_lifetime"
+  amount                  Int      // centimes
+  currency                String   @default("eur")
+  status                  String   @default("pending") // pending | paid | failed | refunded
+  licenseId               String?  // lien vers la License générée
+  licenseKey              String?
+  emailSentAt             DateTime?
+  metadata                String?  // JSON
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  @@index([customerEmail])
+  @@index([status])
+}
+
+/// Connexion Stripe Connect d'un atelier (pour encaisser ses clients via SON compte Stripe).
+model StripeConnection {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  stripeAccountId String   @unique // acct_*
+  accessToken     String?  // legacy OAuth, vide si Standard accounts
+  refreshToken    String?
+  livemode        Boolean  @default(false)
+  scope           String?
+  status          String   @default("active") // active | revoked
+  connectedAt     DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([userId])
+}
+
 model LicenseVerification {
   id               String   @id @default(cuid())
   licenseId        String
