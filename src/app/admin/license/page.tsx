@@ -26,6 +26,7 @@ import ListItemText from '@mui/material/ListItemText';
 import PageShell from '../../components/PageShell';
 import RequireAuth from '../../components/RequireAuth';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
+import RedeemPurchaseTokenCard from './components/RedeemPurchaseTokenCard';
 import StarIcon from '@mui/icons-material/Star';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
@@ -211,6 +212,9 @@ export default function LicensePage() {
     <RequireAuth>
       <PageShell title="Gestion de Licence" headerColor="#9c27b0">
         <Stack spacing={4}>
+          {/* Sprint 2 : activation d'un code d'achat Stripe (flow Token → clé). */}
+          <RedeemPurchaseTokenCard onSuccess={(key) => setLicenseKey(key)} />
+
           {/* ✅ FIX PC3: Champ d'activation en haut pour être visible immédiatement */}
           {/* Activer une clé existante - TOUJOURS VISIBLE */}
           <Paper 

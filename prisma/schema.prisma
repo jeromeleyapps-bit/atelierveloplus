@@ -734,6 +734,23 @@ model Order {
   @@index([status])
 }
 
+/// Token d'activation envoyé par email après achat Stripe. L'acheteur le saisit dans
+/// l'app avec son hardwareId pour générer la vraie clé de licence (machine-bound).
+model PurchaseToken {
+  id          String   @id @default(cuid())
+  token       String   @unique // 24 hex chars
+  orderId     String   @unique
+  tier        String
+  email       String
+  expiresAt   DateTime
+  redeemedAt  DateTime?
+  licenseKey  String?
+  hardwareId  String?
+  createdAt   DateTime @default(now())
+
+  @@index([email])
+}
+
 /// Connexion Stripe Connect d'un atelier (pour encaisser ses clients via SON compte Stripe).
 model StripeConnection {
   id              String   @id @default(cuid())

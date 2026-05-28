@@ -21,6 +21,7 @@ const publicApiRoutes = [
   '/api/billing/webhook',         // Stripe webhook (signature vérifiée en interne)
   '/api/billing/order-status',    // Polling statut commande après checkout
   '/api/integrations/stripe/callback',  // OAuth callback Stripe Connect (state cookie vérifié)
+  '/api/license/redeem',          // Échange token d'achat contre clé licence (validé par token interne)
 ];
 
 // Patterns de routes publiques (regex)

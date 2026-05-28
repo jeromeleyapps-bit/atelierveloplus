@@ -1,8 +1,12 @@
+import crypto from 'crypto';
 import { NextResponse } from 'next/server';
 import type Stripe from 'stripe';
 import { prisma } from '@/lib/prisma';
 import { getStripeClient, getWebhookSecret } from '@/lib/stripe';
+import sendMail from '@/lib/mailer';
 import { logger } from '@/lib/logger';
+
+const PURCHASE_TOKEN_VALIDITY_DAYS = 365;
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -89,9 +93,71 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     },
   });
 
-  // TODO(S2.B) : générer la licence + envoyer l'email — implémenté quand la lib license-generator
-  // sera exposée comme module appelable côté serveur (refactor de license-generator/generate-license.js).
-  logger.info('[billing/webhook] Order marked paid', { orderId: order.id, tier: order.tier });
+  // Génère un token d'activation à transmettre au client par email.
+  // Le client le saisira dans l'app avec son hardware ID pour produire la vraie clé.
+  const token = crypto.randomBytes(12).toString('hex').toUpperCase(); // 24 chars
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + PURCHASE_TOKEN_VALIDITY_DAYS);
+
+  await prisma.purchaseToken.create({
+    data: {
+      token,
+      orderId: order.id,
+      tier: order.tier,
+      email: order.customerEmail,
+      expiresAt,
+    },
+  });
+
+  await sendActivationEmail(order.customerEmail, order.tier, token).catch(err => {
+    logger.error('[billing/webhook] Activation email failed', { error: String(err) });
+  });
+
+  await prisma.order.update({
+    where: { id: order.id },
+    data: { emailSentAt: new Date() },
+  });
+
+  logger.info('[billing/webhook] Order paid + token issued', {
+    orderId: order.id,
+    tier: order.tier,
+    tokenPrefix: token.slice(0, 6),
+  });
+}
+
+async function sendActivationEmail(email: string, tier: string, token: string) {
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  const activationUrl = `${baseUrl}/admin/license?token=${encodeURIComponent(token)}`;
+  const tierLabel = ({
+    basique: 'Basique',
+    pro: 'Pro',
+    pro_lifetime: 'Pro Lifetime',
+  } as Record<string, string>)[tier] || tier;
+
+  const html = `
+    <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
+      <h2>Merci pour ton achat — Atelier Vélo+ ${tierLabel}</h2>
+      <p>Voici ton code d'activation. Il est valable 1 an et utilisable une seule fois :</p>
+      <p style="font-family:monospace;font-size:20px;background:#f3f4f6;padding:14px;border-radius:8px;letter-spacing:2px;text-align:center">
+        ${token}
+      </p>
+      <p>Pour activer ta licence :</p>
+      <ol>
+        <li>Ouvre Atelier Vélo+ (ou télécharge-le si ce n'est pas déjà fait).</li>
+        <li>Va dans <strong>Paramètres → Licence</strong>.</li>
+        <li>Colle ton code dans l'onglet <strong>« Activer un code d'achat »</strong>.</li>
+      </ol>
+      <p>Tu peux aussi cliquer directement ici depuis le PC où Atelier Vélo+ est installé :
+        <a href="${activationUrl}">${activationUrl}</a></p>
+      <p style="color:#6b7280;font-size:13px">Si tu n'es pas à l'origine de cet achat, contacte-nous.</p>
+    </div>`;
+
+  await sendMail({
+    to: email,
+    subject: `Ton code d'activation Atelier Vélo+ ${tierLabel}`,
+    html,
+    text: `Code d'activation : ${token}\nÀ saisir dans Atelier Vélo+ → Paramètres → Licence.`,
+  });
 }
 
 async function markOrderFailedByPaymentIntent(paymentIntentId: string) {
