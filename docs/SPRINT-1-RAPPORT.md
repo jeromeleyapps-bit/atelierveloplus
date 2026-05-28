@@ -48,7 +48,9 @@ Audit fait. L'état actuel est :
 - ⚠️ `afterPack: electron-builder-afterpack.js` (rcedit icône, contourne bug electron-builder 26 sur les chemins d'icône). À garder tant que le bug upstream n'est pas résolu.
 - ⚠️ `forceCodeSigning: false`. Correct sans certificat EV ; à inverser en Sprint 2 avec certificat (≈150 €/an).
 
-Validation conditionnelle : test `npm run build:electron` lancé en parallèle de la rédaction. Si succès → on peut envisager de réduire `asarUnpack`. Si échec sur cette branche → on revert ce qui a pu impacter (peu probable, les modifs Sprint 1 sont côté src/ et lib/).
+Validation : `npm run build:electron` exécuté en fin de Sprint 1 → **Exit 0**. Packaging Windows x64 OK, afterPack icône OK, zip généré (`Atelier Velo+-1.1.0-win-x64.zip`). Les modifications Sprint 1 (src/, lib/) n'ont rien cassé côté packaging.
+
+Décision : **ne pas réduire** `asarUnpack: **/*.node + **/*.dll`. Le gain (1-2 fichiers évités au mieux) ne justifie pas le risque de réintroduire un bug binaire-dans-asar. Ces patterns restent comme filet au-dessus des patterns spécifiques Prisma/SQLite.
 
 ## Tests & lint
 - **504 tests unitaires verts** (+3 nouveaux pour le cron dédup).
