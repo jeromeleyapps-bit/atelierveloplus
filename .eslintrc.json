@@ -1,5 +1,17 @@
 {
   "extends": [
     "next/core-web-vitals"
+  ],
+  "rules": {
+    "no-console": ["warn", { "allow": ["warn", "error"] }],
+    "no-warning-comments": ["warn", { "terms": ["fixme", "xxx", "hack"], "location": "anywhere" }]
+  },
+  "overrides": [
+    {
+      "files": ["**/__tests__/**", "**/*.test.ts", "**/*.test.tsx", "**/test/**"],
+      "rules": {
+        "no-console": "off"
+      }
+    }
   ]
 }

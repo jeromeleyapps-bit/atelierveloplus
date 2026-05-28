@@ -132,6 +132,7 @@ export const loggerServer = {
     if (electronLog) {
       electronLog.debug(message, sanitized);
     } else {
+      // eslint-disable-next-line no-console -- fallback when electron-log unavailable
       console.log(formatMessage('debug', message, sanitized));
     }
   },
@@ -146,6 +147,7 @@ export const loggerServer = {
     if (electronLog) {
       electronLog.info(message, sanitized);
     } else {
+      // eslint-disable-next-line no-console -- fallback when electron-log unavailable
       console.log(formatMessage('info', message, sanitized));
     }
   },

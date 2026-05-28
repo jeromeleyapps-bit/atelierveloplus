@@ -66,6 +66,7 @@ export const logger = {
     if (IS_PRODUCTION) return;
 
     const sanitized = sanitizeMeta(meta);
+    // eslint-disable-next-line no-console -- logger uses console as transport
     console.log(formatMessage('debug', message, sanitized));
   },
 
@@ -76,6 +77,7 @@ export const logger = {
    */
   info: (message: string, meta?: LogMeta) => {
     const sanitized = sanitizeMeta(meta);
+    // eslint-disable-next-line no-console -- logger uses console as transport
     console.log(formatMessage('info', message, sanitized));
   },
 

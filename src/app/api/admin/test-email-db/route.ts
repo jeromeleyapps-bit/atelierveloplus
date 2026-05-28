@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sendEmail } from '@/lib/email-with-db-config';
+import { logger } from '@/lib/logger';
 
 /**
  * POST /api/admin/test-email-db
@@ -17,8 +18,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('[TEST-EMAIL-DB] 🧪 Test envoi avec config DB...');
-    console.log('[TEST-EMAIL-DB] Destinataire:', testEmail);
+    logger.info('[TEST-EMAIL-DB] Test envoi avec config DB', { destinataire: testEmail });
 
     // Utilise sendEmail qui lit config DB en priorité
     await sendEmail({
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
       `,
     });
 
-    console.log('[TEST-EMAIL-DB] ✅ Email envoyé avec succès!');
+    logger.info('[TEST-EMAIL-DB] Email envoyé avec succès');
 
     return NextResponse.json({
       success: true,

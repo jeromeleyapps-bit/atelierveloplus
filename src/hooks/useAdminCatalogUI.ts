@@ -13,6 +13,7 @@
 import { useState } from 'react';
 import type { CatalogItem } from '@/lib/api';
 import type { CatalogCategory } from '@/lib/catalog';
+import { logger } from '@/lib/logger';
 
 interface ProductData {
   category?: string;
@@ -36,7 +37,7 @@ export function useAdminCatalogUI(isAutoEntrepreneur: boolean = false) {
   // Helpers
   const openCreate = () => {
     const vatRate = isAutoEntrepreneur ? 0 : 20;
-    console.log('[ADMIN CATALOG] openCreate - isAE:', isAutoEntrepreneur, '=> TVA:', vatRate + '%');
+    logger.debug('[ADMIN CATALOG] openCreate', { isAutoEntrepreneur, vatRate });
     setCurrent({
       sku: '',
       category: 'piece',
