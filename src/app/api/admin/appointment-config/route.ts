@@ -108,18 +108,7 @@ export async function PUT(req: NextRequest) {
       });
     }
 
-    // Vérifier la licence PRO pour appointmentOnlyDayEnabled
-    // Temporairement désactivé pour diagnostic
-    // if (appointmentOnlyDayEnabled) {
-    //   const licenseInfo = await getLicenseInfo();
-    //   const isPro = licenseInfo.tier === 'pro' || licenseInfo.tier === 'pro_lifetime' || licenseInfo.tier === 'trial';
-    //   if (!isPro) {
-    //     return NextResponse.json(
-    //       { error: 'Cette fonctionnalité nécessite une licence PRO' },
-    //       { status: 403 }
-    //     );
-    //   }
-    // }
+    // TODO(licence): réactiver le gating Pro sur appointmentOnlyDayEnabled une fois le diagnostic terminé.
 
     // Récupérer le numéro de téléphone depuis AppSetting si non fourni
     let phone = appointmentOnlyDayPhone;

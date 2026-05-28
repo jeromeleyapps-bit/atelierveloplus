@@ -83,17 +83,6 @@ function createWindow(config, isDev, logger) {
   attachElectronAuthHeader(mainWindow.webContents.session, logger);
   attachContentSecurityPolicy(mainWindow.webContents.session);
 
-  // ❌ DÉSACTIVÉ : Logout forcé causait page blanche (solution existante 27/11/2024)
-  // RAISON: Le logout forcé au démarrage peut causer des problèmes de redirection et page blanche
-  // REF: OUTILS-DIAGNOSTIC-PAGE-BLANCHE.md
-  // mainWindow.webContents.on('did-finish-load', () => {
-  //   mainWindow.webContents.executeJavaScript(`
-  //     localStorage.removeItem('jwt_token');
-  //     localStorage.removeItem('user');
-  //     console.log('[ELECTRON] Logout forcé au démarrage');
-  //   `).catch(err => logger.warn('[WINDOW] Erreur logout:', err));
-  // });
-  
   // Afficher fenêtre quand contenu prêt (évite flash blanc)
   mainWindow.on('ready-to-show', () => {
     mainWindow.show();

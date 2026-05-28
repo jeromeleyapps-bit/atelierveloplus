@@ -2,11 +2,6 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { getUserFromToken } from '@/lib/jwt';
 import { logger } from '@/lib/logger';
-// import { getLicenseInfo } from '@/lib/license-manager'; // Désactivé - Prisma incompatible middleware
-
-// Routes publiques (accessibles sans authentification)
-// Note: Actuellement non utilisées car authentification gérée côté composants
-// const publicRoutes = ['/', '/auth/login', '/auth/register', '/rdv', '/booking-local'];
 
 // Routes API publiques (pas d'authentification requise)
 const publicApiRoutes = [
@@ -32,10 +27,6 @@ const publicPatterns = [
   /^\/api\/catalog\/items$/,                     // Liste des items (GET uniquement, page protégée côté client)
   /^\/api\/catalog\/categories$/,                // Liste des catégories (GET uniquement)
 ];
-
-// Routes admin (nécessitent role = admin)
-// Note: Actuellement non utilisées, vérification admin faite côté composants
-// const adminRoutes = ['/admin'];
 
 // APIs protégées (nécessitent authentification)
 const protectedApiRoutes = [
@@ -88,16 +79,8 @@ export async function middleware(request: NextRequest) {
       }
     }
     
-    // NOTE: Vérification licence désactivée dans middleware (Prisma incompatible Edge Runtime)
-    // La vérification se fait côté client dans les composants admin
-    // const isAdminPage = pathname.startsWith('/admin') && !pathname.startsWith('/admin/license');
-    // if (isAdminPage && !isAuthPage) {
-    //   const licenseInfo = await getLicenseInfo();
-    //   if (licenseInfo.status === 'expired') {
-    //     return NextResponse.redirect('/admin/license/blocked');
-    //   }
-    // }
-    
+    // Note: vérification licence faite côté client (composants /admin) — Prisma incompatible Edge Runtime.
+
     return NextResponse.next();
   }
   

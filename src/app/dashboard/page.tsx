@@ -32,7 +32,6 @@ import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 
 import OnboardingWizard from "../components/OnboardingWizard";
 import { logger } from '@/lib/logger';
-// import TestInfrastructure from "@/components/TestInfrastructure"; // Garder pour debug si besoin
 
 export const dynamic = 'force-dynamic';
 
