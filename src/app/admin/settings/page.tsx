@@ -392,45 +392,22 @@ export default function AdminSettingsPage() {
             />
             <CardContent>
               <Typography variant="subtitle2" gutterBottom fontWeight="bold">
-                Sauvegardes Automatiques
+                Sauvegardes
               </Typography>
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={autoBackupEnabled}
-                    onChange={(e) => setAutoBackupEnabled(e.target.checked)}
-                  />
-                }
-                label="Activer les sauvegardes automatiques"
-              />
-
-              {autoBackupEnabled && (
-                <Box sx={{ mt: 2, mb: 3 }}>
-                  <TextField
-                    fullWidth
-                    label="Fréquence"
-                    select
-                    value={backupFrequency}
-                    onChange={(e) => setBackupFrequency(e.target.value)}
-                    SelectProps={{ native: true }}
-                    sx={{ mb: 2 }}
-                  >
-                    <option value="hourly">Toutes les heures</option>
-                    <option value="daily">Quotidienne</option>
-                    <option value="weekly">Hebdomadaire</option>
-                  </TextField>
-
-                  <Button
-                    variant="contained"
-                    startIcon={backupLoading ? <CircularProgress size={20} /> : <SaveIcon />}
-                    onClick={handleSaveBackupSettings}
-                    disabled={backupLoading}
-                    fullWidth
-                  >
-                    Sauvegarder
-                  </Button>
-                </Box>
-              )}
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                Une sauvegarde compressée est créée chaque nuit à 3 h.
+                Rotation automatique des 30 dernières. Restauration en 1 clic.
+              </Typography>
+              <Button
+                component={Link}
+                href="/admin/backups"
+                variant="contained"
+                startIcon={<BackupIcon />}
+                fullWidth
+                sx={{ mb: 2 }}
+              >
+                Gérer les sauvegardes
+              </Button>
 
               <Divider sx={{ my: 2 }} />
 
@@ -489,6 +466,62 @@ export default function AdminSettingsPage() {
                   Désactiver
                 </Button>
               )}
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* Comptabilité & Encaissement (Sprint 4) */}
+        <Grid item xs={12}>
+          <Typography variant="h6" gutterBottom sx={{ mb: 2, mt: 2, fontWeight: 'bold', color: 'primary.main' }}>
+            Comptabilité & Encaissement
+          </Typography>
+        </Grid>
+
+        <Grid item xs={12} md={6}>
+          <Card sx={{ height: '100%' }}>
+            <CardHeader
+              avatar={<SaveIcon color="primary" />}
+              title="Export comptable (FEC)"
+              subheader="Fichier des Écritures Comptables, format normé"
+            />
+            <CardContent>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                Sélectionne une période, télécharge le fichier FEC conforme art. A47 A-1 LPF.
+                À transmettre à ton comptable ou à l&apos;administration fiscale sur demande.
+              </Typography>
+              <Button
+                component={Link}
+                href="/admin/exports"
+                variant="contained"
+                fullWidth
+              >
+                Télécharger un FEC
+              </Button>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} md={6}>
+          <Card sx={{ height: '100%' }}>
+            <CardHeader
+              avatar={<EmailIcon color="primary" />}
+              title="Encaissement Stripe"
+              subheader="Connecte ton compte pour encaisser tes clients"
+            />
+            <CardContent>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                Saisis tes clés API Stripe (restricted key recommandée). Génère un lien
+                de paiement pour chaque facture, ton client paie en ligne, l&apos;app suit
+                automatiquement le statut.
+              </Typography>
+              <Button
+                component={Link}
+                href="/admin/integrations/stripe"
+                variant="contained"
+                fullWidth
+              >
+                Configurer Stripe
+              </Button>
             </CardContent>
           </Card>
         </Grid>
