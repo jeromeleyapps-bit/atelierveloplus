@@ -58,7 +58,11 @@ export default function RedeemPurchaseTokenCard({ onSuccess }: Props) {
     }
     setSubmitting(true);
     try {
-      const res = await fetch('/api/license/redeem', {
+      const apiBase = process.env.NEXT_PUBLIC_ATELIER_API_BASE;
+      if (!apiBase) {
+        throw new Error('Activation indisponible — NEXT_PUBLIC_ATELIER_API_BASE non configuré.');
+      }
+      const res = await fetch(`${apiBase.replace(/\/$/, '')}/license/redeem`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token: code.trim(), hardwareId }),

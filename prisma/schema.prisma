@@ -711,46 +711,6 @@ model License {
   LicenseVerification   LicenseVerification[]
 }
 
-/// Commande Stripe (vente éditeur de l'app) — idempotence par stripe_payment_intent_id.
-model Order {
-  id                      String   @id @default(cuid())
-  stripeCheckoutSessionId String   @unique
-  stripePaymentIntentId   String?  @unique
-  stripeMode              String   // "test" | "live"
-  customerEmail           String
-  customerName            String?
-  tier                    String   // "basique" | "pro" | "pro_lifetime"
-  amount                  Int      // centimes
-  currency                String   @default("eur")
-  status                  String   @default("pending") // pending | paid | failed | refunded
-  licenseId               String?  // lien vers la License générée
-  licenseKey              String?
-  emailSentAt             DateTime?
-  metadata                String?  // JSON
-  createdAt               DateTime @default(now())
-  updatedAt               DateTime @updatedAt
-
-  @@index([customerEmail])
-  @@index([status])
-}
-
-/// Token d'activation envoyé par email après achat Stripe. L'acheteur le saisit dans
-/// l'app avec son hardwareId pour générer la vraie clé de licence (machine-bound).
-model PurchaseToken {
-  id          String   @id @default(cuid())
-  token       String   @unique // 24 hex chars
-  orderId     String   @unique
-  tier        String
-  email       String
-  expiresAt   DateTime
-  redeemedAt  DateTime?
-  licenseKey  String?
-  hardwareId  String?
-  createdAt   DateTime @default(now())
-
-  @@index([email])
-}
-
 /// Clés Stripe saisies manuellement par l'atelier dans Paramètres → Connexion Stripe.
 /// secretKey est chiffré au repos avec ENCRYPTION_KEY (AES-256-GCM).
 model StripeConnection {
