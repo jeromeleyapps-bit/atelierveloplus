@@ -751,18 +751,18 @@ model PurchaseToken {
   @@index([email])
 }
 
-/// Connexion Stripe Connect d'un atelier (pour encaisser ses clients via SON compte Stripe).
+/// Clés Stripe saisies manuellement par l'atelier dans Paramètres → Connexion Stripe.
+/// secretKey est chiffré au repos avec ENCRYPTION_KEY (AES-256-GCM).
 model StripeConnection {
-  id              String   @id @default(cuid())
-  userId          String   @unique
-  stripeAccountId String   @unique // acct_*
-  accessToken     String?  // legacy OAuth, vide si Standard accounts
-  refreshToken    String?
-  livemode        Boolean  @default(false)
-  scope           String?
-  status          String   @default("active") // active | revoked
-  connectedAt     DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id                  String   @id @default(cuid())
+  userId              String   @unique
+  livemode            Boolean  @default(false)
+  publishableKey      String   // pk_test_… ou pk_live_…
+  secretKeyEncrypted  String   // sk_… chiffré (jamais en clair)
+  accountLabel        String?  // libellé optionnel saisi par l'atelier
+  status              String   @default("active") // active | disabled
+  connectedAt         DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 
   @@index([userId])
 }
