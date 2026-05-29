@@ -131,7 +131,7 @@
   <script>
     // L'URL du Worker (à adapter selon ton déploiement).
     // Cloudflare Pages permet d'injecter cette valeur via "Settings → Environment Variables → API_BASE".
-    const API_BASE = (window.ATELIER_API_BASE || 'https://atelier-velo-api.YOUR-SUBDOMAIN.workers.dev').replace(/\/$/, '');
+    const API_BASE = (window.ATELIER_API_BASE || 'https://atelier-velo-api.upgradedbikes.workers.dev').replace(/\/$/, '');
 
     const alertBox = document.getElementById('alert');
     function showAlert(type, message) {
