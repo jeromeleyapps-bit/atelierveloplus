@@ -47,8 +47,8 @@ router.post('/billing/checkout', async (request: Request, env: Env) => {
       mode: 'payment',
       line_items: [{ price: priceIdForTier(env, tier as Tier), quantity: 1 }],
       customer_email: email,
-      success_url: `${env.APP_PUBLIC_URL.replace(/\/$/, '')}/tarifs/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${env.APP_PUBLIC_URL.replace(/\/$/, '')}/tarifs?cancelled=1`,
+      success_url: `${env.APP_PUBLIC_URL.replace(/\/$/, '')}/success.html?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${env.APP_PUBLIC_URL.replace(/\/$/, '')}/?cancelled=1`,
       metadata: { tier },
       payment_intent_data: { metadata: { tier, email } },
     });
@@ -113,29 +113,46 @@ async function handleCheckoutCompleted(env: Env, session: Stripe.Checkout.Sessio
   const order = await env.DB
     .prepare('SELECT * FROM orders WHERE stripe_checkout_session_id = ?')
     .bind(session.id)
-    .first<{ id: string; status: string; tier: string; customer_email: string; amount: number }>();
+    .first<{ id: string; status: string; tier: string; customer_email: string; amount: number; email_sent_at: string | null }>();
   if (!order) throw new Error('order_not_found');
-  if (order.status === 'paid') return;
 
-  const piId = typeof session.payment_intent === 'string' ? session.payment_intent : session.payment_intent?.id ?? null;
-  await env.DB.prepare(`
-    UPDATE orders
-    SET stripe_payment_intent_id = ?, status = 'paid', amount = ?, updated_at = datetime('now')
-    WHERE id = ?
-  `).bind(piId, session.amount_total ?? order.amount, order.id).run();
+  // Étape 1 — marquer payé (idempotent)
+  if (order.status !== 'paid') {
+    const piId = typeof session.payment_intent === 'string' ? session.payment_intent : session.payment_intent?.id ?? null;
+    await env.DB.prepare(`
+      UPDATE orders
+      SET stripe_payment_intent_id = ?, status = 'paid', amount = ?, updated_at = datetime('now')
+      WHERE id = ?
+    `).bind(piId, session.amount_total ?? order.amount, order.id).run();
+  }
 
-  const token = randomToken(12);
-  const expiresAt = new Date();
-  expiresAt.setUTCDate(expiresAt.getUTCDate() + PURCHASE_TOKEN_VALIDITY_DAYS);
-  const tokenId = crypto.randomUUID();
+  // Étape 2 — si l'email a déjà été envoyé, terminé.
+  if (order.email_sent_at) return;
 
-  await env.DB.prepare(`
-    INSERT INTO purchase_tokens (id, token, order_id, tier, email, expires_at)
-    VALUES (?, ?, ?, ?, ?, ?)
-  `).bind(tokenId, token, order.id, order.tier, order.customer_email, expiresAt.toISOString()).run();
+  // Étape 3 — réutiliser le token existant (sur retry) ou en créer un.
+  const existing = await env.DB
+    .prepare('SELECT token FROM purchase_tokens WHERE order_id = ?')
+    .bind(order.id)
+    .first<{ token: string }>();
 
+  let token: string;
+  if (existing) {
+    token = existing.token;
+  } else {
+    token = randomToken(12);
+    const expiresAt = new Date();
+    expiresAt.setUTCDate(expiresAt.getUTCDate() + PURCHASE_TOKEN_VALIDITY_DAYS);
+    await env.DB.prepare(`
+      INSERT INTO purchase_tokens (id, token, order_id, tier, email, expires_at)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `).bind(crypto.randomUUID(), token, order.id, order.tier, order.customer_email, expiresAt.toISOString()).run();
+  }
+
+  // Étape 4 — envoyer l'email. Si ça échoue, l'exception remonte → Stripe retentera,
+  // et grâce à l'idempotence ci-dessus, seul l'email sera rejoué (pas de doublon de token).
   await sendActivationEmail(env, order.customer_email, order.tier, token);
 
+  // Étape 5 — marquer l'email comme envoyé.
   await env.DB.prepare(`UPDATE orders SET email_sent_at = datetime('now') WHERE id = ?`).bind(order.id).run();
 }
 
