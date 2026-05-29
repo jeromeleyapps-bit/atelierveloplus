@@ -33,51 +33,30 @@ function getUserId(req: Request): string | null {
 export async function GET(req: Request) {
   try {
     let userId = getUserId(req);
-    
+
     logger.debug('SETTINGS GET: User ID from header', { userId });
-  
-  // En développement, si pas d'userId, utiliser le premier utilisateur
+
+  // Fallback : prendre le premier user existant (jamais en créer un par défaut).
+  // Sprint 4.B : on supprime la création automatique d'un user "Administrateur"
+  // qui polluait les bases neuves au premier lancement.
   if (!userId) {
-    const firstUser = await prisma.user.findFirst();
-    logger.info('SETTINGS GET: No user ID, using first user', { userId: firstUser?.id });
+    const firstUser = await prisma.user.findFirst({ where: { active: true }, orderBy: { createdAt: 'asc' } });
     if (!firstUser) {
-      // Créer un utilisateur par défaut si aucun n'existe
-      logger.info('SETTINGS GET: Creating default user');
-      const defaultUser = await prisma.user.create({
-        data: {
-          email: 'admin@atelier-velo.local',
-          name: 'Administrateur',
-          role: 'admin',
-          password: 'hashed_password_placeholder' // Sera remplacé lors du premier login
-        }
-      });
-      userId = defaultUser.id;
-    } else {
-      userId = firstUser.id;
+      logger.info('SETTINGS GET: no user in DB, returning empty settings (fresh install)');
+      return NextResponse.json({ noUser: true }, { status: 404 });
     }
+    userId = firstUser.id;
   } else {
-    // Si l'utilisateur du JWT n'existe pas, utiliser le premier utilisateur
     const userExists = await prisma.user.findUnique({ where: { id: userId } });
     if (!userExists) {
-      logger.warn('SETTINGS GET: User from JWT not found, falling back', { userId });
-      const firstUser = await prisma.user.findFirst();
+      const firstUser = await prisma.user.findFirst({ where: { active: true }, orderBy: { createdAt: 'asc' } });
       if (!firstUser) {
-        // Créer un utilisateur par défaut
-        const defaultUser = await prisma.user.create({
-          data: {
-            email: 'admin@atelier-velo.local',
-            name: 'Administrateur',
-            role: 'admin',
-            password: 'hashed_password_placeholder'
-          }
-        });
-        userId = defaultUser.id;
-      } else {
-        userId = firstUser.id;
+        return NextResponse.json({ noUser: true }, { status: 404 });
       }
+      userId = firstUser.id;
     }
   }
-  
+
   logger.debug('SETTINGS GET: Final user ID', { userId });
   const row = await prisma.appSetting.findUnique({ where: { userId } });
   logger.debug('SETTINGS GET: Settings found', { found: !!row, isAutoEntrepreneur: row?.isAutoEntrepreneur });
@@ -122,48 +101,24 @@ export async function PUT(req: Request) {
 export async function PATCH(req: Request) {
   try {
     let userId = getUserId(req);
-    
+
     logger.info('SETTINGS PATCH: Request received', { userId });
-  
-  // En développement, si pas d'userId, utiliser le premier utilisateur
+
+  // Sprint 4.B : on n'auto-crée plus de user. Si la DB est vide, on refuse.
   if (!userId) {
-    const firstUser = await prisma.user.findFirst();
-    logger.info('SETTINGS PATCH: No user ID, using first user', { userId: firstUser?.id });
+    const firstUser = await prisma.user.findFirst({ where: { active: true }, orderBy: { createdAt: 'asc' } });
     if (!firstUser) {
-      // Créer un utilisateur par défaut
-      const defaultUser = await prisma.user.create({
-        data: {
-          email: 'admin@atelier-velo.local',
-          name: 'Administrateur',
-          role: 'admin',
-          password: 'hashed_password_placeholder'
-        }
-      });
-      userId = defaultUser.id;
-    } else {
-      userId = firstUser.id;
+      return NextResponse.json({ error: 'no_user', message: 'Inscription requise' }, { status: 404 });
     }
+    userId = firstUser.id;
   } else {
-    // Vérifier que l'utilisateur existe
     const userExists = await prisma.user.findUnique({ where: { id: userId } });
-    logger.debug('SETTINGS PATCH: User exists check', { exists: !!userExists, userId });
-    
     if (!userExists) {
-      logger.warn('SETTINGS PATCH: User from JWT not found, falling back', { userId });
-      const firstUser = await prisma.user.findFirst();
+      const firstUser = await prisma.user.findFirst({ where: { active: true }, orderBy: { createdAt: 'asc' } });
       if (!firstUser) {
-        const defaultUser = await prisma.user.create({
-          data: {
-            email: 'admin@atelier-velo.local',
-            name: 'Administrateur',
-            role: 'admin',
-            password: 'hashed_password_placeholder'
-          }
-        });
-        userId = defaultUser.id;
-      } else {
-        userId = firstUser.id;
+        return NextResponse.json({ error: 'no_user', message: 'Inscription requise' }, { status: 404 });
       }
+      userId = firstUser.id;
     }
   }
   

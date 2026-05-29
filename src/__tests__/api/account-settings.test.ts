@@ -143,30 +143,18 @@ describe('GET /api/account/settings', () => {
     expect(mockPrismaUserFindFirst).toHaveBeenCalled();
   });
 
-  it('should create default user if none exists', async () => {
-    const mockDefaultUser = {
-      id: 'default-user',
-      name: 'Administrateur',
-      email: 'admin@atelier-velo.local',
-      role: 'admin',
-    };
-
+  it('returns 404 noUser when DB is empty (no auto-create — Sprint 4.B)', async () => {
     mockPrismaUserFindFirst.mockResolvedValue(null);
-    mockPrismaUserCreate.mockResolvedValue(mockDefaultUser);
-    mockPrismaUserFindUnique.mockResolvedValue(mockDefaultUser);
     mockPrismaAppSettingFindUnique.mockResolvedValue(null);
 
     const req = new Request('http://localhost/api/account/settings');
 
     const res = await GET(req);
+    const data = await res.json();
 
-    expect(res.status).toBe(200);
-    expect(mockPrismaUserCreate).toHaveBeenCalledWith({
-      data: expect.objectContaining({
-        email: 'admin@atelier-velo.local',
-        role: 'admin',
-      }),
-    });
+    expect(res.status).toBe(404);
+    expect(data).toEqual({ noUser: true });
+    expect(mockPrismaUserCreate).not.toHaveBeenCalled();
   });
 
   it('should parse user name into firstName and lastName', async () => {
