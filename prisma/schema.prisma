@@ -330,6 +330,14 @@ model Invoice {
   dueDate         DateTime?
   reminderCount   Int              @default(0)
   lastReminderAt  DateTime?
+
+  // Sprint 4 — paiement Stripe initié par l'atelier sur cette facture
+  stripePaymentLinkId     String?
+  stripePaymentLinkUrl    String?
+  stripePaymentIntentId   String?
+  stripePaymentStatus     String?   // "pending" | "paid" | "failed"
+  stripePaidAt            DateTime?
+
   validUntil      DateTime?
   convertedAt     DateTime?
   convertedToId   String?

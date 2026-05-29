@@ -33,6 +33,8 @@ import ReceiptIcon from "@mui/icons-material/Receipt";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import EmailIcon from "@mui/icons-material/Email";
+import PaymentIcon from "@mui/icons-material/Payment";
+import StripePaymentDialog from "../../components/StripePaymentDialog";
 
 // Composants réutilisables
 import CustomerCard from "@/app/components/CustomerCard";
@@ -67,6 +69,7 @@ export default function InvoiceDetailPageNew() {
   const { document: inv, isLoading: loading, refetch: loadInvoice } = useFinanceDocumentData(id, 'invoice');
   const [converting, setConverting] = useState(false);
   const [issuing, setIssuing] = useState(false);
+  const [stripePaymentOpen, setStripePaymentOpen] = useState(false);
   const [addLineDialogOpen, setAddLineDialogOpen] = useState(false);
   const [editLineDialogOpen, setEditLineDialogOpen] = useState(false);
   const [selectedLine, setSelectedLine] = useState<InvoiceLine | null>(null);
@@ -495,6 +498,21 @@ export default function InvoiceDetailPageNew() {
                   >
                     Envoyer par Email
                   </Button>
+
+                  {inv?.status === 'issued' && inv?.type === 'invoice' && (
+                    <Button
+                      variant="contained"
+                      fullWidth
+                      startIcon={<PaymentIcon />}
+                      onClick={() => setStripePaymentOpen(true)}
+                      sx={{
+                        bgcolor: '#635bff', // Stripe purple
+                        '&:hover': { bgcolor: '#4f46e5' },
+                      }}
+                    >
+                      {inv?.stripePaymentStatus === 'paid' ? 'Paiement Stripe (payée)' : 'Lien de paiement Stripe'}
+                    </Button>
+                  )}
                 </Stack>
               </CardContent>
             </Card>
@@ -630,6 +648,20 @@ export default function InvoiceDetailPageNew() {
           {toast.message}
         </Alert>
       </Snackbar>
+
+      {inv && (
+        <StripePaymentDialog
+          open={stripePaymentOpen}
+          invoiceId={inv.id}
+          invoiceNumber={inv.number || inv.id}
+          customerEmail={inv.WorkOrder?.Customer?.email || null}
+          onClose={() => setStripePaymentOpen(false)}
+          onPaid={() => {
+            setToast({ open: true, message: 'Facture marquée comme payée.', severity: 'success' });
+            queryClient.invalidateQueries({ queryKey: ['financeDocument', 'invoice', id] });
+          }}
+        />
+      )}
     </>
   );
 }
