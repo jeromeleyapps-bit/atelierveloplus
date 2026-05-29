@@ -109,22 +109,22 @@ class AutoUpdater {
   }
 
   /**
-   * Vérifie les mises à jour au démarrage
+   * Vérifie les mises à jour au démarrage.
+   * Activation conditionnelle : il faut AUTO_UPDATE_FEED_URL en environnement (bucket R2).
    */
   checkForUpdates() {
-    // Ne pas vérifier en dev
     if (process.env.NODE_ENV === 'development') {
       log.info('[UPDATER] Mode dev, auto-update désactivé');
       return;
     }
-
-    // FIX 15/11/2025: Désactiver auto-update si repo privé (évite erreur 404)
-    // TODO: Réactiver quand repo public ou releases configurées
-    log.info('[UPDATER] Auto-update désactivé (repo privé)');
-    return;
-
-    // log.info('[UPDATER] Vérification des mises à jour...');
-    // autoUpdater.checkForUpdatesAndNotify();
+    if (!process.env.AUTO_UPDATE_FEED_URL) {
+      log.info('[UPDATER] AUTO_UPDATE_FEED_URL absent — auto-update désactivé');
+      return;
+    }
+    log.info('[UPDATER] Vérification des mises à jour…', { feed: process.env.AUTO_UPDATE_FEED_URL });
+    autoUpdater.checkForUpdatesAndNotify().catch((err) => {
+      log.error('[UPDATER] checkForUpdatesAndNotify failed', err);
+    });
   }
 
   /**

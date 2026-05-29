@@ -275,16 +275,20 @@ portable:
   artifactName: "${productName}-${version}-portable.exe"
 
 # ============================================================================
-# PUBLICATION - GitHub Releases (Auto-Update)
+# PUBLICATION - Cloudflare R2 (Auto-Update)
 # ============================================================================
-# Doc: https://www.electron.build/configuration/publish
-# Provider: GitHub Releases (gratuit, standard)
-# Usage: npm run build:electron -- --publish always
+# Doc: https://www.electron.build/configuration/publish#generic-server
+#
+# Provider: générique S3-compatible (R2). Configure ces vars dans .env.production :
+#   AUTO_UPDATE_FEED_URL=https://pub-xxx.r2.dev/updates
+# Le build doit aussi publier sur R2 via aws-cli ou rclone (script à part).
+#
+# Pour publier : `npm run build:electron -- --publish never` produit les artefacts
+# (.exe/.zip + latest.yml). On les uploade ensuite manuellement / via CI sur le bucket R2.
 publish:
-  - provider: github
-    owner: jeromeleyssard-pixel
-    repo: atelier-velo-plus
-    releaseType: release  # ou 'draft' pour releases brouillons
+  - provider: generic
+    url: ${env.AUTO_UPDATE_FEED_URL}
+    channel: latest
 
 # ============================================================================
 # COMPRESSION - STORE (Installation Rapide)
