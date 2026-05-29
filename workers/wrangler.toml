@@ -1,0 +1,33 @@
+name = "atelier-velo-api"
+main = "src/index.ts"
+compatibility_date = "2026-05-01"
+compatibility_flags = ["nodejs_compat"]
+
+# D1 database (SQLite serverless) pour Order + PurchaseToken
+[[d1_databases]]
+binding = "DB"
+database_name = "atelier-velo-orders"
+database_id = "REMPLACER_APRES_wrangler_d1_create"
+
+# Secrets (à définir via `wrangler secret put NOM`) :
+#   STRIPE_SECRET_KEY                 sk_test_… ou sk_live_…
+#   STRIPE_WEBHOOK_SECRET             whsec_…
+#   STRIPE_PRICE_BASIQUE              price_…
+#   STRIPE_PRICE_PRO                  price_…
+#   STRIPE_PRICE_PRO_LIFETIME         price_…
+#   LICENSE_PRIVATE_KEY_PEM           PEM RSA complet (\n échappés ok)
+#   RESEND_API_KEY                    re_…
+#   EMAIL_FROM                        onboarding@…
+#   APP_PUBLIC_URL                    https://tarifs.tondomaine.fr (URL des pages tarifs)
+
+[vars]
+APP_NAME = "Atelier Vélo+"
+
+# Environnement de production (clés live)
+[env.production]
+name = "atelier-velo-api-prod"
+
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "atelier-velo-orders-prod"
+database_id = "REMPLACER_APRES_wrangler_d1_create"

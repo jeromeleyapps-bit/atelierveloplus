@@ -1,0 +1,23 @@
+{
+  "name": "atelier-velo-workers",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "deploy:prod": "wrangler deploy --env production",
+    "tail": "wrangler tail",
+    "db:migrate": "wrangler d1 migrations apply DB",
+    "db:migrate:prod": "wrangler d1 migrations apply DB --env production"
+  },
+  "dependencies": {
+    "stripe": "^22.2.0",
+    "itty-router": "^5.0.18"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240909.0",
+    "typescript": "^5.6.2",
+    "wrangler": "^3.78.0"
+  }
+}
