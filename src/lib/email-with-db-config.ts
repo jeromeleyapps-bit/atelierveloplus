@@ -36,8 +36,7 @@ export async function determineEmailProvider(): Promise<string> {
   // 2. Fallback .env
   const envProvider = (process.env.MAIL_PROVIDER || '').toLowerCase();
   if (envProvider === 'gmail') return 'gmail';
-  if (envProvider === 'resend') return 'resend';
-  
+
   // 3. Détecter depuis SMTP_HOST
   const smtpHost = (process.env.SMTP_HOST || '').toLowerCase();
   if (smtpHost.includes('gmail')) return 'gmail';
@@ -216,91 +215,13 @@ export async function sendEmail(options: EmailOptions): Promise<void> {
     return;
   }
 
-  // 3. Fallback Resend via ENV
-  const from = process.env.EMAIL_FROM || 'onboarding@resend.dev';
-  if (!process.env.RESEND_API_KEY) {
-    throw new Error('No email configuration found (DB SMTP, Gmail ENV, or Resend)');
-  }
-
-  const payload: {
-    from: string;
-    to: string | string[];
-    subject: string;
-    html?: string;
-    text?: string;
-    attachments?: Array<{ filename: string; content: string | Buffer }>;
-  } = {
-    from,
-    to: [options.to],
-    subject: options.subject,
-    html: options.html,
-  };
-
-  if (options.attachments && options.attachments.length > 0) {
-    payload.attachments = options.attachments.map(att => ({
-      filename: att.filename,
-      content: Buffer.from(att.content).toString('base64'),
-    }));
-  }
-
-  logger.info('📧 Envoi email via Resend à', { to: options.to });
-  const response = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(payload),
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    logger.error('❌ Erreur Resend', { error: errorText });
-    
-    // ✅ TRACING: Enregistrer l'erreur dans Communication
-    try {
-      await logEmail({
-        to: options.to,
-        subject: options.subject,
-        html: options.html,
-        provider: 'resend',
-        type: 'email',
-        event: 'email_failed',
-        error: `Resend API error: ${errorText}`,
-        metadata: { 
-          attachments: options.attachments?.map(a => a.filename) || [],
-          source: 'env',
-          statusCode: response.status 
-        },
-      });
-    } catch (logError) {
-      const errorMessage = logError instanceof Error ? logError.message : String(logError);
-      logger.error('[email-with-db-config] Error logging failed email', { error: errorMessage });
-    }
-    
-    throw new Error(`Resend API error: ${errorText}`);
-  }
-  const result = await response.json();
-  logger.info('✅ Email envoyé via Resend - ID', { id: result.id });
-  
-  // ✅ TRACING: Enregistrer l'email dans Communication
-  try {
-    await logEmail({
-      to: options.to,
-      subject: options.subject,
-      html: options.html,
-      provider: 'resend',
-      messageId: result.id,
-      type: 'email',
-      event: 'email_sent',
-      metadata: { 
-        attachments: options.attachments?.map(a => a.filename) || [],
-        source: 'env' 
-      },
-    });
-  } catch (logError) {
-    logger.error('[email-with-db-config] Error logging email:', logError);
-  }
+  // 3. Aucune config trouvée.
+  // Note (Sprint 5) : le fallback Resend a été retiré de l'app Electron. Chaque atelier
+  // configure son propre SMTP via Paramètres → Configuration Email. Resend n'est plus
+  // utilisé que côté Worker Cloudflare (envoi des codes d'activation de licence par l'éditeur).
+  throw new Error(
+    "Aucune configuration email trouvée. Configurez votre SMTP dans Paramètres → Configuration Email (SMTP)."
+  );
 }
 
 /**
