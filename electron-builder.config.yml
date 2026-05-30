@@ -291,7 +291,6 @@ portable:
 #   - provider: generic
 #     url: ${env.AUTO_UPDATE_FEED_URL}
 publish: null
-    channel: latest
 
 # ============================================================================
 # COMPRESSION - STORE (Installation Rapide)
