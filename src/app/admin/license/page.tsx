@@ -36,9 +36,11 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import WarningIcon from '@mui/icons-material/Warning';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import type { LicenseInfo } from '@/lib/license-manager';
+import { useAdvancedMode } from '@/hooks/useAdvancedMode';
 import { logger } from '@/lib/logger';
 
 export default function LicensePage() {
+  const [advancedMode] = useAdvancedMode();
   const [license, setLicense] = useState<LicenseInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [activating, setActivating] = useState(false);
@@ -218,19 +220,15 @@ export default function LicensePage() {
           {/* Sprint 2 : activation d'un code d'achat Stripe (flow Token → clé). */}
           <RedeemPurchaseTokenCard onActivated={() => fetchLicense()} />
 
-          {/* ✅ FIX PC3: Champ d'activation en haut pour être visible immédiatement */}
-          {/* Activer une clé existante - TOUJOURS VISIBLE */}
-          <Paper 
-            sx={{ 
-              p: 3, 
-              bgcolor: '#fff3e0', 
-              borderLeft: 4, 
+          {/* Saisie manuelle d'une clé de licence — réservée au mode avancé / SAV.
+              Le client normal utilise la carte "Activer un code d'achat" ci-dessus. */}
+          {advancedMode && (
+          <Paper
+            sx={{
+              p: 3,
+              bgcolor: '#fff3e0',
+              borderLeft: 4,
               borderColor: '#ff9800',
-              position: 'relative', // Pour forcer le rendu
-              zIndex: 1000, // Pour être au-dessus de tout
-              display: 'block', // Forcer l'affichage
-              visibility: 'visible', // Forcer la visibilité
-              opacity: 1 // Forcer l'opacité
             }}
           >
             <Stack spacing={2}>
@@ -278,6 +276,7 @@ export default function LicensePage() {
               </Button>
             </Stack>
           </Paper>
+          )}
 
           {/* ✅ Rappel harmonieux jours restants (remplace l'ancienne section "Licence active") */}
           {license && (license.tier || license.isTrial) && (
