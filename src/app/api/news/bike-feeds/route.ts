@@ -46,13 +46,56 @@ const BIKE_FEEDS = [
     name: 'VTTAE.fr',
     url: 'https://vttae.fr/feed/',
     category: 'VTTAE'
+  },
+
+  // Candidats ajoutés (mai 2026). Un flux indisponible est automatiquement ignoré
+  // (parseFeed renvoie [] en cas d'échec → l'article n'apparaît pas). Aucun risque
+  // d'erreur affichée : on peut donc en proposer largement.
+  {
+    name: 'Matos Vélo',
+    url: 'https://www.matosvelo.com/feed/',
+    category: 'Matériel'
+  },
+  {
+    name: '3bikes',
+    url: 'https://www.3bikes.fr/feed/',
+    category: 'Matériel'
+  },
+  {
+    name: 'UltimateBike',
+    url: 'https://ultimatebike.cc/feed/',
+    category: 'Matériel'
+  },
+  {
+    name: 'Bike Avenue',
+    url: 'https://www.bikeavenue.fr/feed/',
+    category: 'Route'
+  },
+  {
+    name: 'Vélo Channel',
+    url: 'https://www.velochannel.com/feed/',
+    category: 'Actu'
+  },
+  {
+    name: 'Le Gruppetto',
+    url: 'https://legruppetto.com/feed/',
+    category: 'Pro'
+  },
+  {
+    name: 'Vojo',
+    url: 'https://www.vojomag.com/feed/',
+    category: 'VTT'
+  },
+  {
+    name: 'Bikepacking.fr',
+    url: 'https://bikepacking.fr/feed/',
+    category: 'Bikepacking'
   }
-  
+
   // FLUX SUPPRIMÉS (404/fetch failed - Nov 2025):
   // - Bike Café (fetch failed)
   // - Vélo Vert (404)
   // - Direct Vélo (404)
-  // - Vojo Magazine (fetch failed)
   // - Enduro Tribe (fetch failed)
   // - Lecyclo.com (404)
 ];
