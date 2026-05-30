@@ -65,6 +65,31 @@ interface FeedItem {
   pubDate: string;
 }
 
+// Entités HTML nommées les plus courantes dans les flux RSS.
+const NAMED_ENTITIES: Record<string, string> = {
+  amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ',
+  laquo: '«', raquo: '»', hellip: '…', mdash: '—', ndash: '–',
+  rsquo: '’', lsquo: '‘', ldquo: '“', rdquo: '”', eacute: 'é',
+  egrave: 'è', agrave: 'à', ccedil: 'ç', ocirc: 'ô', ecirc: 'ê',
+  acirc: 'â', icirc: 'î', ucirc: 'û', euml: 'ë', iuml: 'ï',
+  uuml: 'ü', ouml: 'ö', auml: 'ä', ugrave: 'ù', times: '×', deg: '°',
+};
+
+/**
+ * Décode toutes les entités HTML d'une chaîne : nommées, numériques décimales
+ * (&#8211;) et hexadécimales (&#x2013;). Supprime aussi les balises résiduelles.
+ */
+function decodeHtmlEntities(input: string): string {
+  return input
+    .replace(/<[^>]+>/g, '') // tags HTML résiduels
+    .replace(/&#x([0-9a-fA-F]+);/g, (_, hex) => String.fromCodePoint(parseInt(hex, 16)))
+    .replace(/&#(\d+);/g, (_, dec) => String.fromCodePoint(parseInt(dec, 10)))
+    .replace(/&([a-zA-Z][a-zA-Z0-9]*);/g, (m, name) =>
+      Object.prototype.hasOwnProperty.call(NAMED_ENTITIES, name) ? NAMED_ENTITIES[name] : m,
+    )
+    .trim();
+}
+
 async function parseFeed(feedUrl: string, source: string, category: string): Promise<FeedItem[]> {
   try {
     logger.info(`[RSS] Fetching ${source} from ${feedUrl}...`);
@@ -120,17 +145,9 @@ async function parseFeed(feedUrl: string, source: string, category: string): Pro
         itemXml.match(/<published[^>]*>(.*?)<\/published>/s);
       
       if (titleMatch && linkMatch) {
-        // Nettoyer le titre (decode HTML entities basiques)
-        const title = titleMatch[1].trim()
-          .replace(/&amp;/g, '&')
-          .replace(/&lt;/g, '<')
-          .replace(/&gt;/g, '>')
-          .replace(/&quot;/g, '"')
-          .replace(/&#8217;/g, "'")
-          .replace(/&#8220;/g, '"')
-          .replace(/&#8221;/g, '"')
-          .replace(/<[^>]+>/g, ''); // Supprimer tags HTML
-        
+        // Décodage complet des entités HTML (nommées + numériques déc/hex)
+        const title = decodeHtmlEntities(titleMatch[1]);
+
         items.push({
           title,
           link: linkMatch[1].trim(),
