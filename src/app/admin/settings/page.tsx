@@ -4,6 +4,7 @@
 import { useSystemSettings } from '@/hooks/useSystemSettings';
 import { useSystemSettingsUI } from '@/hooks/useSystemSettingsUI';
 import { useSystemSettingsMutations } from '@/hooks/useSystemSettingsMutations';
+import { useAdvancedMode } from '@/hooks/useAdvancedMode';
 import { useEffect, useRef } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -40,6 +41,7 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 
 export default function AdminSettingsPage() {
   // ✅ Hooks personnalisés
+  const [advancedMode, setAdvancedMode] = useAdvancedMode();
   const settingsData = useSystemSettings();
   const settingsUI = useSystemSettingsUI();
   const settingsMutations = useSystemSettingsMutations({
@@ -193,12 +195,30 @@ export default function AdminSettingsPage() {
 
   return (
     <Box sx={{ p: 3 }}>
-      <Typography variant="h4" gutterBottom>
-        {"Paramètres Administrateur"}
-      </Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-        {"Configuration avancée du système et des intégrations"}
-      </Typography>
+      <Stack direction="row" justifyContent="space-between" alignItems="flex-start" flexWrap="wrap">
+        <Box>
+          <Typography variant="h4" gutterBottom>
+            Paramètres
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+            Email, sauvegardes, encaissement et options de l&apos;atelier.
+          </Typography>
+        </Box>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={advancedMode}
+              onChange={(e) => setAdvancedMode(e.target.checked)}
+            />
+          }
+          label="Mode avancé"
+        />
+      </Stack>
+      {advancedMode && (
+        <Alert severity="info" sx={{ mb: 2 }}>
+          Mode avancé activé : les options techniques (sécurité, identifiants machine, maintenance) sont affichées.
+        </Alert>
+      )}
 
       {error && <Alert severity="error" sx={{ mb: 2 }} onClose={() => settingsUI.setError('')}>{error}</Alert>}
       {success && <Alert severity="success" sx={{ mb: 2 }} onClose={() => settingsUI.setSuccess('')}>{success}</Alert>}
@@ -375,10 +395,10 @@ export default function AdminSettingsPage() {
           />
         </Grid>
 
-        {/* Section 2: Sécurité & Maintenance */}
+        {/* Section 2: Sauvegardes */}
         <Grid item xs={12}>
           <Typography variant="h6" gutterBottom sx={{ mb: 2, mt: 2, fontWeight: 'bold', color: 'primary.main' }}>
-            {"Sécurité & Maintenance"}
+            Sauvegardes
           </Typography>
         </Grid>
 
@@ -387,8 +407,8 @@ export default function AdminSettingsPage() {
           <Card sx={{ height: '100%' }}>
             <CardHeader
               avatar={<BackupIcon color="primary" />}
-              title="Maintenance & Sauvegardes"
-              subheader="Gestion des backups et maintenance"
+              title="Sauvegardes de données"
+              subheader="Backups automatiques et restauration"
             />
             <CardContent>
               <Typography variant="subtitle2" gutterBottom fontWeight="bold">
@@ -409,62 +429,66 @@ export default function AdminSettingsPage() {
                 Gérer les sauvegardes
               </Button>
 
-              <Divider sx={{ my: 2 }} />
+              {advancedMode && (
+                <>
+                  <Divider sx={{ my: 2 }} />
 
-              <Typography variant="subtitle2" gutterBottom fontWeight="bold">
-                Suppression Définitive
-              </Typography>
-              <Alert severity="warning" sx={{ mb: 2 }}>
-                <Typography variant="body2">
-                  <strong>Attention :</strong> Supprime définitivement sans récupération possible.
-                </Typography>
-              </Alert>
+                  <Typography variant="subtitle2" gutterBottom fontWeight="bold">
+                    Suppression Définitive
+                  </Typography>
+                  <Alert severity="warning" sx={{ mb: 2 }}>
+                    <Typography variant="body2">
+                      <strong>Attention :</strong> Supprime définitivement sans récupération possible.
+                    </Typography>
+                  </Alert>
 
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={hardDeleteEnabled}
-                    color="error"
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={hardDeleteEnabled}
+                        color="error"
+                      />
+                    }
+                    label={`Suppression définitive ${hardDeleteEnabled ? 'activée' : 'désactivée'}`}
+                    disabled
                   />
-                }
-                label={`Suppression définitive ${hardDeleteEnabled ? 'activée' : 'désactivée'}`}
-                disabled
-              />
 
-              {!hardDeleteEnabled && (
-                <Box sx={{ mt: 2 }}>
-                  <TextField
-                    fullWidth
-                    label='Tapez "CONFIRMER" pour activer'
-                    value={hardDeleteConfirmation}
-                    onChange={(e) => setHardDeleteConfirmation(e.target.value)}
-                    sx={{ mb: 2 }}
-                  />
-                  <Button
-                    variant="outlined"
-                    color="error"
-                    startIcon={hardDeleteLoading ? <CircularProgress size={20} /> : null}
-                    onClick={handleToggleHardDelete}
-                    disabled={hardDeleteConfirmation !== 'CONFIRMER' || hardDeleteLoading}
-                    fullWidth
-                  >
-                    Activer la suppression définitive
-                  </Button>
-                </Box>
-              )}
+                  {!hardDeleteEnabled && (
+                    <Box sx={{ mt: 2 }}>
+                      <TextField
+                        fullWidth
+                        label='Tapez "CONFIRMER" pour activer'
+                        value={hardDeleteConfirmation}
+                        onChange={(e) => setHardDeleteConfirmation(e.target.value)}
+                        sx={{ mb: 2 }}
+                      />
+                      <Button
+                        variant="outlined"
+                        color="error"
+                        startIcon={hardDeleteLoading ? <CircularProgress size={20} /> : null}
+                        onClick={handleToggleHardDelete}
+                        disabled={hardDeleteConfirmation !== 'CONFIRMER' || hardDeleteLoading}
+                        fullWidth
+                      >
+                        Activer la suppression définitive
+                      </Button>
+                    </Box>
+                  )}
 
-              {hardDeleteEnabled && (
-                <Button
-                  variant="contained"
-                  color="error"
-                  startIcon={hardDeleteLoading ? <CircularProgress size={20} /> : null}
-                  onClick={handleToggleHardDelete}
-                  disabled={hardDeleteLoading}
-                  sx={{ mt: 2 }}
-                  fullWidth
-                >
-                  Désactiver
-                </Button>
+                  {hardDeleteEnabled && (
+                    <Button
+                      variant="contained"
+                      color="error"
+                      startIcon={hardDeleteLoading ? <CircularProgress size={20} /> : null}
+                      onClick={handleToggleHardDelete}
+                      disabled={hardDeleteLoading}
+                      sx={{ mt: 2 }}
+                      fullWidth
+                    >
+                      Désactiver
+                    </Button>
+                  )}
+                </>
               )}
             </CardContent>
           </Card>
@@ -526,56 +550,58 @@ export default function AdminSettingsPage() {
           </Card>
         </Grid>
 
-        {/* Paramètres de Sécurité */}
-        <Grid item xs={12} md={6}>
-          <Card sx={{ height: '100%' }}>
-            <CardHeader
-              avatar={<SecurityIcon color="primary" />}
-              title="Paramètres de Sécurité"
-              subheader="Options de sécurité avancées"
-            />
-            <CardContent>
-              <Stack spacing={2}>
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={requireAdmin2FA}
-                      onChange={(e) => handleToggleSecuritySetting('requireAdmin2FA', e.target.checked, setRequireAdmin2FA)}
-                    />
-                  }
-                  label="Exiger authentification 2FA pour admin"
-                />
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={activityLogsEnabled}
-                      onChange={(e) => handleToggleSecuritySetting('activityLogsEnabled', e.target.checked, setActivityLogsEnabled)}
-                    />
-                  }
-                  label={"Logs d'activité détaillés"}
-                />
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={maintenanceMode}
-                      onChange={(e) => handleToggleSecuritySetting('maintenanceMode', e.target.checked, setMaintenanceMode)}
-                    />
-                  }
-                  label="Mode maintenance"
-                />
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={securityAlertsEnabled}
-                      onChange={(e) => handleToggleSecuritySetting('securityAlertsEnabled', e.target.checked, setSecurityAlertsEnabled)}
-                    />
-                  }
-                  label="Notifications email pour activité suspecte"
-                />
-              </Stack>
-            </CardContent>
-          </Card>
-        </Grid>
+        {/* Paramètres de Sécurité — réservés au mode avancé */}
+        {advancedMode && (
+          <Grid item xs={12} md={6}>
+            <Card sx={{ height: '100%' }}>
+              <CardHeader
+                avatar={<SecurityIcon color="primary" />}
+                title="Paramètres de Sécurité"
+                subheader="Options de sécurité avancées"
+              />
+              <CardContent>
+                <Stack spacing={2}>
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={requireAdmin2FA}
+                        onChange={(e) => handleToggleSecuritySetting('requireAdmin2FA', e.target.checked, setRequireAdmin2FA)}
+                      />
+                    }
+                    label="Exiger authentification 2FA pour admin"
+                  />
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={activityLogsEnabled}
+                        onChange={(e) => handleToggleSecuritySetting('activityLogsEnabled', e.target.checked, setActivityLogsEnabled)}
+                      />
+                    }
+                    label={"Logs d'activité détaillés"}
+                  />
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={maintenanceMode}
+                        onChange={(e) => handleToggleSecuritySetting('maintenanceMode', e.target.checked, setMaintenanceMode)}
+                      />
+                    }
+                    label="Mode maintenance"
+                  />
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={securityAlertsEnabled}
+                        onChange={(e) => handleToggleSecuritySetting('securityAlertsEnabled', e.target.checked, setSecurityAlertsEnabled)}
+                      />
+                    }
+                    label="Notifications email pour activité suspecte"
+                  />
+                </Stack>
+              </CardContent>
+            </Card>
+          </Grid>
+        )}
       </Grid>
 
       {/* Dialog de configuration tunnel */}
