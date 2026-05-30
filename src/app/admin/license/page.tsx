@@ -213,7 +213,7 @@ export default function LicensePage() {
       <PageShell title="Gestion de Licence" headerColor="#9c27b0">
         <Stack spacing={4}>
           {/* Sprint 2 : activation d'un code d'achat Stripe (flow Token → clé). */}
-          <RedeemPurchaseTokenCard onSuccess={(key) => setLicenseKey(key)} />
+          <RedeemPurchaseTokenCard onActivated={() => fetchLicense()} />
 
           {/* ✅ FIX PC3: Champ d'activation en haut pour être visible immédiatement */}
           {/* Activer une clé existante - TOUJOURS VISIBLE */}
