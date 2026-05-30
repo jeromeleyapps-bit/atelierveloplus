@@ -201,8 +201,11 @@ export default function LicensePage() {
   const currentTier = license?.tier || 'basique';
   const isTrial = license?.isTrial || false;
 
-  // Lien unique pour tous les achats de licences
-  const PURCHASE_URL = 'https://upgradedbikes.com/index.php/produit/logiciel-atelier-velo/';
+  // Lien d'achat : page tarifs (checkout Stripe automatique). Configurable via env,
+  // fallback sur l'ancienne boutique si non défini.
+  const PURCHASE_URL =
+    process.env.NEXT_PUBLIC_PURCHASE_URL ||
+    'https://upgradedbikes.com/index.php/produit/logiciel-atelier-velo/';
 
   const handleBuyLicense = () => {
     window.open(PURCHASE_URL, '_blank');
