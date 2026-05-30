@@ -2,6 +2,7 @@
 
 import { useAccountData } from '@/hooks/useAccountData';
 import { useLogoUpload } from '@/hooks/useLogoUpload';
+import { useAdvancedMode } from '@/hooks/useAdvancedMode';
 import { useState, useEffect } from "react";
 import { useAuth } from "../auth/AuthContext";
 import { useRouter } from "next/navigation";
@@ -54,6 +55,7 @@ export default function AccountPage() {
     severity: 'success' | 'error';
   }>({ open: false, message: '', severity: 'success' });
   const [license, setLicense] = useState<{ tier: string; status: string; isTrial?: boolean; trial?: { endsAt: string; daysRemaining?: number }; features?: Record<string, boolean> } | null>(null);
+  const [advancedMode] = useAdvancedMode();
   const [hardwareId, setHardwareId] = useState<string | null>(null);
   const [hardwareIdCopied, setHardwareIdCopied] = useState(false);
 
@@ -238,14 +240,16 @@ export default function AccountPage() {
                       </Typography>
                     </Box>
                   )}
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Typography variant="body2" color="text.secondary" sx={{ minWidth: 80 }}>
-                      User ID:
-                    </Typography>
-                    <Typography variant="body2" sx={{ fontFamily: 'monospace', color: 'text.secondary' }}>
-                      {user.id}
-                    </Typography>
-                  </Box>
+                  {advancedMode && (
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Typography variant="body2" color="text.secondary" sx={{ minWidth: 80 }}>
+                        User ID:
+                      </Typography>
+                      <Typography variant="body2" sx={{ fontFamily: 'monospace', color: 'text.secondary' }}>
+                        {user.id}
+                      </Typography>
+                    </Box>
+                  )}
                 </Stack>
               </Box>
 
@@ -338,11 +342,11 @@ export default function AccountPage() {
                 </Box>
               )}
 
-              {/* Identifiant Machine - Pour activation de licence */}
-              {hardwareId && (
+              {/* Identifiant Machine — technique, réservé au mode avancé / support */}
+              {hardwareId && advancedMode && (
                 <Box>
                   <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1.5 }}>
-                    IDENTIFIANT MACHINE
+                    IDENTIFIANT MACHINE (support)
                   </Typography>
                   <Paper
                     elevation={0}
@@ -359,7 +363,7 @@ export default function AccountPage() {
                         <ComputerIcon sx={{ fontSize: 24, color: '#757575' }} />
                         <Box sx={{ flex: 1 }}>
                           <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
-                            Code à communiquer pour obtenir votre licence
+                            Identifiant de cette machine
                           </Typography>
                           <Typography 
                             variant="h6" 
@@ -390,8 +394,8 @@ export default function AccountPage() {
                       </Box>
                       <Alert severity="info" sx={{ py: 0.5 }}>
                         <Typography variant="caption">
-                          Cet identifiant unique est lié à votre ordinateur. Communiquez-le lors de l&apos;achat 
-                          de votre licence pour recevoir une clé d&apos;activation personnalisée.
+                          Identifiant unique de cet ordinateur. Utile uniquement pour le support
+                          en cas de transfert de licence vers un nouveau matériel.
                         </Typography>
                       </Alert>
                     </Stack>
