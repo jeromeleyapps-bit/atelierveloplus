@@ -665,7 +665,7 @@ export default function AdminPage() {
                     </ListItem>
                     <ListItem sx={{ py: 0 }}>
                       <ListItemText 
-                        primary="• Limitez l&apos;accès physique à la machine hébergeant l&apos;application"
+                        primary="• Limitez l'accès physique à la machine hébergeant l'application"
                         primaryTypographyProps={{ variant: 'body2' }}
                       />
                     </ListItem>
@@ -866,7 +866,7 @@ export default function AdminPage() {
             fullWidth
             sx={{ mb: 1 }}
           >
-            {diagnosticsLoading ? 'Envoi en cours...' : 'Envoyer les journaux d&apos;erreurs au support'}
+            {diagnosticsLoading ? 'Envoi en cours...' : "Envoyer les journaux d'erreurs au support"}
           </Button>
           
           <Button

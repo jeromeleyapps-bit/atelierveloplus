@@ -43,7 +43,7 @@ import SecurityIcon from "@mui/icons-material/Security";
 export default function GuidePage() {
   return (
     <RequireAuth>
-      <PageShell title="Mode d&apos;Emploi">
+      <PageShell title="Mode d'Emploi">
         {/* Header */}
           <Box sx={{ mb: 4 }}>
             <Button
