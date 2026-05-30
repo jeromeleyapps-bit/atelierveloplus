@@ -48,28 +48,18 @@ const BIKE_FEEDS = [
     category: 'VTTAE'
   },
 
-  // Candidats ajoutés (mai 2026). Un flux indisponible est automatiquement ignoré
-  // (parseFeed renvoie [] en cas d'échec → l'article n'apparaît pas). Aucun risque
-  // d'erreur affichée : on peut donc en proposer largement.
-  {
-    name: 'Matos Vélo',
-    url: 'https://www.matosvelo.com/feed/',
-    category: 'Matériel'
-  },
+  // Candidats ajoutés mai 2026 — TOUS vérifiés actifs (test live des flux).
+  // Un flux qui tomberait en panne est de toute façon ignoré automatiquement
+  // (parseFeed renvoie [] → l'article n'apparaît pas, aucune erreur affichée).
   {
     name: '3bikes',
     url: 'https://www.3bikes.fr/feed/',
     category: 'Matériel'
   },
   {
-    name: 'UltimateBike',
-    url: 'https://ultimatebike.cc/feed/',
-    category: 'Matériel'
-  },
-  {
-    name: 'Bike Avenue',
-    url: 'https://www.bikeavenue.fr/feed/',
-    category: 'Route'
+    name: 'Vojo',
+    url: 'https://www.vojomag.com/feed/',
+    category: 'VTT'
   },
   {
     name: 'Vélo Channel',
@@ -78,26 +68,28 @@ const BIKE_FEEDS = [
   },
   {
     name: 'Le Gruppetto',
-    url: 'https://legruppetto.com/feed/',
+    url: 'https://legruppetto.fr/feed/',
+    category: 'Pro'
+  },
+
+  // Flux internationaux (anglais) — vérifiés actifs.
+  {
+    name: 'CyclingNews',
+    url: 'https://www.cyclingnews.com/rss/',
     category: 'Pro'
   },
   {
-    name: 'Vojo',
-    url: 'https://www.vojomag.com/feed/',
-    category: 'VTT'
-  },
-  {
-    name: 'Bikepacking.fr',
-    url: 'https://bikepacking.fr/feed/',
-    category: 'Bikepacking'
+    name: 'road.cc',
+    url: 'https://road.cc/rss',
+    category: 'Route'
   }
 
-  // FLUX SUPPRIMÉS (404/fetch failed - Nov 2025):
-  // - Bike Café (fetch failed)
-  // - Vélo Vert (404)
-  // - Direct Vélo (404)
-  // - Enduro Tribe (fetch failed)
-  // - Lecyclo.com (404)
+  // FLUX TESTÉS NON RETENUS (mai 2026) :
+  // - Matos Vélo (réponse vide) · UltimateBike, Bike Avenue (connexion refusée)
+  // - Bikepacking.fr (certificat invalide) · BikeRadar (404, pas de flux public)
+  // - Pinkbike (403, bloque les bots)
+  // FLUX SUPPRIMÉS antérieurs (Nov 2025) : Bike Café, Vélo Vert, Direct Vélo,
+  // Enduro Tribe, Lecyclo.com (404 / fetch failed)
 ];
 
 interface FeedItem {
