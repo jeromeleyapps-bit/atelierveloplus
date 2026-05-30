@@ -54,7 +54,7 @@ const PageShell = memo(function PageShell({
         }}
       >
         <Typography variant="body2" color="text.secondary" align="center">
-          © {new Date().getFullYear()} Atelier Vélo+ - Upgraded Bikes | Jérôme Leyssard
+          © {new Date().getFullYear()} Atelier Vélo+ — Upgraded Bikes
         </Typography>
         <Typography variant="caption" color="text.secondary" align="center" display="block" sx={{ mt: 0.5 }}>
           Logiciel propriétaire protégé

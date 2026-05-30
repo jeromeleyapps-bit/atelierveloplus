@@ -36,7 +36,7 @@ const getMetadataBase = (): URL => {
 export const metadata: Metadata = {
   metadataBase: getMetadataBase(),
   title: "Atelier Vélo+ | Upgraded Bikes",
-  description: "Système de gestion d'atelier vélo - Copyright © 2024-2025 Jérôme Leyssard",
+  description: "Atelier Vélo+ — logiciel de gestion pour atelier de réparation vélo (Upgraded Bikes).",
   // Note: viewport + themeColor doivent être exportés via `export const viewport`
   // Pour éviter des warnings Next sur chaque route.
   icons: {

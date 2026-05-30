@@ -1371,16 +1371,6 @@ export default function GuidePage() {
             </AccordionDetails>
           </Accordion>
 
-          {/* Footer */}
-          <Box sx={{ mt: 4, mb: 2, textAlign: "center" }}>
-            <Divider sx={{ mb: 2 }} />
-            <Typography variant="body2" color="text.secondary">
-              Atelier Vélo+ v1.0.0 - © 2025 Jérôme Leyssard - Upgraded Bikes
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              Tous droits réservés - Dernière mise à jour: Novembre 2025
-            </Typography>
-          </Box>
       </PageShell>
     </RequireAuth>
   );

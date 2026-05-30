@@ -884,13 +884,6 @@ export default function AdminPage() {
             Email support: atelier-velo-plus@upgradedbikes.com
           </Typography>
         </Paper>
-
-        {/* Footer simplifié - Informations déjà dans PageShell */}
-        <Box sx={{ mt: 4, textAlign: "center" }}>
-          <Typography variant="caption" color="text.secondary">
-            Atelier Vélo+ v1.0.0 - © 2025 Jérôme Leyssard - Upgraded Bikes
-          </Typography>
-        </Box>
       </PageShell>
 
       {/* Wizard Configuration Atelier */}
