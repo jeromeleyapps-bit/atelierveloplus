@@ -187,13 +187,13 @@ extraResources:
 # ============================================================================
 win:
   target:
-    # DIR + ZIP: Crée unpacked ET archive zip
-    # NOTE: NSIS/portable désactivés car ENAMETOOLONG (ligne commande trop longue)
-    # L'utilisateur peut extraire le zip et lancer l'exe directement
+    # DIR: dossier décompressé (test local rapide).
+    # NSIS: vrai installateur Windows (.exe avec assistant). Réactivé mai 2026 —
+    # le mode standalone a réduit le nombre de fichiers (~2000) → plus d'ENAMETOOLONG.
     - target: dir
       arch:
         - x64
-    - target: zip
+    - target: nsis
       arch:
         - x64
   # MODE STANDALONE: Signature et rcedit désactivés (ENAMETOOLONG)
@@ -285,9 +285,12 @@ portable:
 #
 # Pour publier : `npm run build:electron -- --publish never` produit les artefacts
 # (.exe/.zip + latest.yml). On les uploade ensuite manuellement / via CI sur le bucket R2.
-publish:
-  - provider: generic
-    url: ${env.AUTO_UPDATE_FEED_URL}
+# Auto-update désactivé pour l'instant (pas encore de bucket R2 configuré).
+# À réactiver quand R2 sera en place :
+# publish:
+#   - provider: generic
+#     url: ${env.AUTO_UPDATE_FEED_URL}
+publish: null
     channel: latest
 
 # ============================================================================

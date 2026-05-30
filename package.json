@@ -33,7 +33,7 @@
     "dev:electron": "wait-on tcp:3000 && cross-env NODE_ENV=development electron .",
     "dev:next": "next dev -p 3000",
     "dev:all": "concurrently \"npm run dev:next\" \"npm run dev:electron\"",
-    "prebuild": "npx prisma generate",
+    "prebuild": "npx rimraf .next/cache && npx prisma generate",
     "build": "npx cross-env NODE_ENV=production next build",
     "postbuild": "node prepare-build-optimized.js",
     "postbuild:old": "node prepare-build.js",
