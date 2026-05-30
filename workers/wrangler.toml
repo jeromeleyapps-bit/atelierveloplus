@@ -3,11 +3,16 @@ main = "src/index.ts"
 compatibility_date = "2026-05-01"
 compatibility_flags = ["nodejs_compat"]
 
+# Compte Cloudflare propriétaire des workers (épinglé pour éviter toute ambiguïté multi-comptes).
+account_id = "6504582e534d21b0d3526993a0cb5864"
+
 # D1 database (SQLite serverless) pour Order + PurchaseToken
+# IMPORTANT : le `binding` DOIT rester "DB" — c'est le nom utilisé par le code (env.DB).
+# Le `database_name` peut être ce que tu veux.
 [[d1_databases]]
 binding = "DB"
 database_name = "atelier-velo-orders"
-database_id = "REMPLACER_APRES_wrangler_d1_create"
+database_id = "1e71586d-0d1b-4d91-8196-bbbfe5a9aab1"
 
 # Secrets (à définir via `wrangler secret put NOM`) :
 #   STRIPE_SECRET_KEY                 sk_test_… ou sk_live_…
@@ -30,4 +35,4 @@ name = "atelier-velo-api-prod"
 [[env.production.d1_databases]]
 binding = "DB"
 database_name = "atelier-velo-orders-prod"
-database_id = "REMPLACER_APRES_wrangler_d1_create"
+database_id = "775fc75d-d790-44e0-a957-2cf0b25c9434"
