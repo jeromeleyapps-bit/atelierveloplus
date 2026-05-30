@@ -881,7 +881,7 @@ export default function AdminPage() {
           </Button>
           
           <Typography variant="caption" color="text.secondary" display="block" textAlign="center">
-            Email support: jeromeley.apps@gmail.com
+            Email support: atelier-velo-plus@upgradedbikes.com
           </Typography>
         </Paper>
 

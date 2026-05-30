@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const supportEmail = process.env.SUPPORT_EMAIL || "jeromeley.apps@gmail.com";
+    const supportEmail = process.env.SUPPORT_EMAIL || "atelier-velo-plus@upgradedbikes.com";
 
     // Récupérer quelques informations atelier pour le contexte
     let shopName = "Atelier Vélo+";

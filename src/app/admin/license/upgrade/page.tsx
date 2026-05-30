@@ -388,7 +388,7 @@ export default function UpgradePage() {
                         📞 Besoin d&apos;aide pour choisir?
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
-                        Contactez-nous: jeromeley.apps@gmail.com ou +33 7 68 18 45 77
+                        Contactez-nous: atelier-velo-plus@upgradedbikes.com ou +33 7 68 18 45 77
                       </Typography>
                     </Box>
                   </Stack>

@@ -1251,7 +1251,7 @@ export default function GuidePage() {
               </Alert>
               
               <Alert severity="success" sx={{ mt: 2 }}>
-                <strong>Contact:</strong> jeromeley.apps@gmail.com
+                <strong>Contact:</strong> atelier-velo-plus@upgradedbikes.com
               </Alert>
             </AccordionDetails>
           </Accordion>
@@ -1267,9 +1267,9 @@ export default function GuidePage() {
             <Stack direction="row" spacing={2} flexWrap="wrap">
               <Chip
                 icon={<EmailIcon />}
-                label="jeromeley.apps@gmail.com"
+                label="atelier-velo-plus@upgradedbikes.com"
                 component="a"
-                href="mailto:jeromeley.apps@gmail.com"
+                href="mailto:atelier-velo-plus@upgradedbikes.com"
                 clickable
                 color="primary"
               />
