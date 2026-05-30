@@ -12,4 +12,5 @@ export interface Env {
   RESEND_API_KEY: string;
   EMAIL_FROM: string;
   APP_PUBLIC_URL: string;
+  ADMIN_SECRET: string; // protège les endpoints /support/* (éditeur)
 }

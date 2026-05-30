@@ -46,6 +46,8 @@
     "node_modules",
     "scripts",
     "scripts/**",
+    "workers",
+    "workers/**",
     "prisma/seed.cjs",
     "prisma/seed.js",
     "seed-communication-templates.ts",

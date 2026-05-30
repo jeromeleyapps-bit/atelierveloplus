@@ -24,6 +24,10 @@ export async function sendActivationEmail(
       </ol>
       <p>Tu peux aussi cliquer directement ici depuis le PC où l'app est installée :
         <a href="${activationUrl}">${activationUrl}</a></p>
+      <p style="background:#fff7ed;border:1px solid #fed7aa;padding:12px;border-radius:8px;font-size:14px">
+        <strong>⚠️ Conserve cet email.</strong> Ce code te permet de réinstaller le logiciel sur ce
+        même ordinateur. En cas de changement de matériel, contacte le support pour transférer ta licence.
+      </p>
     </div>`;
 
   const res = await fetch('https://api.resend.com/emails', {

@@ -209,6 +209,60 @@ router.post('/license/redeem', async (request: Request, env: Env) => {
   }
 });
 
+// ============================================================================
+// ENDPOINTS SUPPORT (éditeur) — protégés par x-admin-secret == env.ADMIN_SECRET
+// ============================================================================
+
+function isAdmin(request: Request, env: Env): boolean {
+  const provided = request.headers.get('x-admin-secret');
+  return !!env.ADMIN_SECRET && provided === env.ADMIN_SECRET;
+}
+
+// GET /support/lookup?email=...  → commandes + codes d'un client
+router.get('/support/lookup', async (request: Request, env: Env) => {
+  if (!isAdmin(request, env)) return json({ error: 'unauthorized' }, { status: 401 });
+  const url = new URL(request.url);
+  const email = url.searchParams.get('email');
+  if (!email) return json({ error: 'missing_email' }, { status: 400 });
+
+  const tokens = await env.DB
+    .prepare('SELECT token, tier, email, expires_at, redeemed_at, hardware_id, order_id FROM purchase_tokens WHERE email = ? ORDER BY created_at DESC')
+    .bind(email.trim().toLowerCase())
+    .all();
+  const orders = await env.DB
+    .prepare('SELECT id, tier, status, amount, currency, created_at FROM orders WHERE customer_email = ? ORDER BY created_at DESC')
+    .bind(email.trim().toLowerCase())
+    .all();
+
+  return json({ email, orders: orders.results, tokens: tokens.results });
+});
+
+// POST /support/reset-token  { token }  → libère le code pour réactivation sur nouveau matériel
+router.post('/support/reset-token', async (request: Request, env: Env) => {
+  if (!isAdmin(request, env)) return json({ error: 'unauthorized' }, { status: 401 });
+  const { token } = await request.json<{ token: string }>();
+  if (!token) return json({ error: 'missing_token' }, { status: 400 });
+
+  const normalized = token.trim().toUpperCase();
+  const row = await env.DB
+    .prepare('SELECT id, email, tier FROM purchase_tokens WHERE token = ?')
+    .bind(normalized)
+    .first<{ id: string; email: string; tier: string }>();
+  if (!row) return json({ error: 'token_not_found' }, { status: 404 });
+
+  // Réinitialise le lien matériel : le client pourra réactiver le même code sur son nouveau PC.
+  // On prolonge aussi la validité d'un an pour éviter une expiration côté transfert.
+  const newExpiry = new Date();
+  newExpiry.setUTCFullYear(newExpiry.getUTCFullYear() + 1);
+  await env.DB.prepare(`
+    UPDATE purchase_tokens
+    SET redeemed_at = NULL, license_key = NULL, hardware_id = NULL, expires_at = ?
+    WHERE id = ?
+  `).bind(newExpiry.toISOString(), row.id).run();
+
+  return json({ ok: true, token: normalized, email: row.email, tier: row.tier, message: 'Code réinitialisé : le client peut réactiver sur son nouveau matériel.' });
+});
+
 router.all('*', () => json({ error: 'not_found' }, { status: 404 }));
 
 export default {

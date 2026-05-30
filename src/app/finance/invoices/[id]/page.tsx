@@ -510,7 +510,7 @@ export default function InvoiceDetailPageNew() {
                         '&:hover': { bgcolor: '#4f46e5' },
                       }}
                     >
-                      {inv?.stripePaymentStatus === 'paid' ? 'Paiement Stripe (payée)' : 'Lien de paiement Stripe'}
+                      {(inv as { stripePaymentStatus?: string })?.stripePaymentStatus === 'paid' ? 'Paiement Stripe (payée)' : 'Lien de paiement Stripe'}
                     </Button>
                   )}
                 </Stack>
@@ -654,7 +654,7 @@ export default function InvoiceDetailPageNew() {
           open={stripePaymentOpen}
           invoiceId={inv.id}
           invoiceNumber={inv.number || inv.id}
-          customerEmail={inv.WorkOrder?.Customer?.email || null}
+          customerEmail={(inv as { workOrder?: { customer?: { email?: string | null } | null } })?.workOrder?.customer?.email || null}
           onClose={() => setStripePaymentOpen(false)}
           onPaid={() => {
             setToast({ open: true, message: 'Facture marquée comme payée.', severity: 'success' });

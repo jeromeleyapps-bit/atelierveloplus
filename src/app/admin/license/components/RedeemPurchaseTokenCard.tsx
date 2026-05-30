@@ -11,6 +11,10 @@ import Button from '@mui/material/Button';
 import Alert from '@mui/material/Alert';
 import CircularProgress from '@mui/material/CircularProgress';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { logger } from '@/lib/logger';
 
 interface Props {
@@ -32,7 +36,7 @@ export default function RedeemPurchaseTokenCard({ onActivated }: Props) {
   const [hardwareId, setHardwareId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [activated, setActivated] = useState<{ tier?: string } | null>(null);
+  const [activated, setActivated] = useState<{ tier?: string; key?: string } | null>(null);
 
   useEffect(() => {
     const fromUrl = params.get('token');
@@ -99,7 +103,7 @@ export default function RedeemPurchaseTokenCard({ onActivated }: Props) {
         throw new Error(activateData.message || 'Échec de l\'activation de la licence.');
       }
 
-      setActivated({ tier: redeemData.tier });
+      setActivated({ tier: redeemData.tier, key: redeemData.licenseKey });
       setCode('');
       onActivated?.();
     } catch (e) {
@@ -118,14 +122,43 @@ export default function RedeemPurchaseTokenCard({ onActivated }: Props) {
     return (
       <Card sx={{ borderLeft: 4, borderColor: 'success.main' }}>
         <CardContent>
-          <Stack direction="row" spacing={2} alignItems="center">
-            <CheckCircleIcon color="success" sx={{ fontSize: 40 }} />
-            <Stack>
-              <Typography variant="h6">Licence {tierLabel} activée 🎉</Typography>
-              <Typography variant="body2" color="text.secondary">
-                Tout est prêt. Tu peux profiter de l&apos;application.
-              </Typography>
+          <Stack spacing={2}>
+            <Stack direction="row" spacing={2} alignItems="center">
+              <CheckCircleIcon color="success" sx={{ fontSize: 40 }} />
+              <Stack>
+                <Typography variant="h6">Licence {tierLabel} activée 🎉</Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Tout est prêt. Tu peux profiter de l&apos;application.
+                </Typography>
+              </Stack>
             </Stack>
+
+            <Alert severity="info">
+              <strong>Conserve bien l&apos;email contenant ton code d&apos;activation.</strong> Il te
+              permettra de réinstaller le logiciel sur ce même ordinateur. En cas de changement de
+              matériel, contacte le support pour transférer ta licence.
+            </Alert>
+
+            {activated.key && (
+              <Accordion elevation={0} sx={{ bgcolor: 'transparent', '&:before': { display: 'none' } }}>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ px: 0 }}>
+                  <Typography variant="caption" color="text.secondary">
+                    Détails techniques (support)
+                  </Typography>
+                </AccordionSummary>
+                <AccordionDetails sx={{ px: 0 }}>
+                  <Typography variant="caption" color="text.secondary" component="div" gutterBottom>
+                    Clé de licence (à ne communiquer qu&apos;au support si demandé) :
+                  </Typography>
+                  <Typography
+                    component="div"
+                    sx={{ fontFamily: 'monospace', fontSize: 11, wordBreak: 'break-all', bgcolor: 'action.hover', p: 1, borderRadius: 1 }}
+                  >
+                    {activated.key}
+                  </Typography>
+                </AccordionDetails>
+              </Accordion>
+            )}
           </Stack>
         </CardContent>
       </Card>
