@@ -1,0 +1,21 @@
+# Déploiement de la page tarifs statique (Cloudflare Workers Assets).
+# Sert tarifs.upgradedbikes.com — projet "atelier-velo-tarifs".
+#
+# IMPORTANT : ce projet vit dans le compte Cloudflare DU DOMAINE upgradedbikes.com
+# (account 967b3a3e…), distinct du compte des workers API (6504582e…).
+# wrangler étant connecté par défaut à l'autre compte, on déploie avec un token API
+# du compte domaine (voir procédure ci-dessous).
+#
+# Déploiement (PowerShell, dans pages-tarifs/) :
+#   $env:CLOUDFLARE_API_TOKEN="<token Edit Workers du compte domaine 967b3a3e>"
+#   wrangler deploy
+#
+# Le fichier .assetsignore exclut les .md / .toml du déploiement public.
+
+name = "atelier-velo-tarifs"
+compatibility_date = "2026-06-01"
+account_id = "967b3a3e89ce01b779900c875c952e40"
+
+# Sert les fichiers statiques du dossier courant (index.html, success.html).
+[assets]
+directory = "."
