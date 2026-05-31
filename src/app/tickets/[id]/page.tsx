@@ -27,6 +27,7 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import CustomerCard from "@/app/components/CustomerCard";
 import BikeCard from "@/app/components/BikeCard";
 import FinancialSummaryCard from "@/app/components/FinancialSummaryCard";
+import WorkOrderSignatureCard from "@/app/components/WorkOrderSignatureCard";
 import LineItemsTable from "@/app/components/LineItemsTable";
 import LineItemSelector, { type LineItem } from "@/app/components/LineItemSelector";
 import CreateQuoteDialog from "@/app/finance/components/CreateQuoteDialog";
