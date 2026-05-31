@@ -15,9 +15,16 @@ export async function sendActivationEmail(
       <p style="font-family:monospace;font-size:22px;background:#f3f4f6;padding:16px;border-radius:8px;letter-spacing:2px;text-align:center">
         ${token}
       </p>
+      <p>Pas encore installé ? Télécharge l'application ici :</p>
+      <p style="text-align:center;margin:16px 0">
+        <a href="https://downloads.upgradedbikes.com/AtelierVeloPlus-Setup.exe"
+           style="display:inline-block;background:#1e6091;color:#fff;text-decoration:none;font-weight:700;padding:12px 24px;border-radius:8px">
+          ⬇ Télécharger pour Windows
+        </a>
+      </p>
       <p>Pour activer ta licence, depuis l'ordinateur où ${env.APP_NAME} est installé :</p>
       <ol>
-        <li>Ouvre ${env.APP_NAME} (ou télécharge-le si ce n'est pas déjà fait).</li>
+        <li>Ouvre ${env.APP_NAME}.</li>
         <li>Va dans <strong>Mon compte → Gérer ma licence</strong> (ou <strong>Paramètres → Licence</strong>).</li>
         <li>Dans la carte <strong>« Activer un code d'achat »</strong>, colle le code ci-dessus et clique sur <strong>Activer</strong>.</li>
       </ol>
