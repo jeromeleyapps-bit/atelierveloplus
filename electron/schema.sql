@@ -292,6 +292,11 @@ CREATE TABLE "Invoice" (
     "dueDate" DATETIME,
     "reminderCount" INTEGER NOT NULL DEFAULT 0,
     "lastReminderAt" DATETIME,
+    "stripePaymentLinkId" TEXT,
+    "stripePaymentLinkUrl" TEXT,
+    "stripePaymentIntentId" TEXT,
+    "stripePaymentStatus" TEXT,
+    "stripePaidAt" DATETIME,
     "validUntil" DATETIME,
     "convertedAt" DATETIME,
     "convertedToId" TEXT,
@@ -562,6 +567,13 @@ CREATE TABLE "WorkOrder" (
     "satisfactionEmailSentAt" DATETIME,
     "satisfactionRating" INTEGER,
     "satisfactionComment" TEXT,
+    "clientSignature" TEXT,
+    "clientSignedAt" DATETIME,
+    "clientSignedName" TEXT,
+    "intakeCondition" TEXT,
+    "intakeAccessories" TEXT,
+    "intakeSignature" TEXT,
+    "intakeSignedAt" DATETIME,
     CONSTRAINT "WorkOrder_calendarEventId_fkey" FOREIGN KEY ("calendarEventId") REFERENCES "CalendarEvent" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
     CONSTRAINT "WorkOrder_customerId_fkey" FOREIGN KEY ("customerId") REFERENCES "Customer" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
     CONSTRAINT "WorkOrder_bikeId_fkey" FOREIGN KEY ("bikeId") REFERENCES "CustomerBike" ("id") ON DELETE SET NULL ON UPDATE CASCADE
@@ -582,6 +594,42 @@ CREATE TABLE "WorkOrderLine" (
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" DATETIME NOT NULL,
     CONSTRAINT "WorkOrderLine_workOrderId_fkey" FOREIGN KEY ("workOrderId") REFERENCES "WorkOrder" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "ServicePackage" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "name" TEXT NOT NULL,
+    "description" TEXT,
+    "active" BOOLEAN NOT NULL DEFAULT true,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "ServicePackageLine" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "packageId" TEXT NOT NULL,
+    "type" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
+    "quantity" REAL NOT NULL DEFAULT 1,
+    "priceHT" REAL NOT NULL DEFAULT 0,
+    "vatRate" REAL NOT NULL DEFAULT 20,
+    "duration" INTEGER,
+    CONSTRAINT "ServicePackageLine_packageId_fkey" FOREIGN KEY ("packageId") REFERENCES "ServicePackage" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "Deposit" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "workOrderId" TEXT,
+    "invoiceId" TEXT,
+    "amount" REAL NOT NULL,
+    "method" TEXT,
+    "note" TEXT,
+    "receiptNumber" TEXT NOT NULL,
+    "refunded" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- CreateTable
@@ -609,7 +657,22 @@ CREATE TABLE "License" (
     "customerEmail" TEXT,
     "customerName" TEXT,
     "hardwareId" TEXT,
+    "lastExpirationEmailDays" INTEGER,
+    "lastMaintenanceEmailDays" INTEGER,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "StripeConnection" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "userId" TEXT NOT NULL,
+    "livemode" BOOLEAN NOT NULL DEFAULT false,
+    "publishableKey" TEXT NOT NULL,
+    "secretKeyEncrypted" TEXT NOT NULL,
+    "accountLabel" TEXT,
+    "status" TEXT NOT NULL DEFAULT 'active',
+    "connectedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" DATETIME NOT NULL
 );
 
@@ -823,7 +886,25 @@ CREATE INDEX "WorkOrderLine_type_idx" ON "WorkOrderLine"("type");
 CREATE INDEX "WorkOrderLine_workOrderId_idx" ON "WorkOrderLine"("workOrderId");
 
 -- CreateIndex
+CREATE INDEX "ServicePackageLine_packageId_idx" ON "ServicePackageLine"("packageId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Deposit_receiptNumber_key" ON "Deposit"("receiptNumber");
+
+-- CreateIndex
+CREATE INDEX "Deposit_workOrderId_idx" ON "Deposit"("workOrderId");
+
+-- CreateIndex
+CREATE INDEX "Deposit_invoiceId_idx" ON "Deposit"("invoiceId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "License_key_key" ON "License"("key");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "StripeConnection_userId_key" ON "StripeConnection"("userId");
+
+-- CreateIndex
+CREATE INDEX "StripeConnection_userId_idx" ON "StripeConnection"("userId");
 
 -- CreateIndex
 CREATE INDEX "LicenseVerification_licenseId_idx" ON "LicenseVerification"("licenseId");
