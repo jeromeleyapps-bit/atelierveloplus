@@ -28,6 +28,7 @@ import CustomerCard from "@/app/components/CustomerCard";
 import BikeCard from "@/app/components/BikeCard";
 import FinancialSummaryCard from "@/app/components/FinancialSummaryCard";
 import WorkOrderSignatureCard from "@/app/components/WorkOrderSignatureCard";
+import DepositCard from "@/app/components/DepositCard";
 import LineItemsTable from "@/app/components/LineItemsTable";
 import LineItemSelector, { type LineItem } from "@/app/components/LineItemSelector";
 import ForfaitSelector from "@/app/components/ForfaitSelector";
