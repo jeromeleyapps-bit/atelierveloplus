@@ -30,6 +30,7 @@ import FinancialSummaryCard from "@/app/components/FinancialSummaryCard";
 import WorkOrderSignatureCard from "@/app/components/WorkOrderSignatureCard";
 import LineItemsTable from "@/app/components/LineItemsTable";
 import LineItemSelector, { type LineItem } from "@/app/components/LineItemSelector";
+import ForfaitSelector from "@/app/components/ForfaitSelector";
 import CreateQuoteDialog from "@/app/finance/components/CreateQuoteDialog";
 import RequireAuth from "@/app/components/RequireAuth";
 
