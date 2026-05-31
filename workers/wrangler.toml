@@ -32,6 +32,9 @@ APP_NAME = "Atelier Vélo+"
 [env.production]
 name = "atelier-velo-api-prod"
 
+[env.production.vars]
+APP_NAME = "Atelier Vélo+"
+
 [[env.production.d1_databases]]
 binding = "DB"
 database_name = "atelier-velo-orders-prod"
