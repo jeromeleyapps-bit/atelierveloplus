@@ -635,6 +635,17 @@ model WorkOrder {
   satisfactionEmailSentAt   DateTime?
   satisfactionRating        Int?            // 1-5 stars
   satisfactionComment       String?
+
+  // V2-A — signature client (accord devis avant travaux)
+  clientSignature           String?         // PNG data URL (base64)
+  clientSignedAt            DateTime?
+  clientSignedName          String?
+  // V2-B — bon de dépôt (état du vélo à la prise en charge)
+  intakeCondition           String?
+  intakeAccessories         String?
+  intakeSignature           String?
+  intakeSignedAt            DateTime?
+
   Communication             Communication[]
   Invoice                   Invoice[]
   CalendarEvent             CalendarEvent?  @relation(fields: [calendarEventId], references: [id])
@@ -669,6 +680,47 @@ model WorkOrderLine {
 
   @@index([type])
   @@index([workOrderId])
+}
+
+/// V2-C — Forfait prédéfini : main d'œuvre + pièces regroupées, ajoutable en 1 clic.
+model ServicePackage {
+  id          String               @id @default(cuid())
+  name        String
+  description String?
+  active      Boolean              @default(true)
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+  lines       ServicePackageLine[]
+}
+
+model ServicePackageLine {
+  id             String         @id @default(cuid())
+  packageId      String
+  type           String         // "labor" | "part"
+  description    String
+  quantity       Float          @default(1)
+  priceHT        Float          @default(0)
+  vatRate        Float          @default(20)
+  duration       Int?
+  ServicePackage ServicePackage @relation(fields: [packageId], references: [id], onDelete: Cascade)
+
+  @@index([packageId])
+}
+
+/// V2-D — Acompte versé par un client. Génère un reçu, se déduit de la facture finale.
+model Deposit {
+  id            String   @id @default(cuid())
+  workOrderId   String?
+  invoiceId     String?
+  amount        Float
+  method        String?  // "cash" | "card" | "transfer" | "other"
+  note          String?
+  receiptNumber String   @unique
+  refunded      Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  @@index([workOrderId])
+  @@index([invoiceId])
 }
 
 model License {
