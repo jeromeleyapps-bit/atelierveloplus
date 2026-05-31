@@ -285,12 +285,14 @@ portable:
 #
 # Pour publier : `npm run build:electron -- --publish never` produit les artefacts
 # (.exe/.zip + latest.yml). On les uploade ensuite manuellement / via CI sur le bucket R2.
-# Auto-update désactivé pour l'instant (pas encore de bucket R2 configuré).
-# À réactiver quand R2 sera en place :
-# publish:
-#   - provider: generic
-#     url: ${env.AUTO_UPDATE_FEED_URL}
-publish: null
+# Provider générique S3-compatible → bucket Cloudflare R2 (accès public).
+# Cette URL publique (pas un secret) est inscrite dans latest.yml pour que l'app
+# sache où vérifier les mises à jour. On uploade ensuite .exe + latest.yml sur R2
+# via `node scripts/publish-update-r2.mjs`.
+publish:
+  - provider: generic
+    url: https://pub-90ecfd3c99984b488a85432fd6eee742.r2.dev
+    channel: latest
 
 # ============================================================================
 # COMPRESSION - STORE (Installation Rapide)
