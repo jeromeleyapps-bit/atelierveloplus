@@ -21,8 +21,15 @@ import { logger } from './logger';
 // TYPES & INTERFACES
 // ============================================
 
-export type LicenseTier = 'trial' | 'basique' | 'pro' | 'pro_lifetime';
+export type LicenseTier = 'free' | 'trial' | 'basique' | 'pro' | 'pro_lifetime';
 export type LicenseStatus = 'active' | 'suspended' | 'expired' | 'grace' | 'blocked';
+
+// Limites du tier gratuit (freemium). -1 = illimité pour les tiers payants.
+export const FREE_LIMITS = {
+  maxCustomers: 30,
+  maxTicketsPerMonth: 10,
+  maxEmailsPerMonth: 0,
+} as const;
 
 export interface LicenseInfo {
   tier: LicenseTier;
@@ -41,6 +48,9 @@ export interface LicenseInfo {
     emailsPerMonth: number;
     emailsRemaining: number;
     emailResetDate: Date;
+    // Freemium (optionnels : absents = illimité)
+    maxCustomers?: number;
+    maxTicketsPerMonth?: number;
   };
   trial?: {
     startedAt: Date;
@@ -61,6 +71,20 @@ export interface LicenseInfo {
 // ============================================
 
 export const PRICING = {
+  free: {
+    price: 0,
+    currency: 'EUR',
+    maxEmailsPerMonth: FREE_LIMITS.maxEmailsPerMonth,
+    maxCustomers: FREE_LIMITS.maxCustomers,
+    maxTicketsPerMonth: FREE_LIMITS.maxTicketsPerMonth,
+    features: {
+      marketing: false,
+      booking: false,
+      advancedStats: false,
+      pdfDirectSend: false,
+      togglesUnlocked: false,
+    },
+  },
   trial: {
     price: 0,
     duration: 14, // jours
@@ -581,6 +605,10 @@ export async function getLicenseInfo(): Promise<LicenseInfo> {
         emailsPerMonth: emailsPerMonth,
         emailsRemaining: emailsRemaining,
         emailResetDate: license.emailResetDate,
+        // Freemium : limites de volume uniquement en tier gratuit
+        ...(tier === 'free'
+          ? { maxCustomers: FREE_LIMITS.maxCustomers, maxTicketsPerMonth: FREE_LIMITS.maxTicketsPerMonth }
+          : {}),
       },
       trial: trialInfo,
       gracePeriod: gracePeriodInfo,
@@ -1198,50 +1226,59 @@ export async function checkAndDowngradeExpiredTrials(): Promise<{ downgraded: nu
     });
     
     let downgraded = 0;
-    
+
+    // FREEMIUM (juil. 2026) : un trial expiré bascule en version GRATUITE
+    // (données conservées, jamais bloqué) au lieu de grace → blocked.
     for (const trial of expiredTrials) {
-      const gracePeriodEnd = new Date();
-      gracePeriodEnd.setDate(gracePeriodEnd.getDate() + 7); // 7 jours de grâce
-      
       await prisma.license.update({
         where: { id: trial.id },
         data: {
-          status: 'grace', // Passer en grace period
-          gracePeriodEndsAt: gracePeriodEnd,
+          tier: 'free',
+          status: 'active',
+          gracePeriodEndsAt: null,
+          maxEmailsPerMonth: FREE_LIMITS.maxEmailsPerMonth,
+          marketingEnabled: false,
+          bookingEnabled: false,
+          advancedStatsEnabled: false,
+          pdfDirectSendEnabled: false,
         },
       });
       downgraded++;
-      logger.info(`[License Manager] ✅ Trial ${trial.key} expired → Grace Period (7 days until ${gracePeriodEnd.toLocaleDateString('fr-FR')})`);
+      logger.info(`[License Manager] ✅ Trial ${trial.key} expired → FREE tier (données conservées)`);
     }
-    
-    // 2. Grace Periods expirés → Bloquer l'application
-    const expiredGrace = await prisma.license.findMany({
+
+    // 2. Migration : trials restés en grace/blocked (ancien flux) → FREE
+    const legacyStuck = await prisma.license.findMany({
       where: {
         tier: 'trial',
-        status: 'grace',
-        gracePeriodEndsAt: {
-          lt: now,
-        },
+        status: { in: ['grace', 'blocked'] },
       },
     });
-    
-    let blocked = 0;
-    
-    for (const grace of expiredGrace) {
+
+    let blocked = 0; // conservé pour compat signature — compte désormais les migrations legacy
+
+    for (const legacy of legacyStuck) {
       await prisma.license.update({
-        where: { id: grace.id },
+        where: { id: legacy.id },
         data: {
-          status: 'blocked', // Bloquer l'application
+          tier: 'free',
+          status: 'active',
+          gracePeriodEndsAt: null,
+          maxEmailsPerMonth: FREE_LIMITS.maxEmailsPerMonth,
+          marketingEnabled: false,
+          bookingEnabled: false,
+          advancedStatsEnabled: false,
+          pdfDirectSendEnabled: false,
         },
       });
       blocked++;
-      logger.info(`[License Manager] ❌ Grace Period ${grace.key} expired → Application BLOCKED`);
+      logger.info(`[License Manager] ♻️ Legacy trial ${legacy.key} (${legacy.status}) migré → FREE tier`);
     }
-    
+
     if (downgraded > 0 || blocked > 0) {
-      logger.info(`[License Manager] 📊 Processed: ${downgraded} trial→grace, ${blocked} grace→blocked`);
+      logger.info(`[License Manager] 📊 Processed: ${downgraded} trial→free, ${blocked} legacy→free`);
     }
-    
+
     return { downgraded, blocked };
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : String(error);
