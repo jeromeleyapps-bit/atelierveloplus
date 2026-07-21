@@ -37,6 +37,12 @@ interface LicenseInfo {
     daysRemaining: number;
     endsAt: string;
   };
+  // Freemium : jauges d'utilisation du tier gratuit
+  freeUsage?: {
+    isFree: boolean;
+    customers?: { current: number; limit: number };
+    ticketsThisMonth?: { current: number; limit: number };
+  };
 }
 
 export default function GlobalTrialBanner() {
@@ -60,11 +66,12 @@ export default function GlobalTrialBanner() {
         const data = await response.json();
         setLicense(data);
         
-        // Afficher uniquement si trial actif ou grace period
-        const shouldShow = 
-          (data.isTrial && data.status === 'active') || 
-          data.status === 'grace';
-        
+        // Afficher si trial actif, grace period, ou version gratuite
+        const shouldShow =
+          (data.isTrial && data.status === 'active') ||
+          data.status === 'grace' ||
+          data.tier === 'free';
+
         setShow(shouldShow);
       }
     } catch (error) {
@@ -83,6 +90,96 @@ export default function GlobalTrialBanner() {
   };
 
   if (!show || !license || dismissed) return null;
+
+  // === Bannière VERSION GRATUITE (freemium) ===
+  if (license.tier === 'free') {
+    const gauges = [
+      { label: 'Clients', usage: license.freeUsage?.customers },
+      { label: 'Tickets ce mois-ci', usage: license.freeUsage?.ticketsThisMonth },
+    ].filter((g) => g.usage);
+
+    const anyFull = gauges.some((g) => g.usage && g.usage.current >= g.usage.limit);
+    const anyNear = gauges.some((g) => g.usage && g.usage.current >= g.usage.limit * 0.8);
+
+    return (
+      <Collapse in={!dismissed}>
+        <Box sx={{ position: 'sticky', top: 0, zIndex: 1300, width: '100%' }}>
+          <Alert
+            severity={anyFull ? 'warning' : 'info'}
+            icon={<Info />}
+            action={
+              <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                <Button
+                  size="small"
+                  variant="contained"
+                  color="primary"
+                  startIcon={<Upgrade />}
+                  onClick={handleUpgrade}
+                  sx={{ whiteSpace: 'nowrap', fontWeight: 600 }}
+                >
+                  Passer à la version supérieure
+                </Button>
+                <IconButton
+                  size="small"
+                  onClick={handleDismiss}
+                  sx={{ ml: 1, '&:hover': { backgroundColor: 'rgba(0,0,0,0.1)' } }}
+                >
+                  <Close fontSize="small" />
+                </IconButton>
+              </Box>
+            }
+            sx={{
+              borderRadius: 0,
+              mb: 0,
+              py: 1,
+              '& .MuiAlert-message': { width: '100%' },
+            }}
+          >
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, width: '100%' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
+                <Typography variant="body2" sx={{ fontWeight: 700 }}>
+                  Version gratuite
+                </Typography>
+                {anyFull ? (
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                    Limite atteinte — passez à Basique ou Pro pour continuer sans limite
+                  </Typography>
+                ) : anyNear ? (
+                  <Typography variant="body2">Vous approchez des limites de la version gratuite</Typography>
+                ) : null}
+              </Box>
+
+              <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap', mt: 0.5 }}>
+                {gauges.map(({ label, usage }) => {
+                  const pct = usage ? Math.min(100, (usage.current / usage.limit) * 100) : 0;
+                  const full = usage ? usage.current >= usage.limit : false;
+                  return (
+                    <Box key={label} sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 220, flex: 1 }}>
+                      <Typography variant="caption" sx={{ whiteSpace: 'nowrap' }}>
+                        {label} : <strong>{usage?.current}/{usage?.limit}</strong>
+                      </Typography>
+                      <LinearProgress
+                        variant="determinate"
+                        value={pct}
+                        color={full ? 'error' : pct >= 80 ? 'warning' : 'primary'}
+                        sx={{
+                          flex: 1,
+                          height: 4,
+                          borderRadius: 2,
+                          backgroundColor: 'rgba(0, 0, 0, 0.1)',
+                          '& .MuiLinearProgress-bar': { borderRadius: 2 },
+                        }}
+                      />
+                    </Box>
+                  );
+                })}
+              </Box>
+            </Box>
+          </Alert>
+        </Box>
+      </Collapse>
+    );
+  }
 
   const isGracePeriod = license.status === 'grace';
   const daysRemaining = isGracePeriod 

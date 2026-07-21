@@ -39,9 +39,18 @@ import type { LicenseInfo } from '@/lib/license-manager';
 import { useAdvancedMode } from '@/hooks/useAdvancedMode';
 import { logger } from '@/lib/logger';
 
+// Freemium : la route status enrichit LicenseInfo avec les jauges du tier gratuit
+type LicensePageInfo = LicenseInfo & {
+  freeUsage?: {
+    isFree: boolean;
+    customers?: { current: number; limit: number };
+    ticketsThisMonth?: { current: number; limit: number };
+  };
+};
+
 export default function LicensePage() {
   const [advancedMode] = useAdvancedMode();
-  const [license, setLicense] = useState<LicenseInfo | null>(null);
+  const [license, setLicense] = useState<LicensePageInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [activating, setActivating] = useState(false);
   const [_verifying, setVerifying] = useState(false);
@@ -289,8 +298,31 @@ export default function LicensePage() {
               let bgColor = '#e3f2fd';
               let borderColor = '#2196f3';
 
+              // Version gratuite (freemium)
+              if (license.tier === 'free') {
+                const c = license.freeUsage?.customers;
+                const t = license.freeUsage?.ticketsThisMonth;
+                const parts = [
+                  c ? `${c.current}/${c.limit} clients` : null,
+                  t ? `${t.current}/${t.limit} tickets ce mois-ci` : null,
+                ].filter(Boolean);
+                const atLimit = (c && c.current >= c.limit) || (t && t.current >= t.limit);
+                label = `Version gratuite active${parts.length ? ` — ${parts.join(', ')}` : ''}. Vos données sont conservées, sans expiration.`;
+                if (atLimit) {
+                  label += ' Limite atteinte : passez à Basique ou Pro pour continuer sans limite.';
+                  severity = 'warning';
+                  bgColor = '#fff3e0';
+                  borderColor = '#ff9800';
+                  icon = <WarningIcon />;
+                } else {
+                  severity = 'info';
+                  bgColor = '#e3f2fd';
+                  borderColor = '#2196f3';
+                  icon = <CheckCircleOutlineIcon />;
+                }
+              }
               // Trial actif
-              if (license.isTrial && license.trial?.daysRemaining !== undefined) {
+              else if (license.isTrial && license.trial?.daysRemaining !== undefined) {
                 daysRemaining = license.trial.daysRemaining;
                 const days = daysRemaining;
                 if (days > 7) {
