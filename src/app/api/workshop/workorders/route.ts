@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { CreateWorkOrderSchema, formatZodError } from "@/lib/validation";
 import { rateLimit } from "@/lib/security";
+import { checkCanCreateWorkOrder } from "@/lib/free-tier-guards";
 import { logger } from '@/lib/logger';
 
 export const dynamic = "force-dynamic";
@@ -86,7 +87,16 @@ export async function POST(req: Request) {
   if (!userId) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
-  
+
+  // Freemium : limite de tickets/mois en version gratuite
+  const freeCheck = await checkCanCreateWorkOrder();
+  if (!freeCheck.allowed) {
+    return NextResponse.json(
+      { error: freeCheck.reason, message: freeCheck.message, current: freeCheck.current, limit: freeCheck.limit },
+      { status: 403 }
+    );
+  }
+
   try {
     const body = await req.json();
     

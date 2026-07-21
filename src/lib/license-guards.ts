@@ -63,6 +63,16 @@ export async function checkEmailLicense(): Promise<NextResponse | null> {
     const canSend = await canSendEmail();
     
     if (!canSend) {
+      // Freemium : la version gratuite n'inclut pas l'envoi d'emails
+      if (licenseInfo.tier === 'free') {
+        return NextResponse.json({
+          error: "free_tier_no_email",
+          message: "L'envoi d'emails n'est pas inclus dans la version gratuite.",
+          details: "Vous pouvez générer et imprimer vos PDF librement. Pour envoyer devis et factures par email directement depuis l'application, passez à la version Basique (30 emails/mois) ou Pro (illimité).",
+          upgradeUrl: "/admin/license/upgrade"
+        }, { status: 403 });
+      }
+
       // Vérifier si c'est une limite atteinte ou autre chose
       if (licenseInfo.limits.emailsRemaining === 0 && licenseInfo.tier === 'basique') {
         const resetDate = new Date(licenseInfo.limits.emailResetDate);

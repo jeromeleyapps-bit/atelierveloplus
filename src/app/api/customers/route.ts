@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
+import { checkCanCreateCustomer } from "@/lib/free-tier-guards";
 
 export const dynamic = "force-dynamic";
 
@@ -34,6 +35,14 @@ export async function POST(req: Request) {
   // Removed getPrisma() - using direct import
   const body = await req.json();
   try {
+    // Freemium : limite de clients en version gratuite
+    const freeCheck = await checkCanCreateCustomer();
+    if (!freeCheck.allowed) {
+      return NextResponse.json(
+        { error: freeCheck.reason, message: freeCheck.message, current: freeCheck.current, limit: freeCheck.limit },
+        { status: 403 }
+      );
+    }
     const created = await prisma.customer.create({ data: {
       email: body.email || null,
       firstName: body.firstName || null,
