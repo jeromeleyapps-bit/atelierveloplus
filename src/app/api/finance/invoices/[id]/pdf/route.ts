@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { generateInvoicePDF, type InvoiceData as PdfInvoiceData } from "@/lib/pdf-invoice";
 import { getUserIdOrFirst } from "@/lib/api-helpers";
+import { isFreeTier } from "@/lib/free-tier-guards";
 import { logger } from '@/lib/logger';
 
 export const dynamic = "force-dynamic";
@@ -417,8 +418,9 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     validUntil: routeInvoiceData.validUntil?.toISOString() || null,
     paidAt: routeInvoiceData.paidAt?.toISOString() || null,
     logoBytes,
+    freeTierBranding: await isFreeTier(),
   };
-  
+
   // Generate PDF
   const pdfBytes = await generateInvoicePDF(pdfInvoiceData);
   

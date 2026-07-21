@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getUserIdOrFirst } from '@/lib/api-helpers';
 import { getAtelierStripeClient } from '@/lib/stripe-atelier';
+import { isFreeTier } from '@/lib/free-tier-guards';
 import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
@@ -16,6 +17,16 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   const { id } = await params;
   const userId = await getUserIdOrFirst(req);
   if (!userId) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+
+  // Freemium : paiement Stripe sur facture réservé aux versions payantes (Basique+)
+  if (await isFreeTier()) {
+    return NextResponse.json({
+      error: 'free_tier_no_stripe_payment',
+      message: "Le paiement en ligne des factures (lien Stripe) n'est pas inclus dans la version gratuite.",
+      details: "Passez à la version Basique ou Pro pour encaisser vos factures en ligne via Stripe.",
+      upgradeUrl: '/admin/license/upgrade',
+    }, { status: 403 });
+  }
 
   try {
     const invoice = await prisma.invoice.findUnique({

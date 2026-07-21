@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { generateInvoicePDF, formatDocumentNumber } from "@/lib/pdf-invoice";
 import { sendEmail, generateInvoiceEmailHTML } from "@/lib/email-with-db-config";
 import { checkEmailWithPdfLicense, incrementEmailAfterSend } from "@/lib/license-guards";
+import { isFreeTier } from "@/lib/free-tier-guards";
 import { logEmail } from "@/lib/email-logger";
 import { Prisma } from "@prisma/client";
 import { logger } from "@/lib/logger";
@@ -258,6 +259,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       validUntil: invoice.validUntil ? new Date(invoice.validUntil).toISOString().split('T')[0] : null,
       paidAt: invoice.paidAt ? new Date(invoice.paidAt).toISOString().split('T')[0] : null,
       logoBytes,
+      freeTierBranding: await isFreeTier(),
     };
 
     // Generate PDF

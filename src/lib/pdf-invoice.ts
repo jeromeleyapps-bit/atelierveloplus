@@ -78,6 +78,8 @@ export interface InvoiceData {
   legalFooter?: string;
   // Branding
   logoBytes?: Uint8Array | null;
+  /** Freemium : true = mention "édité avec Atelier Vélo+" en pied de page (tier gratuit). */
+  freeTierBranding?: boolean;
 }
 
 /**
@@ -797,6 +799,19 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Uint8Array>
       font: fontBold,
       color: COLORS.textLight,
     });
+
+    // Freemium : mention discrète sur les documents édités en version gratuite
+    if (data.freeTierBranding) {
+      const brandingTxt = 'Document édité avec Atelier Vélo+ (version gratuite) — tarifs.upgradedbikes.com';
+      const brandingWidth = font.widthOfTextAtSize(brandingTxt, 6.5);
+      pg.drawText(brandingTxt, {
+        x: (pgWidth - brandingWidth) / 2,
+        y: 12,
+        size: 6.5,
+        font,
+        color: rgb(0.55, 0.55, 0.55),
+      });
+    }
   });
   
   const pdfBytes = await pdfDoc.save();

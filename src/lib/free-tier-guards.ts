@@ -27,7 +27,8 @@ export interface FreeTierCheck {
 
 const OK: FreeTierCheck = { allowed: true };
 
-async function isFreeTier(): Promise<boolean> {
+/** True si la licence courante est le tier gratuit (fail-open : erreur licence → false). */
+export async function isFreeTier(): Promise<boolean> {
   try {
     const info = await getLicenseInfo();
     return info.tier === 'free';

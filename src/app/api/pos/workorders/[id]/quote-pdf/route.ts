@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { generateInvoicePDF } from "@/lib/pdf-invoice";
 import { getUserSettings } from "@/lib/api-helpers";
+import { isFreeTier } from "@/lib/free-tier-guards";
 import { logger } from '@/lib/logger';
 
 type RouteContext = {
@@ -201,6 +202,7 @@ export async function GET(
     }
 
     // Générer le PDF
+    (invoiceData as { freeTierBranding?: boolean }).freeTierBranding = await isFreeTier();
     const pdfBytes = await generateInvoicePDF(invoiceData);
 
     // Nom fichier: devis-YYYYMMDD-xxxxx.pdf (date + 5 chars ID)
