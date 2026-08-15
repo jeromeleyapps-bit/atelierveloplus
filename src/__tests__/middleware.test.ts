@@ -47,34 +47,45 @@ describe('Middleware', () => {
       expect(res.status).not.toBe(401);
     });
 
-    it('should allow access to public patterns (PDF routes)', async () => {
-      const pdfRoutes = [
+    // Audit août 2026 : les PDF et les routes d'email ne sont plus publics.
+    // Les documents partent en pièce jointe des emails, jamais en lien : personne
+    // d'extérieur n'a besoin d'y accéder. Ces tests vérifiaient auparavant l'inverse,
+    // et continuaient de passer une fois la liste vidée — parce que sans jeton de
+    // session attendu, le repli Electron s'applique en environnement de test. On force
+    // donc ici un jeton attendu pour éprouver le vrai refus.
+    describe('Documents financiers (fermés depuis l\'audit)', () => {
+      const ancienJeton = process.env.ELECTRON_AUTH_TOKEN;
+
+      afterEach(() => {
+        if (ancienJeton === undefined) delete process.env.ELECTRON_AUTH_TOKEN;
+        else process.env.ELECTRON_AUTH_TOKEN = ancienJeton;
+      });
+
+      it.each([
         '/api/finance/invoices/inv-123/pdf',
         '/api/finance/quotes/quote-456/pdf',
         '/api/finance/credits/credit-789/pdf',
-      ];
-
-      for (const route of pdfRoutes) {
-        const req = new NextRequest(`http://localhost${route}`);
-        const res = await middleware(req);
-
-        expect(res.status).not.toBe(401);
-      }
-    });
-
-    it('should allow access to email routes without authentication', async () => {
-      const emailRoutes = [
         '/api/finance/invoices/inv-123/email',
-        '/api/finance/quotes/quote-456/email',
-        '/api/finance/credits/credit-789/email',
-      ];
+        '/api/catalog/items',
+        '/api/catalog/categories',
+      ])('refuse %s sans identité', async (route) => {
+        mockGetUserFromToken.mockResolvedValue(null);
+        process.env.ELECTRON_AUTH_TOKEN = 'jeton-attendu';
 
-      for (const route of emailRoutes) {
         const req = new NextRequest(`http://localhost${route}`);
         const res = await middleware(req);
 
+        expect(res.status).toBe(401);
+      });
+
+      it('reste accessible depuis l\'application authentifiée', async () => {
+        mockGetUserFromToken.mockResolvedValue({ userId: 'u1', email: 'a@b.fr', role: 'admin' });
+
+        const req = new NextRequest('http://localhost/api/finance/invoices/inv-123/pdf');
+        const res = await middleware(req);
+
         expect(res.status).not.toBe(401);
-      }
+      });
     });
   });
 

@@ -34,13 +34,22 @@ const publicApiRoutes = [
 ];
 
 // Patterns de routes publiques (regex)
-const publicPatterns = [
-  /^\/api\/finance\/invoices\/[^/]+\/pdf$/,     // PDFs factures
-  /^\/api\/finance\/quotes\/[^/]+\/pdf$/,       // PDFs devis
-  /^\/api\/finance\/credits\/[^/]+\/pdf$/,      // PDFs avoirs
-  /^\/api\/catalog\/items$/,                     // Liste des items (GET uniquement, page protégée côté client)
-  /^\/api\/catalog\/categories$/,                // Liste des catégories (GET uniquement)
-];
+// Audit août 2026 — cette liste est vidée. Elle contenait :
+//
+//   PDF factures / devis / avoirs — ouverts sans authentification pour qui connaît
+//     l'identifiant du document. Les identifiants sont des cuid difficiles à deviner,
+//     mais c'était la seule protection. Vérifié : les documents partent en pièce jointe
+//     des emails, jamais en lien — aucun usage légitime ne dépend de cet accès public.
+//
+//   /api/catalog/items et /api/catalog/categories — le commentaire d'origine indiquait
+//     « page protégée côté client », ce qui ne protège pas l'API. Ces routes renvoient
+//     tous les champs du catalogue, dont purchasePriceHT, marginCoeff et supplierName :
+//     les prix d'achat, les marges et les fournisseurs de l'atelier.
+//
+// Tous les appelants sont internes à l'application et passent par la session Electron,
+// y compris les ouvertures de PDF en nouvelle fenêtre : aucune partition de session
+// n'est déclarée, l'en-tête de session est donc injecté sur ces navigations aussi.
+const publicPatterns: RegExp[] = [];
 
 // APIs protégées (nécessitent authentification)
 const protectedApiRoutes = [
