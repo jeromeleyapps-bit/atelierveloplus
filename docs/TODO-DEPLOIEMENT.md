@@ -47,10 +47,12 @@
 ## Phase 1 — Sécurité résiduelle Sprint 0 (10 min)
 
 ### Tâche 1.1 — Révoquer l'ancienne clé Resend (CRITIQUE)
-**Objectif** : la clé `re_JKgDdyTu_...` qui était en clair dans `.env` est compromise. Il faut la tuer côté Resend.
+**Objectif** : l'ancienne clé Resend (préfixe `re_JKg…`) était en clair dans `.env`, donc compromise.
+Il faut la tuer côté Resend. *(Fait — clé révoquée pendant le Sprint 0. Valeur retirée de ce
+document : ne jamais recopier un secret dans la doc, même pour expliquer comment le supprimer.)*
 
 1. Connecte-toi sur https://resend.com/api-keys
-2. Repère la clé `re_XXXX-CLE-REVOQUEE-RETIREE`.
+2. Repère l'ancienne clé (préfixe `re_JKg…`).
 3. Clique sur les trois points → **Revoke**.
 4. Clique **Create API Key**, nomme-la "atelier-velo-prod", copie la nouvelle valeur.
 5. Colle dans `C:\atelier\.env` à la ligne :
@@ -59,7 +61,7 @@
    ```
 6. Si l'ancienne valeur apparaît aussi dans `.env.production`, remplace-la pareil.
 
-**Test de validation** : aucune trace de `re_JKgDdyTu_` dans tes fichiers `.env*`.
+**Test de validation** : aucune trace de l'ancienne clé (`re_JKg…`) dans tes fichiers `.env*`.
 
 ---
 
