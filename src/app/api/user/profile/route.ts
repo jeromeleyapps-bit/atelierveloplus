@@ -19,12 +19,32 @@ export async function PATCH(req: Request) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
+  // Repli : en mode Electron local, l'identité injectée est 'electron-local', qui
+  // n'existe pas en base. Même comportement que /api/account/settings : on retombe
+  // sur le premier utilisateur actif. Sans cela, le wizard de première configuration
+  // échouait dès sa première requête (voir docs/REPRENDRE-ICI.md).
+  let userId = jwtUser.userId;
+  const userExists = await prisma.user.findUnique({ where: { id: userId } });
+  if (!userExists) {
+    const firstUser = await prisma.user.findFirst({
+      where: { active: true },
+      orderBy: { createdAt: 'asc' },
+    });
+    if (!firstUser) {
+      return NextResponse.json(
+        { error: 'no_user', message: 'Inscription requise' },
+        { status: 404 }
+      );
+    }
+    userId = firstUser.id;
+  }
+
   const body = await req.json().catch(() => ({}));
   const name = typeof body.name === 'string' ? body.name.trim() : null;
 
   try {
     const updatedUser = await prisma.user.update({
-      where: { id: jwtUser.userId },
+      where: { id: userId },
       data: { name },
       select: { id: true, email: true, name: true, role: true },
     });

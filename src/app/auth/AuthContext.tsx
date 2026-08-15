@@ -39,28 +39,76 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     logger.info('[AUTH] AuthContext initializing');
-    // Load from localStorage after mount to avoid SSR/CSR mismatch
-    const token = window.localStorage.getItem("jwt_token");
-    const userStr = window.localStorage.getItem("user");
-    logger.info('[AUTH] Token exists', { exists: !!token });
-    logger.info('[AUTH] User data exists', { exists: !!userStr });
-    
-    if (token && userStr) {
+
+    // Charge depuis localStorage après le montage (évite un écart SSR/CSR), puis
+    // VÉRIFIE que le jeton est réellement valide côté serveur. Un jeton présent mais
+    // signé avec un ancien JWT_SECRET (rotation de secrets, réinstallation par-dessus
+    // d'anciennes données) doit être purgé : sinon l'application tourne en session
+    // fantôme et le wizard de première configuration échoue silencieusement.
+    async function initAuth() {
+      const token = window.localStorage.getItem("jwt_token");
+      const userStr = window.localStorage.getItem("user");
+      logger.info('[AUTH] Token exists', { exists: !!token });
+      logger.info('[AUTH] User data exists', { exists: !!userStr });
+
+      if (!token || !userStr) {
+        logger.info('[AUTH] No token or user data - user is null');
+        setReady(true);
+        logger.info('[AUTH] AuthContext ready');
+        return;
+      }
+
+      let stored: AuthUser | null = null;
       try {
-        const user = JSON.parse(userStr);
-        logger.info('[AUTH] Setting user:', user.email);
-        setUser({ id: user.id, email: user.email, shopName: user.shopName });
+        const parsed = JSON.parse(userStr);
+        stored = { id: parsed.id, email: parsed.email, shopName: parsed.shopName };
       } catch (_e) {
         logger.info('[AUTH] Invalid user data - clearing');
-        // Invalid user data, clear
         window.localStorage.removeItem("jwt_token");
         window.localStorage.removeItem("user");
+        setReady(true);
+        return;
       }
-    } else {
-      logger.info('[AUTH] No token or user data - user is null');
+
+      try {
+        const res = await fetch('/api/auth/me', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.status === 401) {
+          logger.warn('[AUTH] Jeton de session périmé - purge et retour à la connexion');
+          window.localStorage.removeItem("jwt_token");
+          window.localStorage.removeItem("user");
+          setUser(null);
+          setReady(true);
+          return;
+        }
+        if (res.ok) {
+          const data = await res.json();
+          setUser({
+            id: data.user.id,
+            email: data.user.email,
+            shopName: stored.shopName,
+          });
+        } else {
+          // Serveur indisponible ou erreur inattendue : on garde la session locale
+          // plutôt que de déconnecter l'utilisateur à tort.
+          logger.warn('[AUTH] Vérification du jeton impossible - session locale conservée', {
+            status: res.status,
+          });
+          setUser(stored);
+        }
+      } catch (err) {
+        logger.warn('[AUTH] Vérification du jeton injoignable - session locale conservée', {
+          error: err instanceof Error ? err.message : String(err),
+        });
+        setUser(stored);
+      }
+
+      setReady(true);
+      logger.info('[AUTH] AuthContext ready');
     }
-    setReady(true);
-    logger.info('[AUTH] AuthContext ready');
+
+    void initAuth();
     
     // Écouter les événements de déconnexion depuis api.ts
     const handleStorageChange = () => {

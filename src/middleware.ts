@@ -45,6 +45,7 @@ const protectedApiRoutes = [
   '/api/settings',
   '/api/communications',
   '/api/simplybook',
+  '/api/user',            // profil utilisateur (wizard d'onboarding)
 ];
 
 export async function middleware(request: NextRequest) {
@@ -126,6 +127,7 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/api/metrics') ||
     pathname.startsWith('/api/settings') ||
     pathname.startsWith('/api/communications') ||
+    pathname.startsWith('/api/user') ||     // profil utilisateur (wizard d'onboarding)
     pathname.startsWith('/api/bikes');  // Ajout bikes pour vente vélos
   
   if (!user && needsElectronAuth) {

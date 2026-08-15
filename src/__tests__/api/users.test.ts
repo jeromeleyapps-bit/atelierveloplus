@@ -13,6 +13,7 @@ jest.mock('@/lib/prisma', () => ({
   prisma: {
     user: {
       findFirst: jest.fn(),
+      findUnique: jest.fn(),
       update: jest.fn(),
     },
   },
@@ -23,6 +24,7 @@ jest.mock('@/lib/jwt', () => ({
 }));
 
 const mockPrismaUserFindFirst = prisma.user.findFirst as jest.Mock;
+const mockPrismaUserFindUnique = prisma.user.findUnique as jest.Mock;
 const mockPrismaUserUpdate = prisma.user.update as jest.Mock;
 const mockGetUserFromToken = getUserFromToken as jest.Mock;
 
@@ -69,6 +71,8 @@ describe('PATCH /api/user/profile', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockGetUserFromToken.mockResolvedValue({ userId: 'user-123' });
+    // Par défaut l'utilisateur du jeton existe en base.
+    mockPrismaUserFindUnique.mockResolvedValue({ id: 'user-123' });
   });
 
   it('should update user profile', async () => {
@@ -201,6 +205,70 @@ describe('PATCH /api/user/profile', () => {
 
     expect(res.status).toBe(500);
     expect(data).toHaveProperty('error');
+  });
+
+  // Régression : le wizard de première configuration échouait ici (401 puis 500),
+  // ce qui bloquait l'écran d'accueil sans message visible.
+  describe('identité Electron locale (wizard de première configuration)', () => {
+    it("retombe sur le premier utilisateur actif quand l'identité du jeton n'existe pas en base", async () => {
+      mockGetUserFromToken.mockResolvedValue({ userId: 'electron-local' });
+      mockPrismaUserFindUnique.mockResolvedValue(null); // 'electron-local' n'existe pas
+      mockPrismaUserFindFirst.mockResolvedValue({ id: 'user-reel-1' });
+      mockPrismaUserUpdate.mockResolvedValue({
+        id: 'user-reel-1', email: 'atelier@exemple.fr', name: 'Jean Test', role: 'admin',
+      });
+
+      const req = new Request('http://localhost/api/user/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: 'Jean Test' }),
+      });
+
+      const res = await patchUserProfile(req);
+
+      expect(res.status).toBe(200);
+      expect(mockPrismaUserFindFirst).toHaveBeenCalledWith({
+        where: { active: true },
+        orderBy: { createdAt: 'asc' },
+      });
+      expect(mockPrismaUserUpdate).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { id: 'user-reel-1' } })
+      );
+    });
+
+    it('renvoie 404 no_user quand la base ne contient aucun utilisateur', async () => {
+      mockGetUserFromToken.mockResolvedValue({ userId: 'electron-local' });
+      mockPrismaUserFindUnique.mockResolvedValue(null);
+      mockPrismaUserFindFirst.mockResolvedValue(null);
+
+      const req = new Request('http://localhost/api/user/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: 'Jean Test' }),
+      });
+
+      const res = await patchUserProfile(req);
+      const data = await res.json();
+
+      expect(res.status).toBe(404);
+      expect(data.error).toBe('no_user');
+      expect(mockPrismaUserUpdate).not.toHaveBeenCalled();
+    });
+
+    it('refuse toujours une requête sans identité valide', async () => {
+      mockGetUserFromToken.mockResolvedValue(null);
+
+      const req = new Request('http://localhost/api/user/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: 'Jean Test' }),
+      });
+
+      const res = await patchUserProfile(req);
+
+      expect(res.status).toBe(401);
+      expect(mockPrismaUserUpdate).not.toHaveBeenCalled();
+    });
   });
 });
 

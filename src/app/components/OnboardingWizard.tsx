@@ -120,9 +120,23 @@ export default function OnboardingWizard({ open, onComplete }: OnboardingWizardP
         headers,
         body: JSON.stringify({ name: userName }),
       });
-      
+
+      // Jeton refusé (ex. signé avec un ancien secret) : on purge et on renvoie vers
+      // la connexion, au lieu d'échouer avec un message que l'utilisateur ne relie
+      // pas à sa session.
+      if (profileRes.status === 401) {
+        logger.warn("[Wizard] Jeton de session refusé - purge et retour à la connexion");
+        localStorage.removeItem("jwt_token");
+        localStorage.removeItem("user");
+        window.dispatchEvent(new Event("auth:logout"));
+        setError("Votre session n'est plus valide. Reconnectez-vous pour terminer la configuration.");
+        setSaving(false);
+        setTimeout(() => router.push("/auth/login" as Route), 1500);
+        return;
+      }
+
       if (!profileRes.ok) {
-        const errData = await profileRes.json();
+        const errData = await profileRes.json().catch(() => ({}));
         throw new Error(`Erreur profil: ${errData.error || "Échec sauvegarde"}`);
       }
 
@@ -664,6 +678,15 @@ export default function OnboardingWizard({ open, onComplete }: OnboardingWizardP
         )}
 
         {renderStepContent()}
+
+        {/* L'alerte du haut sort du champ de vision sur les étapes longues : on répète
+            le message juste au-dessus des boutons, sinon un échec passe pour
+            « rien ne se passe ». */}
+        {error && (
+          <Alert severity="error" sx={{ mt: 3 }}>
+            {error}
+          </Alert>
+        )}
 
         <Stack direction="row" spacing={2} sx={{ mt: 4, justifyContent: "space-between", alignItems: "center" }}>
           <Stack direction="row" spacing={1}>
