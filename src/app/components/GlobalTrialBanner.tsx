@@ -9,7 +9,7 @@
  * - Position: Sticky top, non-intrusive mais toujours visible
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -51,15 +51,7 @@ export default function GlobalTrialBanner() {
   const [license, setLicense] = useState<LicenseInfo | null>(null);
   const router = useRouter();
 
-  useEffect(() => {
-    fetchLicenseStatus();
-    
-    // Rafraîchir toutes les 5 minutes
-    const interval = setInterval(fetchLicenseStatus, 5 * 60 * 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const fetchLicenseStatus = async () => {
+  const fetchLicenseStatus = useCallback(async () => {
     try {
       const response = await fetch('/api/admin/license/status');
       if (response.ok) {
@@ -77,7 +69,17 @@ export default function GlobalTrialBanner() {
     } catch (error) {
       logger.error('[GlobalTrialBanner] Error:', error);
     }
-  };
+  }, []);
+
+  // Déclaré après fetchLicenseStatus : l'effet référençait auparavant une fonction
+  // définie plus bas, ce qui la lisait dans sa zone morte temporelle.
+  useEffect(() => {
+    fetchLicenseStatus();
+
+    // Rafraîchir toutes les 5 minutes
+    const interval = setInterval(fetchLicenseStatus, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [fetchLicenseStatus]);
 
   const handleDismiss = () => {
     setDismissed(true);

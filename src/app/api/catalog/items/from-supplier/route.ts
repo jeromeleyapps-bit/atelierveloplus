@@ -4,7 +4,7 @@ import { logger } from '@/lib/logger';
 
 /**
  * POST /api/catalog/items/from-supplier
- * Ajoute un article fournisseur Ã  MON STOCK
+ * Ajoute un article fournisseur à MON STOCK
  * 
  * Body: { supplierOfferId: string }
  */
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // RÃ©cupÃ©rer l'offre fournisseur
+    // Récupérer l'offre fournisseur
     const supplierOffer = await prisma.supplierOffer.findUnique({
       where: { id: supplierOfferId },
       include: { Supplier: true }
@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // VÃ©rifier si un CatalogItem existe dÃ©jÃ  pour cette offre
+    // Vérifier si un CatalogItem existe déjà pour cette offre
     if (supplierOffer.catalogItemId) {
       return NextResponse.json(
         { error: 'Item already in stock', catalogItemId: supplierOffer.catalogItemId },
@@ -49,14 +49,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // DÃ©terminer la catÃ©gorie
+    // Déterminer la catégorie
     let category: string = 'PIECES';
-    if (supplierOffer.name?.toLowerCase().includes('Ã©quipement') || 
+    if (supplierOffer.name?.toLowerCase().includes('équipement') || 
         supplierOffer.name?.toLowerCase().includes('accessoire')) {
       category = 'EQUIPEMENTS';
     }
 
-    // CrÃ©er le CatalogItem
+    // Créer le CatalogItem
     const catalogItem = await prisma.catalogItem.create({
       data: {
         sku: supplierOffer.reference || undefined,
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
         name: supplierOffer.name,
         priceHT: supplierOffer.priceHT || supplierOffer.price,
         priceTTC: supplierOffer.price,
-        vatRate: 20, // TVA par dÃ©faut
+        vatRate: 20, // TVA par défaut
         active: true,
         stockQty: supplierOffer.stock || 0,
         minStock: 1,
@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       catalogItem,
-      message: 'Article ajoutÃ© Ã  MON STOCK'
+      message: 'Article ajouté à MON STOCK'
     });
 
   } catch (error) {
