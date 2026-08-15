@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Atelier Vélo+ — Tarifs</title>
-  <meta name="description" content="Logiciel de gestion pour atelier vélo. Sans abonnement mensuel, vos données chez vous. 14 jours d'essai gratuit.">
+  <meta name="description" content="Logiciel de gestion pour atelier vélo. Version gratuite à vie jusqu'à 30 clients, sans abonnement mensuel, vos données chez vous. Essai Pro 14 jours.">
   <style>
     :root {
       --primary: #1e6091;
@@ -36,7 +36,7 @@
     .alert { max-width: 600px; margin: 0 auto 24px; padding: 12px 16px; border-radius: 8px; }
     .alert-error { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
     .alert-info { background: #dbeafe; color: #1e3a8a; border: 1px solid #93c5fd; }
-    .pricing { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+    .pricing { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
     .card {
       background: var(--card); border: 1px solid var(--border); border-radius: 12px;
       padding: 32px 24px; display: flex; flex-direction: column;
@@ -60,6 +60,7 @@
     }
     .btn:hover { background: var(--primary-dark); }
     .btn:disabled { background: #94a3b8; cursor: wait; }
+    a.btn { display: block; text-align: center; text-decoration: none; }
     .btn-outline { background: transparent; color: var(--primary); border: 2px solid var(--primary); }
     .btn-outline:hover { background: var(--primary); color: white; }
     footer {
@@ -84,17 +85,17 @@
   <div class="container">
     <header>
       <h1>Atelier Vélo+</h1>
-      <p class="tagline">Le logiciel de gestion pour ateliers vélo. Sans abonnement mensuel, vos données chez vous. 14 jours d'essai gratuit inclus.</p>
+      <p class="tagline">Le logiciel de gestion pour ateliers vélo. Version gratuite à vie, sans abonnement mensuel, vos données chez vous. Essai Pro de 14 jours inclus.</p>
     </header>
 
-    <!-- Essai gratuit : on télécharge d'abord, on achète ensuite -->
+    <!-- Gratuit d'abord : on télécharge, on utilise, on achète quand on grandit -->
     <section class="trial">
-      <h2 class="trial-title">Essayez gratuitement pendant 14 jours</h2>
-      <p class="trial-sub">Téléchargez, installez, testez sans engagement. Aucune carte requise pour l'essai.</p>
+      <h2 class="trial-title">Gratuit pour toujours — essai Pro 14 jours inclus</h2>
+      <p class="trial-sub">Téléchargez et utilisez la version gratuite sans limite de temps. Les 14 premiers jours, toutes les fonctions Pro sont débloquées. Aucune carte requise, jamais de blocage.</p>
       <a class="btn-download" href="https://downloads.upgradedbikes.com/AtelierVeloPlus-Setup.exe" download>
         ⬇ Télécharger pour Windows (64 bits)
       </a>
-      <p class="trial-note">Version 1.2.0 · ~396 Mo · Windows 10/11. Après installation, l'essai de 14 jours démarre automatiquement.</p>
+      <p class="trial-note">Version 1.2.0 · ~396 Mo · Windows 10/11. Après l'essai Pro de 14 jours, l'application continue en version gratuite : vos données sont conservées.</p>
     </section>
 
     <div class="sep"><span>Convaincu ? Achetez votre licence</span></div>
@@ -108,12 +109,26 @@
 
     <div class="pricing">
       <div class="card">
+        <h2>Gratuit</h2>
+        <div class="price">0 € <small>pour toujours</small></div>
+        <ul class="features">
+          <li>Jusqu'à 30 clients</li>
+          <li>10 tickets de réparation / mois</li>
+          <li>Devis &amp; factures PDF (impression)</li>
+          <li>Forfaits, acomptes, signature client</li>
+          <li>Sauvegardes locales incluses</li>
+        </ul>
+        <a class="btn btn-outline" href="https://downloads.upgradedbikes.com/AtelierVeloPlus-Setup.exe" download>Télécharger gratuitement</a>
+      </div>
+
+      <div class="card">
         <h2>Basique</h2>
         <div class="price">199 € <small>/ an</small></div>
         <ul class="features">
-          <li>Gestion clients / vélos / tickets</li>
-          <li>Factures PDF illimitées</li>
+          <li>Clients et tickets illimités</li>
+          <li>Factures PDF illimitées, sans mention</li>
           <li>30 emails par mois</li>
+          <li>Paiement en ligne des factures (Stripe)</li>
           <li>Toutes les bases métier</li>
         </ul>
         <button class="btn btn-outline" data-tier="basique">Choisir Basique</button>
