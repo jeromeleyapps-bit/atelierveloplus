@@ -50,9 +50,10 @@ de la 1.2.1.
   sur la branche 13. Convention `middleware` → `proxy`. Build en `--webpack` explicite
   (Turbopack entre en conflit avec la configuration de minification).
 - **ESLint 8 (fin de vie) → 9** avec configuration plate.
+- 12 accès en zone morte temporelle corrigés ; une corruption d'encodage réparée.
 
 **Bilan** : vulnérabilités de production 61 → 35 paquets, la critique éliminée, les hautes
-de 16 à 10. Tests 514 → **625 verts**. TSC 0.
+de 16 à 10. Tests 514 → **625 verts**. TSC 0. Erreurs ESLint 48 → 43.
 
 ---
 
@@ -81,16 +82,38 @@ Si `rdv.upgradedbikes.com` est actif, vérifier qu'il ne sert plus `/api/custome
 
 ## Chantiers ouverts, avec leur justification
 
-### Les 48 erreurs ESLint (à trancher en premier)
-Les règles de Next 16 remontent 48 erreurs et 411 avertissements. **Ce ne sont pas des
-régressions** : le code n'a pas changé, ESLint 8 avec le preset Next 13 ne les voyait pas.
-Pour l'essentiel des règles du React Compiler : 27 `setState` synchrones dans un effet
-(rendus en cascade), 13 accès à une variable avant déclaration, 4 fonctions impures
-pendant le rendu. Répartis sur 35 fichiers, 3 au maximum par fichier.
+### Les 43 erreurs ESLint restantes (à trancher en premier)
+Les règles de Next 16 remontaient 48 erreurs. **Ce ne sont pas des régressions** : le code
+n'a pas changé, ESLint 8 avec le preset Next 13 ne les voyait pas.
+
+**Corrigées (5)** : les 13 accès en zone morte temporelle — un effet appelant une fonction
+déclarée plus bas — sont tous réglés, ainsi qu'une corruption d'encodage. Motif appliqué :
+`useCallback` + effet déplacé après la fonction + référence dans les dépendances.
+
+**Restantes (43)**, toutes de la même famille : `setState` appelé dans un effet. La règle
+vise le chargement de données au montage, motif React standard. **Ce n'est pas une
+correction mécanique** — deux voies possibles, à trancher :
+
+1. **Migrer ces chargements vers TanStack Query**, déjà installé et utilisé ailleurs dans
+   le projet. Correction de fond, mais touche une trentaine de composants et demande sa
+   propre campagne de tests.
+2. **Désactiver la règle localement** là où le motif est légitime, avec un commentaire
+   justifiant chaque cas. Honnête et rapide, mais laisse le signal en place.
 
 **La CI `ci-tests.yml` est rouge** : elle lance `lint:ci --max-warnings=0`. Le seuil n'a
-pas été relâché pour masquer le problème. Corriger touche à la logique de rendu et demande
-sa propre campagne de validation.
+pas été relâché pour masquer le problème.
+
+### Encodage des caractères français — vigilance permanente
+Une précédente réparation ESLint avait corrompu des accents (UTF-8 relu en cp1252 :
+« é » devenu « Ã© »). Un fichier était encore atteint et a été réparé —
+`api/catalog/items/from-supplier/route.ts`, où la comparaison `includes('équipement')`
+portait sur une chaîne corrompue et ne pouvait donc pas fonctionner.
+
+**Règle à respecter** : tout script qui modifie des fichiers source doit lire *et* écrire
+en UTF-8 explicite (`io.open(p, encoding='utf-8')`), sinon Python sous Windows écrit en
+cp1252 et casse les accents. Un contrôle est à repasser après chaque lot de modifications :
+il vérifie la validité UTF-8 et cherche les séquences de mojibake sur les 513 fichiers
+source. Le script vit dans le scratchpad de session ; il est court et se réécrit vite.
 
 ### Prisma 7 — délibérément reporté
 Trois faits : Prisma 6.18 n'a **aucune vulnérabilité** ; Prisma 7 impose l'adaptateur
