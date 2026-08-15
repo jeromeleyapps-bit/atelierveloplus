@@ -252,9 +252,96 @@ describe('Middleware', () => {
     });
   });
 
-  describe('Unprotected API routes', () => {
-    it('should allow access to routes not explicitly protected', async () => {
+  // Audit août 2026 : le middleware refuse désormais par défaut.
+  // Avant, une route absente des deux listes était laissée passer, et 12 routes se
+  // retrouvaient ouvertes sans contrôle (export FEC, devis, config Stripe, /api/debug/env).
+  // Une route oubliée doit être fermée, jamais ouverte.
+  describe('Refus par défaut (routes non listées)', () => {
+    const ancienEnv = process.env.NODE_ENV;
+    const ancienJeton = process.env.ELECTRON_AUTH_TOKEN;
+
+    afterEach(() => {
+      Object.defineProperty(process.env, 'NODE_ENV', { value: ancienEnv, configurable: true });
+      if (ancienJeton === undefined) delete process.env.ELECTRON_AUTH_TOKEN;
+      else process.env.ELECTRON_AUTH_TOKEN = ancienJeton;
+    });
+
+    it("vérifie l'identité sur une route qui n'est dans aucune liste", async () => {
+      mockGetUserFromToken.mockResolvedValue(null);
       const req = new NextRequest('http://localhost/api/some-unprotected-route');
+      await middleware(req);
+
+      // L'ancien comportement n'appelait même pas la vérification d'identité.
+      expect(mockGetUserFromToken).toHaveBeenCalled();
+    });
+
+    // Note : le refus « production sans jeton de session » existe dans le middleware mais
+    // n'est pas simulable ici, NODE_ENV étant figé à la transpilation. Le chemin réellement
+    // emprunté en production — jeton attendu, jeton fourni absent ou faux — est couvert
+    // par les deux cas ci-dessous.
+    it('refuse une route non listée quand le jeton de session Electron est faux', async () => {
+      mockGetUserFromToken.mockResolvedValue(null);
+      process.env.ELECTRON_AUTH_TOKEN = 'jeton-attendu';
+
+      const req = new NextRequest('http://localhost/api/exports/fec', {
+        headers: { 'x-electron-auth-token': 'mauvais-jeton' },
+      });
+      const res = await middleware(req);
+
+      expect(res.status).toBe(401);
+    });
+
+    it('refuse une route non listée quand le jeton de session Electron est absent', async () => {
+      mockGetUserFromToken.mockResolvedValue(null);
+      process.env.ELECTRON_AUTH_TOKEN = 'jeton-attendu';
+
+      const req = new NextRequest('http://localhost/api/integrations/stripe');
+      const res = await middleware(req);
+
+      expect(res.status).toBe(401);
+    });
+
+    it('laisse passer une route non listée avec une identité valide', async () => {
+      mockGetUserFromToken.mockResolvedValue({ userId: 'u1', email: 'a@b.fr', role: 'admin' });
+
+      const req = new NextRequest('http://localhost/api/exports/fec');
+      const res = await middleware(req);
+
+      expect(res.status).not.toBe(401);
+    });
+  });
+
+  // Ces routes portaient des données personnelles ou écrivaient en base, et étaient
+  // déclarées publiques. Elles ne doivent jamais y revenir.
+  describe('Routes refermées par l\'audit', () => {
+    const ancienJeton = process.env.ELECTRON_AUTH_TOKEN;
+
+    afterEach(() => {
+      if (ancienJeton === undefined) delete process.env.ELECTRON_AUTH_TOKEN;
+      else process.env.ELECTRON_AUTH_TOKEN = ancienJeton;
+    });
+
+    it.each([
+      ['/api/customers', 'fichier clients (RGPD)'],
+      ['/api/catalog/scan-bulk', 'import massif au catalogue'],
+      ['/api/catalog/import/supplier-csv-stream', 'import catalogue fournisseur'],
+      ['/api/admin/service-rates/import', 'écrasement des tarifs'],
+    ])('refuse %s sans identité (%s)', async (route) => {
+      mockGetUserFromToken.mockResolvedValue(null);
+      process.env.ELECTRON_AUTH_TOKEN = 'jeton-attendu';
+
+      const req = new NextRequest(`http://localhost${route}`);
+      const res = await middleware(req);
+
+      expect(res.status).toBe(401);
+    });
+  });
+
+  // /api/auth/me juge la validité du jeton : elle doit rester hors de l'injection
+  // d'identité locale, sinon un jeton périmé passerait pour valide.
+  describe('Validation du jeton de session', () => {
+    it('laisse /api/auth/me juger elle-même, sans injection Electron', async () => {
+      const req = new NextRequest('http://localhost/api/auth/me');
       const res = await middleware(req);
 
       expect(res.status).not.toBe(401);

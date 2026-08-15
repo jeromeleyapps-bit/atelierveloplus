@@ -3,20 +3,34 @@ import type { NextRequest } from 'next/server';
 import { getUserFromToken } from '@/lib/jwt';
 import { logger } from '@/lib/logger';
 
-// Routes API publiques (pas d'authentification requise)
+// Routes API publiques (pas d'authentification requise).
+//
+// ⚠️ Cette liste est la surface exposée à Internet dès qu'un atelier active la prise de
+// rendez-vous : le tunnel Cloudflare publie l'origine entière, pas seulement /rdv.
+// N'y ajouter QUE ce dont la page publique /rdv a besoin, et jamais rien qui écrive
+// ou qui renvoie des données personnelles.
+//
+// Audit août 2026 — retirés de cette liste :
+//   /api/customers                            renvoyait nom, email, téléphone et adresse
+//                                             de 200 clients sans authentification (RGPD).
+//                                             Utilisée uniquement par l'interface interne,
+//                                             qui passe par l'identité locale Electron.
+//   /api/catalog/import/supplier-csv-stream   écriture : import du catalogue fournisseur
+//   /api/catalog/scan-bulk                    écriture : import massif au catalogue
+//   /api/admin/service-rates/import           écriture : écrasement des tarifs
 const publicApiRoutes = [
   '/api/auth/login',
   '/api/auth/register',
   '/api/auth/logout',
+  // Validation du jeton de session : la route juge elle-même, strictement, sans repli
+  // Electron. Elle doit donc contourner l'injection d'identité locale du middleware,
+  // sinon un jeton périmé passerait pour valide et ne serait jamais purgé.
+  '/api/auth/me',
   '/api/calendar/availability',  // Disponibilités pour prise de RDV clients
   '/api/calendar/bookings',       // Réservations clients
   '/api/calendar/events',         // Événements calendrier (lecture seule)
   '/api/calendar/blocks',         // Blocs calendrier (lecture seule)
-  '/api/customers',               // Liste clients pour autocomplete
   '/api/catalog/barcode',         // Lookup code-barres uniquement (lecture seule)
-  '/api/catalog/import/supplier-csv-stream',  // Import CSV fournisseur (streaming)
-  '/api/catalog/scan-bulk',       // Import CSV scanner
-  '/api/admin/service-rates/import',  // Import CSV tarifs et prestations
 ];
 
 // Patterns de routes publiques (regex)
@@ -46,6 +60,9 @@ const protectedApiRoutes = [
   '/api/communications',
   '/api/simplybook',
   '/api/user',            // profil utilisateur (wizard d'onboarding)
+  '/api/customers',       // données personnelles clients (RGPD)
+  '/api/bikes',
+  '/api/tunnel',
 ];
 
 export async function middleware(request: NextRequest) {
@@ -90,49 +107,34 @@ export async function middleware(request: NextRequest) {
   if (isPublicApi) {
     return NextResponse.next();
   }
-  
+
   // 2. Vérifier les patterns publics (PDFs, emails, etc.)
   const matchesPublicPattern = publicPatterns.some(pattern => pattern.test(pathname));
   if (matchesPublicPattern) {
     return NextResponse.next();
   }
-  
-  // 3. Vérifier si c'est une API protégée
-  const isProtectedApi = protectedApiRoutes.some(route => pathname.startsWith(route));
-  const isAdminApi = pathname.startsWith('/api/admin');
-  
-  if (!isProtectedApi) {
-    // Ni publique, ni protégée explicitement -> laisser passer par défaut
-    return NextResponse.next();
-  }
 
-  // C'est une API protégée, vérifier l'authentification JWT
+  // 3. REFUS PAR DÉFAUT (audit août 2026).
+  //
+  // Auparavant, une route ne figurant dans aucune des deux listes était « laissée passer
+  // par défaut » : 12 routes se retrouvaient ainsi sans aucun contrôle, dont l'export FEC,
+  // les devis et la configuration Stripe. Oublier d'inscrire une nouvelle route dans la
+  // liste des routes protégées suffisait à l'ouvrir — c'est exactement ce qui est arrivé
+  // à /api/user/profile et à /api/customers.
+  //
+  // Désormais : tout ce qui n'est pas explicitement public exige une identité. Une route
+  // oubliée est fermée, jamais ouverte. La liste `protectedApiRoutes` ci-dessus ne sert
+  // plus qu'à documenter les grands domaines ; elle n'ouvre ni ne ferme plus rien.
+  const isAdminApi = pathname.startsWith('/api/admin');
+
   const user = await getUserFromToken(request);
   logger.info('[Proxy] getUserFromToken result', { result: user ? `User ${user.userId}` : 'null' });
 
-  // Pour toutes les APIs protégées en mode Electron local, créer un user admin fictif
-  // Pattern: Mode Electron = pas de JWT, mais besoin d'accès aux APIs internes
-  const needsElectronAuth = 
-    isAdminApi ||
-    pathname.startsWith('/api/account') ||
-    pathname.startsWith('/api/finance') ||
-    pathname.startsWith('/api/workshop') ||
-    pathname.startsWith('/api/workorders') ||
-    pathname.startsWith('/api/catalog') ||
-    pathname.startsWith('/api/suppliers') ||
-    pathname.startsWith('/api/booking') ||
-    pathname.startsWith('/api/cash-register') ||
-    pathname.startsWith('/api/stats') ||
-    pathname.startsWith('/api/service-rates') ||
-    pathname.startsWith('/api/metrics') ||
-    pathname.startsWith('/api/settings') ||
-    pathname.startsWith('/api/communications') ||
-    pathname.startsWith('/api/user') ||     // profil utilisateur (wizard d'onboarding)
-    pathname.startsWith('/api/bikes');  // Ajout bikes pour vente vélos
-  
-  if (!user && needsElectronAuth) {
-    // Mode Electron local: on auto-injecte un user admin SEULEMENT si la requête
-    // provient bien du process Electron (token de session vérifié).
+  if (!user) {
+    // Pas de JWT valide : seule une requête venant réellement du process Electron peut
+    // continuer. Elle doit porter le jeton de session que seul le process principal
+    // connaît. À défaut, la requête est refusée — y compris si elle arrive par le tunnel
+    // de prise de rendez-vous.
     // En dev pur (npm run dev sans Electron), ELECTRON_AUTH_TOKEN n'est pas défini :
     // on tolère l'auto-injection pour ne pas casser le workflow.
     const expectedToken = process.env.ELECTRON_AUTH_TOKEN;
@@ -160,13 +162,6 @@ export async function middleware(request: NextRequest) {
         headers: requestHeaders
       }
     });
-  }
-
-  if (!user) {
-    return NextResponse.json(
-      { error: 'unauthorized', message: 'Valid JWT token required' },
-      { status: 401 }
-    );
   }
 
   // Pour les routes admin API, vérifier le rôle (case-insensitive)
