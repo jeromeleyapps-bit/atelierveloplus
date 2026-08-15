@@ -284,8 +284,14 @@ function DashboardContent({ user }: { user: { id: string; email?: string; shopNa
   const [isLoadingNews, setIsLoadingNews] = useState(true);
 
   // Fonction pour charger les actualités vélo (stable avec useCallback)
+  // Le jeton est transmis comme pour les autres appels : depuis l'audit d'août 2026,
+  // le middleware refuse par défaut toute route non explicitement publique. Sans
+  // en-tête, cet appel repartait en 401 et la section restait vide sans message.
   const fetchBikeNews = useCallback(() => {
-    fetch('/api/news/bike-feeds')
+    const token = typeof window !== 'undefined' ? window.localStorage.getItem('jwt_token') : null;
+    fetch('/api/news/bike-feeds', {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    })
       .then(res => res.json())
       .then(data => {
         setBikeNews(data.items || []);
