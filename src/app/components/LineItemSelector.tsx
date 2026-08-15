@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -114,13 +114,10 @@ export default function LineItemSelector({
       customType: "service",
     });
     
-    // Charger les données
-    loadServiceRates();
-    loadCatalogItems();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Uniquement au montage
 
-  async function loadServiceRates() {
+  const loadServiceRates = useCallback(async () => {
     try {
       const token = localStorage.getItem("jwt_token");
       const response = await fetch("/api/service-rates?active=true", {
@@ -131,9 +128,9 @@ export default function LineItemSelector({
     } catch (error) {
       logger.error("Error loading service rates:", error);
     }
-  }
+  }, []);
 
-  async function loadCatalogItems() {
+  const loadCatalogItems = useCallback(async () => {
     try {
       const token = localStorage.getItem("jwt_token");
       const response = await fetch("/api/catalog/items", {
@@ -154,7 +151,14 @@ export default function LineItemSelector({
       logger.error("Error loading catalog items:", error);
       setCatalogItems([]);
     }
-  }
+  }, []);
+
+  // Chargement initial des données — déclaré après les deux fonctions, qui étaient
+  // auparavant référencées avant leur déclaration.
+  useEffect(() => {
+    loadServiceRates();
+    loadCatalogItems();
+  }, [loadServiceRates, loadCatalogItems]);
 
   function openDialog(type: "service" | "part" | "manual") {
     setDialogType(type);

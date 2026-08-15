@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -58,18 +58,6 @@ export default function CreateQuoteDialog({
     }
   }, [open]);
 
-  // Charger les tickets et clients au montage
-  useEffect(() => {
-    if (open) {
-      if (quoteType === "ticket") {
-        loadWorkOrders();
-      } else {
-        loadCustomers();
-      }
-      setLines([]); // Reset lines
-    }
-  }, [open, quoteType]);
-
   const handleAddLine = (line: LineItem) => {
     // Forcer TVA à 0 si auto-entrepreneur
     const vatRate = isAutoEntrepreneur ? 0 : line.vatRate;
@@ -86,7 +74,7 @@ export default function CreateQuoteDialog({
     setLines(lines.filter((_, i) => i !== index));
   };
 
-  const loadWorkOrders = async () => {
+  const loadWorkOrders = useCallback(async () => {
     setLoading(true);
     try {
       const data = await searchWorkOrders({});
@@ -96,9 +84,9 @@ export default function CreateQuoteDialog({
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const loadCustomers = async () => {
+  const loadCustomers = useCallback(async () => {
     setLoading(true);
     try {
       const data = await listCustomers();
@@ -108,7 +96,20 @@ export default function CreateQuoteDialog({
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  // Charger les tickets et clients au montage — declare apres les deux fonctions,
+  // qui etaient auparavant referencees avant leur declaration.
+  useEffect(() => {
+    if (open) {
+      if (quoteType === "ticket") {
+        loadWorkOrders();
+      } else {
+        loadCustomers();
+      }
+      setLines([]); // Reset lines
+    }
+  }, [open, quoteType, loadWorkOrders, loadCustomers]);
 
   const handleCreate = async () => {
     setCreating(true);

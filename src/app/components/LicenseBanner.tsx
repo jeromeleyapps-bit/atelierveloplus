@@ -10,7 +10,7 @@
  * - Lifetime: Jamais affiché
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 
@@ -37,21 +37,39 @@ interface LicenseInfo {
   daysUntilExpiry?: number;
 }
 
+// Fonction pure, sortie du composant : elle ne dépend d'aucun état et était
+// appelée avant sa déclaration depuis le chargement du statut.
+function determineShouldShow(info: LicenseInfo): boolean {
+  // Jamais afficher pour Lifetime
+  if (info.isLifetime) {
+    return false;
+  }
+
+  // Afficher si Trial actif
+  if (info.isTrial && info.status === 'active') {
+    return true;
+  }
+
+  // Afficher si en Grace period
+  if (info.status === 'grace') {
+    return true;
+  }
+
+  // Afficher si Basic/Pro expirant dans 30 jours
+  if (info.daysUntilExpiry !== undefined && info.daysUntilExpiry <= 30) {
+    return true;
+  }
+
+  return false;
+}
+
 export default function LicenseBanner() {
   const [show, setShow] = useState(false);
   const [license, setLicense] = useState<LicenseInfo | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchLicenseStatus();
-    
-    // Rafraîchir toutes les 2 minutes pour garder l'affichage à jour
-    const interval = setInterval(fetchLicenseStatus, 2 * 60 * 1000);
-    return () => clearInterval(interval);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- fetchLicenseStatus is stable (only uses state setters)
-  }, []);
 
-  async function fetchLicenseStatus() {
+  const fetchLicenseStatus = useCallback(async () => {
     try {
       const response = await fetch('/api/admin/license/status');
       if (!response.ok) {
@@ -71,31 +89,17 @@ export default function LicenseBanner() {
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
 
-  function determineShouldShow(info: LicenseInfo): boolean {
-    // Jamais afficher pour Lifetime
-    if (info.isLifetime) {
-      return false;
-    }
+  // Déclaré après fetchLicenseStatus : l'effet la référençait auparavant avant
+  // sa déclaration.
+  useEffect(() => {
+    fetchLicenseStatus();
 
-    // Afficher si Trial actif
-    if (info.isTrial && info.status === 'active') {
-      return true;
-    }
-
-    // Afficher si en Grace period
-    if (info.status === 'grace') {
-      return true;
-    }
-
-    // Afficher si Basic/Pro expirant dans 30 jours
-    if (info.daysUntilExpiry !== undefined && info.daysUntilExpiry <= 30) {
-      return true;
-    }
-
-    return false;
-  }
+    // Rafraîchir toutes les 2 minutes pour garder l'affichage à jour
+    const interval = setInterval(fetchLicenseStatus, 2 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [fetchLicenseStatus]);
 
   function getBannerConfig() {
     if (!license) return null;

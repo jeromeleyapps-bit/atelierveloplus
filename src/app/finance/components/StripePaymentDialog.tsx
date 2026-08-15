@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
@@ -37,21 +37,7 @@ export default function StripePaymentDialog({ open, invoiceId, invoiceNumber, cu
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (open && !link) {
-      generate();
-    }
-    if (!open) {
-      // Reset à la fermeture
-      setLink(null);
-      setStatus(null);
-      setError(null);
-      setInfo(null);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
-
-  async function generate() {
+  const generate = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -73,7 +59,22 @@ export default function StripePaymentDialog({ open, invoiceId, invoiceNumber, cu
     } finally {
       setLoading(false);
     }
-  }
+  }, [invoiceId]);
+
+  // Declare apres generate, qui etait auparavant referencee avant sa declaration.
+  useEffect(() => {
+    if (open && !link) {
+      generate();
+    }
+    if (!open) {
+      // Reset à la fermeture
+      setLink(null);
+      setStatus(null);
+      setError(null);
+      setInfo(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   async function copyLink() {
     if (!link) return;

@@ -5,7 +5,7 @@
 
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Badge from '@mui/material/Badge';
 import IconButton from '@mui/material/IconButton';
 import Popover from '@mui/material/Popover';
@@ -37,14 +37,7 @@ export default function NotificationCenter() {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
-  useEffect(() => {
-    loadNotifications();
-    // Recharger toutes les 5 minutes
-    const interval = setInterval(loadNotifications, 5 * 60 * 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  async function loadNotifications() {
+  const loadNotifications = useCallback(async () => {
     const notifs: Notification[] = [];
 
     try {
@@ -114,7 +107,16 @@ export default function NotificationCenter() {
     } catch (_e) {
       // Ignorer silencieusement
     }
-  }
+  }, []);
+
+  // Déclaré après loadNotifications : l'effet la référençait auparavant avant
+  // sa déclaration.
+  useEffect(() => {
+    loadNotifications();
+    // Recharger toutes les 5 minutes
+    const interval = setInterval(loadNotifications, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [loadNotifications]);
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);

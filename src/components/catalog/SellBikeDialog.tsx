@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
@@ -56,14 +56,7 @@ export default function SellBikeDialog({
   const [discount, setDiscount] = useState<number>(0);
   const [loadingCustomers, setLoadingCustomers] = useState(false);
 
-  // Charger liste clients
-  useEffect(() => {
-    if (open) {
-      loadCustomers();
-    }
-  }, [open]);
-
-  async function loadCustomers() {
+  const loadCustomers = useCallback(async () => {
     setLoadingCustomers(true);
     try {
       const response = await fetch('/api/customers');
@@ -76,7 +69,15 @@ export default function SellBikeDialog({
     } finally {
       setLoadingCustomers(false);
     }
-  }
+  }, []);
+
+  // Charger liste clients — déclaré après loadCustomers, qui était auparavant
+  // référencée avant sa déclaration.
+  useEffect(() => {
+    if (open) {
+      loadCustomers();
+    }
+  }, [open, loadCustomers]);
 
   function handleConfirm() {
     if (!selectedCustomer || !bike) return;

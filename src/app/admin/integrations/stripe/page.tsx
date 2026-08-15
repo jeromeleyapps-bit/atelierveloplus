@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Container from '@mui/material/Container';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
@@ -34,9 +34,7 @@ function StripeIntegrationContent() {
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
 
-  useEffect(() => { load(); }, []);
-
-  async function load() {
+  const load = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch('/api/integrations/stripe');
@@ -48,7 +46,10 @@ function StripeIntegrationContent() {
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
+
+  // Déclaré après load : l'effet référençait auparavant une fonction définie plus bas.
+  useEffect(() => { load(); }, [load]);
 
   async function save() {
     setError(null);

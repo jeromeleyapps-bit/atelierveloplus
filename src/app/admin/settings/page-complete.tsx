@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 
@@ -68,14 +68,8 @@ export default function AdminSettingsPage() {
   const [error, setError] = useState('');
   const [diagnosticsLoading, setDiagnosticsLoading] = useState(false);
 
-  // Charger les paramètres au montage
-  useEffect(() => {
-    loadSettings();
-    loadTunnelStatus();
-  }, []);
-
   // FONCTION: Charger tous les paramètres
-  const loadSettings = async () => {
+  const loadSettings = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch('/api/admin/system-settings');
@@ -112,10 +106,10 @@ export default function AdminSettingsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   // FONCTION: Charger status tunnel
-  const loadTunnelStatus = async () => {
+  const loadTunnelStatus = useCallback(async () => {
     try {
       const win = window as { electron?: { invoke: (channel: string, args?: unknown) => Promise<{ ok: boolean; running?: boolean; message?: string }> } };
       if (typeof window !== 'undefined' && win.electron) {
@@ -125,7 +119,14 @@ export default function AdminSettingsPage() {
     } catch (e) {
       logger.error('Erreur status tunnel:', e);
     }
-  };
+  }, []);
+
+  // Déclaré après les deux fonctions : l'effet les référençait auparavant avant
+  // leur déclaration.
+  useEffect(() => {
+    loadSettings();
+    loadTunnelStatus();
+  }, [loadSettings, loadTunnelStatus]);
 
   // FONCTION: Démarrer tunnel
   const handleStartTunnel = async () => {

@@ -4,7 +4,7 @@
 import { useCashRegisterData } from '@/hooks/useCashRegisterData';
 import { useCashRegisterUI } from '@/hooks/useCashRegisterUI';
 import { useCashRegisterMutations } from '@/hooks/useCashRegisterMutations';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { listCustomers, type Customer } from '@/lib/api';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -58,14 +58,7 @@ export default function CashRegisterPage() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loadingCustomers, setLoadingCustomers] = useState(false);
 
-  // Charger clients à l'ouverture du dialog
-  useEffect(() => {
-    if (registerUI.open) {
-      loadCustomers();
-    }
-  }, [registerUI.open]);
-
-  async function loadCustomers() {
+  const loadCustomers = useCallback(async () => {
     setLoadingCustomers(true);
     try {
       const data = await listCustomers();
@@ -75,7 +68,15 @@ export default function CashRegisterPage() {
     } finally {
       setLoadingCustomers(false);
     }
-  }
+  }, []);
+
+  // Charger clients à l'ouverture du dialog — déclaré après loadCustomers, qui
+  // était auparavant référencée avant sa déclaration.
+  useEffect(() => {
+    if (registerUI.open) {
+      loadCustomers();
+    }
+  }, [registerUI.open, loadCustomers]);
 
   // Alias locaux
   const entries = registerData.entries;
