@@ -1,111 +1,142 @@
 # Atelier Vélo+ — Reprendre ici
 
-> Point de reprise unique. Mis à jour le **15 août 2026**.
-> Remplace `ETAT-PROJET-01JUIN2026.md` (toujours valable pour la carte d'infrastructure détaillée).
+> Point de reprise unique. Mis à jour le **15 août 2026** (fin de session d'assainissement).
+> Compléments : `AUDIT-STACK-AOUT2026.md` (audit technique), `ETAT-PROJET-01JUIN2026.md`
+> (carte d'infrastructure : comptes Cloudflare, workers, R2, Stripe).
 
 ---
 
 ## En une phrase
 
-**Le code est en avance de deux versions sur ce que voient les clients.** Tout le travail de
-juin (V2 + version 1.2.0) et de juillet (freemium) est terminé, testé et commité localement,
-mais **rien n'a été publié** : le site et l'installateur en ligne datent de fin mai (v1.1.0).
+Le socle technique vient d'être assaini de fond en comble — sécurité, fins de vie,
+framework — mais **rien n'est encore publié** : le site et l'installateur en ligne datent
+toujours de fin mai (v1.1.0). La prochaine étape est la construction et la publication
+de la 1.2.1.
 
 ---
 
-## Le décalage exact
+## Ce qui a été fait le 15 août 2026
 
-| Élément | En local (à jour) | En ligne (ce que voit un client) |
-|---|---|---|
-| Code source | 172 commits, freemium inclus, 529 tests verts | — |
-| Dépôt GitHub | **jamais poussé depuis v1.1.0** ⚠️ | `origin/macOS` = v1.1.0 |
-| Installateur | `dist-electron/…1.2.0-win-x64.exe` (1er juin, **sans freemium**) | v1.1.0 sur downloads.upgradedbikes.com |
-| Page tarifs | 4 formules dont Gratuit | 3 formules, annonce « Version 1.1.0 » |
+### Correctifs bloquants
+- **Wizard de première configuration** : ne terminait pas. Un jeton de session périmé
+  (624 « signature verification failed » dans les journaux) faisait échouer la première
+  requête sur `/api/user/profile`, seule route du flux absente des routes protégées, et
+  l'erreur s'affichait hors du champ de vision. Corrigé sur les trois points.
+  **Ce défaut bloque tout nouvel utilisateur dans la version actuellement en ligne.**
 
-**Conséquence commerciale** : la version gratuite qui doit amorcer les ventes n'existe pour
-personne. Un visiteur voit encore « essai 14 jours puis il faut payer ».
+### Sécurité (S1–S2)
+- `/api/customers` était **publique** : nom, email, téléphone et adresse de 200 clients
+  accessibles sans authentification dès que le tunnel de prise de RDV publie l'origine.
+  Fermée, ainsi que trois routes d'import en écriture.
+- Supprimé `/api/debug/env` (exposait `DATABASE_URL` et scannait le disque) et
+  `/api/test-invoice` (renvoyait toutes les factures) — reliquats livrés en production.
+- **Le proxy refuse désormais par défaut** : une route oubliée est fermée, jamais ouverte.
+  C'est ce défaut de conception qui avait ouvert `/api/customers` et `/api/user/profile`.
+- PDF financiers et catalogue (prix d'achat, marges, fournisseurs) retirés du public.
+
+### Dépendances et fins de vie (S3–S5)
+- `axios` supprimé : 29 avis de sécurité pour une chaîne de code entièrement morte.
+- 10 dépendances mortes retirées ; `undici` conservée (polyfills de test, malgré ce
+  qu'en dit `depcheck`).
+- **78 tests dormants réactivés** : ils étaient écrits pour Vitest, exclus de Jest, et
+  n'avaient jamais tourné depuis novembre 2025 — sur `crypto`, `jwt` et la tarification.
+- `electron-updater` (canal de mise à jour des clients), `nodemailer` 9, `bcryptjs` 3
+  (compatibilité des mots de passe existants vérifiée et figée par un test), `zod` 4.
+- **Node 20 → 22** (fin de vie en avril 2026) et **Electron 39 → 43** : les clients
+  recevaient un Chromium M142 non patché depuis mai, ils auront Chromium 150.
+
+### Framework (S6)
+- **Next.js 13.5 → 16.3.1** et **React 18 → 19**. Ferme CVE-2024-51479, non corrigeable
+  sur la branche 13. Convention `middleware` → `proxy`. Build en `--webpack` explicite
+  (Turbopack entre en conflit avec la configuration de minification).
+- **ESLint 8 (fin de vie) → 9** avec configuration plate.
+
+**Bilan** : vulnérabilités de production 61 → 35 paquets, la critique éliminée, les hautes
+de 16 à 10. Tests 514 → **625 verts**. TSC 0.
 
 ---
 
-## La séquence pour rattraper (dans cet ordre)
+## À faire maintenant
 
-### 1. Sauvegarder le travail — ✅ FAIT le 15 août 2026
-`refonte-2026` est poussée sur `origin`. Le push avait d'abord été refusé par GitHub Push
-Protection : une ancienne clé Resend (révoquée au Sprint 0) traînait en clair dans
-`docs/TODO-DEPLOIEMENT.md` depuis le 29 mai. L'historique a été réécrit avec `git filter-repo`
-pour la purger — **les identifiants de commit d'avant le 15 août ont donc changé**.
-
-Si un ancien clone de ce dépôt existe ailleurs, ne pas le fusionner : le recloner.
-
-### 1 bis. Wizard de première configuration — ✅ CORRIGÉ le 15 août 2026
-La version en ligne (1.1.0) bloquait sur la dernière étape du wizard : « Terminer » ne
-produisait rien. Un `jwt_token` périmé survivait dans les données Electron, et
-`/api/user/profile` — seule route du wizard absente des routes protégées du middleware —
-répondait 401 sans que l'erreur soit visible. Corrigé en trois points (route alignée +
-purge du jeton au démarrage via `/api/auth/me` + alerte près du bouton).
-
-**Ce correctif doit être dans le prochain build** : la version publiée aujourd'hui bloque
-tout nouvel utilisateur sur son premier écran.
-
-### 2. Publier la page tarifs (10 min)
-Elle est prête localement (colonne Gratuit + wording freemium). Compte Cloudflare **du domaine**
-(`967b3a3e…`), pas celui des workers.
-
-```bash
-cd pages-tarifs && wrangler deploy
-```
-(après `$env:CLOUDFLARE_API_TOKEN="<token du compte domaine>"`)
-
-### 3. Construire et publier l'application avec le freemium (1 h)
-Le build du 1er juin ne contient pas le freemium. Il faut en refaire un.
+### 1. Construire et publier la 1.2.1 — la priorité
+Tout est prêt. La version en ligne bloque ses nouveaux utilisateurs dès le premier écran.
 
 ```bash
 npm run build && npm run build:electron
-```
-Puis publier l'installateur (compte domaine) et le flux de mise à jour (compte workers) :
-```bash
 node scripts/publish-installer-r2.mjs
 ```
+Puis déployer la page tarifs (compte Cloudflare **du domaine**, `967b3a3e…`) :
+```bash
+cd pages-tarifs && wrangler deploy
+```
 
-### 4. Vérifier le tunnel de bout en bout (30 min)
-Installer le .exe publié sur une machine neuve ou une VM, vérifier que l'essai démarre, que la
-bascule en version gratuite fonctionne, et qu'un code d'activation prend bien.
+### 2. Tester sur une machine neuve
+Installer le `.exe` publié sur une VM : inscription, wizard complet, bascule en version
+gratuite, activation d'un code. C'est le seul maillon jamais retesté de bout en bout.
 
-### 5. Mesurer (2 h) — la question sans réponse depuis le lancement
-Aucune donnée sur les téléchargements. Worker `/download` qui compte dans D1 puis redirige
-vers R2, pour enfin savoir si le problème est l'absence de visiteurs ou l'absence de conversion.
+### 3. Vérifier ton propre tunnel
+Si `rdv.upgradedbikes.com` est actif, vérifier qu'il ne sert plus `/api/customers`.
 
 ---
 
-## Décisions en attente (ne bloquent pas la publication)
+## Chantiers ouverts, avec leur justification
 
-- **Licence payante expirée → blocage.** Avec le freemium, la logique cohérente serait de
-  retomber en version gratuite plutôt que de bloquer un ancien client. Politique commerciale
-  à trancher (`src/lib/license-manager.ts:1088`).
-- **`APP_PUBLIC_URL` du worker prod** : à vérifier dans le dashboard, doit pointer sur
-  `https://tarifs.upgradedbikes.com`.
-- **Signature de code** (SmartScreen « Éditeur inconnu ») : voir `plan-signature-code.md`.
-- **Taille de l'installateur** : 415 Mo, lourd pour un premier contact.
-- **`cle stripe.txt`** à la racine : clé en clair, à supprimer une fois sauvegardée ailleurs.
+### Les 48 erreurs ESLint (à trancher en premier)
+Les règles de Next 16 remontent 48 erreurs et 411 avertissements. **Ce ne sont pas des
+régressions** : le code n'a pas changé, ESLint 8 avec le preset Next 13 ne les voyait pas.
+Pour l'essentiel des règles du React Compiler : 27 `setState` synchrones dans un effet
+(rendus en cascade), 13 accès à une variable avant déclaration, 4 fonctions impures
+pendant le rendu. Répartis sur 35 fichiers, 3 au maximum par fichier.
+
+**La CI `ci-tests.yml` est rouge** : elle lance `lint:ci --max-warnings=0`. Le seuil n'a
+pas été relâché pour masquer le problème. Corriger touche à la logique de rendu et demande
+sa propre campagne de validation.
+
+### Prisma 7 — délibérément reporté
+Trois faits : Prisma 6.18 n'a **aucune vulnérabilité** ; Prisma 7 impose l'adaptateur
+natif `better-sqlite3`, alors que `electron-builder.config.yml` désactive explicitement
+la recompilation native (`npmRebuild: false`) *précisément à cause de better-sqlite3* ;
+et 173 fichiers importent `@prisma/client`. Le risque de casser un packaging déjà délicat
+(ASAR, standalone, ENAMETOOLONG) dépasse largement le bénéfice.
+
+### MUI 5 → 9 — délibérément reporté
+Quatre versions majeures sur 131 fichiers. MUI 5.18 n'est ni en fin de vie, ni vulnérable,
+et déclare React 19 dans ses peerDependencies : rien ne presse.
+
+### ESLint 10
+Bloqué par `@typescript-eslint` (8.67, dernière version) qui ne fournit pas encore
+l'interface attendue par ESLint 10. À reprendre quand l'écosystème suivra.
+
+### Reste de l'audit
+- **Secrets identiques dans toutes les installations** (`JWT_SECRET`, `ENCRYPTION_KEY`) :
+  à générer par installation au premier lancement. C'est une rotation de ces secrets qui
+  a produit le bug du wizard ; prévoir la purge des jetons devenus invalides (le mécanisme
+  existe désormais via `/api/auth/me`).
+- **Installateur de 396 Mo** : lourd pour un premier contact.
+- **Signature de code** : SmartScreen affiche encore « Éditeur inconnu ».
+- **Compteur de téléchargements** : toujours aucune donnée sur la diffusion réelle.
+- **`cle stripe.txt`** à la racine : clé en clair, à supprimer une fois sauvegardée.
+
+---
+
+## Points de vigilance
+
+- **108 appels `fetch` de l'interface n'envoient aucun en-tête.** Ils fonctionnent parce
+  qu'Electron injecte le jeton de session sur toutes les requêtes locales. Hors Electron,
+  ils échouent — c'est ce qui a fait apparaître un 401 sur les actualités du tableau de bord.
+- **`nvm use 22`** a changé la version de Node globalement : les autres projets de la
+  machine tournent aussi en Node 22 (réversible par `nvm use 20.18.0`).
+- **Deux comptes Cloudflare** : workers API = `6504582e…`, domaine/page/downloads = `967b3a3e…`.
+- **Prix Stripe immuables** : changer un prix = créer un nouveau `price_id`.
+- La page tarifs déployée est `pages-tarifs/index.html` (racine du dossier).
 
 ---
 
 ## Contexte légal (vérifié en juillet 2026, rien à faire côté logiciel)
 
-- L'obligation de « logiciel certifié » au 1er septembre 2026 **a été annulée** par la loi de
-  finances 2026 (art. 125) : l'attestation individuelle de l'éditeur redevient valable.
+- L'obligation de « logiciel certifié » au 1er septembre 2026 **a été annulée** par la loi
+  de finances 2026 (art. 125) : l'attestation individuelle de l'éditeur redevient valable.
 - Septembre 2026 = obligation de **réception** des factures électroniques, côté entreprise :
-  c'est une démarche administrative (s'enregistrer auprès d'une Plateforme Agréée), pas un
-  sujet logiciel.
+  démarche administrative (s'enregistrer auprès d'une Plateforme Agréée), pas un sujet logiciel.
 - La vraie échéance produit est **septembre 2027** (émission Factur-X + e-reporting).
   Plan technique : `plan-V2-fiscalisation.md`.
-
----
-
-## Rappels qui font perdre du temps si on les oublie
-
-- **Deux comptes Cloudflare** : workers API = `6504582e…`, domaine/page/downloads = `967b3a3e…`.
-- **Cache Next** : le prebuild nettoie `.next/cache`, sinon les variables `NEXT_PUBLIC_*`
-  ne s'inlinent pas silencieusement.
-- **Prix Stripe immuables** : changer un prix = créer un nouveau `price_id`.
-- La page tarifs déployée est `pages-tarifs/index.html` (racine du dossier, pas de sous-dossier).
