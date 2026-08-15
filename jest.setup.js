@@ -21,6 +21,10 @@ if (typeof global.ReadableStream === 'undefined') {
 
 // Polyfills for Next.js Request/Response (required for API route tests)
 // Node 20+ has native fetch, but Jest/jsdom needs polyfills
+//
+// ⚠️ undici est une dépendance de test indispensable, même si les outils d'analyse
+// statique la signalent comme inutilisée : elle n'est référencée que dans ce fichier
+// de configuration, jamais dans src/. Ne pas la retirer sans exécuter la suite.
 try {
   const undici = require('undici');
   const { Request, Response, Headers } = undici;

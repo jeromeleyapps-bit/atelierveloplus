@@ -1,4 +1,9 @@
-import { describe, it, expect, beforeAll } from 'vitest'
+/**
+ * @jest-environment node
+ *
+ * jose s'appuie sur structuredClone et sur la Web Crypto API, absents de jsdom.
+ * Ce module est de toute façon serveur : il se teste en environnement node.
+ */
 import { generateToken, verifyToken, type JWTPayload } from '../jwt'
 
 describe('jwt', () => {

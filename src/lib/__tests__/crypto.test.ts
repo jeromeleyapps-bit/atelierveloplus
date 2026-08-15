@@ -1,4 +1,3 @@
-import { describe, it, expect, beforeAll } from 'vitest'
 import { encrypt, decrypt } from '../crypto'
 
 describe('crypto', () => {
@@ -70,13 +69,9 @@ describe('crypto', () => {
     })
 
     it('should throw on invalid ciphertext', () => {
-      // Format invalide doit throw
-      try {
-        decrypt('invalid-ciphertext')
-        expect.fail('Should have thrown')
-      } catch (error) {
-        expect(error).toBeDefined()
-      }
+      // expect.fail est une API Vitest, absente de Jest : on exprime la même
+      // intention avec toThrow, qui échoue aussi si rien n'est levé.
+      expect(() => decrypt('invalid-ciphertext')).toThrow()
     })
 
     it('should throw on tampered ciphertext', () => {

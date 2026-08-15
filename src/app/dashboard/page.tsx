@@ -556,9 +556,6 @@ function DashboardContent({ user }: { user: { id: string; email?: string; shopNa
           </ResponsiveContainer>
         </Box>
         <ResponsiveContainer>
-        {/* TEST INFRASTRUCTURE - Phase 3 - Decommente si besoin debug */}
-        {/* <TestInfrastructure /> */}
-        
         {/* Cartes de statistiques (responsive: 1/2/3/4/5 colonnes selon taille écran) */}
         <Box sx={{
           mb: 4,

@@ -1,21 +1,20 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { calculateLaborCost, formatDuration } from '../labor-pricing'
 
 // Mock Prisma
 const mockPrisma = {
   globalSetting: {
-    findUnique: vi.fn(),
+    findUnique: jest.fn(),
   },
 }
 
-vi.mock('../db', () => ({
-  getPrisma: vi.fn(() => mockPrisma),
+jest.mock('../db', () => ({
+  getPrisma: jest.fn(() => mockPrisma),
 }))
 
 describe('labor-pricing', () => {
   beforeEach(() => {
     // Reset tous les mocks avant chaque test
-    vi.clearAllMocks()
+    jest.clearAllMocks()
   })
 
   describe('calculateLaborCost', () => {

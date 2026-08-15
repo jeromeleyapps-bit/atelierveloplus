@@ -1,14 +1,13 @@
-import { describe, it, expect, vi } from 'vitest'
 import { getUserId, getUserIdOrFirst, getIsAutoEntrepreneur, getUserSettings } from '../api-helpers'
 
 // Mock Prisma
-vi.mock('../db', () => ({
-  getPrisma: vi.fn(() => ({
+jest.mock('../db', () => ({
+  getPrisma: jest.fn(() => ({
     user: {
-      findFirst: vi.fn(),
+      findFirst: jest.fn(),
     },
     appSetting: {
-      findUnique: vi.fn(),
+      findUnique: jest.fn(),
     },
   })),
 }))
