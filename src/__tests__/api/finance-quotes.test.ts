@@ -6,20 +6,29 @@ import { calculateLaborCost } from '@/lib/labor-pricing';
 import { recomputeTotals } from '@/lib/invoice-totals';
 
 // Mock dependencies
+// Le client est expose par un accesseur : la route relit la valeur a chaque
+// appel, ce qui permet de simuler une base indisponible. Reassigner l'import
+// directement n'est plus possible avec le transpileur actuel.
+const mockClientPrisma: { valeur: unknown } = {
+  valeur: {
+      invoice: {
+        findMany: jest.fn(),
+        create: jest.fn(),
+        update: jest.fn(),
+        findUnique: jest.fn(),
+      },
+      workOrder: {
+        findUnique: jest.fn(),
+      },
+      workOrderLine: {
+        findMany: jest.fn(),
+      },
+    },
+};
+
 jest.mock('@/lib/prisma', () => ({
-  prisma: {
-    invoice: {
-      findMany: jest.fn(),
-      create: jest.fn(),
-      update: jest.fn(),
-      findUnique: jest.fn(),
-    },
-    workOrder: {
-      findUnique: jest.fn(),
-    },
-    workOrderLine: {
-      findMany: jest.fn(),
-    },
+  get prisma() {
+    return mockClientPrisma.valeur;
   },
 }));
 
@@ -63,8 +72,8 @@ describe('GET /api/finance/quotes', () => {
   });
 
   it('should return 503 if Prisma is not available', async () => {
-    const originalPrisma = prisma;
-    (prisma as any) = null;
+    const originalPrisma = mockClientPrisma.valeur;
+    mockClientPrisma.valeur = null;
 
     const req = createMockRequest('http://localhost:3000/api/finance/quotes') as any;
     const res = await GET(req);
@@ -73,7 +82,7 @@ describe('GET /api/finance/quotes', () => {
     expect(res.status).toBe(503);
     expect(data).toHaveProperty('error', 'Database unavailable');
 
-    (prisma as any) = originalPrisma;
+    mockClientPrisma.valeur = originalPrisma;
   });
 
   it('should return all quotes', async () => {
@@ -144,8 +153,8 @@ describe('POST /api/finance/quotes', () => {
   });
 
   it('should return 503 if Prisma is not available', async () => {
-    const originalPrisma = prisma;
-    (prisma as any) = null;
+    const originalPrisma = mockClientPrisma.valeur;
+    mockClientPrisma.valeur = null;
 
     const req = createMockRequest('http://localhost:3000/api/finance/quotes', {
       method: 'POST',
@@ -158,7 +167,7 @@ describe('POST /api/finance/quotes', () => {
     expect(res.status).toBe(503);
     expect(data).toHaveProperty('error', 'Database unavailable');
 
-    (prisma as any) = originalPrisma;
+    mockClientPrisma.valeur = originalPrisma;
   });
 
   it('should return 400 if workOrderId is missing', async () => {

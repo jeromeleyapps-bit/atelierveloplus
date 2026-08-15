@@ -3,12 +3,21 @@ import { prisma } from '@/lib/prisma';
 import { createMockRequest } from '../helpers/test-request';
 
 // Mock dependencies
-jest.mock('@/lib/prisma', () => ({
-  prisma: {
-    booking: {
-      findMany: jest.fn(),
-      create: jest.fn(),
+// Le client est expose par un accesseur : la route relit la valeur a chaque
+// appel, ce qui permet de simuler une base indisponible. Reassigner l'import
+// directement n'est plus possible avec le transpileur actuel.
+const mockClientPrisma: { valeur: unknown } = {
+  valeur: {
+      booking: {
+        findMany: jest.fn(),
+        create: jest.fn(),
+      },
     },
+};
+
+jest.mock('@/lib/prisma', () => ({
+  get prisma() {
+    return mockClientPrisma.valeur;
   },
 }));
 
@@ -55,8 +64,8 @@ describe('GET /api/calendar/bookings', () => {
   });
 
   it('should return 503 if Prisma is not available', async () => {
-    const originalPrisma = prisma;
-    (prisma as any) = null;
+    const originalPrisma = mockClientPrisma.valeur;
+    mockClientPrisma.valeur = null;
 
     const req = createMockRequest('http://localhost:3000/api/calendar/bookings') as any;
     const res = await GET(req);
@@ -65,7 +74,7 @@ describe('GET /api/calendar/bookings', () => {
     expect(res.status).toBe(503);
     expect(data).toHaveProperty('error', 'prisma_unavailable');
 
-    (prisma as any) = originalPrisma;
+    mockClientPrisma.valeur = originalPrisma;
   });
 
   it('should return all bookings', async () => {

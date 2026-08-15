@@ -4,11 +4,20 @@ import { createMockRequest } from '../helpers/test-request';
 import { searchCatalogLocal } from '@/lib/catalog';
 
 // Mock dependencies
-jest.mock('@/lib/prisma', () => ({
-  prisma: {
-    catalogItem: {
-      findMany: jest.fn(),
+// Le client est expose par un accesseur : la route relit la valeur a chaque
+// appel, ce qui permet de simuler une base indisponible. Reassigner l'import
+// directement n'est plus possible avec le transpileur actuel.
+const mockClientPrisma: { valeur: unknown } = {
+  valeur: {
+      catalogItem: {
+        findMany: jest.fn(),
+      },
     },
+};
+
+jest.mock('@/lib/prisma', () => ({
+  get prisma() {
+    return mockClientPrisma.valeur;
   },
 }));
 
@@ -130,8 +139,8 @@ describe('GET /api/catalog/search', () => {
   });
 
   it('should fallback to local search if Prisma unavailable', async () => {
-    const originalPrisma = prisma;
-    (prisma as any) = null;
+    const originalPrisma = mockClientPrisma.valeur;
+    mockClientPrisma.valeur = null;
     mockSearchCatalogLocal.mockReturnValue([{ id: '1', name: 'Local Item' }]);
 
     const req = createMockRequest('http://localhost:3000/api/catalog/search?q=test') as any;
@@ -142,7 +151,7 @@ describe('GET /api/catalog/search', () => {
     expect(mockSearchCatalogLocal).toHaveBeenCalled();
     expect(data).toBeDefined();
 
-    (prisma as any) = originalPrisma;
+    mockClientPrisma.valeur = originalPrisma;
   });
 
   it('should handle database errors gracefully', async () => {

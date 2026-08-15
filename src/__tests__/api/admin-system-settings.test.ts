@@ -5,14 +5,23 @@ import { getUserIdOrFirst } from '@/lib/api-helpers';
 import { getCache, setCache } from '@/lib/cache';
 
 // Mock dependencies
+// Le client est expose par un accesseur : la route relit la valeur a chaque
+// appel, ce qui permet de simuler une base indisponible. Reassigner l'import
+// directement n'est plus possible avec le transpileur actuel.
+const mockClientPrisma: { valeur: unknown } = {
+  valeur: {
+      user: {
+        findUnique: jest.fn(),
+      },
+      systemSettings: {
+        upsert: jest.fn(),
+      },
+    },
+};
+
 jest.mock('@/lib/prisma', () => ({
-  prisma: {
-    user: {
-      findUnique: jest.fn(),
-    },
-    systemSettings: {
-      upsert: jest.fn(),
-    },
+  get prisma() {
+    return mockClientPrisma.valeur;
   },
 }));
 
@@ -47,8 +56,8 @@ describe('GET /api/admin/system-settings', () => {
   });
 
   it('should return 503 if Prisma is not available', async () => {
-    const originalPrisma = prisma;
-    (prisma as any) = null;
+    const originalPrisma = mockClientPrisma.valeur;
+    mockClientPrisma.valeur = null;
 
     const req = createMockRequest('http://localhost:3000/api/admin/system-settings') as any;
     const res = await GET(req);
@@ -57,7 +66,7 @@ describe('GET /api/admin/system-settings', () => {
     expect(res.status).toBe(503);
     expect(data).toHaveProperty('error', 'database_unavailable');
 
-    (prisma as any) = originalPrisma;
+    mockClientPrisma.valeur = originalPrisma;
   });
 
   it('should return default settings when no user found', async () => {

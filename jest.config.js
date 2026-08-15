@@ -57,11 +57,8 @@ const customJestConfig = {
     '/dist-electron/',
     '/electron-resources/',
   ],
-  transformIgnorePatterns: [
-    // jose est publié en ESM pur : sans transpilation, tout test qui charge
-    // réellement src/lib/jwt.ts échoue sur « Unexpected token 'export' ».
-    'node_modules/(?!(date-fns|jose)/)',
-  ],
+  // transformIgnorePatterns : voir la fusion en bas de fichier. next/jest génère
+  // ses propres motifs et ignore ceux déclarés ici.
 }
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
@@ -75,11 +72,26 @@ const ESM_A_TRANSPILER = ['jose', 'date-fns'];
 
 module.exports = async () => {
   const config = await createJestConfig(customJestConfig)();
-  config.transformIgnorePatterns = (config.transformIgnorePatterns || []).map((motif) =>
-    motif === '/node_modules/' || motif === 'node_modules/'
-      ? `/node_modules/(?!(${ESM_A_TRANSPILER.join('|')})/)`
-      : motif
-  );
+
+  // next/jest produit des motifs de la forme « /node_modules/(?!(geist)/) ». Un fichier
+  // est ignoré dès qu'il correspond à UN motif : il ne suffit donc pas d'en ajouter un,
+  // il faut inscrire nos paquets dans les négations existantes. On le fait par détection
+  // de motif plutôt que par égalité de chaîne, pour survivre aux évolutions de next/jest.
+  const ajout = ESM_A_TRANSPILER.join('|');
+  config.transformIgnorePatterns = (config.transformIgnorePatterns || []).map((motif) => {
+    if (typeof motif !== 'string' || !motif.includes('node_modules')) return motif;
+    // Étend chaque négation « (?!(a|b)/) » ou « (?!(a|b)@) » avec nos paquets.
+    const etendu = motif.replace(
+      /\(\?!\(([^)]*)\)([/@])\)/g,
+      (_t, paquets, separateur) => `(?!(${paquets}|${ajout})${separateur})`
+    );
+    // Motif sans négation nommée (ex. « /node_modules/ ») : on en ajoute une.
+    if (etendu === motif && /^\/?node_modules\/$/.test(motif)) {
+      return `/node_modules/(?!(${ajout})/)`;
+    }
+    return etendu;
+  });
+
   return config;
 };
 
