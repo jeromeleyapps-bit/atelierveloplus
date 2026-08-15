@@ -103,10 +103,12 @@ describe('Validation Schemas', () => {
     });
 
     it('should handle empty errors', () => {
+      // Zod 4 : la liste des problèmes s'appelle `issues`. On ne construit qu'un
+      // objet minimal, d'où le passage explicite par unknown.
       const error = {
         name: 'ZodError',
-        errors: [],
-      } as z.ZodError;
+        issues: [],
+      } as unknown as z.ZodError;
 
       const formatted = formatZodError(error);
       expect(formatted).toBeDefined();

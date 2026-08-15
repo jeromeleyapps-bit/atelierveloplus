@@ -65,7 +65,8 @@ export function handleApiError(error: unknown, context?: string): NextResponse {
       {
         error: 'VALIDATION_ERROR',
         message: 'Données invalides',
-        ...(process.env.NODE_ENV !== 'production' ? { details: error.errors } : {}),
+        // Zod 4 : `issues` remplace `errors`.
+        ...(process.env.NODE_ENV !== 'production' ? { details: error.issues } : {}),
       },
       { status: 400 }
     );

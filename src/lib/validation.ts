@@ -64,7 +64,8 @@ export const SendCommunicationSchema = z.object({
   customerId: cuidSchema,
   workOrderId: cuidSchema.optional(),
   invoiceId: cuidSchema.optional(),
-  data: z.record(z.any()).optional(),
+  // Zod 4 exige un type de clé explicite pour z.record.
+  data: z.record(z.string(), z.any()).optional(),
 });
 
 // ============================================
@@ -141,5 +142,6 @@ export function safeValidate<T>(
  * Format Zod errors for API responses
  */
 export function formatZodError(error: z.ZodError): string {
-  return error.errors.map(err => `${err.path.join('.')}: ${err.message}`).join(', ');
+  // Zod 4 : la liste des problèmes s'appelle `issues` (anciennement `errors`).
+  return error.issues.map(err => `${err.path.join('.')}: ${err.message}`).join(', ');
 }
