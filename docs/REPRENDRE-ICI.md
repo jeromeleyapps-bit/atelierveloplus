@@ -37,6 +37,16 @@ pour la purger — **les identifiants de commit d'avant le 15 août ont donc cha
 
 Si un ancien clone de ce dépôt existe ailleurs, ne pas le fusionner : le recloner.
 
+### 1 bis. Wizard de première configuration — ✅ CORRIGÉ le 15 août 2026
+La version en ligne (1.1.0) bloquait sur la dernière étape du wizard : « Terminer » ne
+produisait rien. Un `jwt_token` périmé survivait dans les données Electron, et
+`/api/user/profile` — seule route du wizard absente des routes protégées du middleware —
+répondait 401 sans que l'erreur soit visible. Corrigé en trois points (route alignée +
+purge du jeton au démarrage via `/api/auth/me` + alerte près du bouton).
+
+**Ce correctif doit être dans le prochain build** : la version publiée aujourd'hui bloque
+tout nouvel utilisateur sur son premier écran.
+
 ### 2. Publier la page tarifs (10 min)
 Elle est prête localement (colonne Gratuit + wording freemium). Compte Cloudflare **du domaine**
 (`967b3a3e…`), pas celui des workers.
