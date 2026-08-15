@@ -29,12 +29,13 @@ personne. Un visiteur voit encore « essai 14 jours puis il faut payer ».
 
 ## La séquence pour rattraper (dans cet ordre)
 
-### 1. Sauvegarder le travail (15 min) — le plus urgent
-172 commits n'existent que sur ce disque. Aucune copie ailleurs.
+### 1. Sauvegarder le travail — ✅ FAIT le 15 août 2026
+`refonte-2026` est poussée sur `origin`. Le push avait d'abord été refusé par GitHub Push
+Protection : une ancienne clé Resend (révoquée au Sprint 0) traînait en clair dans
+`docs/TODO-DEPLOIEMENT.md` depuis le 29 mai. L'historique a été réécrit avec `git filter-repo`
+pour la purger — **les identifiants de commit d'avant le 15 août ont donc changé**.
 
-```bash
-git push -u origin refonte-2026
-```
+Si un ancien clone de ce dépôt existe ailleurs, ne pas le fusionner : le recloner.
 
 ### 2. Publier la page tarifs (10 min)
 Elle est prête localement (colonne Gratuit + wording freemium). Compte Cloudflare **du domaine**
